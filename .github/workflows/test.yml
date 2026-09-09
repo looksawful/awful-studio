@@ -1,0 +1,46 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+      - 'agent/**'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Project status
+        run: python tools/awful.py status
+      - name: Static tests
+        run: python -m unittest discover -s tests/static -p 'test_*.py'
+
+  blender-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Cache pinned Blender runtime
+        uses: actions/cache@v4
+        with:
+          path: |
+            .cache/blender
+            .runtime
+          key: awful-blender-${{ runner.os }}-${{ hashFiles('runtime/blender.lock') }}
+      - name: Bootstrap Blender 5.2.1
+        run: python tools/awful.py bootstrap
+      - name: Environment doctor
+        run: python tools/awful.py doctor
+      - name: Blender runtime smoke
+        run: python tools/awful.py test-runtime
