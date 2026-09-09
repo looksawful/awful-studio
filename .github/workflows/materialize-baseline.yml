@@ -5,7 +5,7 @@ on:
     branches:
       - agent/6-agent-runtime-foundation
     paths:
-      - .bootstrap/alpha-0.0.15.py.gz.b64
+      - '.bootstrap/alpha-0.0.15.part-*'
   workflow_dispatch:
 
 permissions:
@@ -21,7 +21,8 @@ jobs:
       - name: Decode exact baseline source
         run: |
           mkdir -p baseline
-          base64 --decode .bootstrap/alpha-0.0.15.py.gz.b64 > /tmp/alpha.py.gz
+          cat .bootstrap/alpha-0.0.15.part-* > /tmp/alpha.py.gz.b64
+          base64 --decode /tmp/alpha.py.gz.b64 > /tmp/alpha.py.gz
           gzip --decompress --stdout /tmp/alpha.py.gz > baseline/awful_studio_v4_2_gpu_perf.py
           echo "5d14513b699a0c0a0e693bba7c31111f264ac5988cf1abb85c7153f6a2e7e56b  baseline/awful_studio_v4_2_gpu_perf.py" | sha256sum --check --strict
           python -m py_compile baseline/awful_studio_v4_2_gpu_perf.py
