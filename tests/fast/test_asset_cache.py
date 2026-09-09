@@ -115,6 +115,14 @@ class AssetCacheTests(unittest.TestCase):
             self.assertTrue(self.asset_cache.fetch(ASSET_URL, self.path))
         urlopen.assert_not_called()
 
+    def test_failed_forced_refresh_preserves_previous_valid_cache(self):
+        payload = b'#?RADIANCE\nvalid hdr payload'
+        self._write_entry(payload)
+        with mock.patch.object(self.asset_cache.urllib.request, 'urlopen', side_effect=OSError('offline')):
+            self.assertFalse(self.asset_cache.fetch(ASSET_URL, self.path, force=True))
+        self.assertEqual(self.path.read_bytes(), payload)
+        self.assertTrue(self.asset_cache.read_valid(self.path, expected_url=ASSET_URL))
+
     def test_clear_preserves_payload_when_sidecar_is_not_valid_provenance(self):
         payload = b'#?RADIANCE\nuser payload'
         self._write_entry(payload, sha256='0' * 64)
