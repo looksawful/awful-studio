@@ -129,12 +129,11 @@ def prepare_repository(*, blender: str, package: Path, metadata_path: Path,
     if metadata.get('version') != manifest.get('version'):
         raise RuntimeError('Release metadata version does not match manifest')
 
-    output_dir.mkdir(parents=True, exist_ok=True)
-    for path in output_dir.iterdir():
-        if path.is_file() or path.is_symlink():
-            path.unlink()
-        elif path.is_dir():
-            shutil.rmtree(path)
+    if output_dir.exists():
+        if output_dir.is_symlink() or not output_dir.is_dir() or any(output_dir.iterdir()):
+            raise FileExistsError(f'Repository output must be a new or empty directory: {output_dir}')
+    else:
+        output_dir.mkdir(parents=True)
 
     staged_package = output_dir / package.name
     shutil.copy2(package, staged_package)
