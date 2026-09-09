@@ -127,6 +127,12 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Enforce owner-only license approval
+        if: inputs.license_approved && github.actor != github.repository_owner
+        shell: bash
+        run: |
+          echo 'license approval may only be asserted by the repository owner' >&2
+          exit 1
       - name: Download exact candidate
         uses: actions/download-artifact@v6
         with:
