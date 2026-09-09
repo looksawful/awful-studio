@@ -36,11 +36,12 @@ class State:
 
 
 class Scene:
-    def __init__(self, name, objects=(), collections=(), world=None):
+    def __init__(self, name, objects=(), collections=(), world=None, compositor=None):
         self.name = name
         self.objects = list(objects)
         self.collection = Collection(name + '_ROOT', collections)
         self.world = world
+        self.compositing_node_group = compositor
         self.awful_state = State()
 
 
@@ -129,17 +130,18 @@ class MigrationTests(unittest.TestCase):
         obj = managed(Object('CYC', data=mesh), 'CYC')
         child = managed(Collection('AWFUL_STUDIO'), 'ROOT')
         world = managed(Block('World'), 'WORLD')
-        scene = Scene('Target', [obj], [child], world)
+        compositor = managed(Block('Compositor'), 'COMPOSITOR')
+        scene = Scene('Target', [obj], [child], world, compositor)
         migrations = load_migrations([scene], scene)
 
         self.assertTrue(migrations.migrate(scene))
         oid = scene.awful_state.owner_id
         self.assertTrue(oid)
-        for block in (obj, mesh, material, child, world):
+        for block in (obj, mesh, material, child, world, compositor):
             self.assertEqual(block.get('awful_owner'), oid)
-        snapshot = [dict(block) for block in (obj, mesh, material, child, world)]
+        snapshot = [dict(block) for block in (obj, mesh, material, child, world, compositor)]
         self.assertFalse(migrations.migrate(scene))
-        self.assertEqual(snapshot, [dict(block) for block in (obj, mesh, material, child, world)])
+        self.assertEqual(snapshot, [dict(block) for block in (obj, mesh, material, child, world, compositor)])
 
 
 if __name__ == '__main__':
