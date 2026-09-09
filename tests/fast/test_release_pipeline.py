@@ -90,6 +90,27 @@ class ReleasePipelineTests(unittest.TestCase):
             self.assertEqual(first, path.read_bytes())
             self.assertEqual(json.loads(first), payload)
 
+    def test_repository_generation_refuses_nonempty_output_without_deleting_it(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = pathlib.Path(td)
+            package = root / 'awful_studio-0.0.16.zip'
+            package.write_bytes(b'exact-candidate')
+            digest = hashlib.sha256(package.read_bytes()).hexdigest()
+            metadata = root / 'release-metadata.json'
+            self.release.write_json(metadata, {
+                'version': '0.0.16',
+                'package': {'filename': package.name, 'sha256': digest},
+                'release_gate': {'publishable': True, 'reasons': []},
+            })
+            output = root / 'pages'
+            output.mkdir()
+            sentinel = output / 'do-not-delete.txt'
+            sentinel.write_text('keep me', encoding='utf-8')
+            with self.assertRaises(FileExistsError):
+                self.release.prepare_repository(
+                    blender='should-not-run', package=package, metadata_path=metadata, output_dir=output)
+            self.assertEqual(sentinel.read_text(encoding='utf-8'), 'keep me')
+
     def test_release_workflow_is_manual_and_does_not_deploy_pages(self):
         text = WORKFLOW.read_text(encoding='utf-8')
         self.assertIn('workflow_dispatch:', text)
