@@ -5,6 +5,7 @@ import bpy
 KEY = 'awful_owner'
 MANAGED = 'awful_managed'
 ROLE = 'awful_role'
+VERSION_KEY = 'awful_version'
 GROUPS = ('objects', 'collections', 'meshes', 'curves', 'cameras', 'lights',
           'materials', 'worlds', 'node_groups', 'actions', 'images')
 
@@ -17,31 +18,38 @@ def owned(block, scene):
     return bool(block and owner(scene) and block.get(MANAGED) and block.get(KEY) == owner(scene))
 
 
-def mark(block, role=''):
-    scene = bpy.context.scene
-    if not owner(scene):
+def mark(block, role='', scene=None):
+    scene = scene or getattr(bpy.context, 'scene', None)
+    if scene is None or not owner(scene):
         raise RuntimeError('Build or migrate a studio before creating AWFUL data')
     block[MANAGED] = True
     block[KEY] = owner(scene)
     block[ROLE] = role
-    block['awful_version'] = '0.0.16'
+    block[VERSION_KEY] = '0.0.16'
     return block
 
 
-def snapshot():
-    return {name: {b.as_pointer() for b in getattr(bpy.data, name)} for name in GROUPS}
+def detach(block):
+    """Transfer a retained managed datablock back to user ownership."""
+    for key in (MANAGED, KEY, ROLE, VERSION_KEY):
+        try:
+            if key in block:
+                del block[key]
+        except (TypeError, ReferenceError):
+            pass
+    return block
 
 
-def mark_generated(before):
-    for name in GROUPS:
-        for block in getattr(bpy.data, name):
-            if block.as_pointer() not in before[name]:
-                mark(block, block.get(ROLE, name.upper()))
-                tree = getattr(block, 'node_tree', None)
-                if tree:
-                    mark(tree, 'NODE_TREE')
-                    for node in tree.nodes:
-                        mark(node, node.name)
+def mark_generated_actions(scene):
+    """Adopt only animation actions reachable from objects already owned by this scene."""
+    for obj in scene.objects:
+        if not owned(obj, scene):
+            continue
+        for source in (obj, getattr(obj, 'data', None)):
+            animation = getattr(source, 'animation_data', None)
+            action = getattr(animation, 'action', None) if animation else None
+            if action and not owned(action, scene):
+                mark(action, 'ACTION', scene)
 
 
 def preflight(scene):
@@ -55,6 +63,12 @@ def preflight(scene):
         if other != scene and (objects.intersection(other.objects[:]) or
                               collections.intersection(other.collection.children_recursive)):
             raise RuntimeError('AWFUL data is linked to another scene; unlink it before rebuilding')
+    # Parenting is global object state. Removing a parent owned by this scene would
+    # mutate a child that lives only in another scene, even when the parent itself
+    # is not linked there. Refuse rather than silently altering foreign scene data.
+    scene_objects = set(scene.objects)
+    if any(obj not in scene_objects and obj.parent in objects for obj in bpy.data.objects):
+        raise RuntimeError('External scene object is parented to AWFUL data; detach it before rebuilding')
 
 
 def initialize(scene):
@@ -70,6 +84,14 @@ def initialize(scene):
         state.previous_camera = scene.camera
 
 
+def detach_retained(scene):
+    """User-referenced generated data survives cleanup without stale AWFUL ownership."""
+    for name in GROUPS[2:]:
+        for block in list(getattr(bpy.data, name)):
+            if owned(block, scene) and block.users > 0:
+                detach(block)
+
+
 def remove(scene):
     preflight(scene)
     # External objects nested inside managed collections must stay linked and visible.
@@ -81,7 +103,7 @@ def remove(scene):
         for child in list(col.children):
             if not owned(child, scene) and child.name not in scene.collection.children:
                 scene.collection.children.link(child)
-    for obj in list(bpy.data.objects):
+    for obj in list(scene.objects):
         if not owned(obj, scene) and obj.parent and owned(obj.parent, scene):
             world_matrix = obj.matrix_world.copy()
             obj.parent = None
@@ -109,5 +131,8 @@ def remove(scene):
                     count += 1
         if not count:
             break
+    # Any generated datablock deliberately retained because a user datablock still
+    # references it is no longer safe to treat as destructively managed by AWFUL.
+    detach_retained(scene)
     scene['awful_post_pipeline_enabled'] = False
     scene.awful_state.built = False
