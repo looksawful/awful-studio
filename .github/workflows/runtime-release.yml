@@ -1,0 +1,48 @@
+name: Publish Blender Runtime
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - runtime/blender.lock
+      - .github/workflows/runtime-release.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Read runtime lock
+        id: runtime
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import tomllib
+          from pathlib import Path
+          data = tomllib.loads(Path('runtime/blender.lock').read_text())
+          for key in ('version', 'archive', 'sha256', 'release_tag', 'official_url'):
+              print(f"{key}={data[key]}")
+          PY
+      - name: Download official Blender runtime
+        run: |
+          curl --fail --location --retry 3 --output "${{ steps.runtime.outputs.archive }}" "${{ steps.runtime.outputs.official_url }}"
+          echo "${{ steps.runtime.outputs.sha256 }}  ${{ steps.runtime.outputs.archive }}" | sha256sum --check --strict
+      - name: Create or update runtime release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.runtime.outputs.release_tag }}
+          ARCHIVE: ${{ steps.runtime.outputs.archive }}
+          VERSION: ${{ steps.runtime.outputs.version }}
+        run: |
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --title "AWFUL Blender Runtime $VERSION" --notes "Pinned unmodified Blender $VERSION Linux x64 development runtime for AWFUL STUDIO agents and CI. Upstream: Blender Foundation. See runtime/blender.lock for source URL and SHA-256."
+          fi
+          gh release upload "$TAG" "$ARCHIVE" --clobber
