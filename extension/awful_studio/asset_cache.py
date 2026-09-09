@@ -93,12 +93,19 @@ def fetch(url, path, force=False):
     sidecar_temp = sidecar.with_suffix(sidecar.suffix + '.part')
     if temp.is_symlink() or sidecar.is_symlink() or sidecar_temp.is_symlink():
         raise ValueError('Symlink cache files are not writable')
+    previous_sidecar = None
+    if cached_before:
+        try:
+            previous_sidecar = sidecar.read_bytes()
+        except OSError:
+            cached_before = False
     metadata = {
         'source_url': url,
         'license': LICENSE_ID,
         'license_url': LICENSE_URL,
         'status': 'downloading',
     }
+    sidecar_promoted = False
     try:
         request = urllib.request.Request(url, headers={'User-Agent': 'AWFUL-Studio/0.0.16'})
         with urllib.request.urlopen(request, timeout=30) as response, temp.open('wb') as output:
@@ -115,14 +122,23 @@ def fetch(url, path, force=False):
         metadata.update(status='ready', sha256=digest(temp), bytes=total)
         if not _write_metadata(sidecar_temp, metadata):
             raise OSError('Unable to write asset provenance metadata')
-        os.replace(temp, path)
         os.replace(sidecar_temp, sidecar)
+        sidecar_promoted = True
+        os.replace(temp, path)
         _LAST_ERROR = ''
         return True
     except (OSError, ValueError) as exc:
         _LAST_ERROR = str(exc)
         temp.unlink(missing_ok=True)
         sidecar_temp.unlink(missing_ok=True)
+        if sidecar_promoted:
+            if previous_sidecar is not None:
+                try:
+                    sidecar.write_bytes(previous_sidecar)
+                except OSError:
+                    pass
+            else:
+                sidecar.unlink(missing_ok=True)
         if not cached_before:
             metadata.update(status='error', error=_LAST_ERROR)
             _write_metadata(sidecar, metadata)
