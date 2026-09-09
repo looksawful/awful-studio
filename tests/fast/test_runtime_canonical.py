@@ -1,5 +1,6 @@
 import importlib.util
 import pathlib
+import re
 import tempfile
 import unittest
 
@@ -7,6 +8,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 TOOL = ROOT / 'tools' / 'awful.py'
 LOCK = ROOT / 'runtime' / 'blender.lock'
 WORKFLOW = ROOT / '.github' / 'workflows' / 'extension-ci.yml'
+VERIFY = ROOT / 'tools' / 'verify_extension.py'
 
 
 class RuntimeCanonicalContract(unittest.TestCase):
@@ -58,6 +60,12 @@ class RuntimeCanonicalContract(unittest.TestCase):
             text = evidence.read_text(encoding='utf-8')
             self.assertIn('5.2.1', text)
             self.assertIn('failed', text)
+
+    def test_blender_52_validate_uses_positional_source_path(self):
+        source = VERIFY.read_text(encoding='utf-8')
+        self.assertRegex(source, re.compile(r"'validate',\s*str\(source\)"))
+        validate_call = source.split("'validate'", 1)[1].split('subprocess.run', 1)[0]
+        self.assertNotIn("'--source-dir'", validate_call)
 
     def test_extension_ci_uses_only_canonical_runtime_entrypoint(self):
         workflow = WORKFLOW.read_text(encoding='utf-8')
