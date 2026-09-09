@@ -27,10 +27,12 @@ class RuntimeCanonicalContract(unittest.TestCase):
         self.assertNotIn('checksum_url', runtime)
 
     def test_bootstrap_uses_pinned_checksum_without_remote_checksum_lookup(self):
-        awful = self.load_tool()
+        self.load_tool()
         source = TOOL.read_text(encoding='utf-8')
         self.assertIn("runtime['sha256']", source)
-        self.assertNotIn('.sha256', source)
+        self.assertIn("runtime['official_url']", source)
+        self.assertNotIn('checksum_url', source)
+        self.assertNotIn('sha256_url', source)
 
     def test_bootstrap_failure_writes_evidence(self):
         awful = self.load_tool()
