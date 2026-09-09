@@ -1,0 +1,45 @@
+schema_version = "1.0"
+
+[[integration]]
+id = "blender-agent-studio"
+name = "Blender Agent Studio"
+upstream = "https://github.com/ifBars/blender-agent-studio"
+pinned_commit = "1f9e050b17ecbb9174c93a001bece7fdbe73f436"
+upstream_version = "0.6.2"
+status = "pilot"
+purpose = "Selective Blender validation, refinement, rendering/procedural workflow methods and bounded MCP evaluation"
+vendor_code = false
+notes = "Selected methods are being adapted locally. Full plugin and MCP are not installed or supported yet."
+
+[[integration]]
+id = "pytest-blender"
+name = "pytest-blender"
+upstream = "https://github.com/mondeja/pytest-blender"
+pinned_commit = ""
+upstream_version = ""
+status = "candidate"
+purpose = "Run pytest inside Blender for runtime coverage"
+vendor_code = false
+notes = "Pin exact version/commit only after Blender 5.2 compatibility verification."
+
+[[integration]]
+id = "flue"
+name = "Flue"
+upstream = "https://github.com/SFKislev/Flue"
+pinned_commit = ""
+upstream_version = ""
+status = "candidate"
+purpose = "Optional live Blender inspection and debugging bridge"
+vendor_code = false
+notes = "Developer bridge only; not canonical runtime test infrastructure."
+
+[[integration]]
+id = "blender-addon-tester"
+name = "blender-addon-tester"
+upstream = "https://github.com/nangtani/blender-addon-tester"
+pinned_commit = ""
+upstream_version = ""
+status = "reference"
+purpose = "Reference implementation for multi-version Blender add-on testing"
+vendor_code = false
+notes = "Do not adopt unless multi-version support becomes an explicit requirement."
