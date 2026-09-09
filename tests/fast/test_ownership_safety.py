@@ -23,6 +23,10 @@ class OwnershipSafetySourceTests(unittest.TestCase):
         args = [arg.arg for arg in mark.args.args]
         self.assertIn('scene', args)
 
+    def test_build_uses_explicit_scene_ownership_scope(self):
+        source = LIFECYCLE.read_text(encoding='utf-8')
+        self.assertIn('with ownership.for_scene(scene):', source)
+
     def test_remove_does_not_scan_all_objects_for_external_children(self):
         tree = ast.parse(OWNERSHIP.read_text(encoding='utf-8'))
         remove = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == 'remove')
