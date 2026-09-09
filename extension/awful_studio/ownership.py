@@ -1,4 +1,5 @@
 """Scene-scoped ownership. Names and semantic roles alone never grant ownership."""
+from contextlib import contextmanager
 import uuid
 import bpy
 
@@ -8,6 +9,7 @@ ROLE = 'awful_role'
 VERSION_KEY = 'awful_version'
 GROUPS = ('objects', 'collections', 'meshes', 'curves', 'cameras', 'lights',
           'materials', 'worlds', 'node_groups', 'actions', 'images')
+_MARK_SCENE = None
 
 
 def owner(scene):
@@ -18,8 +20,20 @@ def owned(block, scene):
     return bool(block and owner(scene) and block.get(MANAGED) and block.get(KEY) == owner(scene))
 
 
+@contextmanager
+def for_scene(scene):
+    """Bind legacy factory calls to one explicit scene for the duration of an operation."""
+    global _MARK_SCENE
+    previous = _MARK_SCENE
+    _MARK_SCENE = scene
+    try:
+        yield
+    finally:
+        _MARK_SCENE = previous
+
+
 def mark(block, role='', scene=None):
-    scene = scene or getattr(bpy.context, 'scene', None)
+    scene = scene or _MARK_SCENE or getattr(bpy.context, 'scene', None)
     if scene is None or not owner(scene):
         raise RuntimeError('Build or migrate a studio before creating AWFUL data')
     block[MANAGED] = True
