@@ -40,10 +40,10 @@ def run_build(context):
     scene = context.scene
     migrations.migration_path(scene.awful_state.schema_version)
     ownership.initialize(scene)
-    before = ownership.snapshot()
     started = time.perf_counter()
     try:
         legacy.build_studio(True)
+        ownership.mark_generated_actions(scene)
         scene.awful_state.schema_version = migrations.CURRENT_SCHEMA
         scene.awful_state.built = True
         scene.awful_state.last_error = ''
@@ -51,7 +51,6 @@ def run_build(context):
         scene.awful_state.last_error = str(exc)
         raise
     finally:
-        ownership.mark_generated(before)
         scene.awful_state.last_operation = f'build: {time.perf_counter()-started:.6f}s'
 
 
@@ -126,18 +125,15 @@ class AWFUL_OT_ResetSystem(bpy.types.Operator):
     def execute(self, context):
         scene = context.scene
         s = scene.awful_studio
-        before = ownership.snapshot()
-        try:
-            if self.system == 'LIGHTING':
-                legacy.apply_lighting_preset(scene, s.studio_light_preset, False, False)
-            elif self.system == 'CAMERA':
-                legacy.apply_camera_motion(scene, s.camera_motion)
-            elif self.system == 'PRODUCT':
-                legacy.apply_product_motion(scene, s.product_motion)
-            else:
-                legacy.apply_environment_preset(scene, s.world_preset, True)
-        finally:
-            ownership.mark_generated(before)
+        if self.system == 'LIGHTING':
+            legacy.apply_lighting_preset(scene, s.studio_light_preset, False, False)
+        elif self.system == 'CAMERA':
+            legacy.apply_camera_motion(scene, s.camera_motion)
+        elif self.system == 'PRODUCT':
+            legacy.apply_product_motion(scene, s.product_motion)
+        else:
+            legacy.apply_environment_preset(scene, s.world_preset, True)
+        ownership.mark_generated_actions(scene)
         return {'FINISHED'}
 
 
