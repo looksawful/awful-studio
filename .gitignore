@@ -1,0 +1,6 @@
+.runtime/
+.cache/
+dist/
+__pycache__/
+*.pyc
+*.blend1
