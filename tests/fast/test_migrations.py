@@ -97,6 +97,21 @@ class MigrationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             migrations.migration_path(True)
 
+    def test_future_schema_is_rejected_before_mutation(self):
+        mesh = managed(Block('Mesh'), 'CYC_MESH')
+        obj = managed(Object('CYC', data=mesh), 'CYC')
+        scene = Scene('Target', [obj])
+        scene.awful_state.schema_version = 999
+        migrations = load_migrations([scene], scene)
+
+        with self.assertRaises(ValueError):
+            migrations.migrate(scene)
+        self.assertEqual(scene.awful_state.schema_version, 999)
+        self.assertEqual(scene.awful_state.owner_id, '')
+        self.assertFalse(scene.awful_state.built)
+        self.assertNotIn('awful_owner', obj)
+        self.assertNotIn('awful_owner', mesh)
+
     def test_target_scene_does_not_depend_on_active_context(self):
         mesh = managed(Block('Mesh'), 'CYC_MESH')
         obj = managed(Object('CYC', data=mesh), 'CYC')
