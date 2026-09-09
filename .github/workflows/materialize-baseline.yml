@@ -1,0 +1,38 @@
+name: Materialize Alpha 0.0.15 Baseline
+
+on:
+  push:
+    branches:
+      - agent/6-agent-runtime-foundation
+    paths:
+      - .bootstrap/alpha-0.0.15.py.gz.b64
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - name: Decode exact baseline source
+        run: |
+          mkdir -p baseline
+          base64 --decode .bootstrap/alpha-0.0.15.py.gz.b64 > /tmp/alpha.py.gz
+          gzip --decompress --stdout /tmp/alpha.py.gz > baseline/awful_studio_v4_2_gpu_perf.py
+          echo "5d14513b699a0c0a0e693bba7c31111f264ac5988cf1abb85c7153f6a2e7e56b  baseline/awful_studio_v4_2_gpu_perf.py" | sha256sum --check --strict
+          python -m py_compile baseline/awful_studio_v4_2_gpu_perf.py
+      - name: Commit materialized baseline
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add baseline/awful_studio_v4_2_gpu_perf.py
+          if git diff --cached --quiet; then
+            echo "Baseline already materialized"
+            exit 0
+          fi
+          git commit -m "chore: materialize Alpha 0.0.15 baseline source"
+          git push origin "HEAD:${{ github.ref_name }}"
