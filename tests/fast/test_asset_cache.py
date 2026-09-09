@@ -20,6 +20,25 @@ class _Prefs:
     asset_cache_path = ''
 
 
+class _InterruptedResponse:
+    url = ASSET_URL
+
+    def __init__(self):
+        self.calls = 0
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        return False
+
+    def read(self, size):
+        self.calls += 1
+        if self.calls == 1:
+            return b'#?RADIANCE\npartial'
+        raise OSError('connection interrupted')
+
+
 class AssetCacheTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -101,6 +120,14 @@ class AssetCacheTests(unittest.TestCase):
         self._write_entry(payload, sha256='0' * 64)
         self.assertEqual(self.asset_cache.clear(), 0)
         self.assertTrue(self.path.exists())
+
+    def test_interrupted_download_cleans_partial_if_error_sidecar_write_fails(self):
+        temp = self.path.with_suffix(self.path.suffix + '.part')
+        with mock.patch.object(self.asset_cache.urllib.request, 'urlopen', return_value=_InterruptedResponse()), \
+             mock.patch.object(Path, 'write_text', side_effect=OSError('sidecar unwritable')):
+            self.assertFalse(self.asset_cache.fetch(ASSET_URL, self.path))
+        self.assertFalse(temp.exists())
+        self.assertFalse(self.path.exists())
 
     def test_network_gate_blocks_before_urlopen(self):
         sys.modules['bpy'].app.online_access = False
