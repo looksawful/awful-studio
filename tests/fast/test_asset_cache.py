@@ -39,6 +39,26 @@ class _InterruptedResponse:
         raise OSError('connection interrupted')
 
 
+class _CompleteResponse:
+    url = ASSET_URL
+
+    def __init__(self, payload):
+        self.payload = payload
+        self.sent = False
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        return False
+
+    def read(self, size):
+        if self.sent:
+            return b''
+        self.sent = True
+        return self.payload
+
+
 class AssetCacheTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -121,6 +141,26 @@ class AssetCacheTests(unittest.TestCase):
         with mock.patch.object(self.asset_cache.urllib.request, 'urlopen', side_effect=OSError('offline')):
             self.assertFalse(self.asset_cache.fetch(ASSET_URL, self.path, force=True))
         self.assertEqual(self.path.read_bytes(), payload)
+        self.assertTrue(self.asset_cache.read_valid(self.path, expected_url=ASSET_URL))
+
+    def test_forced_refresh_promotion_failure_restores_previous_valid_cache(self):
+        old_payload = b'#?RADIANCE\nold valid hdr payload'
+        new_payload = b'#?RADIANCE\nnew valid hdr payload'
+        self._write_entry(old_payload)
+        real_replace = self.asset_cache.os.replace
+        calls = 0
+
+        def fail_second_replace(src, dst):
+            nonlocal calls
+            calls += 1
+            if calls == 2:
+                raise OSError('metadata promotion failed')
+            return real_replace(src, dst)
+
+        with mock.patch.object(self.asset_cache.urllib.request, 'urlopen', return_value=_CompleteResponse(new_payload)), \
+             mock.patch.object(self.asset_cache.os, 'replace', side_effect=fail_second_replace):
+            self.assertFalse(self.asset_cache.fetch(ASSET_URL, self.path, force=True))
+        self.assertEqual(self.path.read_bytes(), old_payload)
         self.assertTrue(self.asset_cache.read_valid(self.path, expected_url=ASSET_URL))
 
     def test_clear_preserves_payload_when_sidecar_is_not_valid_provenance(self):
