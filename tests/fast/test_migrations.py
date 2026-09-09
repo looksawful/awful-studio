@@ -9,6 +9,8 @@ MIGRATIONS = ROOT / 'extension' / 'awful_studio' / 'migrations.py'
 
 
 class Block(dict):
+    __hash__ = object.__hash__
+
     def __init__(self, name, *, data=None, materials=()):
         super().__init__()
         self.name = name
