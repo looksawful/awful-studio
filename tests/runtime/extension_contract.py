@@ -96,6 +96,28 @@ def install(args):
     for i in range(3):
         check(f'rebuild {i}', measured('rebuild', bpy.ops.awful.rebuild_studio) == {'FINISHED'})
         check(f'rebuild {i} bounded datablocks', counts == freeze()['counts'])
+        generated_actions = [getattr(getattr(o, 'animation_data', None), 'action', None)
+                             for o in scene.objects if ext.ownership.owned(o, scene)]
+        generated_actions = [a for a in generated_actions if a]
+        check(f'rebuild {i} generated actions owned',
+              all(ext.ownership.owned(a, scene) for a in generated_actions))
+
+    # A foreign-scene-only child parented to an owned object must make destructive
+    # cleanup refuse the operation rather than silently mutate the other scene.
+    foreign_scene = bpy.data.scenes.new('ForeignScene')
+    foreign_child = bpy.data.objects.new('ForeignSceneChild', None)
+    foreign_scene.collection.objects.link(foreign_child)
+    foreign_parent = ext.legacy.REG.object('CYC')
+    foreign_child.parent = foreign_parent
+    foreign_matrix = foreign_child.matrix_world.copy()
+    check('cross-scene remove refused', bpy.ops.awful.remove_studio() == {'CANCELLED'})
+    check('foreign scene child parent preserved', foreign_child.parent == foreign_parent)
+    check('foreign scene child transform preserved',
+          all(abs(a-b) < 1e-5 for ra, rb in zip(foreign_child.matrix_world, foreign_matrix) for a,b in zip(ra,rb)))
+    foreign_child.parent = None
+    bpy.data.objects.remove(foreign_child, do_unlink=True)
+    bpy.data.scenes.remove(foreign_scene)
+
     # Unmanaged objects and nested collections inside owned containers must survive removal.
     child = bpy.data.objects.new('UserInsideAwful', None)
     ext.legacy.REG.collection('COL_PRODUCT').objects.link(child)
@@ -118,6 +140,8 @@ def install(args):
     shared.diffuse_color = (0.13, 0.24, 0.35, 1)
     check('rebuild shared material', bpy.ops.awful.rebuild_studio() == {'FINISHED'})
     check('shared generated material survives', shared.name in bpy.data.materials and abs(shared.diffuse_color[0] - 0.13) < 1e-6)
+    check('retained shared material transferred to user ownership',
+          not shared.get('awful_managed') and not shared.get('awful_owner'))
     check('world/cameras/lights', scene.world is not None and scene.camera is not None and len(bpy.data.lights) > 1)
     check('post off by default', not scene.get('awful_post_pipeline_enabled'))
     check('no eager volumes', not any(o.type == 'VOLUME' for o in scene.objects))
@@ -138,7 +162,8 @@ def install(args):
     check('remove studio', bpy.ops.awful.remove_studio() == {'FINISHED'})
     check('remove preserves user nested content', child.name in scene.objects and nested_obj.name in scene.objects)
     check('remove restores original world and camera', scene.world == original_world and scene.camera == original_camera)
-    # Orphan data intentionally retained for user material references is allowed.
+    check('retained shared material stays user-owned after remove',
+          shared.name in bpy.data.materials and not shared.get('awful_managed') and not shared.get('awful_owner'))
     check('remove clears managed scene objects', not any(ext.ownership.owned(o, scene) for o in scene.objects))
 
 
