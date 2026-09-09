@@ -1,7 +1,7 @@
 name: Extension QA
 on:
   push:
-    branches: [main, 'feature/**', 'agent/**']
+    branches: [main, 'feature/**']
   pull_request:
   workflow_dispatch:
 permissions:
