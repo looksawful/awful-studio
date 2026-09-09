@@ -8,6 +8,7 @@ import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 TOOL = ROOT / 'tools' / 'release_pipeline.py'
+WORKFLOW = ROOT / '.github' / 'workflows' / 'release-candidate.yml'
 
 
 def load_tool():
@@ -88,6 +89,22 @@ class ReleasePipelineTests(unittest.TestCase):
             self.release.write_json(path, payload)
             self.assertEqual(first, path.read_bytes())
             self.assertEqual(json.loads(first), payload)
+
+    def test_release_workflow_is_manual_and_does_not_deploy_pages(self):
+        text = WORKFLOW.read_text(encoding='utf-8')
+        self.assertIn('workflow_dispatch:', text)
+        self.assertIn('license_approved:', text)
+        self.assertNotIn('push:', text)
+        self.assertNotIn('actions/deploy-pages', text)
+        self.assertNotIn('pages: write', text)
+
+    def test_release_workflow_consumes_same_candidate_in_both_runtime_jobs(self):
+        text = WORKFLOW.read_text(encoding='utf-8')
+        self.assertIn('name: candidate-zip', text)
+        self.assertIn('needs: candidate', text)
+        self.assertIn('runtime-${{ matrix.platform }}', text)
+        self.assertIn('python tools/release_pipeline.py metadata', text)
+        self.assertIn('python tools/release_pipeline.py repository', text)
 
 
 if __name__ == '__main__':
