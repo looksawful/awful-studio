@@ -8,6 +8,7 @@ has been explicitly approved for that run.
 from __future__ import annotations
 
 import argparse
+import collections
 import hashlib
 import json
 from pathlib import Path
@@ -41,6 +42,14 @@ def _blender_52(version: str) -> bool:
 def evaluate_publish_gate(runtime_evidence: list[dict], *, expected_package: str,
                           expected_sha256: str, license_approved: bool) -> dict:
     reasons: list[str] = []
+    platform_counts = collections.Counter(entry.get('platform') for entry in runtime_evidence)
+    duplicates = sorted(
+        str(platform) for platform, count in platform_counts.items()
+        if platform is not None and count > 1
+    )
+    if duplicates:
+        reasons.append('duplicate runtime evidence for: ' + ', '.join(duplicates))
+
     by_platform = {entry.get('platform'): entry for entry in runtime_evidence}
 
     for platform in REQUIRED_PLATFORMS:
@@ -102,7 +111,7 @@ def write_json(path: Path, payload: dict) -> None:
 
 
 def validate_repository_index(index: dict, *, extension_id: str, version: str,
-                              package_name: str) -> dict:
+                              package_name: str, expected_sha256: str | None = None) -> dict:
     entries = [entry for entry in index.get('data', [])
                if entry.get('id') == extension_id and entry.get('version') == version]
     if len(entries) != 1:
@@ -111,6 +120,10 @@ def validate_repository_index(index: dict, *, extension_id: str, version: str,
     archive_url = str(entry.get('archive_url', ''))
     if Path(archive_url).name != package_name:
         raise ValueError('Repository index does not reference the exact candidate ZIP')
+    if expected_sha256 is not None:
+        expected_hash = f'sha256:{expected_sha256}'
+        if entry.get('archive_hash') != expected_hash:
+            raise ValueError('Repository index hash does not match the exact candidate ZIP')
     return entry
 
 
@@ -122,7 +135,8 @@ def prepare_repository(*, blender: str, package: Path, metadata_path: Path,
         raise RuntimeError('Release gate is closed: ' + '; '.join(reasons))
 
     expected = metadata.get('package', {})
-    if package.name != expected.get('filename') or sha256_file(package) != expected.get('sha256'):
+    actual_sha256 = sha256_file(package)
+    if package.name != expected.get('filename') or actual_sha256 != expected.get('sha256'):
         raise RuntimeError('Candidate ZIP does not match release metadata')
 
     manifest = read_manifest()
@@ -151,6 +165,7 @@ def prepare_repository(*, blender: str, package: Path, metadata_path: Path,
         extension_id=manifest['id'],
         version=manifest['version'],
         package_name=package.name,
+        expected_sha256=actual_sha256,
     )
     shutil.copy2(metadata_path, output_dir / 'release-metadata.json')
     return index_path
