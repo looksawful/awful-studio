@@ -39,6 +39,7 @@ def _scene_surface(scene, *, managed_only=False):
     for collection in scene.collection.children_recursive:
         add(collection)
     add(scene.world)
+    add(getattr(scene, 'compositing_node_group', None))
     return blocks
 
 
@@ -47,7 +48,7 @@ def _historical_surface(scene):
 
 
 def _validate_historical(scene, blocks):
-    if not blocks or not any(block in scene.objects for block in blocks):
+    if not blocks or not any(any(block is obj for obj in scene.objects) for block in blocks):
         raise ValueError('This file has no historical AWFUL studio to migrate')
     if scene.awful_state.owner_id:
         raise ValueError('Historical AWFUL schema already contains scene ownership metadata')
