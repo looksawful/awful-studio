@@ -43,6 +43,14 @@ def measured(name, function):
     return result
 
 
+def cancelled_operator(function):
+    """Normalize Blender's two Python forms of an operator reporting ERROR+CANCELLED."""
+    try:
+        return function()
+    except RuntimeError:
+        return {'CANCELLED'}
+
+
 def block_network():
     def blocked(*args, **kwargs):
         REPORT['network_attempts'] = REPORT.get('network_attempts', 0) + 1
@@ -102,6 +110,32 @@ def install(args):
         check(f'rebuild {i} generated actions owned',
               all(ext.ownership.owned(a, scene) for a in generated_actions))
 
+    # Semantic role strings are not authority. A foreign-scene object and an
+    # unmanaged current-scene object with colliding ROOM_* roles must not be changed
+    # by the current studio's visibility switch.
+    foreign_visibility_scene = bpy.data.scenes.new('ForeignVisibilityScene')
+    foreign_room = bpy.data.objects.new('ForeignRoomRoleCollision', None)
+    foreign_room['awful_role'] = 'ROOM_FOREIGN'
+    foreign_visibility_scene.collection.objects.link(foreign_room)
+    local_role_collision = bpy.data.objects.new('LocalRoomRoleCollision', None)
+    local_role_collision['awful_role'] = 'ROOM_USER'
+    scene.collection.objects.link(local_role_collision)
+    foreign_room.hide_render = False
+    foreign_room.hide_viewport = False
+    local_role_collision.hide_render = False
+    local_role_collision.hide_viewport = False
+    scene.awful_studio.reflective_room_enabled = False
+    ext.legacy.apply_room_visibility(scene)
+    check('room visibility ignores foreign role collision',
+          not foreign_room.hide_render and not foreign_room.hide_viewport)
+    check('room visibility ignores unmanaged local role collision',
+          not local_role_collision.hide_render and not local_role_collision.hide_viewport)
+    scene.awful_studio.reflective_room_enabled = True
+    ext.legacy.apply_room_visibility(scene)
+    bpy.data.objects.remove(foreign_room, do_unlink=True)
+    bpy.data.scenes.remove(foreign_visibility_scene)
+    bpy.data.objects.remove(local_role_collision, do_unlink=True)
+
     # A foreign-scene-only child parented to an owned object must make destructive
     # cleanup refuse the operation rather than silently mutate the other scene.
     foreign_scene = bpy.data.scenes.new('ForeignScene')
@@ -110,7 +144,7 @@ def install(args):
     foreign_parent = ext.legacy.REG.object('CYC')
     foreign_child.parent = foreign_parent
     foreign_matrix = foreign_child.matrix_world.copy()
-    check('cross-scene remove refused', bpy.ops.awful.remove_studio() == {'CANCELLED'})
+    check('cross-scene remove refused', cancelled_operator(bpy.ops.awful.remove_studio) == {'CANCELLED'})
     check('foreign scene child parent preserved', foreign_child.parent == foreign_parent)
     check('foreign scene child transform preserved',
           all(abs(a-b) < 1e-5 for ra, rb in zip(foreign_child.matrix_world, foreign_matrix) for a,b in zip(ra,rb)))
@@ -181,10 +215,7 @@ def reopen(args):
     # Unknown future schemas refuse changes.
     bpy.context.scene.awful_state.schema_version = 999
     before = freeze()
-    try:
-        result = bpy.ops.awful.rebuild_studio()
-    except RuntimeError:
-        result = {'CANCELLED'}
+    result = cancelled_operator(bpy.ops.awful.rebuild_studio)
     check('future schema rejected without mutation', result == {'CANCELLED'} and freeze() == before)
 
 

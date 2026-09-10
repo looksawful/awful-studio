@@ -45,6 +45,20 @@ class OwnershipSafetySourceTests(unittest.TestCase):
         source = OWNERSHIP.read_text(encoding='utf-8')
         self.assertIn('detach_retained', source)
 
+    def test_remove_cleans_owned_unlinked_collections(self):
+        tree = ast.parse(OWNERSHIP.read_text(encoding='utf-8'))
+        remove = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == 'remove')
+        text = ast.unparse(remove)
+        self.assertIn('bpy.data.collections', text)
+        self.assertIn('owned(c, scene)', text)
+
+    def test_registry_collection_lookup_includes_owned_unlinked_collections(self):
+        source = LIFECYCLE.read_text(encoding='utf-8')
+        self.assertIn('def _collection_for_scene_registry(', source)
+        self.assertIn('for c in bpy.data.collections', source)
+        self.assertIn('ownership.owned(c, scene)', source)
+        self.assertIn('legacy.StudioRegistry.collection = _collection_for_scene_registry', source)
+
 
 if __name__ == '__main__':
     unittest.main()

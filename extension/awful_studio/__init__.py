@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """AWFUL STUDIO Extension lifecycle. Import/register never read or mutate a scene."""
+import os
 import time
 import bpy
 from bpy.props import BoolProperty, StringProperty, IntProperty, PointerProperty, EnumProperty
@@ -8,6 +9,87 @@ from .core import legacy
 
 VERSION = (0, 0, 16)
 _registered = []
+
+# Legacy environment functions resolve ``load_image`` through their module globals.
+# Interpose only curated HDRI paths so stale/forged cache files cannot bypass the
+# Extension provenance gate. Other legacy image loads remain unchanged.
+_legacy_load_image_raw = getattr(legacy, '_awful_original_load_image', legacy.load_image)
+legacy._awful_original_load_image = _legacy_load_image_raw
+
+
+def _load_image_with_hdri_provenance(path, non_color=False):
+    candidate = os.path.normcase(os.path.abspath(bpy.path.abspath(path)))
+    for key, (_filename, url) in legacy.ASSET_URLS.items():
+        expected = os.path.normcase(os.path.abspath(bpy.path.abspath(legacy.hdri_asset_path(key))))
+        if candidate == expected:
+            if not asset_cache.read_valid(path, expected_url=url):
+                return None
+            break
+    return _legacy_load_image_raw(path, non_color)
+
+
+legacy.load_image = _load_image_with_hdri_provenance
+
+# Light-link receiver collections are valid Blender datablocks but intentionally do
+# not live in the visible scene collection tree. Resolve them by explicit AWFUL
+# ownership instead of visibility, otherwise every preset/rebuild can create another
+# hidden receiver collection.
+def _collection_for_scene_registry(self, role):
+    scene = getattr(bpy.context, 'scene', None)
+    if scene is None:
+        return None
+    return next((c for c in bpy.data.collections
+                 if ownership.owned(c, scene) and c.get(legacy.ROLE_KEY) == role), None)
+
+
+legacy.StudioRegistry.collection = _collection_for_scene_registry
+
+# Only a user root that actually contains measurable geometry is a mounted product.
+# Unmanaged empties or helpers nested in PRODUCT_CONTENT still survive ownership
+# cleanup, but they must not be fed into product metrics / Auto Fit during rebuild.
+def _has_measurable_geometry(root):
+    return any(obj.type in {'MESH', 'CURVE', 'FONT', 'SURFACE', 'META'}
+               for obj in [root, *legacy.descendants(root)])
+
+
+def _collect_external_mounted_roots_measurable():
+    content = legacy.REG.object('PRODUCT_CONTENT')
+    if not content:
+        return []
+    return [child for child in list(content.children)
+            if not legacy.is_managed(child) and _has_measurable_geometry(child)]
+
+
+legacy.collect_external_mounted_roots = _collect_external_mounted_roots_measurable
+
+# Semantic role labels are descriptive metadata, not permission to mutate a block.
+# Keep the legacy room-toggle behavior but restrict every mutation to data explicitly
+# owned by the supplied scene. This also protects another AWFUL scene with a distinct
+# owner id and user objects carrying colliding role strings.
+def _apply_room_visibility_owned(scene):
+    enabled = bool(scene.awful_studio.reflective_room_enabled)
+    for obj in scene.objects:
+        if not ownership.owned(obj, scene):
+            continue
+        role = obj.get(legacy.ROLE_KEY, '')
+        if role.startswith('ROOM_') or role == 'WINDOW_FRAME':
+            obj.hide_render = not enabled
+            obj.hide_viewport = not enabled
+    glass = next((obj for obj in scene.objects
+                  if ownership.owned(obj, scene) and obj.get(legacy.ROLE_KEY) == 'WINDOW_GLASS'), None)
+    if glass:
+        glass_enabled = enabled and bool(scene.awful_studio.window_glass_enabled)
+        glass.hide_render = not glass_enabled
+        glass.hide_viewport = not glass_enabled
+    portal = next((obj for obj in scene.objects
+                   if ownership.owned(obj, scene) and obj.get(legacy.ROLE_KEY) == 'WINDOW_PORTAL'), None)
+    if portal:
+        portal_enabled = enabled and bool(scene.awful_studio.natural_light_enabled)
+        portal.hide_render = not portal_enabled
+        portal.hide_viewport = not portal_enabled
+
+
+legacy.apply_room_visibility = _apply_room_visibility_owned
 
 
 class AWFUL_AddonPreferences(bpy.types.AddonPreferences):

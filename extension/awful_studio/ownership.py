@@ -72,7 +72,10 @@ def preflight(scene):
     if oid and any(s != scene and hasattr(s, 'awful_state') and owner(s) == oid for s in bpy.data.scenes):
         raise RuntimeError('AWFUL scene ownership is shared; make an independent studio before rebuilding')
     objects = {o for o in scene.objects if owned(o, scene)}
-    collections = {c for c in scene.collection.children_recursive if owned(c, scene)}
+    # Receiver/light-link collections are deliberately not part of the visible scene
+    # collection tree, but they are still owned by this scene and must participate in
+    # cross-scene safety checks and cleanup.
+    collections = {c for c in bpy.data.collections if owned(c, scene)}
     for other in bpy.data.scenes:
         if other != scene and (objects.intersection(other.objects[:]) or
                               collections.intersection(other.collection.children_recursive)):
@@ -108,9 +111,12 @@ def detach_retained(scene):
 
 def remove(scene):
     preflight(scene)
-    # External objects nested inside managed collections must stay linked and visible.
-    managed_cols = [c for c in scene.collection.children_recursive if owned(c, scene)]
-    for col in managed_cols:
+    # Only scene-linked managed collections need user-content preservation/relinking.
+    # Other owned collections, such as light-link receiver collections, are internal
+    # containers and are removed after their generated object references disappear.
+    linked_managed_cols = [c for c in scene.collection.children_recursive if owned(c, scene)]
+    all_managed_cols = [c for c in bpy.data.collections if owned(c, scene)]
+    for col in linked_managed_cols:
         for obj in list(col.objects):
             if not owned(obj, scene) and obj.name not in scene.collection.objects:
                 scene.collection.objects.link(obj)
@@ -132,7 +138,7 @@ def remove(scene):
     for obj in list(scene.objects):
         if owned(obj, scene):
             bpy.data.objects.remove(obj, do_unlink=True)
-    for col in managed_cols:
+    for col in all_managed_cols:
         bpy.data.collections.remove(col)
     # Multiple passes resolve dependency order (mesh -> material -> image, action).
     for _ in range(len(GROUPS)):
