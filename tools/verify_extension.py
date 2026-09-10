@@ -14,7 +14,7 @@ def verify(blender, output):
     output.mkdir(parents=True, exist_ok=True)
     source = ROOT / 'extension/awful_studio'
     subprocess.run([blender, '--background', '--factory-startup', '--command', 'extension',
-                    'validate', '--source-dir', str(source)], check=True)
+                    'validate', str(source)], check=True)
     subprocess.run([blender, '--background', '--factory-startup', '--command', 'extension',
                     'build', '--source-dir', str(source), '--output-dir', str(output)], check=True)
     package = output / 'awful_studio-0.0.16.zip'
