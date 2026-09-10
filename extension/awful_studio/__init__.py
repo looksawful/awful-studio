@@ -44,6 +44,24 @@ def _collection_for_scene_registry(self, role):
 
 legacy.StudioRegistry.collection = _collection_for_scene_registry
 
+# Only a user root that actually contains measurable geometry is a mounted product.
+# Unmanaged empties or helpers nested in PRODUCT_CONTENT still survive ownership
+# cleanup, but they must not be fed into product metrics / Auto Fit during rebuild.
+def _has_measurable_geometry(root):
+    return any(obj.type in {'MESH', 'CURVE', 'FONT', 'SURFACE', 'META'}
+               for obj in [root, *legacy.descendants(root)])
+
+
+def _collect_external_mounted_roots_measurable():
+    content = legacy.REG.object('PRODUCT_CONTENT')
+    if not content:
+        return []
+    return [child for child in list(content.children)
+            if not legacy.is_managed(child) and _has_measurable_geometry(child)]
+
+
+legacy.collect_external_mounted_roots = _collect_external_mounted_roots_measurable
+
 
 class AWFUL_AddonPreferences(bpy.types.AddonPreferences):
     bl_idname = __package__
