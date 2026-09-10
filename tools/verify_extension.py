@@ -22,9 +22,13 @@ def verify(blender, output):
         raise FileNotFoundError('Official build did not create the expected package')
     with tempfile.TemporaryDirectory(prefix='awful-runtime-') as temporary:
         work = Path(temporary)
-        env = dict(os.environ, BLENDER_USER_CONFIG=str(work/'config'),
-                   BLENDER_USER_SCRIPTS=str(work/'scripts'), BLENDER_USER_DATAFILES=str(work/'datafiles'),
-                   BLENDER_USER_EXTENSIONS=str(work/'extensions'))
+        user_resources = work / 'user-resources'
+        user_resources.mkdir()
+        # Blender 5.2 uses BLENDER_USER_RESOURCES as the supported override for
+        # preferences, scripts, extensions and other per-user state. Keeping the
+        # whole runtime profile under the temporary work directory prevents QA
+        # from touching the developer's real Blender profile.
+        env = dict(os.environ, BLENDER_USER_RESOURCES=str(user_resources))
         (work/'installed').mkdir()
         try:
             for phase in ('historical', 'install', 'reopen', 'migrate'):
