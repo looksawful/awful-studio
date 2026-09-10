@@ -30,15 +30,34 @@ def _scene_surface(scene, *, managed_only=False):
             return
         _append_identity_unique(blocks, block)
 
+    def add_reachable_action(source):
+        if source is None:
+            return
+        animation = getattr(source, 'animation_data', None)
+        action = getattr(animation, 'action', None) if animation else None
+        if action is None:
+            return
+        # Historical 0.0.15 actions created by keyframe_insert were not tagged even
+        # though their owner object/data was. Treat only actions reachable from an
+        # explicitly managed historical source as part of that source's migration.
+        if managed_only:
+            if source.get(ownership.MANAGED):
+                _append_identity_unique(blocks, action)
+        else:
+            _append_identity_unique(blocks, action)
+
     for obj in scene.objects:
         add(obj)
         data = getattr(obj, 'data', None)
         add(data)
+        add_reachable_action(obj)
+        add_reachable_action(data)
         for material in getattr(data, 'materials', ()) if data is not None else ():
             add(material)
     for collection in scene.collection.children_recursive:
         add(collection)
     add(scene.world)
+    add_reachable_action(scene.world)
     add(getattr(scene, 'compositing_node_group', None))
     return blocks
 

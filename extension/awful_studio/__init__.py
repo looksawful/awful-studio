@@ -1,7 +1,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """AWFUL STUDIO Extension lifecycle. Import/register never read or mutate a scene."""
 import os
+import re
 import time
+import uuid
 import bpy
 from bpy.props import BoolProperty, StringProperty, IntProperty, PointerProperty, EnumProperty
 from . import ownership, migrations, asset_cache
@@ -137,6 +139,98 @@ def run_build(context):
         scene.awful_state.last_operation = f'build: {time.perf_counter()-started:.6f}s'
 
 
+def _normalize_candidate_names(scene):
+    """Restore stable legacy names after the old owner has been removed."""
+    for group_name in ownership.GROUPS:
+        group = getattr(bpy.data, group_name)
+        for block in list(group):
+            if not ownership.owned(block, scene):
+                continue
+            match = re.match(r'^(.*)\.\d{3}$', block.name)
+            if match and group.get(match.group(1)) is None:
+                block.name = match.group(1)
+
+
+def _rebuild_with_rollback(context):
+    """Stage a replacement owner and commit only after the complete build validates."""
+    scene = context.scene
+    migrations.migration_path(scene.awful_state.schema_version)
+    ownership.preflight(scene)
+    old_owner = scene.awful_state.owner_id
+    if not old_owner:
+        raise RuntimeError('Rebuild requires an existing owned AWFUL Studio')
+
+    old_schema = scene.awful_state.schema_version
+    old_built = scene.awful_state.built
+    old_previous_world = scene.awful_state.previous_world
+    old_previous_camera = scene.awful_state.previous_camera
+    old_world = scene.world
+    old_camera = scene.camera
+    old_post = bool(scene.get('awful_post_pipeline_enabled', False))
+    preserved = legacy.collect_external_mounted_roots()
+    preserved_state = {obj: (obj.parent, obj.matrix_world.copy()) for obj in preserved}
+    candidate_owner = uuid.uuid4().hex
+    original_collect = legacy.collect_external_mounted_roots
+
+    try:
+        # While the candidate owner is active, legacy cleanup cannot see or delete
+        # the current studio. Explicitly feed it the old mounted user roots so the
+        # candidate is built against the same product rather than a diagnostic cube.
+        scene.awful_state.owner_id = candidate_owner
+        legacy.collect_external_mounted_roots = lambda: list(preserved)
+        with ownership.for_scene(scene):
+            legacy.build_studio(True)
+            ownership.mark_generated_actions(scene)
+            legacy.validate_built_scene(scene)
+        candidate_world = scene.world
+        candidate_camera = scene.camera
+
+        # Commit: remove only the former owner after the candidate is complete.
+        scene.awful_state.owner_id = old_owner
+        ownership.remove(scene)
+        scene.awful_state.owner_id = candidate_owner
+        scene.awful_state.schema_version = migrations.CURRENT_SCHEMA
+        scene.awful_state.built = True
+        scene.awful_state.previous_world = old_previous_world
+        scene.awful_state.previous_camera = old_previous_camera
+        scene.world = candidate_world
+        scene.camera = candidate_camera
+        scene['awful_post_pipeline_enabled'] = False
+        _normalize_candidate_names(scene)
+        legacy.validate_built_scene(scene)
+    except Exception as exc:
+        error = str(exc)
+        rollback_error = None
+        try:
+            # Delete only candidate-owned partial data, then reattach the exact user
+            # roots and scene pointers to the untouched old owner.
+            scene.awful_state.owner_id = candidate_owner
+            ownership.remove(scene)
+        except Exception as cleanup_exc:
+            rollback_error = cleanup_exc
+        finally:
+            scene.awful_state.owner_id = old_owner
+            scene.awful_state.schema_version = old_schema
+            scene.awful_state.built = old_built
+            scene.awful_state.previous_world = old_previous_world
+            scene.awful_state.previous_camera = old_previous_camera
+            scene.world = old_world
+            scene.camera = old_camera
+            scene['awful_post_pipeline_enabled'] = old_post
+            for obj, (parent, matrix) in preserved_state.items():
+                try:
+                    obj.parent = parent
+                    obj.matrix_world = matrix
+                except ReferenceError:
+                    pass
+            bpy.context.view_layer.update()
+        if rollback_error is not None:
+            raise RuntimeError(f'{error}; staged rebuild rollback failed: {rollback_error}') from exc
+        raise RuntimeError(error) from exc
+    finally:
+        legacy.collect_external_mounted_roots = original_collect
+
+
 class AWFUL_OT_Build(bpy.types.Operator):
     bl_idname = 'awful.build_studio'
     bl_label = 'Build Studio'
@@ -166,7 +260,7 @@ class AWFUL_OT_Rebuild(bpy.types.Operator):
 
     def execute(self, context):
         try:
-            run_build(context)
+            _rebuild_with_rollback(context)
         except Exception as exc:
             self.report({'ERROR'}, str(exc))
             return {'CANCELLED'}
