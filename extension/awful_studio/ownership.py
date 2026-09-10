@@ -33,7 +33,7 @@ def for_scene(scene):
 
 
 def mark(block, role='', scene=None):
-    scene = scene or _MARK_SCENE or getattr(bpy.context, 'scene', None)
+    scene = scene or _MARK_SCENE
     if scene is None or not owner(scene):
         raise RuntimeError('Build or migrate a studio before creating AWFUL data')
     block[MANAGED] = True
