@@ -40,10 +40,11 @@ def run_build(context):
     scene = context.scene
     migrations.migration_path(scene.awful_state.schema_version)
     ownership.initialize(scene)
-    before = ownership.snapshot()
     started = time.perf_counter()
     try:
-        legacy.build_studio(True)
+        with ownership.for_scene(scene):
+            legacy.build_studio(True)
+            ownership.mark_generated_actions(scene)
         scene.awful_state.schema_version = migrations.CURRENT_SCHEMA
         scene.awful_state.built = True
         scene.awful_state.last_error = ''
@@ -51,7 +52,6 @@ def run_build(context):
         scene.awful_state.last_error = str(exc)
         raise
     finally:
-        ownership.mark_generated(before)
         scene.awful_state.last_operation = f'build: {time.perf_counter()-started:.6f}s'
 
 
@@ -126,8 +126,7 @@ class AWFUL_OT_ResetSystem(bpy.types.Operator):
     def execute(self, context):
         scene = context.scene
         s = scene.awful_studio
-        before = ownership.snapshot()
-        try:
+        with ownership.for_scene(scene):
             if self.system == 'LIGHTING':
                 legacy.apply_lighting_preset(scene, s.studio_light_preset, False, False)
             elif self.system == 'CAMERA':
@@ -136,8 +135,7 @@ class AWFUL_OT_ResetSystem(bpy.types.Operator):
                 legacy.apply_product_motion(scene, s.product_motion)
             else:
                 legacy.apply_environment_preset(scene, s.world_preset, True)
-        finally:
-            ownership.mark_generated(before)
+            ownership.mark_generated_actions(scene)
         return {'FINISHED'}
 
 
@@ -148,7 +146,8 @@ class AWFUL_OT_Migrate(bpy.types.Operator):
 
     def execute(self, context):
         try:
-            migrations.migrate(context.scene)
+            with ownership.for_scene(context.scene):
+                migrations.migrate(context.scene)
         except (ValueError, RuntimeError) as exc:
             self.report({'ERROR'}, str(exc))
             return {'CANCELLED'}
