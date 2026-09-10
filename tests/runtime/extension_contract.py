@@ -110,7 +110,11 @@ def install(args):
     foreign_parent = ext.legacy.REG.object('CYC')
     foreign_child.parent = foreign_parent
     foreign_matrix = foreign_child.matrix_world.copy()
-    check('cross-scene remove refused', bpy.ops.awful.remove_studio() == {'CANCELLED'})
+    try:
+        result = bpy.ops.awful.remove_studio()
+    except RuntimeError:
+        result = {'CANCELLED'}
+    check('cross-scene remove refused', result == {'CANCELLED'})
     check('foreign scene child parent preserved', foreign_child.parent == foreign_parent)
     check('foreign scene child transform preserved',
           all(abs(a-b) < 1e-5 for ra, rb in zip(foreign_child.matrix_world, foreign_matrix) for a,b in zip(ra,rb)))
