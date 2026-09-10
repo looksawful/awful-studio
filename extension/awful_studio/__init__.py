@@ -36,6 +36,19 @@ class AWFUL_SceneState(bpy.types.PropertyGroup):
     last_error: StringProperty()
 
 
+def _detach_non_product_children():
+    """Keep unrelated user objects safe without treating them as mounted products."""
+    content = legacy.REG.object('PRODUCT_CONTENT')
+    if content is None:
+        return
+    for child in list(content.children):
+        if legacy.is_managed(child):
+            continue
+        hierarchy = [child] + legacy.descendants(child)
+        if legacy.world_bbox(hierarchy) is None:
+            legacy.parent_keep_world(child, None)
+
+
 def run_build(context):
     scene = context.scene
     migrations.migration_path(scene.awful_state.schema_version)
@@ -43,6 +56,7 @@ def run_build(context):
     started = time.perf_counter()
     try:
         with ownership.for_scene(scene):
+            _detach_non_product_children()
             legacy.build_studio(True)
             ownership.mark_generated_actions(scene)
         scene.awful_state.schema_version = migrations.CURRENT_SCHEMA
