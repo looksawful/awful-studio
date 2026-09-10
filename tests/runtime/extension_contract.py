@@ -110,6 +110,32 @@ def install(args):
         check(f'rebuild {i} generated actions owned',
               all(ext.ownership.owned(a, scene) for a in generated_actions))
 
+    # Semantic role strings are not authority. A foreign-scene object and an
+    # unmanaged current-scene object with colliding ROOM_* roles must not be changed
+    # by the current studio's visibility switch.
+    foreign_visibility_scene = bpy.data.scenes.new('ForeignVisibilityScene')
+    foreign_room = bpy.data.objects.new('ForeignRoomRoleCollision', None)
+    foreign_room['awful_role'] = 'ROOM_FOREIGN'
+    foreign_visibility_scene.collection.objects.link(foreign_room)
+    local_role_collision = bpy.data.objects.new('LocalRoomRoleCollision', None)
+    local_role_collision['awful_role'] = 'ROOM_USER'
+    scene.collection.objects.link(local_role_collision)
+    foreign_room.hide_render = False
+    foreign_room.hide_viewport = False
+    local_role_collision.hide_render = False
+    local_role_collision.hide_viewport = False
+    scene.awful_studio.reflective_room_enabled = False
+    ext.legacy.apply_room_visibility(scene)
+    check('room visibility ignores foreign role collision',
+          not foreign_room.hide_render and not foreign_room.hide_viewport)
+    check('room visibility ignores unmanaged local role collision',
+          not local_role_collision.hide_render and not local_role_collision.hide_viewport)
+    scene.awful_studio.reflective_room_enabled = True
+    ext.legacy.apply_room_visibility(scene)
+    bpy.data.objects.remove(foreign_room, do_unlink=True)
+    bpy.data.scenes.remove(foreign_visibility_scene)
+    bpy.data.objects.remove(local_role_collision, do_unlink=True)
+
     # A foreign-scene-only child parented to an owned object must make destructive
     # cleanup refuse the operation rather than silently mutate the other scene.
     foreign_scene = bpy.data.scenes.new('ForeignScene')
