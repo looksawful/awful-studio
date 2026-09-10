@@ -30,8 +30,9 @@ def verify(blender, output):
         # from touching the developer's real Blender profile.
         env = dict(os.environ, BLENDER_USER_RESOURCES=str(user_resources))
         (work/'installed').mkdir()
+        phases = ['historical', 'install', 'reopen', 'migrate']
         try:
-            for phase in ('historical', 'install', 'reopen', 'migrate'):
+            for phase in phases:
                 command = [blender, '--background', '--disable-autoexec', '--offline-mode']
                 if phase in ('historical', 'install'):
                     command.append('--factory-startup')
@@ -46,12 +47,30 @@ def verify(blender, output):
                 report = json.loads((work/f'{phase}.json').read_text())
                 if report['status'] != 'passed':
                     raise RuntimeError(f'{phase} report did not pass')
+
+            # Run P0 photographic behavior against the installed package and the
+            # saved studio produced by the canonical install phase.
+            lighting_command = [
+                blender, '--background', '--disable-autoexec', '--offline-mode',
+                '--python-exit-code', '1', '--python', str(ROOT/'tests/runtime/p0_lighting_contract.py'),
+                '--', '--work', str(work),
+            ]
+            result = subprocess.run(lighting_command, env=env, text=True,
+                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=300)
+            (output/'lighting.log').write_text(result.stdout, encoding='utf-8')
+            print(result.stdout)
+            if result.returncode:
+                raise RuntimeError(f'lighting exited {result.returncode}')
+            report = json.loads((work/'lighting.json').read_text())
+            if report['status'] != 'passed':
+                raise RuntimeError('lighting report did not pass')
+            phases.append('lighting')
         finally:
             for report in work.glob('*.json'):
                 (output/report.name).write_bytes(report.read_bytes())
     summary = {'status': 'passed', 'package': package.name,
                'sha256': hashlib.sha256(package.read_bytes()).hexdigest(),
-               'phases': ['historical', 'install', 'reopen', 'migrate']}
+               'phases': phases}
     (output/'verification.json').write_text(json.dumps(summary, indent=2), encoding='utf-8')
     return package
 
