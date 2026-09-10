@@ -30,6 +30,20 @@ def _load_image_with_hdri_provenance(path, non_color=False):
 
 legacy.load_image = _load_image_with_hdri_provenance
 
+# Light-link receiver collections are valid Blender datablocks but intentionally do
+# not live in the visible scene collection tree. Resolve them by explicit AWFUL
+# ownership instead of visibility, otherwise every preset/rebuild can create another
+# hidden receiver collection.
+def _collection_for_scene_registry(self, role):
+    scene = getattr(bpy.context, 'scene', None)
+    if scene is None:
+        return None
+    return next((c for c in bpy.data.collections
+                 if ownership.owned(c, scene) and c.get(legacy.ROLE_KEY) == role), None)
+
+
+legacy.StudioRegistry.collection = _collection_for_scene_registry
+
 
 class AWFUL_AddonPreferences(bpy.types.AddonPreferences):
     bl_idname = __package__
