@@ -43,6 +43,14 @@ def measured(name, function):
     return result
 
 
+def cancelled_operator(function):
+    """Normalize Blender's two Python forms of an operator reporting ERROR+CANCELLED."""
+    try:
+        return function()
+    except RuntimeError:
+        return {'CANCELLED'}
+
+
 def block_network():
     def blocked(*args, **kwargs):
         REPORT['network_attempts'] = REPORT.get('network_attempts', 0) + 1
@@ -110,7 +118,7 @@ def install(args):
     foreign_parent = ext.legacy.REG.object('CYC')
     foreign_child.parent = foreign_parent
     foreign_matrix = foreign_child.matrix_world.copy()
-    check('cross-scene remove refused', bpy.ops.awful.remove_studio() == {'CANCELLED'})
+    check('cross-scene remove refused', cancelled_operator(bpy.ops.awful.remove_studio) == {'CANCELLED'})
     check('foreign scene child parent preserved', foreign_child.parent == foreign_parent)
     check('foreign scene child transform preserved',
           all(abs(a-b) < 1e-5 for ra, rb in zip(foreign_child.matrix_world, foreign_matrix) for a,b in zip(ra,rb)))
@@ -181,10 +189,7 @@ def reopen(args):
     # Unknown future schemas refuse changes.
     bpy.context.scene.awful_state.schema_version = 999
     before = freeze()
-    try:
-        result = bpy.ops.awful.rebuild_studio()
-    except RuntimeError:
-        result = {'CANCELLED'}
+    result = cancelled_operator(bpy.ops.awful.rebuild_studio)
     check('future schema rejected without mutation', result == {'CANCELLED'} and freeze() == before)
 
 
