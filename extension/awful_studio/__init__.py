@@ -146,7 +146,8 @@ class AWFUL_OT_Migrate(bpy.types.Operator):
 
     def execute(self, context):
         try:
-            migrations.migrate(context.scene)
+            with ownership.for_scene(context.scene):
+                migrations.migrate(context.scene)
         except (ValueError, RuntimeError) as exc:
             self.report({'ERROR'}, str(exc))
             return {'CANCELLED'}
