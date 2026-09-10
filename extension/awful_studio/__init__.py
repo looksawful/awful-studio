@@ -139,6 +139,9 @@ def run_build(context):
 
 def _rebuild_with_rollback(context):
     """Run the destructive legacy rebuild transactionally using Blender's undo stack."""
+    # Fail safe preconditions before pushing an undo checkpoint. Otherwise a
+    # non-mutating validation error could undo the previous legitimate user action.
+    migrations.migration_path(context.scene.awful_state.schema_version)
     scene_name = context.scene.name
     bpy.ops.ed.undo_push(message='AWFUL Studio pre-rebuild')
     try:
