@@ -48,23 +48,26 @@ def verify(blender, output):
                 if report['status'] != 'passed':
                     raise RuntimeError(f'{phase} report did not pass')
 
-            # Run P0 photographic behavior against the installed package and the
-            # saved studio produced by the canonical install phase.
-            lighting_command = [
-                blender, '--background', '--disable-autoexec', '--offline-mode',
-                '--python-exit-code', '1', '--python', str(ROOT/'tests/runtime/p0_lighting_contract.py'),
-                '--', '--work', str(work),
-            ]
-            result = subprocess.run(lighting_command, env=env, text=True,
-                                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=300)
-            (output/'lighting.log').write_text(result.stdout, encoding='utf-8')
-            print(result.stdout)
-            if result.returncode:
-                raise RuntimeError(f'lighting exited {result.returncode}')
-            report = json.loads((work/'lighting.json').read_text())
-            if report['status'] != 'passed':
-                raise RuntimeError('lighting report did not pass')
-            phases.append('lighting')
+            contracts = (
+                ('lighting', ROOT/'tests/runtime/p0_lighting_contract.py'),
+                ('camera', ROOT/'tests/runtime/p0_camera_contract.py'),
+            )
+            for name, script in contracts:
+                command = [
+                    blender, '--background', '--disable-autoexec', '--offline-mode',
+                    '--python-exit-code', '1', '--python', str(script),
+                    '--', '--work', str(work),
+                ]
+                result = subprocess.run(command, env=env, text=True,
+                                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=300)
+                (output/f'{name}.log').write_text(result.stdout, encoding='utf-8')
+                print(result.stdout)
+                if result.returncode:
+                    raise RuntimeError(f'{name} exited {result.returncode}')
+                report = json.loads((work/f'{name}.json').read_text())
+                if report['status'] != 'passed':
+                    raise RuntimeError(f'{name} report did not pass')
+                phases.append(name)
         finally:
             for report in work.glob('*.json'):
                 (output/report.name).write_bytes(report.read_bytes())
