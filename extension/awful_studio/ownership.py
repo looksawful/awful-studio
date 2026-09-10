@@ -72,7 +72,9 @@ def preflight(scene):
     if oid and any(s != scene and hasattr(s, 'awful_state') and owner(s) == oid for s in bpy.data.scenes):
         raise RuntimeError('AWFUL scene ownership is shared; make an independent studio before rebuilding')
     objects = {o for o in scene.objects if owned(o, scene)}
-    collections = {c for c in scene.collection.children_recursive if owned(c, scene)}
+    # Include unlinked internal collections (for example light-link receiver
+    # collections) so moving one into another scene cannot bypass preflight.
+    collections = {c for c in bpy.data.collections if owned(c, scene)}
     for other in bpy.data.scenes:
         if other != scene and (objects.intersection(other.objects[:]) or
                               collections.intersection(other.collection.children_recursive)):
@@ -108,9 +110,12 @@ def detach_retained(scene):
 
 def remove(scene):
     preflight(scene)
-    # External objects nested inside managed collections must stay linked and visible.
-    managed_cols = [c for c in scene.collection.children_recursive if owned(c, scene)]
-    for col in managed_cols:
+    # Collections in the scene tree can contain user data that must remain visible.
+    # Internal light-link receiver collections are deliberately unlinked from that
+    # tree, but they are still AWFUL-owned and must be removed on rebuild too.
+    scene_managed_cols = [c for c in scene.collection.children_recursive if owned(c, scene)]
+    managed_cols = [c for c in bpy.data.collections if owned(c, scene)]
+    for col in scene_managed_cols:
         for obj in list(col.objects):
             if not owned(obj, scene) and obj.name not in scene.collection.objects:
                 scene.collection.objects.link(obj)
