@@ -66,12 +66,19 @@ def verify(blender, output):
                 '--python', str(ROOT/'tests/runtime/migrate_animated_historical.py'),
                 '--', '--input', str(animated_historical),
             ], env, output/'migrate-animated.log')
+
+            _run([
+                blender, '--background', '--disable-autoexec', '--offline-mode', '--python-exit-code', '1',
+                '--python', str(ROOT/'tests/runtime/rebuild_failure_contract.py'),
+                '--', '--input', str(work/'studio.blend'),
+            ], env, output/'rebuild-failure.log')
         finally:
             for report in work.glob('*.json'):
                 (output/report.name).write_bytes(report.read_bytes())
     summary = {'status': 'passed', 'package': package.name,
                'sha256': hashlib.sha256(package.read_bytes()).hexdigest(),
-               'phases': ['historical-animated', 'historical', 'install', 'reopen', 'migrate', 'migrate-animated']}
+               'phases': ['historical-animated', 'historical', 'install', 'reopen', 'migrate',
+                          'migrate-animated', 'rebuild-failure']}
     (output/'verification.json').write_text(json.dumps(summary, indent=2), encoding='utf-8')
     return package
 
