@@ -137,6 +137,27 @@ def run_build(context):
         scene.awful_state.last_operation = f'build: {time.perf_counter()-started:.6f}s'
 
 
+def _rebuild_with_rollback(context):
+    """Run the destructive legacy rebuild transactionally using Blender's undo stack."""
+    scene_name = context.scene.name
+    bpy.ops.ed.undo_push(message='AWFUL Studio pre-rebuild')
+    try:
+        run_build(context)
+    except Exception as exc:
+        error = str(exc)
+        try:
+            result = bpy.ops.ed.undo()
+            if result != {'FINISHED'}:
+                raise RuntimeError(f'Blender undo returned {result}')
+        except Exception as rollback_exc:
+            raise RuntimeError(f'{error}; rebuild rollback failed: {rollback_exc}') from exc
+        restored = bpy.data.scenes.get(scene_name)
+        if restored is not None and hasattr(restored, 'awful_state'):
+            restored.awful_state.last_error = error
+            restored.awful_state.last_operation = 'rebuild: rolled back after failure'
+        raise RuntimeError(error) from exc
+
+
 class AWFUL_OT_Build(bpy.types.Operator):
     bl_idname = 'awful.build_studio'
     bl_label = 'Build Studio'
@@ -166,7 +187,7 @@ class AWFUL_OT_Rebuild(bpy.types.Operator):
 
     def execute(self, context):
         try:
-            run_build(context)
+            _rebuild_with_rollback(context)
         except Exception as exc:
             self.report({'ERROR'}, str(exc))
             return {'CANCELLED'}
