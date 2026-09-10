@@ -1,8 +1,6 @@
 # AWFUL STUDIO project-local skills
 
-This directory is reserved for thin project-specific workflow adapters.
-
-The authoritative adoption decisions live in `.agents/skills-audit.md`.
+This directory contains thin project-specific workflow adapters. The authoritative adoption decisions live in `.agents/skills-audit.md`.
 
 ## Rules
 
@@ -15,15 +13,20 @@ The authoritative adoption decisions live in `.agents/skills-audit.md`.
 - Performance regressions are defects.
 - Business requirements are not relaxed to satisfy tooling.
 
-## Proposed adapters
+## Active adapters
 
-- `awful-tdd`
-- `awful-systematic-debugging`
-- `awful-verification`
-- `blender-runtime-qa`
-- `blender-performance-profiling`
-- `blender-visual-regression`
-- `research-doc-sync`
-- `git-change-review`
+- `blender-evidence-loop` — existing evidence-oriented Blender workflow.
+- `awful-tdd` — Superpowers TDD adapted to Blender runtime and product constraints.
+- `awful-systematic-debugging` — root-cause debugging with Blender/scene/GPU classification.
+- `awful-verification` — completion gate requiring the right runtime, visual and performance evidence.
+- `blender-runtime-qa` — two-tier pure/static plus Blender 5.2 runtime verification.
+- `blender-performance-profiling` — repeatable before/after scene-build and render-sensitive profiling.
+- `blender-visual-regression` — deterministic fixed-view visual evidence plus semantic assertions.
+- `research-doc-sync` — separates verified project state, external reference, recommendation and installed/tested integration status.
+- `git-change-review` — change review for scope, evidence, business-text safety and generated/private asset leakage.
 
-These names are recommendations only. Their presence in this README does not mean the skill directories are installed or active.
+## External upstream status
+
+Superpowers remains upstream methodology and is not copied wholesale into this repository. `ifBars/blender-agent-studio` remains selective/pilot only until its exact revision is exercised against the target Blender 5.2 environment. Flue and `pytest-blender` remain evaluation candidates as described in `.agents/skills-audit.md`.
+
+Do not describe an external integration as installed or supported merely because one of these local adapters references its methods.
