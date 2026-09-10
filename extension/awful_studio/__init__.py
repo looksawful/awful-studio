@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """AWFUL STUDIO Extension lifecycle. Import/register never read or mutate a scene."""
+import os
 import time
 import bpy
 from bpy.props import BoolProperty, StringProperty, IntProperty, PointerProperty, EnumProperty
@@ -8,6 +9,26 @@ from .core import legacy
 
 VERSION = (0, 0, 16)
 _registered = []
+
+# Legacy environment functions resolve ``load_image`` through their module globals.
+# Interpose only curated HDRI paths so stale/forged cache files cannot bypass the
+# Extension provenance gate. Other legacy image loads remain unchanged.
+_legacy_load_image_raw = getattr(legacy, '_awful_original_load_image', legacy.load_image)
+legacy._awful_original_load_image = _legacy_load_image_raw
+
+
+def _load_image_with_hdri_provenance(path, non_color=False):
+    candidate = os.path.normcase(os.path.abspath(bpy.path.abspath(path)))
+    for key, (_filename, url) in legacy.ASSET_URLS.items():
+        expected = os.path.normcase(os.path.abspath(bpy.path.abspath(legacy.hdri_asset_path(key))))
+        if candidate == expected:
+            if not asset_cache.read_valid(path, expected_url=url):
+                return None
+            break
+    return _legacy_load_image_raw(path, non_color)
+
+
+legacy.load_image = _load_image_with_hdri_provenance
 
 
 class AWFUL_AddonPreferences(bpy.types.AddonPreferences):
