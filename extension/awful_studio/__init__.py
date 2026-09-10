@@ -62,6 +62,35 @@ def _collect_external_mounted_roots_measurable():
 
 legacy.collect_external_mounted_roots = _collect_external_mounted_roots_measurable
 
+# Semantic role labels are descriptive metadata, not permission to mutate a block.
+# Keep the legacy room-toggle behavior but restrict every mutation to data explicitly
+# owned by the supplied scene. This also protects another AWFUL scene with a distinct
+# owner id and user objects carrying colliding role strings.
+def _apply_room_visibility_owned(scene):
+    enabled = bool(scene.awful_studio.reflective_room_enabled)
+    for obj in scene.objects:
+        if not ownership.owned(obj, scene):
+            continue
+        role = obj.get(legacy.ROLE_KEY, '')
+        if role.startswith('ROOM_') or role == 'WINDOW_FRAME':
+            obj.hide_render = not enabled
+            obj.hide_viewport = not enabled
+    glass = next((obj for obj in scene.objects
+                  if ownership.owned(obj, scene) and obj.get(legacy.ROLE_KEY) == 'WINDOW_GLASS'), None)
+    if glass:
+        glass_enabled = enabled and bool(scene.awful_studio.window_glass_enabled)
+        glass.hide_render = not glass_enabled
+        glass.hide_viewport = not glass_enabled
+    portal = next((obj for obj in scene.objects
+                   if ownership.owned(obj, scene) and obj.get(legacy.ROLE_KEY) == 'WINDOW_PORTAL'), None)
+    if portal:
+        portal_enabled = enabled and bool(scene.awful_studio.natural_light_enabled)
+        portal.hide_render = not portal_enabled
+        portal.hide_viewport = not portal_enabled
+
+
+legacy.apply_room_visibility = _apply_room_visibility_owned
+
 
 class AWFUL_AddonPreferences(bpy.types.AddonPreferences):
     bl_idname = __package__
