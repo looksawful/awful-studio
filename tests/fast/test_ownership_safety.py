@@ -23,9 +23,17 @@ class OwnershipSafetySourceTests(unittest.TestCase):
         args = [arg.arg for arg in mark.args.args]
         self.assertIn('scene', args)
 
+    def test_mark_never_falls_back_to_active_context_scene(self):
+        source = OWNERSHIP.read_text(encoding='utf-8')
+        self.assertNotIn("getattr(bpy.context, 'scene', None)", source)
+
     def test_build_uses_explicit_scene_ownership_scope(self):
         source = LIFECYCLE.read_text(encoding='utf-8')
         self.assertIn('with ownership.for_scene(scene):', source)
+
+    def test_migrate_uses_explicit_scene_ownership_scope(self):
+        source = LIFECYCLE.read_text(encoding='utf-8')
+        self.assertIn('with ownership.for_scene(context.scene):', source)
 
     def test_remove_does_not_scan_all_objects_for_external_children(self):
         tree = ast.parse(OWNERSHIP.read_text(encoding='utf-8'))
