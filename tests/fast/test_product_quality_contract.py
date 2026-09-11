@@ -5,7 +5,11 @@ import unittest
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 MODULE_PATH = ROOT / 'extension' / 'awful_studio' / 'product_quality.py'
 EXPECTED_MOCKUPS = {'BOTTLE', 'JAR', 'BOX', 'CAN', 'PHONE', 'TABLET'}
-EXPECTED_MATERIALS = {'COATED', 'GLASS', 'METAL', 'PAPER', 'SCREEN'}
+EXPECTED_MATERIALS = {
+    'PLASTIC_MATTE', 'PLASTIC_GLOSSY', 'METAL_ANODIZED',
+    'GLASS_CLEAR', 'GLASS_DARK', 'CERAMIC', 'CARDBOARD',
+    'PAPER_LABEL', 'SCREEN',
+}
 
 
 def load_policy():
@@ -33,8 +37,10 @@ class ProductQualityContractTests(unittest.TestCase):
             self.assertLessEqual(spec['bevel_segments'], 6)
             self.assertTrue(spec['material_slots'])
             self.assertEqual(len(spec['material_slots']), len(set(spec['material_slots'])))
+            self.assertEqual(set(spec['material_slots']), set(spec['slot_materials']))
+            self.assertTrue(set(spec['slot_materials'].values()).issubset(EXPECTED_MATERIALS))
 
-    def test_material_starters_are_bounded_and_offline(self):
+    def test_notion_material_starters_are_bounded_and_offline(self):
         policy = load_policy()
         self.assertEqual(set(policy.MATERIAL_STARTERS), EXPECTED_MATERIALS)
         for key in EXPECTED_MATERIALS:
@@ -45,6 +51,11 @@ class ProductQualityContractTests(unittest.TestCase):
             self.assertLessEqual(spec['metallic'], 1.0)
             self.assertNotIn('url', repr(spec).lower())
             self.assertNotIn('path', repr(spec).lower())
+
+        self.assertGreater(policy.material_spec('GLASS_CLEAR')['transmission'], 0.8)
+        self.assertGreater(policy.material_spec('GLASS_DARK')['transmission'], 0.8)
+        self.assertGreater(policy.material_spec('SCREEN')['emission_strength'], 0.0)
+        self.assertEqual(policy.material_spec('METAL_ANODIZED')['metallic'], 1.0)
 
     def test_policy_module_remains_blender_independent(self):
         source = MODULE_PATH.read_text(encoding='utf-8')
