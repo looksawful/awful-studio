@@ -487,6 +487,18 @@ def install(legacy):
 
     legacy.AWFUL_PT_Product.draw = draw_product
 
+    original_mount_product = legacy.mount_product
+
+    def mount_product(root_objects, auto_fit=True):
+        scene = legacy.bpy.context.scene
+        selected = getattr(scene.awful_studio, 'product_mockup', 'NONE')
+        if (selected != 'NONE' and len(root_objects) == 1
+                and root_objects[0].get(legacy.ROLE_KEY, '') == 'MOCKUP_ROOT'):
+            auto_fit = bool(scene.awful_studio.auto_fit)
+        return original_mount_product(root_objects, auto_fit)
+
+    legacy.mount_product = mount_product
+
     original_diagnostic = legacy.create_diagnostic_product
 
     def create_diagnostic_or_selected_mockup(diag_col, material):
