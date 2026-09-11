@@ -1,10 +1,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Pure HDRI workflow policy for AWFUL STUDIO.
+"""HDRI workflow policy and Blender adapter for AWFUL STUDIO.
 
-No Blender import, filesystem mutation, or network access occurs here. The
-Blender adapter is installed separately after the policy is covered by fast tests.
+The pure section performs no Blender, filesystem, or network work. ``install``
+receives those adapters explicitly and wires the reviewed bulk workflow before
+Extension class registration.
 """
 from __future__ import annotations
+
+from pathlib import Path
 
 try:
     from . import asset_provenance
@@ -71,3 +74,131 @@ def environment_resolution(*, selected_preset: str, asset_ready: bool) -> dict[s
             'fallback': not asset_ready,
         }
     raise ValueError(f'Unknown environment intent: {selected_preset}')
+
+
+def _asset_ready(legacy, cache, preset_id: str) -> bool:
+    if preset_id in PHYSICAL_SKY_PRESETS:
+        return True
+    if preset_id not in HDRI_PRESETS:
+        raise ValueError(f'Unknown environment intent: {preset_id}')
+    asset_key = legacy.HDRI_PRESETS[preset_id]['asset']
+    return bool(cache.read_valid(Path(legacy.hdri_asset_path(asset_key))))
+
+
+def runtime_status(legacy, cache, scene) -> dict[str, object]:
+    """Return compact Environment-panel status without causing network activity."""
+    selected = str(scene.awful_studio.world_preset)
+    if selected in PHYSICAL_SKY_PRESETS:
+        return {'code': 'PHYSICAL_SKY', 'label': 'Physical Sky', 'icon': 'WORLD_DATA'}
+    if _asset_ready(legacy, cache, selected):
+        return {'code': 'READY', 'label': 'HDRI: Ready', 'icon': 'CHECKMARK'}
+    prefs = cache.preferences()
+    permission = permission_state(
+        blender_online=bool(legacy.bpy.app.online_access),
+        awful_consent=bool(prefs and prefs.allow_network_assets),
+    )
+    if not permission['ready']:
+        label = ('HDRI: Blender Online Access Off'
+                 if permission['code'] == 'BLENDER_ONLINE_ACCESS_OFF'
+                 else 'HDRI: Network Consent Required')
+        return {'code': permission['code'], 'label': label, 'icon': 'ERROR'}
+    return {
+        'code': 'MISSING_FALLBACK',
+        'label': 'HDRI: Missing, Physical Sky fallback',
+        'icon': 'INFO',
+    }
+
+
+def install(legacy, cache):
+    """Install reviewed bulk-download/fallback UX without fetching at startup."""
+    if getattr(legacy, '_awful_asset_workflow_installed', False):
+        return
+
+    original_environment_draw = legacy.AWFUL_PT_Environment.draw
+
+    def resolve_environment_preset(scene, selected_preset):
+        resolution = environment_resolution(
+            selected_preset=str(selected_preset),
+            asset_ready=_asset_ready(legacy, cache, str(selected_preset)),
+        )
+        return str(resolution['effective_preset'])
+
+    def ensure_assets(force=False):
+        results = {}
+        for record in reviewed_hdri_records():
+            destination = (
+                cache.root()
+                / str(record.get('cache_subdir', ''))
+                / str(record['filename'])
+            )
+            results[str(record['asset_id'])] = cache.fetch(
+                str(record['download_url']), destination, force=bool(force))
+        return results
+
+    def fetch_execute(self, context):
+        prefs = cache.preferences()
+        permission = permission_state(
+            blender_online=bool(legacy.bpy.app.online_access),
+            awful_consent=bool(prefs and prefs.allow_network_assets),
+        )
+        if not permission['ready']:
+            self.report({'ERROR'}, str(permission['message']))
+            return {'CANCELLED'}
+        selected = str(context.scene.awful_studio.world_preset)
+        try:
+            result = ensure_assets(False)
+            if not all(result.values()):
+                self.report({'ERROR'}, cache.last_error())
+                return {'CANCELLED'}
+            legacy.refresh_world_images()
+            legacy.apply_environment_preset(context.scene, selected, False)
+        except (OSError, ValueError, RuntimeError) as exc:
+            self.report({'ERROR'}, str(exc))
+            return {'CANCELLED'}
+        self.report({'INFO'}, f'{len(result)} reviewed HDRIs Ready')
+        return {'FINISHED'}
+
+    class AWFUL_OT_OpenOnlinePreferences(legacy.bpy.types.Operator):
+        bl_idname = 'awful.open_online_preferences'
+        bl_label = 'Open Blender Online Access Preferences'
+        bl_description = 'Open Blender Preferences where Allow Online Access can be enabled'
+
+        def execute(self, context):
+            try:
+                context.preferences.active_section = 'SYSTEM'
+            except Exception:
+                pass
+            if legacy.bpy.app.background:
+                self.report({'INFO'}, 'Open Blender Preferences > System and enable Allow Online Access')
+                return {'FINISHED'}
+            try:
+                legacy.bpy.ops.screen.userpref_show('INVOKE_DEFAULT')
+            except Exception as exc:
+                self.report({'ERROR'}, str(exc))
+                return {'CANCELLED'}
+            return {'FINISHED'}
+
+    def draw_environment(self, context):
+        original_environment_draw(self, context)
+        scene = context.scene
+        selected = str(scene.awful_studio.world_preset)
+        status = runtime_status(legacy, cache, scene)
+        box = self.layout.box()
+        box.label(text=str(status['label']), icon=str(status['icon']))
+        if selected in HDRI_PRESETS:
+            prefs = cache.preferences()
+            if prefs is not None:
+                box.prop(prefs, 'allow_network_assets', text='Allow Network Assets')
+            box.operator('awful.fetch_assets_v4', text='Download All HDRIs', icon='IMPORT')
+            if status['code'] == 'BLENDER_ONLINE_ACCESS_OFF':
+                box.operator('awful.open_online_preferences', icon='PREFERENCES')
+
+    legacy.resolve_environment_preset = resolve_environment_preset
+    legacy.ensure_assets = ensure_assets
+    legacy.AWFUL_OT_FetchAssets.bl_label = 'Download All HDRIs'
+    legacy.AWFUL_OT_FetchAssets.bl_description = (
+        'Download all five provenance-reviewed AWFUL HDRIs into the managed cache')
+    legacy.AWFUL_OT_FetchAssets.execute = fetch_execute
+    legacy.CLASSES = (*legacy.CLASSES, AWFUL_OT_OpenOnlinePreferences)
+    legacy.AWFUL_PT_Environment.draw = draw_environment
+    legacy._awful_asset_workflow_installed = True
