@@ -43,26 +43,31 @@ class Release017HygieneTests(unittest.TestCase):
     def test_release_tree_has_no_dev_junk_or_machine_specific_paths(self):
         forbidden_suffixes = {'.pyc', '.pyo', '.blend', '.blend1', '.exe', '.dll', '.zip'}
         tracked = tracked_files()
+        violations = []
+
         for path in tracked:
             try:
                 relative = path.relative_to(ROOT)
             except ValueError:
                 continue
-            if relative.parts[:2] == ('extension', 'awful_studio'):
-                self.assertNotIn(path.suffix.lower(), forbidden_suffixes, str(relative))
+            if relative.parts[:2] == ('extension', 'awful_studio') and path.suffix.lower() in forbidden_suffixes:
+                violations.append(f'dev junk in Extension package: {relative}')
 
         patterns = (
-            re.compile(r'[A-Za-z]:\\Users\\', re.IGNORECASE),
-            re.compile(r'[A-Za-z]:\\Blender Foundation\\', re.IGNORECASE),
-            re.compile(r'/home/[^/\s]+/'),
+            ('user-home', re.compile(r'[A-Za-z]:\\Users\\', re.IGNORECASE)),
+            ('blender-install', re.compile(r'[A-Za-z]:\\Blender Foundation\\', re.IGNORECASE)),
+            ('posix-home', re.compile(r'/home/[^/\s]+/')),
         )
         text_suffixes = {'.md', '.py', '.toml', '.yml', '.yaml', '.json', '.txt'}
         for path in tracked:
             if not path.is_file() or path.suffix.lower() not in text_suffixes:
                 continue
             text = path.read_text(encoding='utf-8', errors='ignore')
-            for pattern in patterns:
-                self.assertIsNone(pattern.search(text), f'machine-specific path in {path.relative_to(ROOT)}')
+            for label, pattern in patterns:
+                if pattern.search(text):
+                    violations.append(f'{label} machine-specific path in {path.relative_to(ROOT)}')
+
+        self.assertEqual(violations, [], '\n' + '\n'.join(violations))
 
 
 if __name__ == '__main__':
