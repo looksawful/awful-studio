@@ -1,17 +1,54 @@
+import importlib.util
 import pathlib
 import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-LEGACY = ROOT / 'extension' / 'awful_studio' / 'core' / 'legacy.py'
+EXT = ROOT / 'extension' / 'awful_studio'
 VERIFY = ROOT / 'tools' / 'verify_extension.py'
 RUNTIME = ROOT / 'tests' / 'runtime'
 
 
+def load_performance_policy():
+    path = EXT / 'runtime_performance.py'
+    spec = importlib.util.spec_from_file_location('awful_runtime_performance_test', path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 class RuntimePerformancePolicyTests(unittest.TestCase):
-    def test_build_never_auto_probes_gpu_backends(self):
-        source = LEGACY.read_text(encoding='utf-8')
-        setup = source.split('def setup_render(scene):', 1)[1].split('\ndef ', 1)[0]
-        self.assertNotIn('configure_cycles_gpu(scene)', setup)
+    def test_build_preserves_native_device_without_gpu_probe(self):
+        policy = load_performance_policy()
+
+        class FakeLegacy:
+            pass
+
+        legacy = FakeLegacy()
+        calls = {'probe': 0, 'setup': 0}
+
+        def probe(_scene):
+            calls['probe'] += 1
+            return 'GPU', 'unexpected probe'
+
+        def setup(scene):
+            calls['setup'] += 1
+            return legacy.configure_cycles_gpu(scene)
+
+        legacy.configure_cycles_gpu = probe
+        legacy.setup_render = setup
+        original_probe = legacy.configure_cycles_gpu
+        policy.install(legacy)
+        result = legacy.setup_render(object())
+
+        self.assertEqual(result[0], 'NATIVE')
+        self.assertEqual(calls, {'probe': 0, 'setup': 1})
+        self.assertIs(legacy.configure_cycles_gpu, original_probe)
+
+    def test_performance_policy_installs_before_registration(self):
+        source = (EXT / '__init__.py').read_text(encoding='utf-8')
+        self.assertIn('runtime_performance.install(legacy)', source)
+        self.assertLess(source.index('runtime_performance.install(legacy)'),
+                        source.index('class AWFUL_AddonPreferences'))
 
     def test_full_verifier_batches_p0_contracts_into_one_blender_process(self):
         source = VERIFY.read_text(encoding='utf-8')
