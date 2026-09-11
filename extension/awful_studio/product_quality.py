@@ -399,10 +399,102 @@ def create_mockup(legacy, scene, key):
     return root
 
 
+def _mounted_unmanaged_products(legacy, scene):
+    content = legacy.REG.object('PRODUCT_CONTENT')
+    if content is None:
+        return []
+    result = []
+    for child in content.children:
+        if legacy.ownership.owned(child, scene):
+            continue
+        hierarchy = [child] + legacy.descendants(child)
+        if legacy.world_bbox(hierarchy) is not None:
+            result.append(child)
+    return result
+
+
+def _guard_mockup_hierarchies(legacy, scene):
+    for root in mockup_roots(legacy, scene):
+        foreign = [
+            child for child in legacy.descendants(root)
+            if not legacy.ownership.owned(child, scene)
+        ]
+        if foreign:
+            raise RuntimeError(
+                'User data is parented under the AWFUL mockup; detach it before replacing the mockup')
+
+
+def _purge_orphan_mockup_data(legacy, scene):
+    bpy = legacy.bpy
+    for mesh in list(bpy.data.meshes):
+        if (legacy.ownership.owned(mesh, scene)
+                and str(mesh.get(legacy.ROLE_KEY, '')).startswith('MOCKUP_')
+                and mesh.users == 0):
+            bpy.data.meshes.remove(mesh)
+    for material in list(bpy.data.materials):
+        if (legacy.ownership.owned(material, scene)
+                and str(material.get(legacy.ROLE_KEY, '')).startswith('MOCKUP_MAT_')
+                and material.users == 0):
+            bpy.data.materials.remove(material)
+
+
+def _remove_owned_mockups(legacy, scene):
+    _guard_mockup_hierarchies(legacy, scene)
+    for root in list(mockup_roots(legacy, scene)):
+        legacy.delete_object_hierarchy(root)
+    _purge_orphan_mockup_data(legacy, scene)
+
+
 def replace_mockup(legacy, scene, key):
     mockup_spec(key)
     legacy.ownership.preflight(scene)
+    unmanaged = _mounted_unmanaged_products(legacy, scene)
+    if unmanaged:
+        raise RuntimeError(
+            'A user product is mounted; unmount it before generating an AWFUL mockup')
+    _guard_mockup_hierarchies(legacy, scene)
     with legacy.ownership.for_scene(scene):
+        _remove_owned_mockups(legacy, scene)
         root = create_mockup(legacy, scene, key)
         legacy.mount_product([root], bool(scene.awful_studio.auto_fit))
+        _purge_orphan_mockup_data(legacy, scene)
     return root
+
+
+def install(legacy):
+    if getattr(legacy, '_awful_product_quality_installed', False):
+        return
+
+    items = [('NONE', 'None', 'Keep the diagnostic fixture or mounted user product')]
+    items.extend((key, MOCKUP_SPECS[key]['label'], f'Generate AWFUL {MOCKUP_SPECS[key]["label"]} mockup')
+                 for key in mockup_keys())
+    annotations = legacy.AWFUL_StudioSettings.__annotations__
+    annotations['product_mockup'] = legacy.EnumProperty(
+        name='Mockup', items=items, default='NONE')
+
+    original_draw = legacy.AWFUL_PT_Product.draw
+
+    def draw_product(self, context):
+        original_draw(self, context)
+        layout = self.layout
+        settings = context.scene.awful_studio
+        box = layout.box()
+        box.label(text='Procedural Mockup')
+        box.prop(settings, 'product_mockup', text='Mockup')
+        row = box.row()
+        row.enabled = settings.product_mockup != 'NONE'
+        row.operator('awful.generate_mockup', text='Generate / Replace AWFUL Mockup')
+
+    legacy.AWFUL_PT_Product.draw = draw_product
+
+    original_diagnostic = legacy.create_diagnostic_product
+
+    def create_diagnostic_or_selected_mockup(diag_col, material):
+        scene = legacy.bpy.context.scene
+        key = getattr(scene.awful_studio, 'product_mockup', 'NONE')
+        if key != 'NONE':
+            return create_mockup(legacy, scene, key)
+        return original_diagnostic(diag_col, material)
+
+    legacy.create_diagnostic_product = create_diagnostic_or_selected_mockup
+    legacy._awful_product_quality_installed = True
