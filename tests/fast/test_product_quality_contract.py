@@ -58,6 +58,12 @@ class ProductQualityContractTests(unittest.TestCase):
         self.assertGreater(policy.material_spec('SCREEN')['emission_strength'], 0.0)
         self.assertEqual(policy.material_spec('METAL_ANODIZED')['metallic'], 1.0)
 
+    def test_support_surface_offset_places_bottom_exactly_on_support(self):
+        policy = load_policy()
+        self.assertAlmostEqual(policy.support_surface_offset(0.125, 0.500), 0.375)
+        self.assertAlmostEqual(policy.support_surface_offset(0.500, 0.500), 0.0)
+        self.assertAlmostEqual(policy.support_surface_offset(0.750, 0.500), -0.250)
+
     def test_policy_module_remains_blender_independent(self):
         source = MODULE_PATH.read_text(encoding='utf-8')
         self.assertNotIn('import bpy', source)
