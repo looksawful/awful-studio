@@ -1,29 +1,32 @@
 # AWFUL STUDIO project-local skills
 
-This directory is reserved for thin project-specific workflow adapters.
+This directory contains thin, project-specific workflow adapters. Skills define repeatable working methods only. They do not duplicate Notion requirements, GitHub issue state, or external skill ecosystems.
 
-The authoritative adoption decisions live in `.agents/skills-audit.md`.
+## Installed adapters
+
+- `awful-tdd` — RED/GREEN/REFACTOR with Blender-runtime rules.
+- `awful-systematic-debugging` — root-cause-first Blender/Python/CI debugging.
+- `awful-verification` — evidence gate before completion claims.
+- `git-change-isolation` — branch/worktree ownership and concurrent-agent rules.
+- `git-change-review` — issue-linked code review and destructive-safety priorities.
+- `blender-runtime-qa` — two-tier static + Blender 5.2 final-ZIP runtime testing.
+- `blender-extension-lifecycle` — register/enable/disable/restart/package lifecycle discipline.
+- `blender-managed-data-safety` — scene-scoped ownership, migration and cleanup safety.
+- `asset-network-safety` — offline-first network/cache/provenance discipline.
+- `blender-performance-profiling` — measure-first build/rebuild performance evidence.
+- `release-readiness` — final ZIP, native repository/update and publication gates.
+- `agent-handoff` — precise issue/evidence/branch handoff and recursive review.
+- `blender-evidence-loop` — existing selected Blender Agent Studio evidence/refinement pilot.
 
 ## Rules
 
-- A project-local skill describes a repeatable method, not project state.
-- Do not duplicate Notion requirements or GitHub issue status inside a skill.
-- Prefer small adapters over vendoring entire third-party skill ecosystems.
-- External skills remain `candidate` or `pilot` until their exact version/commit is tested.
-- Blender behavior requires Blender 5.2 runtime evidence where relevant.
-- Static tests alone never prove scene/render correctness.
+- A local skill adds AWFUL-specific constraints to a general method; it is not a vendored copy of an upstream skill.
+- Business/product/architecture requirements remain authoritative in Notion.
+- GitHub Issues own implementation tasks and status.
+- Blender-dependent claims require Blender 5.2 runtime evidence.
+- Static tests alone never prove `bpy` scene behavior.
 - Performance regressions are defects.
-- Business requirements are not relaxed to satisfy tooling.
+- No skill may weaken requirements or destructive-data safeguards to make a test pass.
+- External integrations remain `candidate`, `pilot`, `reference`, or `rejected` until exact-version runtime evidence justifies `supported`.
 
-## Proposed adapters
-
-- `awful-tdd`
-- `awful-systematic-debugging`
-- `awful-verification`
-- `blender-runtime-qa`
-- `blender-performance-profiling`
-- `blender-visual-regression`
-- `research-doc-sync`
-- `git-change-review`
-
-These names are recommendations only. Their presence in this README does not mean the skill directories are installed or active.
+Read `AGENTS.md` first, then only the skills relevant to the task.
