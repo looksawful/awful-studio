@@ -16,6 +16,18 @@ class ReleaseRepositoryContractTests(unittest.TestCase):
         self.assertIn("'awful_studio'", source)
         self.assertIn('.as_uri()', source)
 
+    def test_repository_sync_explicitly_enables_blender_online_access(self):
+        source = VERIFY_REPO.read_text(encoding='utf-8')
+        self.assertIn(
+            "blender, '--background', '--online-mode', '--command', 'extension', 'sync'",
+            source,
+        )
+        self.assertIn(
+            "blender, '--background', '--online-mode', '--command', 'extension',",
+            source,
+        )
+        self.assertIn("'install', '-s', '-e', 'awful_studio'", source)
+
     def test_repository_verification_is_profile_isolated_and_render_free(self):
         source = VERIFY_REPO.read_text(encoding='utf-8')
         self.assertIn('BLENDER_USER_RESOURCES', source)
