@@ -50,10 +50,10 @@ def target_actions(legacy, target):
     return actions
 
 
-def cycles_state(actions):
+def cycles_state(policy, actions):
     result = []
     for action in actions:
-        for fcurve in action.fcurves:
+        for fcurve in policy.iter_fcurves(action):
             cycles = [modifier for modifier in fcurve.modifiers if modifier.type == 'CYCLES']
             result.append({
                 'action': action.name,
@@ -65,10 +65,11 @@ def cycles_state(actions):
     return result
 
 
-def assert_mode(legacy, target, mode, expected):
+def assert_mode(legacy, policy, target, mode, expected):
     actions = target_actions(legacy, target)
     check(f'{target} {mode} has keyed action', bool(actions), [action.name for action in actions])
-    state = cycles_state(actions)
+    state = cycles_state(policy, actions)
+    check(f'{target} {mode} exposes fcurves', bool(state), state)
     if expected is None:
         check(f'{target} {mode} has no cycles modifier',
               all(item['count'] == 0 for item in state), state)
@@ -94,6 +95,7 @@ def main():
 
         ext = importlib.import_module(MODULE)
         legacy = ext.legacy
+        policy = ext.playback_policy
         scene = bpy.context.scene
         settings = scene.awful_studio
 
@@ -114,21 +116,21 @@ def main():
             product_motion = settings.product_motion
             camera_motion = settings.camera_motion
             settings.product_playback = mode
-            assert_mode(legacy, 'PRODUCT', mode, expected)
+            assert_mode(legacy, policy, 'PRODUCT', mode, expected)
             check(f'product {mode} does not change artistic preset',
                   settings.product_motion == product_motion)
             check(f'product {mode} leaves camera policy independent',
                   settings.camera_motion == camera_motion)
 
             settings.camera_playback = mode
-            assert_mode(legacy, 'CAMERA', mode, expected)
+            assert_mode(legacy, policy, 'CAMERA', mode, expected)
             check(f'camera {mode} does not change artistic preset',
                   settings.camera_motion == camera_motion)
 
         settings.product_playback = 'LOOP'
         settings.camera_playback = 'PING_PONG'
-        assert_mode(legacy, 'PRODUCT', 'independent LOOP', 'REPEAT')
-        assert_mode(legacy, 'CAMERA', 'independent PING_PONG', 'MIRROR')
+        assert_mode(legacy, policy, 'PRODUCT', 'independent LOOP', 'REPEAT')
+        assert_mode(legacy, policy, 'CAMERA', 'independent PING_PONG', 'MIRROR')
         check('playback properties remain independent',
               settings.product_playback == 'LOOP' and settings.camera_playback == 'PING_PONG')
 
@@ -139,8 +141,8 @@ def main():
         check('reapplying motions does not accumulate actions',
               len(bpy.data.actions) == baseline_actions,
               {'before': baseline_actions, 'after': len(bpy.data.actions)})
-        assert_mode(legacy, 'PRODUCT', 'reapplied LOOP', 'REPEAT')
-        assert_mode(legacy, 'CAMERA', 'reapplied PING_PONG', 'MIRROR')
+        assert_mode(legacy, policy, 'PRODUCT', 'reapplied LOOP', 'REPEAT')
+        assert_mode(legacy, policy, 'CAMERA', 'reapplied PING_PONG', 'MIRROR')
 
         check('generated playback actions remain owned',
               all(ext.ownership.owned(action, scene)
