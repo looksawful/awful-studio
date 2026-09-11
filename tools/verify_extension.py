@@ -56,7 +56,7 @@ def verify(blender, output):
         'build', '--source-dir', str(source), '--output-dir', str(output),
     ], check=True)
 
-    package = output / 'awful_studio-0.0.16.zip'
+    package = output / 'awful_studio-0.0.17.zip'
     if not package.is_file():
         raise FileNotFoundError('Official build did not create the expected package')
 
