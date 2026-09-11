@@ -73,6 +73,20 @@ class ProductQualityContractTests(unittest.TestCase):
         self.assertAlmostEqual(policy.support_surface_offset(0.500, 0.500), 0.0)
         self.assertAlmostEqual(policy.support_surface_offset(0.750, 0.500), -0.250)
 
+    def test_mount_delta_centers_xy_and_places_bottom_on_support(self):
+        policy = load_placement_policy()
+        self.assertEqual(
+            policy.mount_delta(
+                center_x=2.0,
+                center_y=-3.0,
+                bottom_z=1.09,
+                target_x=0.0,
+                target_y=0.0,
+                support_z=0.50,
+            ),
+            (-2.0, 3.0, -0.59),
+        )
+
     def test_policy_modules_remain_blender_independent(self):
         for path in (MODULE_PATH, PLACEMENT_PATH):
             source = path.read_text(encoding='utf-8')
