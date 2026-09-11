@@ -4,6 +4,7 @@ import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 MODULE_PATH = ROOT / 'extension' / 'awful_studio' / 'product_quality.py'
+INIT_PATH = ROOT / 'extension' / 'awful_studio' / '__init__.py'
 EXPECTED_MOCKUPS = {'BOTTLE', 'JAR', 'BOX', 'CAN', 'PHONE', 'TABLET'}
 EXPECTED_MATERIALS = {
     'PLASTIC_MATTE', 'PLASTIC_GLOSSY', 'METAL_ANODIZED',
@@ -68,6 +69,17 @@ class ProductQualityContractTests(unittest.TestCase):
             policy.mockup_spec('VAGUE_HUMAN_OBJECT')
         with self.assertRaises(ValueError):
             policy.material_spec('MAGIC')
+
+    def test_product_quality_installs_before_registration_and_exposes_one_action(self):
+        init_source = INIT_PATH.read_text(encoding='utf-8')
+        policy_source = MODULE_PATH.read_text(encoding='utf-8')
+        self.assertIn('product_quality.install(legacy)', init_source)
+        self.assertLess(init_source.index('product_quality.install(legacy)'),
+                        init_source.index('CLASSES ='))
+        self.assertIn("bl_idname = 'awful.generate_mockup'", init_source)
+        self.assertIn("annotations['product_mockup']", policy_source)
+        self.assertIn("row.operator('awful.generate_mockup'", policy_source)
+        self.assertIn('create_diagnostic_or_selected_mockup', policy_source)
 
 
 if __name__ == '__main__':
