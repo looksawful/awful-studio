@@ -9,7 +9,7 @@ WORKFLOW = ROOT / '.github' / 'workflows' / 'extension-ci.yml'
 class ReleaseCandidateIdentityTests(unittest.TestCase):
     def test_verifier_can_validate_existing_exact_package_without_rebuilding(self):
         source = VERIFIER.read_text(encoding='utf-8')
-        self.assertIn("parser.add_argument('--package'", source)
+        self.assertIn("'--package', type=Path", source)
         self.assertIn('package_override', source)
         self.assertIn("'validate', str(package)", source)
 
