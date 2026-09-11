@@ -14,38 +14,43 @@ Verified reference set for AWFUL STUDIO. These links are external references, no
 
 ### Packaging
 
-The source directory for Alpha 0.0.16 must contain `blender_manifest.toml` and `__init__.py`. Release verification uses Blender's own command-line extension tooling rather than constructing a ZIP with a custom archiver.
+The 0.0.17 Extension source contains `blender_manifest.toml` and `__init__.py`. Release verification uses Blender's own command-line extension tooling rather than constructing a ZIP with a custom archiver.
 
 Canonical package checks:
 
 ```sh
 blender --command extension validate extension/awful_studio
 blender --command extension build --source-dir extension/awful_studio --output-dir dist
-blender --command extension validate dist/awful_studio-0.0.16.zip
+blender --command extension validate dist/awful_studio-0.0.17.zip
 ```
 
 The exact built ZIP, not the source checkout, is what runtime QA installs and executes.
 
 ### Install/update
 
-`Install from Disk` is useful for local package verification but belongs to a local repository and does not provide the remote update flow AWFUL wants. Native update behavior requires a remote Extension repository. Blender can generate a static repository listing with `extension server-generate`; AWFUL can host the generated files on GitHub Pages or equivalent static hosting.
+`Install from Disk` is useful for exact candidate verification but is not the production update channel. Native update behavior uses a Blender Extension Repository. Blender generates the static repository listing with `extension server-generate`; AWFUL verifies that repository through Blender's native `repo-add` / `sync` / install path in isolated CI profiles.
 
-Required update evidence:
+The production repository URL is published only after the final manual UI smoke. Do not invent a placeholder URL in release-facing docs or code.
 
-1. install a published test package from the remote repository;
-2. publish a higher test version;
-3. sync/check updates;
-4. update using Blender's native extension mechanism;
-5. restart/reopen the saved AWFUL scene;
-6. rerun lifecycle/schema/runtime assertions.
+Required publication/update evidence:
+
+1. the exact candidate ZIP passes packaged runtime on Windows and Ubuntu;
+2. Blender generates the static repository from the exact package;
+3. an isolated Blender profile adds and syncs the repository;
+4. Blender installs AWFUL STUDIO through the native repository path;
+5. after the final manual UI smoke, the approved state is promoted through the accepted `dev` → `prod` release topology;
+6. the production repository is published and exposes 0.0.17;
+7. future update qualification uses a higher test version and Blender's native update path before that later release is published.
 
 ### Network permissions and offline behavior
 
-Manifest permissions document capability; they do not replace runtime discipline. Blender's `--offline-mode` is part of the runtime contract. AWFUL must additionally ensure its own code makes no direct network attempt during import/register/startup/build/preset operations. Optional downloads require explicit user intent and Blender online access.
+Manifest permissions document capability; they do not replace runtime discipline. Blender's `--offline-mode` is part of the runtime contract. AWFUL additionally ensures its own code makes no direct network attempt during import/register/startup/build/preset/procedural-mockup operations. Optional downloads require explicit user intent and Blender online access.
+
+Blender 5.2 also requires online access to be explicitly enabled for repository synchronization, including file-backed repository tests. The canonical repository gate therefore enables online mode only for the explicit repository sync/install operation; this does not make normal AWFUL scene operations network-dependent.
 
 ### Repository generation
 
-Canonical static repository generation should use Blender itself:
+Canonical static repository generation uses Blender itself:
 
 ```sh
 blender --command extension server-generate --repo-dir dist/repository
@@ -55,8 +60,10 @@ Do not hand-maintain a second package index format if Blender can generate it.
 
 ## Project-specific evidence rules
 
-- Target Blender: 5.2.1 for Alpha 0.0.16 verification.
-- Runtime tests are structural/lifecycle/data-safety tests; renders are not required for this foundation.
-- Both Linux CI and Windows verification matter before calling the package production-ready.
-- Save/reopen and native update are part of compatibility, not optional documentation exercises.
-- All final commands, Blender version, package SHA-256 and test reports should be retained as release evidence.
+- Target Blender: 5.2.1 for 0.0.17 verification.
+- Runtime tests are structural/lifecycle/data-safety tests; renders are not required for the ordinary candidate gate.
+- Linux and Windows cloud runtime must both pass before the candidate reaches the manual UI smoke.
+- Save/reopen and native repository install are compatibility requirements, not optional documentation exercises.
+- The manual UI smoke is the final human acceptance layer before tag/publication; it does not require rendering.
+- Release/tag/deploy follows the accepted branch contract: `dev` = integration, `prod` = production/release/deploy.
+- Final candidate identification must retain commit/run/artifact evidence; the published release must expose the exact approved package and SHA-256.
