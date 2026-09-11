@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 import urllib.request
 
-from . import asset_provenance
+from . import asset_provenance, asset_workflow
 
 MAX_BYTES = 128 * 1024 * 1024
 _LAST_ERROR = ''
@@ -57,8 +57,12 @@ def fetch(url, path, force=False):
     import bpy
     global _LAST_ERROR
     prefs = preferences()
-    if not prefs or not prefs.allow_network_assets or not bpy.app.online_access:
-        raise RuntimeError('Enable Blender online access and AWFUL Allow Network Assets first')
+    permission = asset_workflow.permission_state(
+        blender_online=bool(bpy.app.online_access),
+        awful_consent=bool(prefs and prefs.allow_network_assets),
+    )
+    if not permission['ready']:
+        raise RuntimeError(str(permission['message']))
     record = _active_record_for_url(url)
     path = Path(path)
     expected = root() / record.get('cache_subdir', '') / record['filename']
@@ -83,7 +87,7 @@ def fetch(url, path, force=False):
         'status': 'downloading',
     }
     try:
-        request = urllib.request.Request(url, headers={'User-Agent': 'AWFUL-Studio/0.0.16'})
+        request = urllib.request.Request(url, headers={'User-Agent': 'AWFUL-Studio/0.0.17'})
         with urllib.request.urlopen(request, timeout=30) as response, temp.open('wb') as output:
             if response.url != url:
                 raise ValueError('Unexpected asset redirect; review the curated source')
