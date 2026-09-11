@@ -6,6 +6,7 @@ import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 EXT = ROOT / 'extension' / 'awful_studio'
+THIS_FILE = pathlib.Path(__file__).resolve()
 
 
 def tracked_files():
@@ -60,6 +61,8 @@ class Release017HygieneTests(unittest.TestCase):
         )
         text_suffixes = {'.md', '.py', '.toml', '.yml', '.yaml', '.json', '.txt'}
         for path in tracked:
+            if path.resolve() == THIS_FILE:
+                continue
             if not path.is_file() or path.suffix.lower() not in text_suffixes:
                 continue
             text = path.read_text(encoding='utf-8', errors='ignore')
