@@ -38,7 +38,7 @@ Required publication/update evidence:
 2. Blender generates the static repository from the exact package;
 3. an isolated Blender profile adds and syncs the repository;
 4. Blender installs AWFUL STUDIO through the native repository path;
-5. after the final manual UI smoke, the approved state is promoted through the accepted `dev` → `prod` release topology;
+5. after the final manual UI smoke, the approved candidate is tagged/published from the repository's actual approved release state;
 6. the production repository is published and exposes 0.0.17;
 7. future update qualification uses a higher test version and Blender's native update path before that later release is published.
 
@@ -65,5 +65,4 @@ Do not hand-maintain a second package index format if Blender can generate it.
 - Linux and Windows cloud runtime must both pass before the candidate reaches the manual UI smoke.
 - Save/reopen and native repository install are compatibility requirements, not optional documentation exercises.
 - The manual UI smoke is the final human acceptance layer before tag/publication; it does not require rendering.
-- Release/tag/deploy follows the accepted branch contract: `dev` = integration, `prod` = production/release/deploy.
 - Final candidate identification must retain commit/run/artifact evidence; the published release must expose the exact approved package and SHA-256.
