@@ -24,10 +24,6 @@ def verify(blender, output):
         work = Path(temporary)
         user_resources = work / 'user-resources'
         user_resources.mkdir()
-        # Blender 5.2 uses BLENDER_USER_RESOURCES as the supported override for
-        # preferences, scripts, extensions and other per-user state. Keeping the
-        # whole runtime profile under the temporary work directory prevents QA
-        # from touching the developer's real Blender profile.
         env = dict(os.environ, BLENDER_USER_RESOURCES=str(user_resources))
         (work/'installed').mkdir()
         phases = ['historical', 'install', 'reopen', 'migrate']
