@@ -1,9 +1,11 @@
-"""Opt-in asset cache. No work is performed at import, enable or Blender startup."""
+"""Opt-in provenance-backed asset cache. No work occurs at import/enable/startup."""
 import hashlib
 import json
 import os
 from pathlib import Path
 import urllib.request
+
+from . import asset_provenance
 
 MAX_BYTES = 128 * 1024 * 1024
 _LAST_ERROR = ''
@@ -44,19 +46,24 @@ def last_error():
     return _LAST_ERROR or 'Asset unavailable; procedural fallback remains active'
 
 
+def _active_record_for_url(url):
+    record = asset_provenance.record_for_url(url)
+    if not record or not record['active'] or record['distribution'] != 'remote-only':
+        raise ValueError('Only provenance-reviewed active remote assets may be downloaded')
+    return record
+
+
 def fetch(url, path, force=False):
     import bpy
-    from .core.legacy import ASSET_URLS
     global _LAST_ERROR
     prefs = preferences()
     if not prefs or not prefs.allow_network_assets or not bpy.app.online_access:
         raise RuntimeError('Enable Blender online access and AWFUL Allow Network Assets first')
-    allowed = {u for _, u in ASSET_URLS.values()}
-    if url not in allowed:
-        raise ValueError('Only curated official asset URLs may be downloaded')
+    record = _active_record_for_url(url)
     path = Path(path)
-    if path.is_symlink() or not path.resolve().is_relative_to(root().resolve()):
-        raise ValueError('Asset destination must be inside the AWFUL cache')
+    expected = root() / record.get('cache_subdir', '') / record['filename']
+    if path.is_symlink() or path.resolve() != expected.resolve():
+        raise ValueError('Asset destination must match its provenance cache path')
     if not force and read_valid(path):
         return True
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -64,8 +71,17 @@ def fetch(url, path, force=False):
     sidecar = path.with_suffix(path.suffix + '.json')
     if temp.is_symlink() or sidecar.is_symlink():
         raise ValueError('Symlink cache files are not writable')
-    metadata = {'source_url': url, 'license': 'CC0-1.0',
-                'license_url': 'https://polyhaven.com/license', 'status': 'downloading'}
+    metadata = {
+        'provider': record['provider'],
+        'asset_id': record['asset_id'],
+        'title': record['title'],
+        'source_page': record['source_page'],
+        'source_url': url,
+        'license': record['license'],
+        'license_url': record['license_url'],
+        'distribution': record['distribution'],
+        'status': 'downloading',
+    }
     try:
         request = urllib.request.Request(url, headers={'User-Agent': 'AWFUL-Studio/0.0.16'})
         with urllib.request.urlopen(request, timeout=30) as response, temp.open('wb') as output:
@@ -78,8 +94,9 @@ def fetch(url, path, force=False):
                     raise ValueError('Asset exceeds the cache download limit')
                 output.write(chunk)
         with temp.open('rb') as stream:
-            if not stream.read(16).startswith((b'#?RADIANCE', b'#?RGBE')):
-                raise ValueError('Downloaded asset is not a Radiance HDR image')
+            if record.get('media_type') == 'image/vnd.radiance':
+                if not stream.read(16).startswith((b'#?RADIANCE', b'#?RGBE')):
+                    raise ValueError('Downloaded asset is not a Radiance HDR image')
         metadata.update(status='ready', sha256=digest(temp), bytes=total)
         os.replace(temp, path)
         sidecar.write_text(json.dumps(metadata, indent=2), encoding='utf-8')
@@ -94,16 +111,19 @@ def fetch(url, path, force=False):
 
 
 def clear():
-    # Only known, provenance-bearing cache files; never recursively delete a user directory.
-    from .core.legacy import ASSET_URLS
+    # Delete only exact active provenance-bearing files. Never recurse into a
+    # user-selected cache parent and never follow symlinks.
     removed = 0
-    for filename, url in ASSET_URLS.values():
-        path = root() / 'hdri' / filename
+    cache_root = root().resolve()
+    for record in asset_provenance.active_assets().values():
+        path = root() / record.get('cache_subdir', '') / record['filename']
         sidecar = path.with_suffix(path.suffix + '.json')
-        if path.is_symlink() or sidecar.is_symlink() or not path.resolve().is_relative_to(root().resolve()):
+        if path.is_symlink() or sidecar.is_symlink() or not path.resolve().is_relative_to(cache_root):
             continue
         try:
-            if json.loads(sidecar.read_text()).get('source_url') != url:
+            meta = json.loads(sidecar.read_text(encoding='utf-8'))
+            if (meta.get('source_url') != record['download_url'] or
+                    meta.get('asset_id') != record['asset_id']):
                 continue
             path.unlink(missing_ok=True)
             sidecar.unlink()
