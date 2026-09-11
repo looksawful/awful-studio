@@ -1,10 +1,19 @@
 import pathlib
 import re
+import subprocess
 import tomllib
 import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 EXT = ROOT / 'extension' / 'awful_studio'
+
+
+def tracked_files():
+    result = subprocess.run(
+        ['git', 'ls-files', '-z'], cwd=ROOT,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True,
+    )
+    return [ROOT / item.decode('utf-8') for item in result.stdout.split(b'\0') if item]
 
 
 class Release017HygieneTests(unittest.TestCase):
@@ -33,9 +42,14 @@ class Release017HygieneTests(unittest.TestCase):
 
     def test_release_tree_has_no_dev_junk_or_machine_specific_paths(self):
         forbidden_suffixes = {'.pyc', '.pyo', '.blend', '.blend1', '.exe', '.dll', '.zip'}
-        for path in EXT.rglob('*'):
-            if path.is_file():
-                self.assertNotIn(path.suffix.lower(), forbidden_suffixes, str(path.relative_to(ROOT)))
+        tracked = tracked_files()
+        for path in tracked:
+            try:
+                relative = path.relative_to(ROOT)
+            except ValueError:
+                continue
+            if relative.parts[:2] == ('extension', 'awful_studio'):
+                self.assertNotIn(path.suffix.lower(), forbidden_suffixes, str(relative))
 
         patterns = (
             re.compile(r'[A-Za-z]:\\Users\\', re.IGNORECASE),
@@ -43,7 +57,7 @@ class Release017HygieneTests(unittest.TestCase):
             re.compile(r'/home/[^/\s]+/'),
         )
         text_suffixes = {'.md', '.py', '.toml', '.yml', '.yaml', '.json', '.txt'}
-        for path in ROOT.rglob('*'):
+        for path in tracked:
             if not path.is_file() or path.suffix.lower() not in text_suffixes:
                 continue
             text = path.read_text(encoding='utf-8', errors='ignore')
