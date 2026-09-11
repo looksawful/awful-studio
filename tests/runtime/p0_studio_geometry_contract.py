@@ -84,12 +84,12 @@ def main():
         check('cyclorama principled exists', shader is not None)
 
         inventory = counts()
-        settings.cyclorama_distance_m = 4.0
+        settings.cyclorama_distance_m = 3.5
         bpy.context.view_layer.update()
-        check('metric distance stored', abs(float(settings.cyclorama_distance_m) - 4.0) < 1e-6,
+        check('metric distance stored', abs(float(settings.cyclorama_distance_m) - 3.5) < 1e-6,
               float(settings.cyclorama_distance_m))
         check('metric distance applied to scene',
-              abs(float(scene['awful_cyclorama_distance_m']) - 4.0) < 1e-6,
+              abs(float(scene['awful_cyclorama_distance_m']) - 3.5) < 1e-6,
               float(scene.get('awful_cyclorama_distance_m', -1.0)))
         check('distance update datablock bounded', counts() == inventory, counts())
 

@@ -3,13 +3,14 @@
 import time
 import bpy
 from bpy.props import BoolProperty, StringProperty, IntProperty, PointerProperty, EnumProperty
-from . import ownership, migrations, asset_cache, photography, camera_policy
+from . import ownership, migrations, asset_cache, photography, camera_policy, studio_geometry
 from .core import legacy
 
 # Policy installation mutates only in-memory preset metadata/callables. It must run
 # before legacy PropertyGroup classes are registered and must never touch a scene.
 photography.install(legacy)
 camera_policy.install(legacy)
+studio_geometry.install(legacy)
 
 VERSION = (0, 0, 16)
 _registered = []
