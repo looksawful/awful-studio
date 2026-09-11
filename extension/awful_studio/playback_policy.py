@@ -44,6 +44,30 @@ def modifier_plan(mode):
     }
 
 
+def iter_fcurves(action):
+    """Yield an Action's F-Curves on both legacy and Blender 5.2 APIs.
+
+    Blender 5.2 stores keyframed channels under Action layers -> strips ->
+    channelbags. Older/legacy actions expose `action.fcurves` directly.
+    """
+    seen = set()
+    direct = getattr(action, 'fcurves', None)
+    if direct is not None:
+        for fcurve in direct:
+            pointer = fcurve.as_pointer()
+            if pointer not in seen:
+                seen.add(pointer)
+                yield fcurve
+    for layer in getattr(action, 'layers', ()):
+        for strip in getattr(layer, 'strips', ()):
+            for channelbag in getattr(strip, 'channelbags', ()):
+                for fcurve in getattr(channelbag, 'fcurves', ()):
+                    pointer = fcurve.as_pointer()
+                    if pointer not in seen:
+                        seen.add(pointer)
+                        yield fcurve
+
+
 def _sources(legacy, target):
     roles = _PRODUCT_ROLES if target == 'PRODUCT' else _CAMERA_ROLES
     sources = [legacy.REG.object(role) for role in roles]
@@ -73,7 +97,7 @@ def _actions(legacy, target):
 def _apply_action_policy(action, mode):
     policy = mode_policy(mode)
     cycle_mode = policy['cycles_modifier']
-    for fcurve in action.fcurves:
+    for fcurve in iter_fcurves(action):
         for modifier in list(fcurve.modifiers):
             if modifier.type == 'CYCLES':
                 fcurve.modifiers.remove(modifier)
