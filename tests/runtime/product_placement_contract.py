@@ -30,6 +30,34 @@ def check(name, condition, value=None):
         raise AssertionError(name)
 
 
+def xyz(value):
+    return tuple(float(component) for component in value)
+
+
+def transform_evidence(obj):
+    return {
+        'name': obj.name,
+        'parent': obj.parent.name if obj.parent else None,
+        'location': xyz(obj.location),
+        'world_translation': xyz(obj.matrix_world.translation),
+        'parent_inverse_translation': xyz(obj.matrix_parent_inverse.translation),
+        'scale': xyz(obj.scale),
+    }
+
+
+def placement_chain(legacy, root):
+    chain = []
+    for role in (
+        'PRODUCT_STAGE', 'PRODUCT_MOTION', 'PRODUCT_ROT_Z', 'PRODUCT_ROT_X',
+        'PRODUCT_ROT_Y', 'PRODUCT_GEOMETRY_ROOT', 'PRODUCT_CONTENT',
+    ):
+        obj = legacy.REG.object(role)
+        if obj is not None:
+            chain.append(transform_evidence(obj))
+    chain.append(transform_evidence(root))
+    return chain
+
+
 def geometry_bbox(legacy, root):
     objects = [root] + legacy.descendants(root)
     meshes = [obj for obj in objects if obj.type in {'MESH', 'CURVE', 'FONT', 'SURFACE', 'META'}]
@@ -54,7 +82,13 @@ def assert_grounded(legacy, root, label, tolerance=1e-4):
     check(
         f'{label} product bottom contacts pedestal top',
         abs(gap) <= tolerance,
-        {'gap': gap, 'product_bottom': product_bottom, 'pedestal_top': pedestal_top},
+        {
+            'gap': gap,
+            'product_bottom': product_bottom,
+            'pedestal_top': pedestal_top,
+            'pedestal': transform_evidence(legacy.REG.require_object('PEDESTAL')),
+            'chain': placement_chain(legacy, root),
+        },
     )
 
 
