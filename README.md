@@ -17,15 +17,6 @@ Historical source SHA-256:
 5d14513b699a0c0a0e693bba7c31111f264ac5988cf1abb85c7153f6a2e7e56b
 ```
 
-## Branch contract
-
-The accepted repository topology is:
-
-- `dev` = working/integration branch;
-- `prod` = production/release/deploy branch.
-
-Feature/agent branches integrate into `dev`. Release/tag/deploy work advances from `dev` to `prod` only after the owning release gates pass. Do not redefine branch topology from stale branch names in historical PRs or documentation.
-
 ## Repository map
 
 ```text
@@ -137,4 +128,4 @@ External tools such as Blender Agent Studio and Flue remain optional research it
 - Completed product roadmap: GitHub issue #27
 - Pre-smoke release prep: GitHub issue #37
 
-Current implementation truth is the latest accepted GitHub issue/PR/CI evidence, not stale historical branch names or prose claims.
+Current implementation truth is the latest accepted GitHub issue/PR/CI evidence, not stale prose claims.
