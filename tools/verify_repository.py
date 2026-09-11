@@ -60,8 +60,11 @@ def verify(blender, package, output):
                 'repo-add', 'awful_ci', '--name', 'AWFUL CI', '--url', repository_url,
                 '--clear-all',
             ], env, evidence['steps'])
+            # Blender 5.2 gates repository synchronization behind its online-access
+            # policy even for file:// repositories. --online-mode only enables that
+            # Blender policy gate here; the configured repository itself remains local.
             run([
-                blender, '--background', '--command', 'extension', 'sync',
+                blender, '--background', '--online-mode', '--command', 'extension', 'sync',
             ], env, evidence['steps'])
             listing = run([
                 blender, '--background', '--command', 'extension', 'list',
@@ -69,7 +72,7 @@ def verify(blender, package, output):
             if 'awful_studio' not in listing:
                 raise RuntimeError('Synced native repository does not expose awful_studio')
             installed = run([
-                blender, '--background', '--command', 'extension',
+                blender, '--background', '--online-mode', '--command', 'extension',
                 'install', '-s', '-e', 'awful_studio',
             ], env, evidence['steps'])
             if 'awful_studio' not in installed.lower():
