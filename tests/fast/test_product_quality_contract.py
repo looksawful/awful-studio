@@ -93,6 +93,15 @@ class ProductQualityContractTests(unittest.TestCase):
             self.assertNotIn('import bpy', source)
             self.assertNotIn('from bpy', source)
 
+    def test_product_placement_installs_before_product_quality(self):
+        init_source = INIT_PATH.read_text(encoding='utf-8')
+        self.assertIn('product_placement.install(legacy)', init_source)
+        self.assertIn('product_quality.install(legacy)', init_source)
+        self.assertLess(
+            init_source.index('product_placement.install(legacy)'),
+            init_source.index('product_quality.install(legacy)'),
+        )
+
     def test_unknown_catalog_keys_are_rejected(self):
         policy = load_policy()
         with self.assertRaises(ValueError):
