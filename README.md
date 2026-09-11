@@ -1,14 +1,15 @@
 # AWFUL STUDIO
 
-AWFUL STUDIO is a Blender-native virtual product and advertising studio for building editable product-shooting scenes, lighting rigs, camera setups, environments and motion presets without replacing Blender's native controls.
+AWFUL STUDIO is a Blender-native virtual product and advertising studio for building editable product-shooting scenes, lighting rigs, camera setups, environments, procedural product mockups and motion presets without replacing Blender's native controls.
 
 ## Status
 
 - Historical baseline: **Alpha 0.0.15** (`historical/0.0.15/awful_studio_v4_2_gpu_perf.py`).
-- Current target: **Alpha 0.0.16 Extension Foundation** on `feature/extension-foundation`.
+- Current target: **Alpha 0.0.17 pre-release candidate**.
 - Blender target: **5.2 LTS**; exact verified runtime: **Blender 5.2.1**, build `9e2066aef7ef`.
 - Exact official Windows/Linux distribution pins: `runtime/blender.lock`.
-- 0.0.16 is not public-release-ready until the remaining provenance and native Extension repository/update gates are reconciled, but the core lifecycle and accepted P0 systems already have exact-package Blender 5.2.1 Windows/Ubuntu CI evidence.
+- Structural/runtime qualification is cloud-first and uses the exact built Extension ZIP on Windows and Ubuntu.
+- The final manual UI smoke remains the last human gate before 0.0.17 is tagged or published.
 
 Historical source SHA-256:
 
@@ -30,7 +31,7 @@ tools/verify_extension.py official build + exact-ZIP runtime verifier
 integrations/             external integration status/pins
 .skills/                  thin AWFUL-specific workflow adapters
 .agents/                  research/checkpoint/evidence notes
-docs/                     engineering plans and references
+docs/                     install, release, engineering plans and references
 AGENTS.md                  default instructions for agents/contributors
 STATE.md                   current engineering handoff
 ```
@@ -47,7 +48,7 @@ Key invariants:
 - Base studio operation is offline; optional asset downloads require explicit opt-in.
 - Rebuild/Remove/migration preserve unmanaged and shared user data.
 - Heavy post/compositor/volume paths remain opt-in.
-- Render/image regression tests are not mandatory for 0.0.16 and must not run locally without explicit user approval.
+- Ordinary structural QA contains no render invocation and must not probe local GPU hardware automatically.
 - Notion owns product/business/accepted architecture requirements. GitHub Issues own implementation work/status/evidence.
 
 ## Tests and runtime
@@ -84,31 +85,47 @@ python tools/awful.py test-runtime --blender <path-to-blender>
 
 Outside CI the underlying verifier refuses to launch full Blender runtime unless the caller deliberately adds `--allow-local-blender`. Ordinary development should use fast tests locally and packaged runtime in CI.
 
-`pytest-blender` was evaluated as a candidate but is not required. AWFUL uses its thinner custom harness because the release contract must test the final Blender Extension ZIP, lifecycle, isolated profile, save/reopen and migration behavior rather than merely import source into Blender Python.
+## 0.0.17 scope
 
-## Extension installation
+The current candidate includes:
 
-Candidate packages are built with Blender's official Extension CLI. Direct `Install from Disk` is useful for isolated candidate testing, but the final user path is a Blender-native Extension repository so install/update can use Blender's Extensions UI.
+- ownership-safe Build/Rebuild/Remove and historical migration;
+- photographic lighting and Flash family;
+- metric cyclorama and independent studio architecture visibility;
+- full product-bounds camera framing;
+- Pure HDRI / Physical Sky / managed Sun natural-light semantics;
+- independent Product/Camera Once / Loop / Ping-Pong playback;
+- reviewed optional-asset provenance and offline cache safety;
+- procedural Bottle / Jar / Box / Can / Phone / Tablet mockups;
+- deterministic offline starter materials and Auto Fit integration;
+- native static Blender Extension repository generation/sync/install verification.
 
-Do not treat a package as a release merely because it imports. Release evidence must cover the exact ZIP, isolated install/enable/disable/re-enable/restart/save/reopen/migrate behavior, offline guarantees and the native repository/install/update path required by the current release issue.
+The separate visual-regression/render harness is not a release blocker. The required remaining human acceptance step is the manual UI smoke documented in `docs/releases/0.0.17.md`.
+
+## Extension installation and update
+
+Use `docs/INSTALL_UPDATE.md` for the verified Install from Disk and Blender Extension Repository workflows, update rules and troubleshooting.
+
+Candidate packages are built with Blender's official Extension CLI. A package is not considered published merely because it imports or passes CI: tagging/release/deploy happens only after the final manual UI smoke.
 
 ## Optional third-party assets
 
-Base Build contains no mandatory media downloads. Optional HDRIs are explicit opt-in cache assets. Provenance and third-party licenses are documented separately in `docs/THIRD_PARTY_ASSETS.md` once the provenance slice is integrated.
+Base Build contains no mandatory media downloads. Optional HDRIs are explicit opt-in cache assets. Provenance and third-party licenses are documented in `docs/THIRD_PARTY_ASSETS.md`.
 
 ## Agent skills and integrations
 
 `.skills/README.md` lists project-local workflow adapters for TDD, debugging, verification, Git isolation/review, Blender runtime/lifecycle/data safety, network/cache safety, performance, release and handoff.
 
-External tools such as Blender Agent Studio and Flue remain explicit pilot/candidate integrations until exact-version Blender 5.2 evidence justifies a supported status. Do not introduce a second runtime harness merely because another tool can launch Blender too. Apparently one reproducible test system is less fashionable than three conflicting ones, but it is considerably easier to maintain.
+External tools such as Blender Agent Studio and Flue remain optional research items. They are not required for AWFUL STUDIO 0.0.17 readiness and must not replace the canonical runtime path.
 
-## Production readiness
+## Release references
 
 - Current handoff: `STATE.md`
-- P0 roadmap: GitHub issue #27
-- Cloud-only completion batch: GitHub issue #33
-- Design: `docs/superpowers/specs/2026-09-10-awful-studio-production-readiness-design.md`
-- Implementation plan: `docs/superpowers/plans/2026-09-10-awful-studio-production-readiness.md`
+- Install/update: `docs/INSTALL_UPDATE.md`
+- 0.0.17 release notes and final smoke gate: `docs/releases/0.0.17.md`
+- Third-party assets: `docs/THIRD_PARTY_ASSETS.md`
 - Official Blender Extension references: `docs/references/blender-extension-development.md`
+- Completed product roadmap: GitHub issue #27
+- Pre-smoke release prep: GitHub issue #37
 
-Current implementation truth is the latest GitHub issue/PR/CI evidence, not an old prose claim in a README.
+Current implementation truth is the latest accepted GitHub issue/PR/CI evidence, not stale prose claims.

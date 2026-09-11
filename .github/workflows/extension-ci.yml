@@ -16,13 +16,10 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - run: python3 -m unittest discover -s tests/fast -v
       - run: git diff --check
-  runtime:
+
+  candidate:
     needs: fast
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -31,25 +28,58 @@ jobs:
         run: |
           python tools/setup_blender.py --destination .blender > blender-path.txt
           echo "BLENDER=$(tail -n 1 blender-path.txt)" >> "$GITHUB_ENV"
-      - name: Validate, build and test final ZIP
+      - name: Build and verify canonical candidate on Ubuntu
         shell: bash
         run: python tools/verify_extension.py --blender "$BLENDER"
-      - name: Verify native static Extension repository install
+      - name: Verify native static Extension repository install on Ubuntu
         shell: bash
         run: python tools/verify_repository.py --blender "$BLENDER" --package dist/awful_studio-0.0.17.zip --output dist
-      - name: Upload runtime evidence
+      - name: Upload Ubuntu runtime evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: runtime-${{ matrix.os }}
+          name: runtime-ubuntu-latest
           path: |
             dist/*.json
             dist/*.log
             .blender/distribution.json
           if-no-files-found: error
-      - name: Upload verified candidate
+      - name: Upload canonical candidate
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: extension-${{ matrix.os }}
+          name: extension-candidate
           path: dist/awful_studio-0.0.17.zip
+          if-no-files-found: error
+
+  runtime-windows:
+    needs: [fast, candidate]
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Download canonical candidate
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: extension-candidate
+          path: dist
+      - name: Install exact official Blender
+        shell: bash
+        run: |
+          python tools/setup_blender.py --destination .blender > blender-path.txt
+          echo "BLENDER=$(tail -n 1 blender-path.txt)" >> "$GITHUB_ENV"
+      - name: Validate and test the exact Ubuntu-built candidate on Windows
+        shell: bash
+        run: python tools/verify_extension.py --blender "$BLENDER" --package dist/awful_studio-0.0.17.zip
+      - name: Verify native static Extension repository install on Windows
+        shell: bash
+        run: python tools/verify_repository.py --blender "$BLENDER" --package dist/awful_studio-0.0.17.zip --output dist
+      - name: Upload Windows runtime evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: runtime-windows-latest
+          path: |
+            dist/*.json
+            dist/*.log
+            .blender/distribution.json
           if-no-files-found: error

@@ -275,7 +275,7 @@ Extend `tools/verify_extension.py`:
 - [ ] **Step 8: Run packaged runtime and observe RED**
 
 ```powershell
-python .\tools\verify_extension.py --blender "D:\Blender Foundation\Blender 5.2\blender.exe" --output .\dist
+python .\tools\verify_extension.py --blender <BLENDER_5_2_1_EXECUTABLE> --output .\dist
 ```
 
 Expected: existing phases pass until `studio_geometry`, which fails on the first missing #7/#21 requirement. Preserve `dist/studio_geometry.log` and JSON evidence.
@@ -342,7 +342,7 @@ Update Principled/fallback material inputs in place. Reuse the material and text
 
 ```powershell
 python -m unittest tests.fast.test_studio_geometry_contract -v
-python .\tools\verify_extension.py --blender "D:\Blender Foundation\Blender 5.2\blender.exe" --output .\dist
+python .\tools\verify_extension.py --blender <BLENDER_5_2_1_EXECUTABLE> --output .\dist
 ```
 
 Expected: cyclorama-specific checks progress; architecture checks may still fail until Task 5.
@@ -460,7 +460,7 @@ Do not duplicate native transforms or material-node parameters.
 - [ ] **Step 5: Run full packaged runtime**
 
 ```powershell
-python .\tools\verify_extension.py --blender "D:\Blender Foundation\Blender 5.2\blender.exe" --output .\dist
+python .\tools\verify_extension.py --blender <BLENDER_5_2_1_EXECUTABLE> --output .\dist
 ```
 
 Expected: `historical`, `install`, `reopen`, `migrate`, `lighting`, `camera`, and `studio_geometry` all PASS locally.
@@ -512,7 +512,7 @@ Compare with the current 0.0.16 foundation runtime evidence. Any material unappr
 
 ```powershell
 Remove-Item .\dist -Recurse -Force -ErrorAction SilentlyContinue
-python .\tools\verify_extension.py --blender "D:\Blender Foundation\Blender 5.2\blender.exe" --output .\dist
+python .\tools\verify_extension.py --blender <BLENDER_5_2_1_EXECUTABLE> --output .\dist
 Get-Content .\dist\verification.json
 ```
 
