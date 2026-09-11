@@ -39,7 +39,7 @@ def mark(block, role='', scene=None):
     block[MANAGED] = True
     block[KEY] = owner(scene)
     block[ROLE] = role
-    block[VERSION_KEY] = '0.0.16'
+    block[VERSION_KEY] = '0.0.17'
     return block
 
 

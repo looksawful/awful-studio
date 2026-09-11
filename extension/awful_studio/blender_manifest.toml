@@ -1,6 +1,6 @@
 schema_version = "1.0.0"
 id = "awful_studio"
-version = "0.0.16"
+version = "0.0.17"
 name = "AWFUL STUDIO"
 tagline = "Build an editable virtual product and advertising studio"
 maintainer = "Ivan Krushinsky / looksawful"

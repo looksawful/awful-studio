@@ -3,7 +3,7 @@
 import time
 import bpy
 from bpy.props import BoolProperty, StringProperty, IntProperty, PointerProperty, EnumProperty
-from . import ownership, migrations, asset_cache, photography, camera_policy, studio_geometry, natural_light, runtime_performance, playback_policy
+from . import ownership, migrations, asset_cache, photography, camera_policy, studio_geometry, natural_light, runtime_performance, playback_policy, product_quality
 from .core import legacy
 
 # Policy installation mutates only in-memory preset metadata/callables. It must run
@@ -14,8 +14,9 @@ studio_geometry.install(legacy)
 natural_light.install(legacy)
 runtime_performance.install(legacy)
 playback_policy.install(legacy)
+product_quality.install(legacy)
 
-VERSION = (0, 0, 16)
+VERSION = (0, 0, 17)
 _registered = []
 
 
@@ -26,7 +27,7 @@ class AWFUL_AddonPreferences(bpy.types.AddonPreferences):
     diagnostics: BoolProperty(name='Diagnostics', default=False)
 
     def draw(self, context):
-        self.layout.label(text='AWFUL STUDIO 0.0.16 — Blender 5.2 LTS')
+        self.layout.label(text='AWFUL STUDIO 0.0.17 — Blender 5.2 LTS')
         self.layout.prop(self, 'asset_cache_path')
         self.layout.prop(self, 'allow_network_assets')
         self.layout.prop(self, 'diagnostics')
@@ -186,9 +187,35 @@ class AWFUL_OT_ClearCache(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class AWFUL_OT_GenerateMockup(bpy.types.Operator):
+    bl_idname = 'awful.generate_mockup'
+    bl_label = 'Generate / Replace AWFUL Mockup'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return (context.scene is not None
+                and legacy.REG.object('CYC') is not None
+                and getattr(context.scene.awful_studio, 'product_mockup', 'NONE') != 'NONE')
+
+    def execute(self, context):
+        scene = context.scene
+        key = scene.awful_studio.product_mockup
+        try:
+            root = product_quality.replace_mockup(legacy, scene, key)
+            with ownership.for_scene(scene):
+                legacy.apply_product_motion(scene, scene.awful_studio.product_motion)
+                ownership.mark_generated_actions(scene)
+            self.report({'INFO'}, f'Generated {product_quality.mockup_spec(key)["label"]}: {root.name}')
+        except Exception as exc:
+            self.report({'ERROR'}, str(exc))
+            return {'CANCELLED'}
+        return {'FINISHED'}
+
+
 CLASSES = (AWFUL_AddonPreferences, AWFUL_SceneState, *legacy.CLASSES,
            AWFUL_OT_Build, AWFUL_OT_Rebuild, AWFUL_OT_Remove, AWFUL_OT_ResetSystem,
-           AWFUL_OT_Migrate, AWFUL_OT_ClearCache)
+           AWFUL_OT_Migrate, AWFUL_OT_ClearCache, AWFUL_OT_GenerateMockup)
 
 
 def register():

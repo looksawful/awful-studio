@@ -20,7 +20,7 @@ class AgentRuntimeEntrypointTests(unittest.TestCase):
         result = self.run_awful('status')
         self.assertEqual(result.returncode, 0, result.stderr)
         data = json.loads(result.stdout)
-        self.assertEqual(data['extension_version'], '0.0.16')
+        self.assertEqual(data['extension_version'], '0.0.17')
         self.assertEqual(data['blender_target'], '5.2.1')
         self.assertEqual(data['blender_build_hash'], '9e2066aef7ef')
         self.assertFalse(data['render_tests_required'])

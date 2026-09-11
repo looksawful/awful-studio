@@ -69,7 +69,7 @@ def doctor():
     except Exception as exc:
         add('runtime lock', False, str(exc))
 
-    add('manifest', MANIFEST.is_file() and manifest_version() == '0.0.16',
+    add('manifest', MANIFEST.is_file() and manifest_version() == '0.0.17',
         str(MANIFEST.relative_to(ROOT)))
     historical_ok = HISTORICAL.is_file() and sha256(HISTORICAL) == HISTORICAL_SHA256
     add('historical baseline', historical_ok, HISTORICAL_SHA256)
