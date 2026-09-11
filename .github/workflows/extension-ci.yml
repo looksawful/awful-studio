@@ -36,7 +36,7 @@ jobs:
         run: python tools/verify_extension.py --blender "$BLENDER"
       - name: Verify native static Extension repository install
         shell: bash
-        run: python tools/verify_repository.py --blender "$BLENDER" --package dist/awful_studio-0.0.16.zip --output dist
+        run: python tools/verify_repository.py --blender "$BLENDER" --package dist/awful_studio-0.0.17.zip --output dist
       - name: Upload runtime evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -51,5 +51,5 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: extension-${{ matrix.os }}
-          path: dist/awful_studio-0.0.16.zip
+          path: dist/awful_studio-0.0.17.zip
           if-no-files-found: error
