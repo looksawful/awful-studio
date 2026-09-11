@@ -1,4 +1,4 @@
-"""Build and verify the exact Extension ZIP.
+"""Build or consume and verify the exact Extension ZIP.
 
 Full Blender runtime is intentionally CI/release-oriented. Local execution is
 blocked by default because structural development must not consume the user's
@@ -14,6 +14,7 @@ import subprocess
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
+EXPECTED_PACKAGE = 'awful_studio-0.0.17.zip'
 
 
 def _timing_summary(operations):
@@ -44,9 +45,21 @@ def _run(command, env, log_path, timeout=300):
         raise RuntimeError(f'{log_path.stem} exited {result.returncode}')
 
 
-def verify(blender, output):
-    output.mkdir(parents=True, exist_ok=True)
+def _resolve_package(blender, output, package_override=None):
+    """Return the exact package to test, building only when no package is supplied."""
     source = ROOT / 'extension/awful_studio'
+    if package_override is not None:
+        package = Path(package_override).resolve()
+        if package.name != EXPECTED_PACKAGE:
+            raise ValueError(f'Expected {EXPECTED_PACKAGE}, got {package.name}')
+        if not package.is_file():
+            raise FileNotFoundError(f'Candidate package not found: {package}')
+        subprocess.run([
+            blender, '--background', '--factory-startup', '--command', 'extension',
+            'validate', str(package),
+        ], check=True)
+        return package, 1, 'prebuilt'
+
     subprocess.run([
         blender, '--background', '--factory-startup', '--command', 'extension',
         'validate', str(source),
@@ -55,14 +68,24 @@ def verify(blender, output):
         blender, '--background', '--factory-startup', '--command', 'extension',
         'build', '--source-dir', str(source), '--output-dir', str(output),
     ], check=True)
-
-    package = output / 'awful_studio-0.0.17.zip'
+    package = output / EXPECTED_PACKAGE
     if not package.is_file():
         raise FileNotFoundError('Official build did not create the expected package')
+    subprocess.run([
+        blender, '--background', '--factory-startup', '--command', 'extension',
+        'validate', str(package),
+    ], check=True)
+    return package, 3, 'official-build'
+
+
+def verify(blender, output, package_override=None):
+    output.mkdir(parents=True, exist_ok=True)
+    package, blender_processes, package_source = _resolve_package(
+        blender, output, package_override=package_override,
+    )
 
     phases = []
     operations = []
-    blender_processes = 2  # official validate + official build
 
     with tempfile.TemporaryDirectory(prefix='awful-runtime-') as temporary:
         work = Path(temporary)
@@ -110,6 +133,7 @@ def verify(blender, output):
     summary = {
         'status': 'passed',
         'package': package.name,
+        'package_source': package_source,
         'sha256': hashlib.sha256(package.read_bytes()).hexdigest(),
         'phases': phases,
         'blender_processes': blender_processes,
@@ -126,6 +150,10 @@ if __name__ == '__main__':
     parser.add_argument('--blender', required=True)
     parser.add_argument('--output', type=Path, default=ROOT / 'dist')
     parser.add_argument(
+        '--package', type=Path, default=None,
+        help='Verify this exact prebuilt Extension ZIP instead of rebuilding source.',
+    )
+    parser.add_argument(
         '--allow-local-blender', action='store_true',
         help='Explicitly allow the full Blender runtime outside CI.',
     )
@@ -137,4 +165,5 @@ if __name__ == '__main__':
             'Run fast tests locally and use CI for packaged runtime; '
             'pass --allow-local-blender only for an intentional release check.'
         )
-    verify(args.blender, args.output.resolve())
+    package_override = args.package.resolve() if args.package else None
+    verify(args.blender, args.output.resolve(), package_override=package_override)
