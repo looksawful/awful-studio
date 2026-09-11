@@ -32,6 +32,26 @@ def dimensions(bbox):
     return tuple(float(maximum[index] - minimum[index]) for index in range(3))
 
 
+def managed_mockup_counts(legacy, ownership, scene):
+    objects = [
+        obj for obj in scene.objects
+        if ownership.owned(obj, scene)
+        and (obj.get(legacy.ROLE_KEY, '') == 'MOCKUP_ROOT'
+             or str(obj.get(legacy.ROLE_KEY, '')).startswith('MOCKUP_'))
+    ]
+    meshes = [
+        mesh for mesh in bpy.data.meshes
+        if ownership.owned(mesh, scene)
+        and str(mesh.get(legacy.ROLE_KEY, '')).startswith('MOCKUP_')
+    ]
+    materials = [
+        material for material in bpy.data.materials
+        if ownership.owned(material, scene)
+        and str(material.get(legacy.ROLE_KEY, '')).startswith('MOCKUP_MAT_')
+    ]
+    return {'objects': len(objects), 'meshes': len(meshes), 'materials': len(materials)}
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--work', type=Path, required=True)
@@ -91,6 +111,75 @@ def main():
             check(f'{key} bevel complexity bounded',
                   all(int(modifier.segments) <= int(spec['bevel_segments']) for modifier in bevels),
                   [int(modifier.segments) for modifier in bevels])
+
+        # Explicit UI generation must never displace a measurable unmanaged product.
+        check('mockup selector scene state exists', hasattr(scene.awful_studio, 'product_mockup'))
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.0, 0.0, 0.5))
+        user_root = bpy.context.object
+        user_root.name = 'USER_PRODUCT_SAFETY_FIXTURE'
+        legacy.mount_product([user_root], False)
+        scene.awful_studio.product_mockup = 'BOTTLE'
+        try:
+            operator_result = bpy.ops.awful.generate_mockup()
+        except RuntimeError:
+            operator_result = {'CANCELLED'}
+        except AttributeError:
+            operator_result = {'MISSING'}
+        check('unmanaged mounted product refuses mockup operator',
+              operator_result == {'CANCELLED'}, list(operator_result))
+        check('unmanaged mounted product survives refusal',
+              user_root.name in bpy.data.objects and not ownership.owned(user_root, scene))
+        check('unmanaged mounted product stays mounted after refusal',
+              user_root.parent is not None
+              and user_root.parent.get(legacy.ROLE_KEY, '') == 'PRODUCT_CONTENT')
+
+        # Remove only the local test fixture, then exercise owned replacement bounds.
+        user_root.parent = None
+        bpy.data.objects.remove(user_root, do_unlink=True)
+        before = managed_mockup_counts(legacy, ownership, scene)
+        for key in ('BOTTLE', 'JAR', 'PHONE', 'BOTTLE'):
+            with ownership.for_scene(scene):
+                root = product_quality.replace_mockup(legacy, scene, key)
+        after = managed_mockup_counts(legacy, ownership, scene)
+        final_limit = int(product_quality.mockup_spec('BOTTLE')['max_mesh_parts'])
+        check('repeated owned replacement keeps one mockup root',
+              len(product_quality.mockup_roots(legacy, scene)) == 1)
+        check('repeated owned replacement keeps mockup meshes bounded',
+              after['meshes'] <= final_limit,
+              {'before': before, 'after': after, 'limit': final_limit})
+        check('repeated owned replacement keeps starter materials bounded',
+              after['materials'] <= len(product_quality.MATERIAL_STARTERS), after)
+
+        # A user object parented into an owned mockup makes replacement ambiguous.
+        guarded_root = product_quality.mockup_roots(legacy, scene)[0]
+        foreign = bpy.data.objects.new('USER_CHILD_UNDER_MOCKUP', None)
+        scene.collection.objects.link(foreign)
+        foreign.parent = guarded_root
+        refused = False
+        try:
+            with ownership.for_scene(scene):
+                product_quality.replace_mockup(legacy, scene, 'JAR')
+        except RuntimeError:
+            refused = True
+        check('unmanaged child under mockup refuses replacement', refused)
+        check('unmanaged child guard is mutation-free',
+              foreign.name in bpy.data.objects and foreign.parent == guarded_root)
+        foreign.parent = None
+        bpy.data.objects.remove(foreign, do_unlink=True)
+
+        # Explicit rebuild restores the selected AWFUL mockup, not the diagnostic fixture.
+        scene.awful_studio.product_mockup = 'PHONE'
+        with ownership.for_scene(scene):
+            product_quality.replace_mockup(legacy, scene, 'PHONE')
+        check('selected mockup exists before rebuild',
+              len(product_quality.mockup_roots(legacy, scene)) == 1)
+        rebuild = bpy.ops.awful.rebuild_studio()
+        check('mockup rebuild finishes', rebuild == {'FINISHED'}, list(rebuild))
+        restored = product_quality.mockup_roots(legacy, scene)
+        check('mockup selection survives rebuild', scene.awful_studio.product_mockup == 'PHONE')
+        check('selected mockup geometry restored on rebuild',
+              len(restored) == 1 and product_quality.mockup_key(restored[0]) == 'PHONE',
+              [product_quality.mockup_key(item) for item in restored] if restored else [])
 
         REPORT['status'] = 'passed'
     except Exception:
