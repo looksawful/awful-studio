@@ -60,7 +60,9 @@ class RuntimePerformancePolicyTests(unittest.TestCase):
     def test_local_full_runtime_requires_explicit_opt_in(self):
         source = VERIFY.read_text(encoding='utf-8')
         self.assertIn('--allow-local-blender', source)
-        self.assertIn("os.environ.get('CI')", source)
+        self.assertIn('os.environ.get(', source)
+        self.assertIn("'CI'", source)
+        self.assertIn('if not in_ci and not args.allow_local_blender', source)
 
     def test_runtime_suite_contains_no_render_invocation(self):
         offenders = []
