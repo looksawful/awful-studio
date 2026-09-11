@@ -15,15 +15,6 @@ This is the short engineering handoff. Product requirements live in Notion; impl
 - Issue #37 owns pre-smoke release preparation. A fresh candidate gate is required after those documentation/hygiene changes.
 - The final manual UI smoke remains the last human acceptance gate before tag/publication/deploy. It is not replaced by structural CI.
 
-## Branch contract
-
-Accepted topology:
-
-- `dev` = working/integration;
-- `prod` = production/release/deploy.
-
-Agent/feature work targets `dev`; release/tag/deploy advances to `prod` only after release gates pass. Historical PR bases and branch names do not redefine this contract. Do not mutate or close parallel work merely to normalize old topology.
-
 ## Canonical runtime architecture
 
 There is one canonical path. Do not build another pytest/bootstrap/runtime stack.
@@ -89,7 +80,7 @@ Issue #37 must leave the repository in a state where the only remaining release 
 5. run fresh exact `awful_studio-0.0.17.zip` Windows + Ubuntu cloud runtime;
 6. pass native static Extension repository generation/sync/install on both platforms;
 7. identify the exact candidate artifact/evidence for the manual smoke;
-8. after the manual smoke passes, promote through the accepted `dev` → `prod` release path, tag and publish.
+8. after the manual smoke passes, tag and publish from the approved release state using the repository's actual release process.
 
 No tag or public release is created before the manual smoke passes.
 
