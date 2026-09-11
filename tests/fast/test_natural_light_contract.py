@@ -49,6 +49,73 @@ class NaturalLightPolicyContractTests(unittest.TestCase):
         self.assertNotEqual(day['elevation_deg'], sunset['elevation_deg'])
         self.assertNotEqual(day['rotation_deg'], sunset['rotation_deg'])
 
+    def test_commercial_defaults_to_hybrid_world_fill_but_flash_and_cinema_do_not(self):
+        import natural_light
+
+        commercial = natural_light.lighting_regime('COMMERCIAL')
+        natural = natural_light.lighting_regime('NATURAL')
+        flash = natural_light.lighting_regime('FLASH')
+        cinema = natural_light.lighting_regime('CINEMA')
+
+        self.assertEqual(commercial['regime'], 'HYBRID')
+        self.assertTrue(commercial['world_default'])
+        self.assertGreaterEqual(commercial['world_factor'], 0.20)
+        self.assertLessEqual(commercial['world_factor'], 0.30)
+
+        self.assertTrue(natural['world_default'])
+        self.assertEqual(natural['world_factor'], 1.0)
+
+        for policy in (flash, cinema):
+            self.assertFalse(policy['world_default'])
+            self.assertEqual(policy['world_factor'], 0.0)
+
+    def test_world_light_and_camera_background_strength_are_independent(self):
+        import natural_light
+
+        base = 0.8
+        world = natural_light.effective_world_strength(
+            base_strength=base,
+            user_strength=1.5,
+            family='COMMERCIAL',
+        )
+        camera = natural_light.camera_background_strength(
+            base_strength=base,
+            brightness=1.5,
+        )
+        self.assertAlmostEqual(world, base * 1.5 * 0.25)
+        self.assertAlmostEqual(camera, base * 1.5)
+        self.assertNotEqual(world, camera)
+
+        # Background brightness must never feed back into illumination energy.
+        darker_camera = natural_light.camera_background_strength(
+            base_strength=base,
+            brightness=0.25,
+        )
+        self.assertAlmostEqual(
+            natural_light.effective_world_strength(
+                base_strength=base,
+                user_strength=1.5,
+                family='COMMERCIAL',
+            ),
+            world,
+        )
+        self.assertLess(darker_camera, camera)
+
+    def test_strength_controls_are_bounded_and_unknown_family_is_rejected(self):
+        import natural_light
+
+        self.assertEqual(
+            natural_light.effective_world_strength(
+                base_strength=1.0, user_strength=-10.0, family='COMMERCIAL'),
+            0.0,
+        )
+        self.assertEqual(
+            natural_light.camera_background_strength(base_strength=1.0, brightness=-1.0),
+            0.0,
+        )
+        with self.assertRaises(ValueError):
+            natural_light.lighting_regime('ALIEN_PRODUCT_PHOTOGRAPHY')
+
 
 if __name__ == '__main__':
     unittest.main()
