@@ -8,7 +8,7 @@ The Extension manifest supports Blender `>= 5.2.0` and `< 5.3.0`.
 
 - Use the exact release ZIP named `awful_studio-0.0.17.zip`.
 - Do not unpack or rename the package before Blender installs it.
-- A candidate ZIP is not a public release until the final manual UI smoke passes and the release is promoted through the accepted `dev` → `prod` path.
+- A candidate ZIP is not a public release until the final manual UI smoke passes and the release is explicitly tagged/published.
 - Base studio operation is offline. Network access is needed only for Extension repository synchronization/update or an explicitly requested optional asset download.
 
 ## Install from Disk
