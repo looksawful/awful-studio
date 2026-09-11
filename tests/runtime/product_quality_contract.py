@@ -117,7 +117,8 @@ def main():
         bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.0, 0.0, 0.5))
         user_root = bpy.context.object
         user_root.name = 'USER_PRODUCT_SAFETY_FIXTURE'
-        legacy.mount_product([user_root], False)
+        with ownership.for_scene(scene):
+            legacy.mount_product([user_root], False)
         scene.awful_studio.product_mockup = 'BOTTLE'
         try:
             operator_result = bpy.ops.awful.generate_mockup()
