@@ -13,6 +13,74 @@ HDRI_PRESETS = frozenset({
 })
 PHYSICAL_SKY_PRESETS = frozenset({'NISHITA_DAY', 'NISHITA_SUNSET'})
 
+HYBRID_WORLD_FACTOR = 0.25
+MAX_STRENGTH_MULTIPLIER = 4.0
+_LIGHTING_REGIMES = {
+    'COMMERCIAL': {
+        'regime': 'HYBRID',
+        'world_default': True,
+        'world_factor': HYBRID_WORLD_FACTOR,
+    },
+    'NATURAL': {
+        'regime': 'NATURAL',
+        'world_default': True,
+        'world_factor': 1.0,
+    },
+    'FLASH': {
+        'regime': 'STUDIO',
+        'world_default': False,
+        'world_factor': 0.0,
+    },
+    'CINEMA': {
+        'regime': 'STUDIO',
+        'world_default': False,
+        'world_factor': 0.0,
+    },
+}
+
+
+def _bounded_multiplier(value: float) -> float:
+    return max(0.0, min(MAX_STRENGTH_MULTIPLIER, float(value)))
+
+
+def lighting_regime(family: str) -> dict[str, object]:
+    """Return the preset-family default World participation policy."""
+    try:
+        return dict(_LIGHTING_REGIMES[family])
+    except KeyError as exc:
+        raise ValueError(f'Unknown lighting family: {family}') from exc
+
+
+def effective_world_strength(*, base_strength: float, user_strength: float,
+                             family: str, world_enabled: bool | None = None,
+                             studio_enabled: bool = True) -> float:
+    """Resolve illumination strength without coupling it to camera background.
+
+    Commercial defaults to World as a 25% fill while Studio lights are active.
+    Natural uses the World at full preset strength. Flash/Cinema default World
+    off, but an explicit user enable remains meaningful instead of being locked
+    to zero by the default regime.
+    """
+    policy = lighting_regime(family)
+    enabled = bool(policy['world_default']) if world_enabled is None else bool(world_enabled)
+    if not enabled:
+        return 0.0
+
+    if family == 'NATURAL' or not studio_enabled:
+        factor = 1.0
+    elif bool(policy['world_default']):
+        factor = float(policy['world_factor'])
+    else:
+        # Explicit World opt-in for a Studio-only family becomes a normal hybrid.
+        factor = HYBRID_WORLD_FACTOR
+
+    return max(0.0, float(base_strength)) * _bounded_multiplier(user_strength) * factor
+
+
+def camera_background_strength(*, base_strength: float, brightness: float) -> float:
+    """Resolve camera-visible background brightness independently of lighting."""
+    return max(0.0, float(base_strength)) * _bounded_multiplier(brightness)
+
 
 def mode_policy(preset_id: str) -> dict[str, object]:
     if preset_id in HDRI_PRESETS:
