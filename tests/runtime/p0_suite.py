@@ -17,6 +17,7 @@ CONTRACTS = (
     ('natural_light', 'p0_natural_light_contract.py'),
     ('playback', 'p0_playback_contract.py'),
     ('product_quality', 'product_quality_contract.py'),
+    ('product_placement', 'product_placement_contract.py'),
 )
 
 
