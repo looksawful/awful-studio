@@ -202,6 +202,9 @@ def historical(args):
     sys.modules[mod.__name__] = mod
     exec(compile(source.read_text(), str(source), 'exec'), mod.__dict__)
     mod.register()
+    # Keep the historical source byte-identical while preventing its old build
+    # helper from probing GPU backends during a non-rendering migration fixture.
+    mod.configure_cycles_gpu = lambda _scene: ('NATIVE', 'runtime fixture: GPU probe disabled')
     # Historical downloads are intentionally denied, not patched into the source.
     mod.build_studio(True)
     bpy.ops.wm.save_as_mainfile(filepath=str(args.work / 'historical.blend'))
