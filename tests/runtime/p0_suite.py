@@ -1,4 +1,4 @@
-"""Run all P0 structural Blender contracts in one process.
+"""Run all structural Blender contracts in one process.
 
 Each contract reopens the saved studio fixture itself, so they stay isolated at
 scene level while avoiding separate Blender startups. No render is invoked.
@@ -16,6 +16,7 @@ CONTRACTS = (
     ('studio_geometry', 'p0_studio_geometry_contract.py'),
     ('natural_light', 'p0_natural_light_contract.py'),
     ('playback', 'p0_playback_contract.py'),
+    ('product_quality', 'product_quality_contract.py'),
 )
 
 
@@ -50,7 +51,7 @@ def main():
         (args.work / 'p0_suite.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
 
     if report['status'] != 'passed':
-        raise RuntimeError('AWFUL P0 runtime suite failed')
+        raise RuntimeError('AWFUL structural runtime suite failed')
 
 
 if __name__ == '__main__':
