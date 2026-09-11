@@ -44,6 +44,31 @@ class PlaybackPolicyContractTests(unittest.TestCase):
             self.assertEqual(plan['remove_existing_cycles'], True)
             self.assertLessEqual(plan['cycles_modifiers_to_add'], 1)
 
+    def test_preview_span_matches_one_or_two_complete_keyed_spans(self):
+        import playback_policy
+
+        keyed = (10.0, 50.0)
+        self.assertEqual(playback_policy.preview_span(keyed, 'ONCE'), (10, 50))
+        self.assertEqual(playback_policy.preview_span(keyed, 'LOOP'), (10, 90))
+        self.assertEqual(playback_policy.preview_span(keyed, 'PING_PONG'), (10, 90))
+
+    def test_combined_preview_range_is_union_of_independent_targets(self):
+        import playback_policy
+
+        product = playback_policy.preview_span((1.0, 241.0), 'ONCE')
+        camera = playback_policy.preview_span((20.0, 80.0), 'PING_PONG')
+        self.assertEqual(camera, (20, 140))
+        self.assertEqual(playback_policy.union_preview_spans(product, camera), (1, 241))
+        self.assertEqual(playback_policy.union_preview_spans(None, camera), camera)
+        self.assertIsNone(playback_policy.union_preview_spans(None, None))
+
+    def test_current_frame_is_preserved_inside_preview_and_clamped_outside(self):
+        import playback_policy
+
+        self.assertEqual(playback_policy.clamp_frame_to_span(25, (10, 90)), 25)
+        self.assertEqual(playback_policy.clamp_frame_to_span(1, (10, 90)), 10)
+        self.assertEqual(playback_policy.clamp_frame_to_span(120, (10, 90)), 90)
+
 
 if __name__ == '__main__':
     unittest.main()
