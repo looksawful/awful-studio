@@ -2,8 +2,10 @@
 import argparse
 import importlib
 import json
+import math
 from pathlib import Path
 import platform
+import socket
 import sys
 import traceback
 
@@ -18,6 +20,7 @@ REPORT = {
     'platform': platform.platform(),
     'python': sys.version,
     'render_tests': False,
+    'network_attempts': 0,
 }
 
 
@@ -52,6 +55,23 @@ def managed_mockup_counts(legacy, ownership, scene):
     return {'objects': len(objects), 'meshes': len(meshes), 'materials': len(materials)}
 
 
+def datablock_counts():
+    return {name: len(getattr(bpy.data, name)) for name in
+            ('objects', 'collections', 'meshes', 'materials', 'actions', 'cameras', 'lights')}
+
+
+def metric_tuple(scene):
+    return tuple(float(scene[f'awful_product_{name}']) for name in ('width', 'depth', 'height', 'scale'))
+
+
+def block_network():
+    def blocked(*args, **kwargs):
+        REPORT['network_attempts'] += 1
+        raise OSError('Network forbidden in product-quality runtime contract')
+    socket.create_connection = blocked
+    socket.socket.connect = blocked
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--work', type=Path, required=True)
@@ -64,6 +84,7 @@ def main():
             addon_utils.enable(MODULE, default_set=False)
         check('extension enabled', addon_utils.check(MODULE)[1])
         bpy.ops.wm.open_mainfile(filepath=str(args.work / 'studio.blend'), use_scripts=False)
+        block_network()
 
         ext = importlib.import_module(MODULE)
         legacy = ext.legacy
@@ -181,6 +202,62 @@ def main():
         check('selected mockup geometry restored on rebuild',
               len(restored) == 1 and product_quality.mockup_key(restored[0]) == 'PHONE',
               [product_quality.mockup_key(item) for item in restored] if restored else [])
+
+        # Auto Fit and camera framing must work for every procedural product.
+        scene.awful_studio.auto_fit = True
+        envelope = legacy.STUDIO_SPEC['product_envelope']
+        for key in product_quality.mockup_keys():
+            scene.awful_studio.product_mockup = key
+            with ownership.for_scene(scene):
+                product_quality.replace_mockup(legacy, scene, key)
+            metrics = legacy.get_product_metrics(scene)
+            check(f'{key} Auto Fit metrics are positive',
+                  min(metrics.width, metrics.depth, metrics.height, metrics.scale) > 0.0,
+                  {'width': metrics.width, 'depth': metrics.depth,
+                   'height': metrics.height, 'scale': metrics.scale})
+            check(f'{key} Auto Fit stays inside product envelope',
+                  metrics.width <= float(envelope['max_xy'])
+                  and metrics.depth <= float(envelope['max_xy'])
+                  and metrics.height <= float(envelope['max_height']),
+                  {'width': metrics.width, 'depth': metrics.depth, 'height': metrics.height})
+            legacy.apply_camera_base_pose(scene, lens=70.0, margin=1.25)
+            distance = float(scene['awful_camera_base_distance'])
+            check(f'{key} camera framing distance is finite and positive',
+                  math.isfinite(distance) and distance > 0.0, distance)
+
+        # Rebuild must preserve the selected mockup's Auto Fit semantics and stay bounded.
+        scene.awful_studio.product_mockup = 'BOTTLE'
+        with ownership.for_scene(scene):
+            product_quality.replace_mockup(legacy, scene, 'BOTTLE')
+        pre_rebuild_metrics = metric_tuple(scene)
+        first_rebuild = bpy.ops.awful.rebuild_studio()
+        check('Auto Fit mockup first rebuild finishes', first_rebuild == {'FINISHED'})
+        check('Auto Fit metrics survive explicit rebuild',
+              all(abs(a - b) < 1e-6 for a, b in zip(metric_tuple(scene), pre_rebuild_metrics)),
+              {'before': pre_rebuild_metrics, 'after': metric_tuple(scene)})
+
+        baseline_counts = datablock_counts()
+        for index in range(3):
+            result = bpy.ops.awful.rebuild_studio()
+            check(f'product-quality rebuild {index} finishes', result == {'FINISHED'})
+            check(f'product-quality rebuild {index} datablocks bounded',
+                  datablock_counts() == baseline_counts,
+                  {'baseline': baseline_counts, 'actual': datablock_counts()})
+
+        # Selected mockup metadata and measurable geometry survive a real file restart.
+        reopen_path = args.work / 'product_quality_reopen.blend'
+        bpy.ops.wm.save_as_mainfile(filepath=str(reopen_path))
+        bpy.ops.wm.open_mainfile(filepath=str(reopen_path), use_scripts=False)
+        scene = bpy.context.scene
+        check('mockup selection survives save/reopen', scene.awful_studio.product_mockup == 'BOTTLE')
+        reopened = product_quality.mockup_roots(legacy, scene)
+        check('one mockup root survives save/reopen', len(reopened) == 1)
+        reopened_meshes = [obj for obj in [reopened[0]] + legacy.descendants(reopened[0])
+                           if obj.type == 'MESH']
+        check('mockup geometry measurable after save/reopen',
+              legacy.world_bbox(reopened_meshes) is not None)
+        check('product-quality operations make zero network attempts',
+              REPORT['network_attempts'] == 0, REPORT['network_attempts'])
 
         REPORT['status'] = 'passed'
     except Exception:
