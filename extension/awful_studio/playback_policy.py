@@ -5,6 +5,8 @@ Pure helpers stay Blender-independent for fast tests. `install()` adapts the
 retained motion functions before PropertyGroup/Panel registration.
 """
 
+import math
+
 PLAYBACK_MODES = ('ONCE', 'LOOP', 'PING_PONG')
 _MODE_POLICIES = {
     'ONCE': {'cycles_modifier': None, 'repeats': False},
@@ -42,6 +44,49 @@ def modifier_plan(mode):
         'cycles_modifiers_to_add': 0 if policy['cycles_modifier'] is None else 1,
         'mode': policy['cycles_modifier'],
     }
+
+
+def _integer_keyed_span(span):
+    if span is None:
+        return None
+    start, end = map(float, span)
+    if not math.isfinite(start) or not math.isfinite(end):
+        raise ValueError('Playback span must be finite')
+    if end < start:
+        start, end = end, start
+    return int(math.floor(start)), int(math.ceil(end))
+
+
+def preview_span(keyed_span, mode):
+    """Map one keyed action span to the Preview Range needed to see playback.
+
+    ONCE shows one keyed span. LOOP shows two consecutive spans. PING_PONG uses
+    the same two-span duration, representing one forward + backward cycle.
+    """
+    mode_policy(mode)
+    span = _integer_keyed_span(keyed_span)
+    if span is None:
+        return None
+    start, end = span
+    if mode == 'ONCE':
+        return start, end
+    duration = max(0, end - start)
+    return start, end + duration
+
+
+def union_preview_spans(*spans):
+    """Return the union of available Product/Camera preview spans."""
+    normalized = [_integer_keyed_span(span) for span in spans if span is not None]
+    if not normalized:
+        return None
+    return min(span[0] for span in normalized), max(span[1] for span in normalized)
+
+
+def clamp_frame_to_span(frame, span):
+    """Preserve current frame inside a span and clamp only when outside it."""
+    start, end = _integer_keyed_span(span)
+    value = int(frame)
+    return max(start, min(end, value))
 
 
 def iter_fcurves(action):
