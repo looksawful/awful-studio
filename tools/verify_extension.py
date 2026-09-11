@@ -51,6 +51,7 @@ def verify(blender, output):
             contracts = (
                 ('lighting', ROOT/'tests/runtime/p0_lighting_contract.py'),
                 ('camera', ROOT/'tests/runtime/p0_camera_contract.py'),
+                ('studio_geometry', ROOT/'tests/runtime/p0_studio_geometry_contract.py'),
             )
             for name, script in contracts:
                 command = [
