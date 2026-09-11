@@ -4,6 +4,7 @@ import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 MODULE_PATH = ROOT / 'extension' / 'awful_studio' / 'product_quality.py'
+PLACEMENT_PATH = ROOT / 'extension' / 'awful_studio' / 'product_placement.py'
 INIT_PATH = ROOT / 'extension' / 'awful_studio' / '__init__.py'
 EXPECTED_MOCKUPS = {'BOTTLE', 'JAR', 'BOX', 'CAN', 'PHONE', 'TABLET'}
 EXPECTED_MATERIALS = {
@@ -13,13 +14,21 @@ EXPECTED_MATERIALS = {
 }
 
 
-def load_policy():
-    spec = importlib.util.spec_from_file_location('awful_product_quality_policy', MODULE_PATH)
+def load_module(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
     if spec is None or spec.loader is None:
-        raise RuntimeError('Unable to load product-quality policy module')
+        raise RuntimeError(f'Unable to load policy module: {path}')
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def load_policy():
+    return load_module('awful_product_quality_policy', MODULE_PATH)
+
+
+def load_placement_policy():
+    return load_module('awful_product_placement_policy', PLACEMENT_PATH)
 
 
 class ProductQualityContractTests(unittest.TestCase):
@@ -59,15 +68,16 @@ class ProductQualityContractTests(unittest.TestCase):
         self.assertEqual(policy.material_spec('METAL_ANODIZED')['metallic'], 1.0)
 
     def test_support_surface_offset_places_bottom_exactly_on_support(self):
-        policy = load_policy()
+        policy = load_placement_policy()
         self.assertAlmostEqual(policy.support_surface_offset(0.125, 0.500), 0.375)
         self.assertAlmostEqual(policy.support_surface_offset(0.500, 0.500), 0.0)
         self.assertAlmostEqual(policy.support_surface_offset(0.750, 0.500), -0.250)
 
-    def test_policy_module_remains_blender_independent(self):
-        source = MODULE_PATH.read_text(encoding='utf-8')
-        self.assertNotIn('import bpy', source)
-        self.assertNotIn('from bpy', source)
+    def test_policy_modules_remain_blender_independent(self):
+        for path in (MODULE_PATH, PLACEMENT_PATH):
+            source = path.read_text(encoding='utf-8')
+            self.assertNotIn('import bpy', source)
+            self.assertNotIn('from bpy', source)
 
     def test_unknown_catalog_keys_are_rejected(self):
         policy = load_policy()
