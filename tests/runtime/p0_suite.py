@@ -1,7 +1,7 @@
 """Run all P0 structural Blender contracts in one process.
 
 Each contract reopens the saved studio fixture itself, so they stay isolated at
-scene level while avoiding four separate Blender startups. No render is invoked.
+scene level while avoiding separate Blender startups. No render is invoked.
 """
 import argparse
 import json
@@ -15,6 +15,7 @@ CONTRACTS = (
     ('camera', 'p0_camera_contract.py'),
     ('studio_geometry', 'p0_studio_geometry_contract.py'),
     ('natural_light', 'p0_natural_light_contract.py'),
+    ('playback', 'p0_playback_contract.py'),
 )
 
 

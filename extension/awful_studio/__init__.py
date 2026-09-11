@@ -3,7 +3,7 @@
 import time
 import bpy
 from bpy.props import BoolProperty, StringProperty, IntProperty, PointerProperty, EnumProperty
-from . import ownership, migrations, asset_cache, photography, camera_policy, studio_geometry, natural_light, runtime_performance
+from . import ownership, migrations, asset_cache, photography, camera_policy, studio_geometry, natural_light, runtime_performance, playback_policy
 from .core import legacy
 
 # Policy installation mutates only in-memory preset metadata/callables. It must run
@@ -13,6 +13,7 @@ camera_policy.install(legacy)
 studio_geometry.install(legacy)
 natural_light.install(legacy)
 runtime_performance.install(legacy)
+playback_policy.install(legacy)
 
 VERSION = (0, 0, 16)
 _registered = []
