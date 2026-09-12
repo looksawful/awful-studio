@@ -49,7 +49,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add scene_lab/loft_daylight/generated
+          git add -f scene_lab/loft_daylight/generated/loft_daylight_v1.blend
+          git add scene_lab/loft_daylight/generated/loft_daylight_v1_review.png
           if ! git diff --cached --quiet; then
             git commit -m "build(scene): generate loft daylight v1 [skip ci]"
             git push
