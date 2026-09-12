@@ -38,21 +38,18 @@ def install(legacy):
     original_detect_capabilities = legacy.detect_blender_capabilities
 
     def detect_blender_capabilities():
-        """Refine generic probes using the concrete Blender APIs AWFUL executes."""
+        """Refine generic probes through Blender RNA metadata, not Python hasattr."""
         caps = original_detect_capabilities()
-        scene = getattr(legacy.bpy.context, 'scene', None)
         try:
-            caps['viewlayer_lightgroups'] = all((
-                hasattr(legacy.bpy.ops.scene, 'view_layer_add_lightgroup'),
-                hasattr(legacy.bpy.ops.scene, 'view_layer_remove_lightgroup'),
-            ))
+            props = legacy.bpy.types.ViewLayer.bl_rna.properties
+            caps['viewlayer_lightgroups'] = props.get('lightgroups') is not None
         except Exception:
             pass
-        if scene is not None:
-            try:
-                caps['compositor_group_api'] = hasattr(scene, 'compositing_node_group')
-            except Exception:
-                pass
+        try:
+            props = legacy.bpy.types.Scene.bl_rna.properties
+            caps['compositor_group_api'] = props.get('compositing_node_group') is not None
+        except Exception:
+            pass
         return caps
 
     operator.bl_label = 'Setup Post Pipeline'
