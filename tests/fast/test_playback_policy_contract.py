@@ -22,6 +22,11 @@ class PlaybackPolicyContractTests(unittest.TestCase):
         self.assertTrue(loop['repeats'])
         self.assertTrue(pingpong['repeats'])
 
+    def test_timeline_controls_set_current_frame_for_visible_feedback(self):
+        source = (EXT / 'playback_policy.py').read_text(encoding='utf-8')
+        self.assertIn('scene.frame_set(start)', source)
+        self.assertIn('scene.frame_set(int(scene.frame_start))', source)
+
     def test_unknown_playback_mode_is_rejected(self):
         import playback_policy
 

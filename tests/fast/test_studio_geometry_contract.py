@@ -83,6 +83,43 @@ class StudioGeometryContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             studio_geometry.cyclorama_style('WHITE', 'MIRROR')
 
+    def test_window_frame_layout_is_inside_opening_and_non_overlapping(self):
+        import studio_geometry
+
+        window = {
+            'width': 8.5, 'bottom_z': 0.55, 'top_z': 6.15,
+            'frame_width': 0.12, 'frame_depth': 0.24,
+        }
+        layout = studio_geometry.window_frame_layout(window)
+        ymin, ymax = -window['width'] * 0.5, window['width'] * 0.5
+        bottom, top = window['bottom_z'], window['top_z']
+        for item in layout['bars']:
+            y, z = item['center_yz']
+            width_y, height_z = item['size_yz']
+            self.assertGreaterEqual(y - width_y * 0.5, ymin - 1e-9)
+            self.assertLessEqual(y + width_y * 0.5, ymax + 1e-9)
+            self.assertGreaterEqual(z - height_z * 0.5, bottom - 1e-9)
+            self.assertLessEqual(z + height_z * 0.5, top + 1e-9)
+        self.assertEqual(len(layout['bars']), 7)
+        self.assertGreater(layout['glass_size_yz'][0], 0.0)
+        self.assertGreater(layout['glass_size_yz'][1], 0.0)
+
+    def test_floor_is_camera_physical_independently_of_reflective_room(self):
+        import studio_geometry
+
+        self.assertTrue(studio_geometry.architecture_camera_physical('FLOOR', reflective_room=False))
+        self.assertTrue(studio_geometry.architecture_camera_physical('WINDOW_FRAME', reflective_room=False))
+        self.assertTrue(studio_geometry.architecture_camera_physical('DOOR', reflective_room=False))
+        self.assertFalse(studio_geometry.architecture_camera_physical('WALLS', reflective_room=False))
+        self.assertTrue(studio_geometry.architecture_camera_physical('WALLS', reflective_room=True))
+
+    def test_visible_floor_uses_dedicated_pbr_material(self):
+        legacy_source = (ROOT / 'extension' / 'awful_studio' / 'core' / 'legacy.py').read_text(encoding='utf-8')
+        geom_source = (ROOT / 'extension' / 'awful_studio' / 'studio_geometry.py').read_text(encoding='utf-8')
+        self.assertIn('"floor": build_painted_material("MAT_Studio_Floor", "MAT_FLOOR"', legacy_source)
+        self.assertIn('mats["floor"]', legacy_source)
+        self.assertIn('_build_visible_floor(legacy, room_col, floor_mat)', geom_source)
+
     def test_architecture_groups_are_independent_from_hidden_bounce_floor(self):
         import studio_geometry
 

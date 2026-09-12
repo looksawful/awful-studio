@@ -86,6 +86,15 @@ class ProductQualityContractTests(unittest.TestCase):
         for value, expected in zip(actual, (-2.0, 3.0, -0.59)):
             self.assertAlmostEqual(value, expected)
 
+    def test_float_motion_never_moves_below_support_height(self):
+        policy = load_placement_policy()
+        heights = policy.float_motion_heights(lift=0.8, amplitude=0.2)
+        self.assertEqual(len(heights), 5)
+        self.assertAlmostEqual(heights[0], 0.8)
+        self.assertAlmostEqual(heights[-1], 0.8)
+        self.assertGreater(max(heights), 0.8)
+        self.assertGreaterEqual(min(heights), 0.8)
+
     def test_policy_modules_remain_blender_independent(self):
         for path in (MODULE_PATH, PLACEMENT_PATH):
             source = path.read_text(encoding='utf-8')
@@ -107,6 +116,12 @@ class ProductQualityContractTests(unittest.TestCase):
             policy.mockup_spec('VAGUE_HUMAN_OBJECT')
         with self.assertRaises(ValueError):
             policy.material_spec('MAGIC')
+
+    def test_use_selected_has_hierarchy_aware_roots_and_clears_mockup_intent(self):
+        legacy_source = (ROOT / 'extension' / 'awful_studio' / 'core' / 'legacy.py').read_text(encoding='utf-8')
+        self.assertIn('def selected_user_product_roots(context):', legacy_source)
+        self.assertIn("scene.awful_studio.product_mockup = 'NONE'", legacy_source)
+        self.assertIn('Use selected unmanaged object hierarchy as the editable product', legacy_source)
 
     def test_product_quality_installs_before_registration_and_exposes_one_action(self):
         init_source = INIT_PATH.read_text(encoding='utf-8')

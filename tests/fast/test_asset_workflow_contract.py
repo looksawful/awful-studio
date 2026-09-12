@@ -59,6 +59,21 @@ class AssetWorkflowContractTests(unittest.TestCase):
         self.assertEqual(physical['effective_preset'], 'NISHITA_SUNSET')
         self.assertFalse(physical['fallback'])
 
+    def test_download_all_imports_legacy_cache_and_rebuilds_when_studio_exists(self):
+        import asset_workflow
+
+        source = (ROOT / 'extension' / 'awful_studio' / 'asset_workflow.py').read_text(encoding='utf-8')
+        cache_source = (ROOT / 'extension' / 'awful_studio' / 'asset_cache.py').read_text(encoding='utf-8')
+        self.assertIn('migrate_legacy_asset(record)', source)
+        self.assertIn('legacy.build_studio(True)', source)
+        self.assertIn('refresh_material_assets()', source)
+        self.assertIn('legacy_root()', cache_source)
+
+    def test_open_online_preferences_switches_section_after_window_open(self):
+        source = (ROOT / 'extension' / 'awful_studio' / 'asset_workflow.py').read_text(encoding='utf-8')
+        self.assertIn("_set_preferences_section('SYSTEM')", source)
+        self.assertLess(source.index("userpref_show('INVOKE_DEFAULT')"), source.rindex("_set_preferences_section('SYSTEM')"))
+
     def test_unknown_environment_intent_is_rejected(self):
         import asset_workflow
 

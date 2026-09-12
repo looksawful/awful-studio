@@ -656,7 +656,14 @@ def hdri_asset_path(key):
     return os.path.join(asset_root(), "hdri", filename)
 
 
+def packaged_asset_root():
+    return os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets"))
+
+
 def paint_asset_path(key):
+    bundled = os.path.join(packaged_asset_root(), "painted_plaster017", PAINT_TARGET_FILES[key])
+    if file_is_valid(bundled):
+        return bundled
     return os.path.join(asset_root(), "painted_plaster017", PAINT_TARGET_FILES[key])
 
 
@@ -916,6 +923,7 @@ def build_all_materials(coord_obj=None):
     return {
         "cyc": build_painted_material("MAT_Studio_Cyclorama", "MAT_CYC", wall=False, coord_obj=coord_obj),
         "room_bounce": make_simple_material("MAT_Studio_Bounce_White", "MAT_ROOM_BOUNCE", (0.72, 0.72, 0.70), 0.58, 0.0),
+        "floor": build_painted_material("MAT_Studio_Floor", "MAT_FLOOR", wall=False, coord_obj=coord_obj),
         "glass": make_window_glass_material(),
         "diagnostic": make_diagnostic_material(),
         "pedestal": make_simple_material("MAT_Pedestal", "MAT_PEDESTAL", (0.055, 0.060, 0.070), 0.34, 0.03),
@@ -940,7 +948,7 @@ def refresh_material_assets():
         "AWFUL_PAINT_NORMAL": ("paint_normal", True),
         "AWFUL_PAINT_HEIGHT": ("paint_displacement", True),
     }
-    for role, wall in (("MAT_CYC", False),):
+    for role, wall in (("MAT_CYC", False), ("MAT_FLOOR", False)):
         mat = REG.material(role)
         if not mat or not mat.use_nodes:
             continue
@@ -1951,7 +1959,10 @@ def apply_product_motion(scene, preset=None):
     elif preset=="SPIN_X": key_rotation(rx,0,0,sign*math.tau,1,end)
     elif preset=="SPIN_Y": key_rotation(ry,1,0,sign*math.tau,1,end)
     elif preset=="FLOAT_SPIN":
-        key_rotation(rz,2,0,sign*math.tau,1,end); amp=max(0.08,min(0.28,get_product_metrics(scene).height*0.12)); key_location(motion,2,[(1,lift),(60,lift+amp),(120,lift),(180,lift-amp),(end,lift)])
+        key_rotation(rz,2,0,sign*math.tau,1,end)
+        amp=max(0.08,min(0.28,get_product_metrics(scene).height*0.12))
+        heights=float_motion_heights(lift=lift, amplitude=amp)
+        key_location(motion,2,list(zip((1,60,120,180,end),heights)))
     elif preset=="HERO_REVEAL":
         key_rotation(rz,2,math.radians(45),math.radians(-6),1,DEFAULT_FRAMES,"BEZIER"); key_rotation(rx,0,math.radians(8),0,1,DEFAULT_FRAMES,"BEZIER")
     elif preset=="TUMBLE":
@@ -2368,7 +2379,7 @@ def build_studio(preserve_product=True):
     mats=build_all_materials(material_coords)
     build_cyclorama(cols["STAGE"],mats["cyc"])
     build_pedestal(cols["STAGE"],mats["pedestal"])
-    build_room(cols["ROOM"],cols["WINDOW"],mats["room_bounce"],mats["frame"],mats["glass"])
+    build_room(cols["ROOM"],cols["WINDOW"],mats["room_bounce"],mats["floor"],mats["frame"],mats["glass"])
     build_product_rig(cols["CONTROLS"],cols["PRODUCT"])
     build_camera_rig(cols["CAMERA"],cols["CONTROLS"])
     scene=bpy.context.scene
@@ -2453,22 +2464,37 @@ class AWFUL_OT_BuildStudio(bpy.types.Operator):
         return {"FINISHED"}
 
 
+def selected_user_product_roots(context):
+    """Return topmost selected unmanaged object hierarchies for Use Selected."""
+    selected = [o for o in getattr(context, 'selected_objects', ()) if not is_managed(o)]
+    roots = []
+    for obj in selected:
+        root = obj
+        while root.parent is not None and not is_managed(root.parent):
+            root = root.parent
+        if root not in roots:
+            roots.append(root)
+    return roots
+
+
 class AWFUL_OT_UseSelectedProduct(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         return context.scene is not None and REG.object("CYC") is not None
 
     bl_idname="awful.use_selected_product_v4"; bl_label="Use Selected"; bl_options={"REGISTER","UNDO"}
+    bl_description = "Use selected unmanaged object hierarchy as the editable product"
     def execute(self,context):
-        selected=[o for o in context.selected_objects if not is_managed(o)]
-        if not selected: self.report({"ERROR"},"Select user product object(s)"); return {"CANCELLED"}
-        selected_set=set(selected); roots=[o for o in selected if o.parent not in selected_set]
+        scene = context.scene
+        roots=selected_user_product_roots(context)
+        if not roots: self.report({"ERROR"},"Select user product object(s), not AWFUL studio controls"); return {"CANCELLED"}
         try:
-            mount_product(roots,context.scene.awful_studio.auto_fit)
+            scene.awful_studio.product_mockup = 'NONE'
+            mount_product(roots,scene.awful_studio.auto_fit)
             populate_link_collections()
-            apply_product_motion(context.scene,context.scene.awful_studio.product_motion)
-            apply_lighting_preset(context.scene,context.scene.awful_studio.studio_light_preset,False,False)
-            apply_camera_motion(context.scene,context.scene.awful_studio.camera_motion)
+            apply_product_motion(scene,scene.awful_studio.product_motion)
+            apply_lighting_preset(scene,scene.awful_studio.studio_light_preset,False,False)
+            apply_camera_motion(scene,scene.awful_studio.camera_motion)
         except Exception as exc: self.report({"ERROR"},str(exc)); return {"CANCELLED"}
         return {"FINISHED"}
 

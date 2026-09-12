@@ -36,6 +36,12 @@ class FoundationTests(unittest.TestCase):
         init = next(n for n in registry.body if isinstance(n, ast.FunctionDef) and n.name == '__init__')
         self.assertNotIn('bpy.context', ast.unparse(init))
 
+    def test_first_build_can_clear_factory_scene_without_touching_user_edits(self):
+        source = (EXT / '__init__.py').read_text(encoding='utf-8')
+        self.assertIn('clear_factory_scene_objects(scene)', source)
+        self.assertIn("{'Cube', 'Camera', 'Light'}", source)
+        self.assertIn('not scene.awful_state.built', source)
+
     def test_build_never_fetches_assets(self):
         tree = ast.parse((EXT / 'core/legacy.py').read_text())
         build = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == 'build_studio')

@@ -22,6 +22,13 @@ def mount_delta(*, center_x: float, center_y: float, bottom_z: float,
     )
 
 
+def float_motion_heights(*, lift: float, amplitude: float) -> tuple[float, float, float, float, float]:
+    """Return a support-safe bob cycle whose minimum never falls below ``lift``."""
+    lift = float(lift)
+    amplitude = max(0.0, float(amplitude))
+    return (lift, lift + amplitude, lift, lift + amplitude, lift)
+
+
 def _align_mounted_geometry(legacy, metrics):
     content = legacy.REG.require_object('PRODUCT_CONTENT')
     motion = legacy.REG.require_object('PRODUCT_MOTION')
@@ -75,5 +82,6 @@ def install(legacy):
         metrics = original_mount_product(root_objects, auto_fit)
         return _align_mounted_geometry(legacy, metrics)
 
+    legacy.float_motion_heights = float_motion_heights
     legacy.mount_product = mount_product
     legacy._awful_product_placement_installed = True

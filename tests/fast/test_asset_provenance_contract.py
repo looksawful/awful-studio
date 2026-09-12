@@ -54,13 +54,24 @@ class AssetProvenanceContractTests(unittest.TestCase):
         self.assertTrue(historical_urls)
         self.assertTrue(historical_urls.issubset(recorded), historical_urls - recorded)
 
-    def test_extension_contains_no_bundled_third_party_binary_assets(self):
-        forbidden = {'.hdr', '.exr', '.png', '.jpg', '.jpeg', '.zip', '.tif', '.tiff'}
-        offenders = [
-            str(path.relative_to(EXT)) for path in EXT.rglob('*')
-            if path.is_file() and path.suffix.lower() in forbidden
-        ]
-        self.assertEqual(offenders, [])
+    def test_only_reviewed_floor_maps_are_bundled_with_attribution(self):
+        binary_suffixes = {'.hdr', '.exr', '.png', '.jpg', '.jpeg', '.zip', '.tif', '.tiff'}
+        bundled = {
+            str(path.relative_to(EXT)).replace('\\', '/') for path in EXT.rglob('*')
+            if path.is_file() and path.suffix.lower() in binary_suffixes
+        }
+        expected = {
+            'assets/painted_plaster017/painted_plaster017_color.png',
+            'assets/painted_plaster017/painted_plaster017_roughness.png',
+            'assets/painted_plaster017/painted_plaster017_normalgl.png',
+            'assets/painted_plaster017/painted_plaster017_displacement.png',
+        }
+        self.assertEqual(bundled, expected)
+        record = self.load_inventory()['assets']['painted_plaster017']
+        self.assertEqual(record['provider'], 'ambientCG')
+        self.assertEqual(record['distribution'], 'bundled')
+        self.assertEqual(set(record['bundled_files']), expected)
+        self.assertTrue((EXT / 'assets' / 'ATTRIBUTION.md').is_file())
 
     def test_cache_uses_provenance_for_authorization_and_metadata(self):
         source = (EXT / 'asset_cache.py').read_text(encoding='utf-8')

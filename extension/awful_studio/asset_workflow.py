@@ -82,7 +82,8 @@ def _asset_ready(legacy, cache, preset_id: str) -> bool:
     if preset_id not in HDRI_PRESETS:
         raise ValueError(f'Unknown environment intent: {preset_id}')
     asset_key = legacy.HDRI_PRESETS[preset_id]['asset']
-    return bool(cache.read_valid(Path(legacy.hdri_asset_path(asset_key))))
+    record = asset_provenance.record_for_key(asset_key)
+    return bool(cache.read_valid(Path(legacy.hdri_asset_path(asset_key))) or cache.migrate_legacy_asset(record))
 
 
 def runtime_status(legacy, cache, scene) -> dict[str, object]:
@@ -141,6 +142,9 @@ def install(legacy, cache):
                 / str(record.get('cache_subdir', ''))
                 / str(record['filename'])
             )
+            if not force and cache.migrate_legacy_asset(record):
+                results[str(record['asset_id'])] = True
+                continue
             results[str(record['asset_id'])] = cache.fetch(
                 str(record['download_url']), destination, force=bool(force))
         return results
@@ -161,12 +165,23 @@ def install(legacy, cache):
                 self.report({'ERROR'}, cache.last_error())
                 return {'CANCELLED'}
             legacy.refresh_world_images()
+            legacy.refresh_material_assets()
             legacy.apply_environment_preset(context.scene, selected, False)
+            if legacy.REG.object('CYC') is not None:
+                with legacy.ownership.for_scene(context.scene):
+                    legacy.build_studio(True)
+                    legacy.ownership.mark_generated_actions(context.scene)
         except (OSError, ValueError, RuntimeError) as exc:
             self.report({'ERROR'}, str(exc))
             return {'CANCELLED'}
         self.report({'INFO'}, f'{len(result)} reviewed HDRIs Ready')
         return {'FINISHED'}
+
+    def _set_preferences_section(section):
+        try:
+            legacy.bpy.context.preferences.active_section = section
+        except Exception:
+            pass
 
     class AWFUL_OT_OpenOnlinePreferences(legacy.bpy.types.Operator):
         bl_idname = 'awful.open_online_preferences'
@@ -174,15 +189,13 @@ def install(legacy, cache):
         bl_description = 'Open Blender Preferences where Allow Online Access can be enabled'
 
         def execute(self, context):
-            try:
-                context.preferences.active_section = 'SYSTEM'
-            except Exception:
-                pass
+            _set_preferences_section('SYSTEM')
             if legacy.bpy.app.background:
                 self.report({'INFO'}, 'Open Blender Preferences > System and enable Allow Online Access')
                 return {'FINISHED'}
             try:
                 legacy.bpy.ops.screen.userpref_show('INVOKE_DEFAULT')
+                _set_preferences_section('SYSTEM')
             except Exception as exc:
                 self.report({'ERROR'}, str(exc))
                 return {'CANCELLED'}

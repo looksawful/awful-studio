@@ -85,11 +85,17 @@
       "filename": "PaintedPlaster017_2K-PNG.zip",
       "license": "CC0-1.0",
       "license_url": "https://docs.ambientcg.com/license/",
-      "distribution": "historical-only",
+      "distribution": "bundled",
       "cache_subdir": "painted_plaster017",
       "media_type": "application/zip",
       "active": false,
-      "historical_reference": true
+      "historical_reference": true,
+      "bundled_files": [
+        "assets/painted_plaster017/painted_plaster017_color.png",
+        "assets/painted_plaster017/painted_plaster017_roughness.png",
+        "assets/painted_plaster017/painted_plaster017_normalgl.png",
+        "assets/painted_plaster017/painted_plaster017_displacement.png"
+      ]
     }
   }
 }

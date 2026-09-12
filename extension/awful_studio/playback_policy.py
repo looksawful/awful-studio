@@ -182,6 +182,7 @@ def reset_preview_range(scene):
     scene.use_preview_range = False
     scene.frame_preview_start = int(scene.frame_start)
     scene.frame_preview_end = int(scene.frame_end)
+    scene.frame_set(int(scene.frame_start))
 
 
 def _apply_action_policy(action, mode):
@@ -280,9 +281,13 @@ def install(legacy):
         bl_options = {'REGISTER', 'UNDO'}
 
         def execute(self, context):
-            span = sync_preview_range(legacy, context.scene)
+            scene = context.scene
+            span = sync_preview_range(legacy, scene)
             if span is None:
                 self.report({'INFO'}, 'No generated Product or Camera motion to fit')
+            else:
+                start, _end = span
+                scene.frame_set(start)
             return {'FINISHED'}
 
     class AWFUL_OT_ResetTimeline(legacy.bpy.types.Operator):
