@@ -115,6 +115,7 @@ def install(legacy, cache):
         return
 
     original_environment_draw = legacy.AWFUL_PT_Environment.draw
+    original_apply_environment = legacy.apply_environment_preset
 
     def resolve_environment_preset(scene, selected_preset):
         resolution = environment_resolution(
@@ -122,6 +123,15 @@ def install(legacy, cache):
             asset_ready=_asset_ready(legacy, cache, str(selected_preset)),
         )
         return str(resolution['effective_preset'])
+
+    def apply_environment_preset(scene, preset_id, reset_defaults=True):
+        """Apply an effective source but keep the user's selected environment intent."""
+        selected = str(preset_id)
+        effective = resolve_environment_preset(scene, selected)
+        result = original_apply_environment(scene, effective, reset_defaults)
+        if effective != selected:
+            scene.awful_studio.world_preset = selected
+        return result
 
     def ensure_assets(force=False):
         results = {}
@@ -194,6 +204,7 @@ def install(legacy, cache):
                 box.operator('awful.open_online_preferences', icon='PREFERENCES')
 
     legacy.resolve_environment_preset = resolve_environment_preset
+    legacy.apply_environment_preset = apply_environment_preset
     legacy.ensure_assets = ensure_assets
     legacy.AWFUL_OT_FetchAssets.bl_label = 'Download All HDRIs'
     legacy.AWFUL_OT_FetchAssets.bl_description = (
