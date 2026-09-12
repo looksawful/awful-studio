@@ -38,19 +38,33 @@ def install(legacy):
     original_detect_capabilities = legacy.detect_blender_capabilities
 
     def detect_blender_capabilities():
-        """Refine generic probes through the concrete registered Blender APIs."""
+        """Refine generic probes through Blender 5.2's live context APIs.
+
+        Blender 5.2 exposes Light Group and compositor properties dynamically on
+        live ViewLayer/Scene instances. Type-level RNA probes can therefore report
+        false negatives even though the built-in operators and scene API work.
+        """
         caps = original_detect_capabilities()
         try:
-            legacy.bpy.ops.scene.view_layer_add_lightgroup.get_rna_type()
-            legacy.bpy.ops.scene.view_layer_remove_lightgroup.get_rna_type()
-            caps['viewlayer_lightgroups'] = True
+            scene_ops = legacy.bpy.ops.scene
+            caps['viewlayer_lightgroups'] = all(
+                hasattr(scene_ops, name)
+                for name in (
+                    'view_layer_add_lightgroup',
+                    'view_layer_remove_lightgroup',
+                    'view_layer_add_used_lightgroups',
+                )
+            )
         except Exception:
             caps['viewlayer_lightgroups'] = False
+
         try:
-            props = legacy.bpy.types.Scene.bl_rna.properties
-            caps['compositor_group_api'] = props.get('compositing_node_group') is not None
+            scene = getattr(legacy.bpy.context, 'scene', None)
+            caps['compositor_group_api'] = (
+                scene is not None and hasattr(scene, 'compositing_node_group')
+            )
         except Exception:
-            pass
+            caps['compositor_group_api'] = False
         return caps
 
     operator.bl_label = 'Setup Post Pipeline'
