@@ -35,6 +35,23 @@ def install(legacy):
     operator = legacy.AWFUL_OT_BuildPostPipeline
     original_execute = operator.execute
     original_setup_draw = legacy.AWFUL_PT_Setup.draw
+    original_detect_capabilities = legacy.detect_blender_capabilities
+
+    def detect_blender_capabilities():
+        """Refine type-level probes with the live 5.2 RNA instances we use."""
+        caps = original_detect_capabilities()
+        scene = getattr(legacy.bpy.context, 'scene', None)
+        if scene is not None:
+            try:
+                view_layer = scene.view_layers[0]
+                caps['viewlayer_lightgroups'] = hasattr(view_layer, 'lightgroups')
+            except Exception:
+                pass
+            try:
+                caps['compositor_group_api'] = hasattr(scene, 'compositing_node_group')
+            except Exception:
+                pass
+        return caps
 
     operator.bl_label = 'Setup Post Pipeline'
     operator.bl_description = (
@@ -79,6 +96,7 @@ def install(legacy):
         if ready:
             box.label(text='Run Setup Post Pipeline again to rebuild it')
 
+    legacy.detect_blender_capabilities = detect_blender_capabilities
     operator.invoke = invoke
     operator.execute = execute
     legacy.AWFUL_PT_Setup.draw = draw_setup
