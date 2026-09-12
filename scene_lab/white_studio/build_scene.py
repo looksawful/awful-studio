@@ -138,7 +138,7 @@ def plant(col):
     pot_mat = material_principled('MAT_Pot', (0.050,0.045,0.040), 0.58)
     leaf_mat = material_principled('MAT_Leaves', (0.020,0.105,0.038), 0.50)
     stem_mat = material_principled('MAT_Stem', (0.065,0.040,0.022), 0.64)
-    cx, cy = -3.10, 3.10
+    cx, cy = -2.80, 3.25
     cylinder('PROP_Plant_Pot', (cx, cy, 0.28), 0.31, 0.56, col, pot_mat, 64, 0.035)
     for j, dx in enumerate((-0.09, 0.07, 0.15)):
         cylinder(f'PROP_Plant_Stem_{j}', (cx+dx, cy, 0.90+j*0.05), 0.032, 1.22, col, stem_mat, 24)
@@ -178,34 +178,38 @@ def build():
     cylinder('STAGE_Pedestal', (0.0,0.0,0.23), 1.58, 0.46, arch, pedestal_mat, 160, 0.04)
     anchor = empty('PRODUCT_ANCHOR', (0.0,0.0,1.30), guides)
 
-    octabox('PROP_Octabox_L', (-4.15,-0.20,3.25), 1.12, 0.42, anchor, props, lights, black, diffuser, 650)
-    stripbox('PROP_Stripbox_R', (4.30,0.50,3.10), (0.18,1.65,2.90), anchor, props, lights, black, diffuser, 390)
+    octabox('PROP_Octabox_L', (-3.22,1.60,3.15), 1.02, 0.40, anchor, props, lights, black, diffuser, 470)
+    stripbox('PROP_Stripbox_R', (3.35,1.82,3.05), (0.18,1.50,2.70), anchor, props, lights, black, diffuser, 310)
     plant(props)
 
-    flag_l = box('PROP_Flag_L', (-3.45,1.35,2.2), (0.07,1.45,3.05), props, black, 0.02)
-    flag_r = box('PROP_Flag_R', (3.50,1.50,2.2), (0.07,1.35,2.95), props, black, 0.02)
+    flag_l = box('PROP_Flag_L', (-3.55,1.55,2.2), (0.07,1.35,2.95), props, black, 0.02)
+    flag_r = box('PROP_Flag_R', (3.60,1.65,2.2), (0.07,1.30,2.90), props, black, 0.02)
     flag_l.visible_camera = False
     flag_r.visible_camera = False
 
-    top = area_light('LIGHT_Top', (0.0,0.3,5.7), 300, 3.4, (1.0,0.94,0.86), anchor, 'RECTANGLE', 2.1)
+    key = area_light('LIGHT_Key_Hidden', (-3.35,-2.30,3.15), 410, 2.8, (1.0,0.91,0.82), anchor, 'RECTANGLE', 2.0)
+    move_to_collection(key, lights)
+    fill = area_light('LIGHT_Fill_Hidden', (3.10,-1.50,2.75), 180, 2.6, (0.92,0.95,1.0), anchor, 'RECTANGLE', 2.0)
+    move_to_collection(fill, lights)
+    top = area_light('LIGHT_Top', (0.0,0.3,5.7), 260, 3.4, (1.0,0.94,0.86), anchor, 'RECTANGLE', 2.1)
     move_to_collection(top, lights)
-    rim = area_light('LIGHT_Back_Rim', (0.0,3.9,3.0), 190, 2.2, (1.0,0.88,0.75), anchor, 'RECTANGLE', 0.95)
+    rim = area_light('LIGHT_Back_Rim', (0.0,3.9,3.0), 160, 2.2, (1.0,0.88,0.75), anchor, 'RECTANGLE', 0.95)
     move_to_collection(rim, lights)
 
     world = scene.world
     world.use_nodes = True
     bg = world.node_tree.nodes.get('Background')
     bg.inputs['Color'].default_value = (0.020,0.020,0.023,1.0)
-    bg.inputs['Strength'].default_value = 0.11
+    bg.inputs['Strength'].default_value = 0.10
 
     cam = camera('CAM_Hero', (0.0,-11.9,2.30), (0.0,0.35,1.20), 57.0)
     cam.data.dof.use_dof = True
     cam.data.dof.focus_object = anchor
-    cam.data.dof.aperture_fstop = 5.2
+    cam.data.dof.aperture_fstop = 2.8
 
     scene.render.filepath = str(HERE/'generated'/'white_studio_v1.png')
     scene['scene_lab_id'] = 'white-studio-v1'
-    scene['scene_lab_status'] = 'visual-pass-3'
+    scene['scene_lab_status'] = 'visual-pass-4'
     return scene
 
 
