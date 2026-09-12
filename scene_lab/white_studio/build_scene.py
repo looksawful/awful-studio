@@ -125,44 +125,41 @@ def tripod_stand(name, x, y, height, props, black, metal):
 
 
 def octabox_fixture(name, side, target, props, lights, black, metal, diffuser, energy):
-    x = side * 4.15
-    y = 1.45
-    tripod_stand(name + '_Stand', x, y + 0.12, 3.30, props, black, metal)
+    x = side * 3.40
+    y = 1.20
+    tripod_stand(name + '_Stand', x, y + 0.10, 3.18, props, black, metal)
 
-    root = empty(name + '_HeadRig', (x, y, 3.48), props)
+    root = empty(name + '_HeadRig', (x, y, 3.34), props)
     root.empty_display_size = 0.08
     point_at(root, target, track='-Z', up='Y')
 
-    shell = local_cylinder(name + '_Shell', root, (0.0, 0.0, 0.0), 0.91, 0.40, props, black, 8, 0.025)
-    local_cylinder(name + '_RearHousing', root, (0.0, 0.0, 0.25), 0.69, 0.18, props, metal, 64, 0.018)
-    local_cylinder(name + '_Diffuser', root, (0.0, 0.0, -0.215), 0.82, 0.026, props, diffuser, 8, 0.010)
+    local_cylinder(name + '_Shell', root, (0.0, 0.0, 0.0), 0.88, 0.38, props, black, 8, 0.025)
+    local_cylinder(name + '_RearHousing', root, (0.0, 0.0, 0.23), 0.66, 0.17, props, metal, 64, 0.018)
+    local_cylinder(name + '_Diffuser', root, (0.0, 0.0, -0.205), 0.79, 0.026, props, diffuser, 8, 0.010)
 
-    # Yoke and pivot pins rotate with the head; the telescopic stand remains vertical.
-    local_box(name + '_YokeL', root, (-0.78, 0.0, 0.12), (0.055, 0.12, 0.76), props, black, 0.018)
-    local_box(name + '_YokeR', root, (0.78, 0.0, 0.12), (0.055, 0.12, 0.76), props, black, 0.018)
-    local_box(name + '_YokeBack', root, (0.0, 0.0, 0.48), (1.60, 0.12, 0.055), props, black, 0.018)
-    local_cylinder(name + '_PivotL', root, (-0.80, 0.0, 0.0), 0.085, 0.11, props, metal, 48, 0.008, rotation=(0.0, math.radians(90.0), 0.0))
-    local_cylinder(name + '_PivotR', root, (0.80, 0.0, 0.0), 0.085, 0.11, props, metal, 48, 0.008, rotation=(0.0, math.radians(90.0), 0.0))
+    local_box(name + '_YokeL', root, (-0.75, 0.0, 0.11), (0.055, 0.12, 0.72), props, black, 0.018)
+    local_box(name + '_YokeR', root, (0.75, 0.0, 0.11), (0.055, 0.12, 0.72), props, black, 0.018)
+    local_box(name + '_YokeBack', root, (0.0, 0.0, 0.45), (1.54, 0.12, 0.055), props, black, 0.018)
+    local_cylinder(name + '_PivotL', root, (-0.77, 0.0, 0.0), 0.082, 0.11, props, metal, 48, 0.008, rotation=(0.0, math.radians(90.0), 0.0))
+    local_cylinder(name + '_PivotR', root, (0.77, 0.0, 0.0), 0.082, 0.11, props, metal, 48, 0.008, rotation=(0.0, math.radians(90.0), 0.0))
 
     data = bpy.data.lights.new(name + '_Light', 'AREA')
     data.energy = energy
     data.color = (1.0, 0.93, 0.86)
     data.shape = 'DISK'
-    data.size = 1.42
+    data.size = 1.36
     light = bpy.data.objects.new(name + '_Light', data)
     lights.objects.link(light)
     light.parent = root
-    light.location = (0.0, 0.0, -0.24)
+    light.location = (0.0, 0.0, -0.23)
     light.rotation_euler = (0.0, 0.0, 0.0)
-
-    return root, shell
 
 
 def build():
     clear_scene()
     scene = configure_scene((1920, 1200), 320)
     scene.render.film_transparent = False
-    scene.view_settings.exposure = -0.28
+    scene.view_settings.exposure = -0.18
 
     arch = collection('SCENE_ARCH')
     props = collection('SCENE_PROPS')
@@ -170,7 +167,7 @@ def build():
     guides = collection('SCENE_GUIDES')
 
     white = painted_white('MAT_Cyclorama')
-    pedestal_mat = painted_white('MAT_Pedestal', (0.57, 0.56, 0.54, 1.0), 0.40)
+    pedestal_mat = painted_white('MAT_Pedestal', (0.58, 0.57, 0.55, 1.0), 0.40)
     black = material_principled('MAT_Studio_Black', (0.005, 0.005, 0.006), 0.70)
     metal = material_principled('MAT_Studio_Metal', (0.08, 0.085, 0.095), 0.24, 0.82)
     diffuser = emissive('MAT_Diffuser')
@@ -179,37 +176,38 @@ def build():
     cylinder('STAGE_Pedestal', (0.0, 0.0, 0.26), 1.62, 0.52, arch, pedestal_mat, 192, 0.042)
     anchor = empty('PRODUCT_ANCHOR', (0.0, 0.0, 1.34), guides)
 
-    octabox_fixture('PROP_KeyFixture', -1.0, anchor, props, lights, black, metal, diffuser, 760)
-    octabox_fixture('PROP_FillFixture', 1.0, anchor, props, lights, black, metal, diffuser, 560)
+    octabox_fixture('PROP_KeyFixture', -1.0, anchor, props, lights, black, metal, diffuser, 720)
+    octabox_fixture('PROP_FillFixture', 1.0, anchor, props, lights, black, metal, diffuser, 520)
 
-    top = area_light('LIGHT_Top', (0.0, 0.20, 5.85), 280, 3.4, (1.0, 0.96, 0.91), anchor, 'RECTANGLE', 2.3)
-    rim = area_light('LIGHT_Rim', (0.0, 3.75, 3.05), 145, 2.2, (1.0, 0.90, 0.82), anchor, 'RECTANGLE', 1.0)
-    for light in (top, rim):
+    top = area_light('LIGHT_Top', (0.0, 0.20, 5.85), 260, 3.4, (1.0, 0.96, 0.91), anchor, 'RECTANGLE', 2.3)
+    rim = area_light('LIGHT_Rim', (0.0, 3.75, 3.05), 135, 2.2, (1.0, 0.90, 0.82), anchor, 'RECTANGLE', 1.0)
+    front = area_light('LIGHT_Front_Bounce', (0.0, -3.8, 2.4), 130, 4.2, (0.94, 0.96, 1.0), anchor, 'RECTANGLE', 3.2)
+    for light in (top, rim, front):
         move_to_collection(light, lights)
 
     for side in (-1.0, 1.0):
         flag = box(
             'PROP_Flag_L' if side < 0 else 'PROP_Flag_R',
-            (side * 3.15, 1.75, 2.35), (0.06, 1.20, 2.90), props, black, 0.018,
+            (side * 3.05, 1.75, 2.35), (0.06, 1.15, 2.85), props, black, 0.018,
         )
         flag.visible_camera = False
 
     world = scene.world
     world.use_nodes = True
     bg = world.node_tree.nodes.get('Background')
-    bg.inputs['Color'].default_value = (0.020, 0.020, 0.022, 1.0)
-    bg.inputs['Strength'].default_value = 0.10
+    bg.inputs['Color'].default_value = (0.022, 0.022, 0.024, 1.0)
+    bg.inputs['Strength'].default_value = 0.11
 
-    cam = camera('CAM_Hero', (0.0, -13.6, 2.18), (0.0, 0.30, 1.18), 72.0)
+    cam = camera('CAM_Hero', (0.0, -10.15, 2.18), (0.0, 0.28, 1.18), 58.0)
     cam.data.dof.use_dof = True
     cam.data.dof.focus_object = anchor
-    cam.data.dof.aperture_fstop = 4.8
+    cam.data.dof.aperture_fstop = 5.0
     cam.data.shift_x = 0.0
     cam.data.shift_y = 0.0
 
     scene.render.filepath = str(HERE / 'generated' / 'white_studio_v2.png')
     scene['scene_lab_id'] = 'white-studio-v2'
-    scene['scene_lab_status'] = 'mechanical-fixture-rig'
+    scene['scene_lab_status'] = 'visible-straight-fixtures'
     return scene
 
 
