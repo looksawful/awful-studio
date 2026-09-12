@@ -81,14 +81,20 @@ def install(legacy):
     def execute(self, context):
         # CAPS is runtime state, not .blend data. Re-detect here so Setup Post
         # Pipeline works after save/reopen and after loading an existing studio.
-        live_caps = detect_blender_capabilities()
+        # Call through legacy so tests and future compatibility shims can override
+        # the detector without bypassing this operation boundary.
+        live_caps = legacy.detect_blender_capabilities()
         legacy.CAPS = dict(live_caps)
         state = capability_state(live_caps)
         if not state['supported']:
             self.report({'ERROR'}, str(state['message']))
             return {'CANCELLED'}
 
-        result = original_execute(self, context)
+        # New Post datablocks must inherit the existing studio's owner identity.
+        # The owner id is persisted in the .blend, but the explicit mark scope is
+        # process-local and must be rebound after every reopen.
+        with legacy.ownership.for_scene(context.scene):
+            result = original_execute(self, context)
         if result != {'FINISHED'}:
             return result
 
