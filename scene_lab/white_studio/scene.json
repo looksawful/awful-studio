@@ -1,0 +1,25 @@
+{
+  "id": "white-studio-v1",
+  "blender": "5.2 LTS",
+  "units": "meters",
+  "purpose": "high-end commercial packshot / cosmetics / fragrance",
+  "hero_reserve": {"center": [0.0, 0.0, 1.35], "radius": 1.35, "height": 2.2},
+  "shell": {"width": 12.0, "depth": 14.0, "height": 6.5, "cyclorama_radius": 2.6},
+  "pedestal": {"shape": "cylinder", "radius": 1.75, "height": 0.55, "material": "warm white micro-concrete"},
+  "camera": {"lens_mm": 72.0, "location": [0.0, -10.5, 2.45], "target": [0.0, 0.15, 1.35]},
+  "lighting": {
+    "key": "large soft source camera-left, feathered across hero",
+    "fill": "large weaker source camera-right",
+    "top": "broad overhead separator",
+    "negative_fill": "black flags close to both sides outside hero reserve"
+  },
+  "set_dressing": ["two visible studio stands", "large softbox shells", "one restrained potted plant"],
+  "materials": ["white painted cyclorama", "micro-concrete pedestal", "black powder-coated stands"],
+  "acceptance": [
+    "hero reserve completely unobstructed",
+    "pedestal top reads cleanly without clipping",
+    "softbox reflections can shape glass and glossy products",
+    "background gradient remains smooth from floor through cove",
+    "no dependency on extension/awful_studio runtime"
+  ]
+}
