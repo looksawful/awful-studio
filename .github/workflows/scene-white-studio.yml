@@ -1,0 +1,56 @@
+name: Scene Lab - White Studio
+
+on:
+  push:
+    branches: ["scene/white-studio-v1"]
+    paths:
+      - "scene_lab/common.py"
+      - "scene_lab/white_studio/**"
+      - ".github/workflows/scene-white-studio.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-scene:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install verified Blender 5.2.1
+        shell: bash
+        run: |
+          python tools/setup_blender.py --destination .blender > blender-path.txt
+          echo "BLENDER=$(tail -n 1 blender-path.txt)" >> "$GITHUB_ENV"
+      - name: Build scene source
+        shell: bash
+        run: |
+          mkdir -p scene_lab/white_studio/generated
+          "$BLENDER" --background --factory-startup \
+            --python scene_lab/white_studio/build_scene.py -- \
+            --output "$PWD/scene_lab/white_studio/generated/white_studio_v1.blend"
+      - name: Render review frame
+        shell: bash
+        run: |
+          "$BLENDER" --background scene_lab/white_studio/generated/white_studio_v1.blend \
+            --python-expr "import bpy; s=bpy.context.scene; s.cycles.samples=48; s.render.resolution_percentage=50; s.render.filepath=r'$GITHUB_WORKSPACE/scene_lab/white_studio/generated/white_studio_v1_review.png'; bpy.ops.render.render(write_still=True)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: white-studio-v1
+          path: |
+            scene_lab/white_studio/generated/white_studio_v1.blend
+            scene_lab/white_studio/generated/white_studio_v1_review.png
+      - name: Commit generated proof to scene branch
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scene_lab/white_studio/generated
+          if ! git diff --cached --quiet; then
+            git commit -m "build(scene): generate white studio v1 [skip ci]"
+            git push
+          fi
