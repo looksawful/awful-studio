@@ -104,9 +104,10 @@ def install(legacy):
             result = original_setup_render(scene)
         finally:
             legacy.configure_cycles_gpu = original_probe
-        settings = getattr(scene, 'awful_studio', None)
-        mode = getattr(settings, 'preview_mode', 'FAST')
-        apply_preview_profile(scene, mode)
+        if hasattr(scene, 'cycles') and hasattr(scene, 'render'):
+            settings = getattr(scene, 'awful_studio', None)
+            mode = getattr(settings, 'preview_mode', 'FAST')
+            apply_preview_profile(scene, mode)
         return result
 
     legacy.setup_render = setup_render
