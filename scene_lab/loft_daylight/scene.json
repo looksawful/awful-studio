@@ -1,0 +1,25 @@
+{
+  "id": "loft-daylight-v1",
+  "blender": "5.2 LTS",
+  "units": "meters",
+  "purpose": "editorial daylight product scene / beverage / lifestyle tech",
+  "hero_reserve": {"center": [0.0, -0.2, 1.25], "radius": 1.4, "height": 2.1},
+  "shell": {"width": 12.0, "depth": 12.0, "height": 5.6},
+  "pedestal": {"shape": "cylinder", "radius": 1.65, "height": 0.48, "material": "polished warm concrete"},
+  "camera": {"lens_mm": 68.0, "location": [0.0, -9.3, 1.85], "target": [0.0, 0.0, 1.25]},
+  "lighting": {
+    "primary": "large daylight window camera-left",
+    "sun": "low warm directional sunlight through frame",
+    "fill": "soft bounce from camera-right",
+    "practicals": "restrained chrome dome lamp on right shelf"
+  },
+  "set_dressing": ["industrial window", "black leather sofa", "wood/steel shelving", "chrome lamp", "three plant groups", "distant city blocks"],
+  "materials": ["polished concrete floor", "raw concrete walls", "black leather", "dark steel", "warm wood", "chrome"],
+  "acceptance": [
+    "window light produces long readable shadows",
+    "floor reflections remain controlled rather than mirror-like",
+    "hero reserve stays visually quiet",
+    "props build depth without competing with the product position",
+    "scene is self-contained and independent from the add-on"
+  ]
+}
