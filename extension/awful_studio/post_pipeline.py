@@ -79,7 +79,11 @@ def install(legacy):
         return self.execute(context)
 
     def execute(self, context):
-        state = capability_state(legacy.CAPS)
+        # CAPS is runtime state, not .blend data. Re-detect here so Setup Post
+        # Pipeline works after save/reopen and after loading an existing studio.
+        live_caps = detect_blender_capabilities()
+        legacy.CAPS = dict(live_caps)
+        state = capability_state(live_caps)
         if not state['supported']:
             self.report({'ERROR'}, str(state['message']))
             return {'CANCELLED'}
