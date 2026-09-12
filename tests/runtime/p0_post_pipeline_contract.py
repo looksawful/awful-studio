@@ -125,8 +125,10 @@ def main():
               {'before': compositor_count_first,
                'after': len(managed_compositors(legacy))})
 
-        # Unsupported capability must be an explicit no-op CANCELLED state. Patch
-        # the detector itself because production refreshes capability on each setup.
+        # Unsupported capability must be an explicit no-op cancellation. Blender's
+        # bpy.ops Python wrapper raises RuntimeError when a CANCELLED operator also
+        # reports {'ERROR'}, so accept that native wrapper form while requiring the
+        # concrete AWFUL explanation and proving no scene mutation occurred.
         original_detect = legacy.detect_blender_capabilities
         unsupported_caps = dict(live_caps)
         unsupported_caps['viewlayer_lightgroups'] = False
@@ -135,8 +137,14 @@ def main():
         scene = bpy.context.scene
         before_groups = lightgroup_names(scene)
         before_compositors = len(managed_compositors(legacy))
-        result = bpy.ops.awful.build_post_pipeline_v4()
-        check('unsupported capability returns CANCELLED', result == {'CANCELLED'}, list(result))
+        try:
+            result = bpy.ops.awful.build_post_pipeline_v4()
+        except RuntimeError as exc:
+            check('unsupported capability reports explicit cancellation reason',
+                  'Post Pipeline unavailable: missing Cycles View Layer Light Groups' in str(exc),
+                  str(exc))
+        else:
+            check('unsupported capability returns CANCELLED', result == {'CANCELLED'}, list(result))
         check('unsupported setup does not mark Ready', not bool(scene.get(key, False)))
         check('unsupported setup does not mutate Light Groups',
               lightgroup_names(scene) == before_groups,
