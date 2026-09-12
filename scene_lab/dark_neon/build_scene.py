@@ -63,8 +63,8 @@ def black_marble_material():
     ramp.color_ramp.elements[1].position = 0.78
     ramp.color_ramp.elements[1].color = (0.030, 0.035, 0.045, 1.0)
     vein = ramp.color_ramp.elements.new(0.61)
-    vein.color = (0.28, 0.31, 0.36, 1.0)
-    bsdf.inputs['Roughness'].default_value = 0.14
+    vein.color = (0.19, 0.22, 0.28, 1.0)
+    bsdf.inputs['Roughness'].default_value = 0.16
     bsdf.inputs['Metallic'].default_value = 0.03
     links.new(noise.outputs['Fac'], ramp.inputs['Fac'])
     links.new(ramp.outputs['Color'], bsdf.inputs['Base Color'])
@@ -89,9 +89,10 @@ def make_soft_panel(name, location, dimensions, target, shell_mat, diffuser_mat,
     x, y, z = location
     shell = box(name + '_Shell', location, dimensions, props, shell_mat, 0.05)
     point_at(shell, target, track='X', up='Z')
-    panel = box(name + '_Diffuser', (x * 0.985, y, z), (0.025, dimensions[1] * 0.90, dimensions[2] * 0.90), props, diffuser_mat, 0.03)
+    panel = box(name + '_Diffuser', (x * 0.987, y, z), (0.025, dimensions[1] * 0.90, dimensions[2] * 0.90), props, diffuser_mat, 0.03)
     point_at(panel, target, track='X', up='Z')
-    light = area_light(name + '_Light', (x * 0.96, y, z), energy, dimensions[2] * 0.76, light_color, target, 'RECTANGLE', dimensions[1] * 0.72)
+    panel.visible_camera = False
+    light = area_light(name + '_Light', (x * 0.965, y, z), energy, dimensions[2] * 0.76, light_color, target, 'RECTANGLE', dimensions[1] * 0.72)
     move_to_collection(light, lights)
     return shell, panel, light
 
@@ -99,7 +100,7 @@ def make_soft_panel(name, location, dimensions, target, shell_mat, diffuser_mat,
 def add_stand(prefix, x, y, height, props, steel):
     from common import cylinder
     cylinder(prefix+'_Pole', (x, y, height*0.47), 0.032, height*0.92, props, steel, 32)
-    cylinder(prefix+'_Base', (x, y, 0.05), 0.36, 0.06, props, steel, 48)
+    cylinder(prefix+'_Base', (x, y, 0.05), 0.34, 0.055, props, steel, 48)
 
 
 def build():
@@ -117,9 +118,10 @@ def build():
     marble = black_marble_material()
     wall_mat = material_principled('MAT_Navy_Wall', (0.008,0.014,0.028), 0.48)
     steel = material_principled('MAT_Black_Steel', (0.006,0.008,0.012), 0.28, 0.72)
-    magenta_emit = emissive_material('MAT_Magenta_Diffuser', (1.0,0.012,0.26), 3.0)
-    cyan_emit = emissive_material('MAT_Cyan_Diffuser', (0.012,0.22,1.0), 3.0)
-    white_emit = emissive_material('MAT_White_Practical', (0.70,0.84,1.0), 3.5)
+    magenta_emit = emissive_material('MAT_Magenta_Diffuser', (1.0,0.012,0.26), 2.0)
+    cyan_emit = emissive_material('MAT_Cyan_Diffuser', (0.012,0.22,1.0), 2.0)
+    magenta_practical = emissive_material('MAT_Magenta_Practical', (1.0,0.015,0.25), 4.5)
+    cyan_practical = emissive_material('MAT_Cyan_Practical', (0.015,0.28,1.0), 4.5)
 
     box('ARCH_Floor', (0.0,0.0,-0.08), (12.0,13.0,0.16), arch, floor_mat)
     box('ARCH_BackWall', (0.0,5.90,2.9), (12.0,0.28,5.8), arch, wall_mat)
@@ -129,31 +131,30 @@ def build():
     box('STAGE_Plinth', (0.0,0.0,0.25), (3.05,2.15,0.50), arch, marble, 0.055)
     anchor = empty('PRODUCT_ANCHOR', (0.0,0.0,1.38), guides)
 
-    make_soft_panel('PROP_MagentaPanel', (-4.65,-0.35,3.10), (0.16,2.20,3.15), anchor, steel, magenta_emit, (1.0,0.015,0.23), 920, props, lights)
-    make_soft_panel('PROP_CyanPanel', (4.70,0.10,3.15), (0.16,2.20,3.15), anchor, steel, cyan_emit, (0.015,0.22,1.0), 980, props, lights)
-    add_stand('PROP_MagentaStand', -4.65, -0.15, 3.0, props, steel)
-    add_stand('PROP_CyanStand', 4.70, 0.28, 3.0, props, steel)
+    make_soft_panel('PROP_MagentaPanel', (-5.20,0.10,3.35), (0.16,1.95,2.90), anchor, steel, magenta_emit, (1.0,0.015,0.23), 920, props, lights)
+    make_soft_panel('PROP_CyanPanel', (5.20,0.35,3.40), (0.16,1.95,2.90), anchor, steel, cyan_emit, (0.015,0.22,1.0), 980, props, lights)
+    add_stand('PROP_MagentaStand', -5.20, 0.25, 3.1, props, steel)
+    add_stand('PROP_CyanStand', 5.20, 0.50, 3.1, props, steel)
 
-    for i, x in enumerate((-3.55, 3.55)):
-        strip = box(f'PROP_RearStrip_{i}', (x,5.05,2.75), (0.09,0.09,3.2), props, white_emit, 0.012)
-        strip.visible_camera = True
+    box('PROP_RearStrip_L', (-4.25,5.02,2.55), (0.065,0.065,2.15), props, magenta_practical, 0.010)
+    box('PROP_RearStrip_R', (4.25,5.02,2.55), (0.065,0.065,2.15), props, cyan_practical, 0.010)
 
-    rear_l = area_light('LIGHT_Rear_Magenta', (-2.7,3.9,2.9), 430, 1.8, (1.0,0.01,0.20), anchor, 'RECTANGLE', 0.65)
+    rear_l = area_light('LIGHT_Rear_Magenta', (-2.8,4.0,2.9), 420, 1.8, (1.0,0.01,0.20), anchor, 'RECTANGLE', 0.65)
     move_to_collection(rear_l, lights)
-    rear_r = area_light('LIGHT_Rear_Cyan', (2.7,3.9,2.9), 460, 1.8, (0.02,0.20,1.0), anchor, 'RECTANGLE', 0.65)
+    rear_r = area_light('LIGHT_Rear_Cyan', (2.8,4.0,2.9), 450, 1.8, (0.02,0.20,1.0), anchor, 'RECTANGLE', 0.65)
     move_to_collection(rear_r, lights)
-    top = area_light('LIGHT_Top_Neutral', (0.0,0.4,5.35), 220, 2.8, (0.76,0.82,1.0), anchor, 'RECTANGLE', 1.8)
+    top = area_light('LIGHT_Top_Neutral', (0.0,0.5,5.35), 210, 2.8, (0.74,0.80,1.0), anchor, 'RECTANGLE', 1.8)
     move_to_collection(top, lights)
 
-    floor_l = area_light('LIGHT_Floor_Magenta', (-3.2,-0.2,0.18), 180, 1.5, (1.0,0.01,0.24), (0.0,0.0,0.1), 'RECTANGLE', 0.35)
+    floor_l = area_light('LIGHT_Floor_Magenta', (-3.4,0.2,0.12), 150, 1.2, (1.0,0.01,0.24), (0.0,0.0,0.1), 'RECTANGLE', 0.30)
     floor_l.rotation_euler.x = math.radians(90)
     move_to_collection(floor_l, lights)
-    floor_r = area_light('LIGHT_Floor_Cyan', (3.2,0.1,0.18), 190, 1.5, (0.01,0.22,1.0), (0.0,0.0,0.1), 'RECTANGLE', 0.35)
+    floor_r = area_light('LIGHT_Floor_Cyan', (3.4,0.25,0.12), 160, 1.2, (0.01,0.22,1.0), (0.0,0.0,0.1), 'RECTANGLE', 0.30)
     floor_r.rotation_euler.x = math.radians(90)
     move_to_collection(floor_r, lights)
 
-    flag_l = box('PROP_Flag_L', (-3.15,1.55,2.25), (0.08,1.45,3.15), props, steel, 0.025)
-    flag_r = box('PROP_Flag_R', (3.15,1.55,2.25), (0.08,1.45,3.15), props, steel, 0.025)
+    flag_l = box('PROP_Flag_L', (-3.30,1.70,2.25), (0.08,1.35,3.05), props, steel, 0.025)
+    flag_r = box('PROP_Flag_R', (3.30,1.70,2.25), (0.08,1.35,3.05), props, steel, 0.025)
     flag_l.visible_camera = False
     flag_r.visible_camera = False
 
@@ -161,16 +162,16 @@ def build():
     world.use_nodes = True
     bg = world.node_tree.nodes.get('Background')
     bg.inputs['Color'].default_value = (0.002,0.004,0.012,1.0)
-    bg.inputs['Strength'].default_value = 0.08
+    bg.inputs['Strength'].default_value = 0.075
 
-    cam = camera('CAM_Hero', (0.0,-11.8,2.25), (0.0,0.15,1.30), 60.0)
+    cam = camera('CAM_Hero', (0.0,-11.8,2.22), (0.0,0.15,1.28), 60.0)
     cam.data.dof.use_dof = True
     cam.data.dof.focus_object = anchor
     cam.data.dof.aperture_fstop = 4.2
 
     scene.render.filepath = str(HERE / 'generated' / 'dark_neon_v1.png')
     scene['scene_lab_id'] = 'dark-neon-v1'
-    scene['scene_lab_status'] = 'visual-pass-2'
+    scene['scene_lab_status'] = 'visual-pass-3'
     return scene
 
 
