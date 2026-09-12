@@ -167,15 +167,20 @@ def main():
         legacy.apply_lighting_preset(scene, 'WINDOW_BALANCED', False, True)
         check('Natural defaults World ON', settings.natural_light_enabled)
 
-        # Preserve existing pure-HDRI and Physical Sky helper semantics.
+        # Preserve ready-HDRI semantics separately from the #43 missing-asset fallback.
         settings.natural_light_enabled = True
         settings.reflective_room_enabled = True
         settings.studio_lights_enabled = False
-        legacy.apply_environment_preset(scene, 'FISH_HOEK', reset_defaults=True)
+        original_read_valid = ext.asset_cache.read_valid
+        ext.asset_cache.read_valid = lambda _path: True
+        try:
+            legacy.apply_environment_preset(scene, 'FISH_HOEK', reset_defaults=True)
+        finally:
+            ext.asset_cache.read_valid = original_read_valid
         bpy.context.view_layer.update()
 
         active = linked_node(mix.inputs[1])
-        check('pure HDRI keeps HDRI source selected',
+        check('ready pure HDRI keeps HDRI source selected',
               active is not None and active.name == 'AWFUL_BG_FISH_HOEK',
               active.name if active else None)
         portal = legacy.REG.object('WINDOW_PORTAL')
