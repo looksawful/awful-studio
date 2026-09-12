@@ -48,7 +48,7 @@ def painted_white(name, base=(0.68, 0.68, 0.665, 1.0), roughness=0.48):
     return mat
 
 
-def emissive(name, color=(1.0, 0.955, 0.91), strength=1.25):
+def emissive(name, color=(1.0, 0.955, 0.91), strength=1.15):
     mat = bpy.data.materials.new(name)
     mat.use_nodes = True
     nodes, links = mat.node_tree.nodes, mat.node_tree.links
@@ -124,34 +124,43 @@ def tripod_stand(name, x, y, height, props, black, metal):
     box(name + '_TopBracket', (x, y, height - 0.10), (0.34, 0.12, 0.10), props, black, 0.025)
 
 
-def octabox_fixture(name, side, target, props, lights, black, metal, diffuser, energy):
-    x = side * 3.40
-    y = 1.20
-    tripod_stand(name + '_Stand', x, y + 0.10, 3.18, props, black, metal)
+def softbox_fixture(name, side, target, props, lights, black, metal, diffuser, energy):
+    stand_x = side * 3.18
+    head_x = side * 2.72
+    y = 0.95
+    head_z = 3.10
+    tripod_stand(name + '_Stand', stand_x, y + 0.10, 3.12, props, black, metal)
 
-    root = empty(name + '_HeadRig', (x, y, 3.34), props)
+    # Straight fixed boom connects the vertical stand to an independently aimed lamp head.
+    boom_mid_x = (stand_x + head_x) * 0.5
+    box(name + '_Boom', (boom_mid_x, y, 3.02), (abs(stand_x - head_x) + 0.18, 0.095, 0.095), props, metal, 0.022)
+
+    root = empty(name + '_HeadRig', (head_x, y, head_z), props)
     root.empty_display_size = 0.08
     point_at(root, target, track='-Z', up='Y')
 
-    local_cylinder(name + '_Shell', root, (0.0, 0.0, 0.0), 0.88, 0.38, props, black, 8, 0.025)
-    local_cylinder(name + '_RearHousing', root, (0.0, 0.0, 0.23), 0.66, 0.17, props, metal, 64, 0.018)
-    local_cylinder(name + '_Diffuser', root, (0.0, 0.0, -0.205), 0.79, 0.026, props, diffuser, 8, 0.010)
+    # Rectangular softbox body. Local Z is depth; local Y stays visually vertical.
+    local_box(name + '_Shell', root, (0.0, 0.0, 0.0), (1.22, 1.58, 0.30), props, black, 0.045)
+    local_box(name + '_RearHousing', root, (0.0, 0.0, 0.22), (0.88, 1.08, 0.18), props, metal, 0.035)
+    local_box(name + '_Diffuser', root, (0.0, 0.0, -0.165), (1.10, 1.44, 0.025), props, diffuser, 0.025)
 
-    local_box(name + '_YokeL', root, (-0.75, 0.0, 0.11), (0.055, 0.12, 0.72), props, black, 0.018)
-    local_box(name + '_YokeR', root, (0.75, 0.0, 0.11), (0.055, 0.12, 0.72), props, black, 0.018)
-    local_box(name + '_YokeBack', root, (0.0, 0.0, 0.45), (1.54, 0.12, 0.055), props, black, 0.018)
-    local_cylinder(name + '_PivotL', root, (-0.77, 0.0, 0.0), 0.082, 0.11, props, metal, 48, 0.008, rotation=(0.0, math.radians(90.0), 0.0))
-    local_cylinder(name + '_PivotR', root, (0.77, 0.0, 0.0), 0.082, 0.11, props, metal, 48, 0.008, rotation=(0.0, math.radians(90.0), 0.0))
+    # Realistic yoke/pivots. They rotate with the head, not with the stand.
+    local_box(name + '_YokeL', root, (-0.66, 0.0, 0.11), (0.055, 0.13, 0.92), props, black, 0.018)
+    local_box(name + '_YokeR', root, (0.66, 0.0, 0.11), (0.055, 0.13, 0.92), props, black, 0.018)
+    local_box(name + '_YokeBack', root, (0.0, 0.0, 0.48), (1.36, 0.13, 0.055), props, black, 0.018)
+    local_cylinder(name + '_PivotL', root, (-0.68, 0.0, 0.0), 0.075, 0.11, props, metal, 48, 0.008, rotation=(0.0, math.radians(90.0), 0.0))
+    local_cylinder(name + '_PivotR', root, (0.68, 0.0, 0.0), 0.075, 0.11, props, metal, 48, 0.008, rotation=(0.0, math.radians(90.0), 0.0))
 
     data = bpy.data.lights.new(name + '_Light', 'AREA')
     data.energy = energy
     data.color = (1.0, 0.93, 0.86)
-    data.shape = 'DISK'
-    data.size = 1.36
+    data.shape = 'RECTANGLE'
+    data.size = 1.05
+    data.size_y = 1.38
     light = bpy.data.objects.new(name + '_Light', data)
     lights.objects.link(light)
     light.parent = root
-    light.location = (0.0, 0.0, -0.23)
+    light.location = (0.0, 0.0, -0.19)
     light.rotation_euler = (0.0, 0.0, 0.0)
 
 
@@ -159,7 +168,7 @@ def build():
     clear_scene()
     scene = configure_scene((1920, 1200), 320)
     scene.render.film_transparent = False
-    scene.view_settings.exposure = -0.18
+    scene.view_settings.exposure = -0.16
 
     arch = collection('SCENE_ARCH')
     props = collection('SCENE_PROPS')
@@ -176,19 +185,19 @@ def build():
     cylinder('STAGE_Pedestal', (0.0, 0.0, 0.26), 1.62, 0.52, arch, pedestal_mat, 192, 0.042)
     anchor = empty('PRODUCT_ANCHOR', (0.0, 0.0, 1.34), guides)
 
-    octabox_fixture('PROP_KeyFixture', -1.0, anchor, props, lights, black, metal, diffuser, 720)
-    octabox_fixture('PROP_FillFixture', 1.0, anchor, props, lights, black, metal, diffuser, 520)
+    softbox_fixture('PROP_KeyFixture', -1.0, anchor, props, lights, black, metal, diffuser, 700)
+    softbox_fixture('PROP_FillFixture', 1.0, anchor, props, lights, black, metal, diffuser, 500)
 
-    top = area_light('LIGHT_Top', (0.0, 0.20, 5.85), 260, 3.4, (1.0, 0.96, 0.91), anchor, 'RECTANGLE', 2.3)
+    top = area_light('LIGHT_Top', (0.0, 0.20, 5.85), 255, 3.4, (1.0, 0.96, 0.91), anchor, 'RECTANGLE', 2.3)
     rim = area_light('LIGHT_Rim', (0.0, 3.75, 3.05), 135, 2.2, (1.0, 0.90, 0.82), anchor, 'RECTANGLE', 1.0)
-    front = area_light('LIGHT_Front_Bounce', (0.0, -3.8, 2.4), 130, 4.2, (0.94, 0.96, 1.0), anchor, 'RECTANGLE', 3.2)
+    front = area_light('LIGHT_Front_Bounce', (0.0, -3.8, 2.4), 125, 4.2, (0.94, 0.96, 1.0), anchor, 'RECTANGLE', 3.2)
     for light in (top, rim, front):
         move_to_collection(light, lights)
 
     for side in (-1.0, 1.0):
         flag = box(
             'PROP_Flag_L' if side < 0 else 'PROP_Flag_R',
-            (side * 3.05, 1.75, 2.35), (0.06, 1.15, 2.85), props, black, 0.018,
+            (side * 2.95, 1.70, 2.35), (0.06, 1.10, 2.75), props, black, 0.018,
         )
         flag.visible_camera = False
 
@@ -207,7 +216,7 @@ def build():
 
     scene.render.filepath = str(HERE / 'generated' / 'white_studio_v2.png')
     scene['scene_lab_id'] = 'white-studio-v2'
-    scene['scene_lab_status'] = 'visible-straight-fixtures'
+    scene['scene_lab_status'] = 'straight-softbox-rigs'
     return scene
 
 
