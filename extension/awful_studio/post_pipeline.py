@@ -38,13 +38,14 @@ def install(legacy):
     original_detect_capabilities = legacy.detect_blender_capabilities
 
     def detect_blender_capabilities():
-        """Refine generic probes through Blender RNA metadata, not Python hasattr."""
+        """Refine generic probes through the concrete registered Blender APIs."""
         caps = original_detect_capabilities()
         try:
-            props = legacy.bpy.types.ViewLayer.bl_rna.properties
-            caps['viewlayer_lightgroups'] = props.get('lightgroups') is not None
+            legacy.bpy.ops.scene.view_layer_add_lightgroup.get_rna_type()
+            legacy.bpy.ops.scene.view_layer_remove_lightgroup.get_rna_type()
+            caps['viewlayer_lightgroups'] = True
         except Exception:
-            pass
+            caps['viewlayer_lightgroups'] = False
         try:
             props = legacy.bpy.types.Scene.bl_rna.properties
             caps['compositor_group_api'] = props.get('compositing_node_group') is not None
