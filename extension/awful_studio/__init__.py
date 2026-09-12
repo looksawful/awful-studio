@@ -3,7 +3,7 @@
 import time
 import bpy
 from bpy.props import BoolProperty, StringProperty, IntProperty, PointerProperty, EnumProperty
-from . import ownership, migrations, asset_cache, photography, camera_policy, studio_geometry, natural_light, runtime_performance, playback_policy, product_quality
+from . import ownership, migrations, asset_cache, asset_workflow, post_pipeline, photography, camera_policy, studio_geometry, natural_light, runtime_performance, playback_policy, product_placement, product_quality
 from .core import legacy
 
 # Policy installation mutates only in-memory preset metadata/callables. It must run
@@ -12,8 +12,11 @@ photography.install(legacy)
 camera_policy.install(legacy)
 studio_geometry.install(legacy)
 natural_light.install(legacy)
+asset_workflow.install(legacy, asset_cache)
+post_pipeline.install(legacy)
 runtime_performance.install(legacy)
 playback_policy.install(legacy)
+product_placement.install(legacy)
 product_quality.install(legacy)
 
 VERSION = (0, 0, 17)
@@ -59,6 +62,28 @@ def _detach_non_product_children():
             legacy.parent_keep_world(child, None)
 
 
+def _is_factory_object(obj, name):
+    if obj.name != name or obj.get(legacy.MANAGED_KEY):
+        return False
+    if obj.parent is not None or obj.keys():
+        return False
+    return obj.users_collection and all(col.name == 'Scene Collection' for col in obj.users_collection)
+
+
+def clear_factory_scene_objects(scene):
+    first_unbuilt_scene = scene.awful_state.schema_version == 0 and not scene.awful_state.built
+    if not first_unbuilt_scene:
+        return
+    factory = {'Cube', 'Camera', 'Light'}
+    scene_names = {obj.name for obj in scene.objects}
+    if not factory.issubset(scene_names):
+        return
+    for name in factory:
+        obj = scene.objects.get(name)
+        if obj is not None and _is_factory_object(obj, name):
+            bpy.data.objects.remove(obj, do_unlink=True)
+
+
 def run_build(context):
     scene = context.scene
     migrations.migration_path(scene.awful_state.schema_version)
@@ -67,6 +92,7 @@ def run_build(context):
     try:
         with ownership.for_scene(scene):
             _detach_non_product_children()
+            clear_factory_scene_objects(scene)
             legacy.build_studio(True)
             ownership.mark_generated_actions(scene)
         scene.awful_state.schema_version = migrations.CURRENT_SCHEMA

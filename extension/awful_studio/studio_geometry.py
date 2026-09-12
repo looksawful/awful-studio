@@ -44,6 +44,56 @@ ARCHITECTURE_ROLE_GROUPS = {
 }
 
 
+def architecture_camera_physical(group: str, reflective_room: bool) -> bool:
+    """Decouple camera-visible architecture from the hidden light-bounce room."""
+    if group in {'FLOOR', 'DOOR', 'WINDOW_FRAME', 'CYC'}:
+        return True
+    return bool(reflective_room)
+
+
+def window_frame_layout(window: Mapping) -> dict[str, object]:
+    """Return a clean seven-bar studio-window layout in local Y/Z coordinates."""
+    width = float(window['width'])
+    bottom = float(window['bottom_z'])
+    top = float(window['top_z'])
+    frame_width = float(window['frame_width'])
+    height = top - bottom
+    if width <= frame_width * 3.0 or height <= frame_width * 3.0:
+        raise ValueError('Window opening is too small for its frame width')
+
+    ymin, ymax = -width * 0.5, width * 0.5
+    inner_width = width - 2.0 * frame_width
+    inner_height = height - 2.0 * frame_width
+    mid_z = (bottom + top) * 0.5
+    mullion = frame_width * 0.70
+    interior_ymin = ymin + frame_width
+    bars = [
+        {'name': 'WINDOW_Frame_Rear', 'center_yz': (ymin + frame_width * 0.5, mid_z),
+         'size_yz': (frame_width, inner_height)},
+        {'name': 'WINDOW_Frame_Front', 'center_yz': (ymax - frame_width * 0.5, mid_z),
+         'size_yz': (frame_width, inner_height)},
+        {'name': 'WINDOW_Frame_Bottom', 'center_yz': (0.0, bottom + frame_width * 0.5),
+         'size_yz': (width, frame_width)},
+        {'name': 'WINDOW_Frame_Top', 'center_yz': (0.0, top - frame_width * 0.5),
+         'size_yz': (width, frame_width)},
+    ]
+    for index, fraction in enumerate((1.0 / 3.0, 2.0 / 3.0), 1):
+        y = interior_ymin + inner_width * fraction
+        bars.append({
+            'name': f'WINDOW_Mullion_V{index}', 'center_yz': (y, mid_z),
+            'size_yz': (mullion, inner_height),
+        })
+    bars.append({
+        'name': 'WINDOW_Mullion_H1', 'center_yz': (0.0, mid_z),
+        'size_yz': (inner_width, mullion),
+    })
+    return {
+        'bars': bars,
+        'glass_center_yz': (0.0, mid_z),
+        'glass_size_yz': (inner_width, inner_height),
+    }
+
+
 def cyclorama_distance_bounds(studio_spec: Mapping, clearance: float = 0.25) -> tuple[float, float]:
     """Return physically safe stage-origin -> cove-tangent distance bounds.
 
@@ -318,7 +368,7 @@ def _build_door_system(legacy, room_col, wall_material, frame_material):
     return leaf
 
 
-def _build_room(legacy, room_col, window_col, wall_mat, frame_mat, glass_mat):
+def _build_room(legacy, room_col, window_col, wall_mat, floor_mat, frame_mat, glass_mat):
     spec = legacy.STUDIO_SPEC
     width, height = float(spec['width']), float(spec['height'])
     half_w = width * 0.5
@@ -343,7 +393,7 @@ def _build_room(legacy, room_col, window_col, wall_mat, frame_mat, glass_mat):
         'ROOM_Floor', 'ROOM_FLOOR',
         (0, center_y, -floor_offset - thick * 0.5),
         (width, depth, thick), room_col, wall_mat)
-    _build_visible_floor(legacy, room_col, wall_mat)
+    _build_visible_floor(legacy, room_col, floor_mat)
 
     win = spec['window']
     ymin = float(win['center_y']) - float(win['width']) * 0.5
@@ -376,30 +426,22 @@ def _build_room(legacy, room_col, window_col, wall_mat, frame_mat, glass_mat):
     frame_d = float(win['frame_depth'])
     frame_w = float(win['frame_width'])
     x = -half_w + 0.02
-    frame_specs = (
-        ('WINDOW_Frame_Rear', (x, ymin, mid_z), (frame_d, frame_w, win_h)),
-        ('WINDOW_Frame_Front', (x, ymax, mid_z), (frame_d, frame_w, win_h)),
-        ('WINDOW_Frame_Bottom', (x, mid_y, bottom), (frame_d, float(win['width']), frame_w)),
-        ('WINDOW_Frame_Top', (x, mid_y, top), (frame_d, float(win['width']), frame_w)),
-    )
-    for name, location, dimensions in frame_specs:
-        legacy.add_box(
-            name, 'WINDOW_FRAME', location, dimensions,
-            window_col, frame_mat, camera_visible=True)
-    for idx, yy in enumerate((mid_y - float(win['width']) / 6.0,
-                              mid_y + float(win['width']) / 6.0), 1):
-        legacy.add_box(
-            f'WINDOW_Mullion_V{idx}', 'WINDOW_FRAME', (x, yy, mid_z),
-            (frame_d, frame_w * 0.85, win_h), window_col, frame_mat, camera_visible=True)
-    for idx, zz in enumerate((bottom + win_h / 3.0, bottom + 2.0 * win_h / 3.0), 1):
-        legacy.add_box(
-            f'WINDOW_Mullion_H{idx}', 'WINDOW_FRAME', (x, mid_y, zz),
-            (frame_d, float(win['width']), frame_w * 0.85),
-            window_col, frame_mat, camera_visible=True)
+    frame_layout = window_frame_layout(win)
+    for item in frame_layout['bars']:
+        local_y, z = item['center_yz']
+        size_y, size_z = item['size_yz']
+        obj = legacy.add_box(
+            item['name'], 'WINDOW_FRAME', (x, mid_y + local_y, z),
+            (frame_d, size_y, size_z), window_col, frame_mat, camera_visible=True)
+        bevel = obj.modifiers.new('AWFUL Window Edge', 'BEVEL')
+        bevel.width = min(0.018, frame_w * 0.16)
+        bevel.segments = 3
+    glass_y, glass_z = frame_layout['glass_center_yz']
+    glass_w, glass_h = frame_layout['glass_size_yz']
     glass = legacy.add_box(
         'WINDOW_Glass', 'WINDOW_GLASS',
-        (-half_w + 0.045, mid_y, mid_z),
-        (float(win['glass_thickness']), float(win['width']) - frame_w, win_h - frame_w),
+        (-half_w + 0.045, mid_y + glass_y, glass_z),
+        (float(win['glass_thickness']), glass_w, glass_h),
         window_col, glass_mat, camera_visible=True)
     glass.hide_render = True
     glass.hide_viewport = True
@@ -420,10 +462,8 @@ def apply_architecture_visibility(legacy, scene):
     }
     for group, roles in ARCHITECTURE_ROLE_GROUPS.items():
         for obj in _owned_role_objects(legacy, scene, roles):
-            object_physical = physical
-            if group == 'CYC':
-                object_physical = True
-            elif group == 'WINDOW_GLASS':
+            object_physical = architecture_camera_physical(group, physical)
+            if group == 'WINDOW_GLASS':
                 object_physical = physical and bool(settings.window_glass_enabled)
             _set_camera_workflow_visibility(
                 legacy, obj, show_map[group], object_physical)
@@ -526,8 +566,8 @@ def install(legacy):
     _install_panel(legacy)
     legacy.build_cyclorama = lambda collection, material: _build_cyclorama(
         legacy, collection, material)
-    legacy.build_room = lambda room_col, window_col, wall_mat, frame_mat, glass_mat: _build_room(
-        legacy, room_col, window_col, wall_mat, frame_mat, glass_mat)
+    legacy.build_room = lambda room_col, window_col, wall_mat, floor_mat, frame_mat, glass_mat: _build_room(
+        legacy, room_col, window_col, wall_mat, floor_mat, frame_mat, glass_mat)
     legacy.apply_cyclorama_state = lambda scene: apply_cyclorama_state(legacy, scene)
     legacy.apply_architecture_visibility = lambda scene: apply_architecture_visibility(legacy, scene)
     legacy.apply_room_visibility = lambda scene: apply_architecture_visibility(legacy, scene)

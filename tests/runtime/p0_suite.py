@@ -15,8 +15,12 @@ CONTRACTS = (
     ('camera', 'p0_camera_contract.py'),
     ('studio_geometry', 'p0_studio_geometry_contract.py'),
     ('natural_light', 'p0_natural_light_contract.py'),
+    ('asset_workflow', 'p0_asset_workflow_contract.py'),
+    ('performance', 'p0_performance_contract.py'),
+    ('post_pipeline', 'p0_post_pipeline_contract.py'),
     ('playback', 'p0_playback_contract.py'),
     ('product_quality', 'product_quality_contract.py'),
+    ('product_placement', 'product_placement_contract.py'),
 )
 
 

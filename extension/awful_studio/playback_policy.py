@@ -1,9 +1,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Independent Product/Camera playback policy for existing AWFUL motions.
+"""Independent Product/Camera playback and Preview Range policy.
 
 Pure helpers stay Blender-independent for fast tests. `install()` adapts the
 retained motion functions before PropertyGroup/Panel registration.
 """
+
+import math
 
 PLAYBACK_MODES = ('ONCE', 'LOOP', 'PING_PONG')
 _MODE_POLICIES = {
@@ -42,6 +44,49 @@ def modifier_plan(mode):
         'cycles_modifiers_to_add': 0 if policy['cycles_modifier'] is None else 1,
         'mode': policy['cycles_modifier'],
     }
+
+
+def _integer_keyed_span(span):
+    if span is None:
+        return None
+    start, end = map(float, span)
+    if not math.isfinite(start) or not math.isfinite(end):
+        raise ValueError('Playback span must be finite')
+    if end < start:
+        start, end = end, start
+    return int(math.floor(start)), int(math.ceil(end))
+
+
+def preview_span(keyed_span, mode):
+    """Map one keyed action span to the Preview Range needed to see playback.
+
+    ONCE shows one keyed span. LOOP shows two consecutive spans. PING_PONG uses
+    the same two-span duration, representing one forward + backward cycle.
+    """
+    mode_policy(mode)
+    span = _integer_keyed_span(keyed_span)
+    if span is None:
+        return None
+    start, end = span
+    if mode == 'ONCE':
+        return start, end
+    duration = max(0, end - start)
+    return start, end + duration
+
+
+def union_preview_spans(*spans):
+    """Return the union of available Product/Camera preview spans."""
+    normalized = [_integer_keyed_span(span) for span in spans if span is not None]
+    if not normalized:
+        return None
+    return min(span[0] for span in normalized), max(span[1] for span in normalized)
+
+
+def clamp_frame_to_span(frame, span):
+    """Preserve current frame inside a span and clamp only when outside it."""
+    start, end = _integer_keyed_span(span)
+    value = int(frame)
+    return max(start, min(end, value))
 
 
 def iter_fcurves(action):
@@ -94,6 +139,52 @@ def _actions(legacy, target):
     return result
 
 
+def _keyed_span(actions):
+    frames = []
+    for action in actions:
+        for fcurve in iter_fcurves(action):
+            frames.extend(float(point.co.x) for point in fcurve.keyframe_points)
+    if not frames:
+        return None
+    return min(frames), max(frames)
+
+
+def target_preview_span(legacy, scene, target):
+    field = _SETTING_FIELDS[target]
+    return preview_span(_keyed_span(_actions(legacy, target)), getattr(scene.awful_studio, field))
+
+
+def scene_preview_span(legacy, scene):
+    return union_preview_spans(
+        target_preview_span(legacy, scene, 'PRODUCT'),
+        target_preview_span(legacy, scene, 'CAMERA'),
+    )
+
+
+def sync_preview_range(legacy, scene):
+    """Fit Blender Preview Range to generated motion without touching render range/FPS."""
+    span = scene_preview_span(legacy, scene)
+    if span is None:
+        scene.use_preview_range = False
+        return None
+    start, end = span
+    scene.frame_preview_start = start
+    scene.frame_preview_end = end
+    scene.use_preview_range = True
+    clamped = clamp_frame_to_span(scene.frame_current, span)
+    if clamped != scene.frame_current:
+        scene.frame_set(clamped)
+    return span
+
+
+def reset_preview_range(scene):
+    """Disable AWFUL's playback Preview Range without changing the render range."""
+    scene.use_preview_range = False
+    scene.frame_preview_start = int(scene.frame_start)
+    scene.frame_preview_end = int(scene.frame_end)
+    scene.frame_set(int(scene.frame_start))
+
+
 def _apply_action_policy(action, mode):
     policy = mode_policy(mode)
     cycle_mode = policy['cycles_modifier']
@@ -131,6 +222,7 @@ def apply_target_policy(legacy, scene, target, mode=None):
     mode_policy(mode)  # validate before mutating anything
     for action in _actions(legacy, target):
         _apply_action_policy(action, mode)
+    sync_preview_range(legacy, scene)
     return mode
 
 
@@ -182,16 +274,51 @@ def install(legacy):
     legacy.apply_product_motion = apply_product_motion
     legacy.apply_camera_motion = apply_camera_motion
 
+    class AWFUL_OT_FitTimelineToMotion(legacy.bpy.types.Operator):
+        bl_idname = 'awful.fit_timeline_to_motion'
+        bl_label = 'Fit Timeline to Motion'
+        bl_description = 'Fit Blender Preview Range to generated Product and Camera motion'
+        bl_options = {'REGISTER', 'UNDO'}
+
+        def execute(self, context):
+            scene = context.scene
+            span = sync_preview_range(legacy, scene)
+            if span is None:
+                self.report({'INFO'}, 'No generated Product or Camera motion to fit')
+            else:
+                start, _end = span
+                scene.frame_set(start)
+            return {'FINISHED'}
+
+    class AWFUL_OT_ResetTimeline(legacy.bpy.types.Operator):
+        bl_idname = 'awful.reset_timeline'
+        bl_label = 'Reset Timeline'
+        bl_description = 'Disable the AWFUL Preview Range and leave Blender render range unchanged'
+        bl_options = {'REGISTER', 'UNDO'}
+
+        def execute(self, context):
+            reset_preview_range(context.scene)
+            return {'FINISHED'}
+
+    legacy.CLASSES = (*legacy.CLASSES, AWFUL_OT_FitTimelineToMotion, AWFUL_OT_ResetTimeline)
+
     product_draw = legacy.AWFUL_PT_Product.draw
     camera_draw = legacy.AWFUL_PT_Camera.draw
+
+    def draw_timeline_controls(layout):
+        row = layout.row(align=True)
+        row.operator('awful.fit_timeline_to_motion', text='Fit Timeline')
+        row.operator('awful.reset_timeline', text='Reset Timeline')
 
     def draw_product(self, context):
         product_draw(self, context)
         self.layout.prop(context.scene.awful_studio, 'product_playback', text='Playback')
+        draw_timeline_controls(self.layout)
 
     def draw_camera(self, context):
         camera_draw(self, context)
         self.layout.prop(context.scene.awful_studio, 'camera_playback', text='Playback')
+        draw_timeline_controls(self.layout)
 
     legacy.AWFUL_PT_Product.draw = draw_product
     legacy.AWFUL_PT_Camera.draw = draw_camera

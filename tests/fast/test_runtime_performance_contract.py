@@ -1,5 +1,6 @@
 import importlib.util
 import pathlib
+import types
 import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -44,11 +45,90 @@ class RuntimePerformancePolicyTests(unittest.TestCase):
         self.assertEqual(calls, {'probe': 0, 'setup': 1})
         self.assertIs(legacy.configure_cycles_gpu, original_probe)
 
+    def test_preview_profiles_are_explicit_bounded_and_viewport_only(self):
+        policy = load_performance_policy()
+        fast = policy.preview_profile('FAST')
+        quality = policy.preview_profile('QUALITY')
+
+        self.assertLess(fast['samples'], quality['samples'])
+        self.assertGreaterEqual(int(fast['pixel_size']), int(quality['pixel_size']))
+        self.assertGreaterEqual(fast['adaptive_threshold'], quality['adaptive_threshold'])
+        for profile in (fast, quality):
+            self.assertGreaterEqual(profile['samples'], 1)
+            self.assertLessEqual(profile['samples'], 64)
+            self.assertIn(profile['pixel_size'], {'1', '2', '4', '8'})
+            self.assertTrue(profile['denoise'])
+            self.assertNotIn('device', profile)
+            self.assertNotIn('render_samples', profile)
+            self.assertNotIn('resolution', profile)
+            self.assertNotIn('light_tree', profile)
+
+        with self.assertRaises(ValueError):
+            policy.preview_profile('MAGIC')
+
+    def test_apply_preview_profile_preserves_final_render_and_device_settings(self):
+        policy = load_performance_policy()
+        scene = types.SimpleNamespace(
+            cycles=types.SimpleNamespace(
+                device='CPU',
+                samples=256,
+                preview_samples=16,
+                preview_adaptive_threshold=0.05,
+                use_preview_denoising=True,
+                use_light_tree=True,
+            ),
+            render=types.SimpleNamespace(
+                preview_pixel_size='2',
+                resolution_x=1600,
+                resolution_y=2000,
+                resolution_percentage=100,
+            ),
+        )
+        final_before = (
+            scene.cycles.device,
+            scene.cycles.samples,
+            scene.cycles.use_light_tree,
+            scene.render.resolution_x,
+            scene.render.resolution_y,
+            scene.render.resolution_percentage,
+        )
+
+        policy.apply_preview_profile(scene, 'FAST')
+        fast = policy.preview_profile('FAST')
+        self.assertEqual(scene.cycles.preview_samples, fast['samples'])
+        self.assertEqual(scene.render.preview_pixel_size, fast['pixel_size'])
+        self.assertEqual(scene.cycles.preview_adaptive_threshold, fast['adaptive_threshold'])
+        self.assertEqual(scene.cycles.use_preview_denoising, fast['denoise'])
+
+        policy.apply_preview_profile(scene, 'QUALITY')
+        quality = policy.preview_profile('QUALITY')
+        self.assertEqual(scene.cycles.preview_samples, quality['samples'])
+        self.assertEqual(scene.render.preview_pixel_size, quality['pixel_size'])
+
+        final_after = (
+            scene.cycles.device,
+            scene.cycles.samples,
+            scene.cycles.use_light_tree,
+            scene.render.resolution_x,
+            scene.render.resolution_y,
+            scene.render.resolution_percentage,
+        )
+        self.assertEqual(final_after, final_before)
+
     def test_performance_policy_installs_before_registration(self):
         source = (EXT / '__init__.py').read_text(encoding='utf-8')
         self.assertIn('runtime_performance.install(legacy)', source)
         self.assertLess(source.index('runtime_performance.install(legacy)'),
                         source.index('class AWFUL_AddonPreferences'))
+
+    def test_performance_ui_exposes_preview_mode_and_cpu_diagnostics(self):
+        source = (EXT / 'runtime_performance.py').read_text(encoding='utf-8')
+        self.assertIn("annotations['preview_mode']", source)
+        self.assertIn("('FAST', 'Fast Preview'", source)
+        self.assertIn("('QUALITY', 'Quality Preview'", source)
+        self.assertIn('collect_diagnostics', source)
+        self.assertIn('Cycles device', source)
+        self.assertIn('CPU', source)
 
     def test_full_verifier_batches_p0_contracts_into_one_blender_process(self):
         source = VERIFY.read_text(encoding='utf-8')
