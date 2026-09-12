@@ -38,15 +38,17 @@ def install(legacy):
     original_detect_capabilities = legacy.detect_blender_capabilities
 
     def detect_blender_capabilities():
-        """Refine type-level probes with the live 5.2 RNA instances we use."""
+        """Refine generic probes using the concrete Blender APIs AWFUL executes."""
         caps = original_detect_capabilities()
         scene = getattr(legacy.bpy.context, 'scene', None)
+        try:
+            caps['viewlayer_lightgroups'] = all((
+                hasattr(legacy.bpy.ops.scene, 'view_layer_add_lightgroup'),
+                hasattr(legacy.bpy.ops.scene, 'view_layer_remove_lightgroup'),
+            ))
+        except Exception:
+            pass
         if scene is not None:
-            try:
-                view_layer = scene.view_layers[0]
-                caps['viewlayer_lightgroups'] = hasattr(view_layer, 'lightgroups')
-            except Exception:
-                pass
             try:
                 caps['compositor_group_api'] = hasattr(scene, 'compositing_node_group')
             except Exception:
