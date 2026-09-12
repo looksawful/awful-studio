@@ -1,0 +1,17 @@
+name: Scene UI Screens V2
+
+on:
+  push:
+    branches: ["scene/ui-screens-v2"]
+  workflow_dispatch:
+
+jobs:
+  upload-screens:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scene-ui-screens-v2
+          path: scene_lab/ui_screens_v2/*.png
+          if-no-files-found: error
