@@ -11,13 +11,13 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 from common import (
     area_light, box, camera, clear_scene, collection, configure_scene,
-    empty, material_principled, move_to_collection, point_at, save_blend,
+    cylinder, empty, material_principled, move_to_collection, save_blend,
 )
 
 
 def args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--output', default=str(HERE / 'generated' / 'dark_neon_v1.blend'))
+    parser.add_argument('--output', default=str(HERE / 'generated' / 'dark_neon_v2.blend'))
     argv = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
     return parser.parse_args(argv)
 
@@ -30,15 +30,15 @@ def glossy_floor_material():
     out = nodes.new('ShaderNodeOutputMaterial')
     bsdf = nodes.new('ShaderNodeBsdfPrincipled')
     noise = nodes.new('ShaderNodeTexNoise')
-    noise.inputs['Scale'].default_value = 135.0
+    noise.inputs['Scale'].default_value = 160.0
     noise.inputs['Detail'].default_value = 2.0
-    noise.inputs['Roughness'].default_value = 0.70
+    noise.inputs['Roughness'].default_value = 0.68
     bump = nodes.new('ShaderNodeBump')
-    bump.inputs['Strength'].default_value = 0.028
-    bump.inputs['Distance'].default_value = 0.0010
-    bsdf.inputs['Base Color'].default_value = (0.008, 0.011, 0.018, 1.0)
-    bsdf.inputs['Roughness'].default_value = 0.20
-    bsdf.inputs['Metallic'].default_value = 0.08
+    bump.inputs['Strength'].default_value = 0.022
+    bump.inputs['Distance'].default_value = 0.0008
+    bsdf.inputs['Base Color'].default_value = (0.006, 0.008, 0.014, 1.0)
+    bsdf.inputs['Roughness'].default_value = 0.16
+    bsdf.inputs['Metallic'].default_value = 0.12
     links.new(noise.outputs['Fac'], bump.inputs['Height'])
     links.new(bump.outputs['Normal'], bsdf.inputs['Normal'])
     links.new(bsdf.outputs['BSDF'], out.inputs['Surface'])
@@ -53,19 +53,19 @@ def black_marble_material():
     out = nodes.new('ShaderNodeOutputMaterial')
     bsdf = nodes.new('ShaderNodeBsdfPrincipled')
     noise = nodes.new('ShaderNodeTexNoise')
-    noise.inputs['Scale'].default_value = 2.2
-    noise.inputs['Detail'].default_value = 7.0
-    noise.inputs['Roughness'].default_value = 0.72
-    noise.inputs['Distortion'].default_value = 3.5
+    noise.inputs['Scale'].default_value = 2.0
+    noise.inputs['Detail'].default_value = 8.0
+    noise.inputs['Roughness'].default_value = 0.78
+    noise.inputs['Distortion'].default_value = 4.0
     ramp = nodes.new('ShaderNodeValToRGB')
-    ramp.color_ramp.elements[0].position = 0.25
-    ramp.color_ramp.elements[0].color = (0.004, 0.006, 0.010, 1.0)
-    ramp.color_ramp.elements[1].position = 0.78
-    ramp.color_ramp.elements[1].color = (0.030, 0.035, 0.045, 1.0)
-    vein = ramp.color_ramp.elements.new(0.61)
-    vein.color = (0.19, 0.22, 0.28, 1.0)
-    bsdf.inputs['Roughness'].default_value = 0.16
-    bsdf.inputs['Metallic'].default_value = 0.03
+    ramp.color_ramp.elements[0].position = 0.30
+    ramp.color_ramp.elements[0].color = (0.003, 0.004, 0.008, 1.0)
+    ramp.color_ramp.elements[1].position = 0.76
+    ramp.color_ramp.elements[1].color = (0.040, 0.045, 0.060, 1.0)
+    vein = ramp.color_ramp.elements.new(0.60)
+    vein.color = (0.20, 0.23, 0.30, 1.0)
+    bsdf.inputs['Roughness'].default_value = 0.13
+    bsdf.inputs['Metallic'].default_value = 0.02
     links.new(noise.outputs['Fac'], ramp.inputs['Fac'])
     links.new(ramp.outputs['Color'], bsdf.inputs['Base Color'])
     links.new(bsdf.outputs['BSDF'], out.inputs['Surface'])
@@ -85,29 +85,26 @@ def emissive_material(name, color, strength):
     return mat
 
 
-def make_soft_panel(name, location, dimensions, target, shell_mat, diffuser_mat, light_color, energy, props, lights):
-    x, y, z = location
-    shell = box(name + '_Shell', location, dimensions, props, shell_mat, 0.05)
-    point_at(shell, target, track='X', up='Z')
-    panel = box(name + '_Diffuser', (x * 0.987, y, z), (0.025, dimensions[1] * 0.90, dimensions[2] * 0.90), props, diffuser_mat, 0.03)
-    point_at(panel, target, track='X', up='Z')
-    panel.visible_camera = False
-    light = area_light(name + '_Light', (x * 0.965, y, z), energy, dimensions[2] * 0.76, light_color, target, 'RECTANGLE', dimensions[1] * 0.72)
-    move_to_collection(light, lights)
-    return shell, panel, light
+def add_backdrop_ribs(arch, wall_mat, accent_mat):
+    for i, x in enumerate((-4.2, -3.0, -1.8, -0.6, 0.6, 1.8, 3.0, 4.2)):
+        depth = 0.18 if i % 2 == 0 else 0.30
+        z = 2.90
+        rib = box(f'ARCH_Rib_{i:02d}', (x, 5.56 - depth * 0.5, z), (0.74, depth, 4.70), arch, wall_mat, 0.035)
+        if i in (1, 6):
+            rib.data.materials.clear()
+            rib.data.materials.append(accent_mat)
 
 
-def add_stand(prefix, x, y, height, props, steel):
-    from common import cylinder
-    cylinder(prefix+'_Pole', (x, y, height*0.47), 0.032, height*0.92, props, steel, 32)
-    cylinder(prefix+'_Base', (x, y, 0.05), 0.34, 0.055, props, steel, 48)
+def add_practical_tube(name, x, z, height, props, material):
+    tube = box(name, (x, 5.15, z), (0.055, 0.055, height), props, material, 0.018)
+    return tube
 
 
 def build():
     clear_scene()
-    scene = configure_scene((1920, 1200), 320)
+    scene = configure_scene((1920, 1200), 360)
     scene.render.film_transparent = False
-    scene.view_settings.exposure = -0.20
+    scene.view_settings.exposure = -0.26
 
     arch = collection('SCENE_ARCH')
     props = collection('SCENE_PROPS')
@@ -116,62 +113,59 @@ def build():
 
     floor_mat = glossy_floor_material()
     marble = black_marble_material()
-    wall_mat = material_principled('MAT_Navy_Wall', (0.008,0.014,0.028), 0.48)
-    steel = material_principled('MAT_Black_Steel', (0.006,0.008,0.012), 0.28, 0.72)
-    magenta_emit = emissive_material('MAT_Magenta_Diffuser', (1.0,0.012,0.26), 2.0)
-    cyan_emit = emissive_material('MAT_Cyan_Diffuser', (0.012,0.22,1.0), 2.0)
-    magenta_practical = emissive_material('MAT_Magenta_Practical', (1.0,0.015,0.25), 4.5)
-    cyan_practical = emissive_material('MAT_Cyan_Practical', (0.015,0.28,1.0), 4.5)
+    wall_mat = material_principled('MAT_Navy_Wall', (0.006, 0.010, 0.022), 0.46)
+    rib_accent = material_principled('MAT_Rib_Accent', (0.020, 0.028, 0.050), 0.30, 0.18)
+    black = material_principled('MAT_Black_Metal', (0.004, 0.005, 0.009), 0.24, 0.78)
+    magenta_emit = emissive_material('MAT_Magenta_Practical', (1.0, 0.012, 0.20), 5.0)
+    cyan_emit = emissive_material('MAT_Cyan_Practical', (0.010, 0.22, 1.0), 5.0)
 
-    box('ARCH_Floor', (0.0,0.0,-0.08), (12.0,13.0,0.16), arch, floor_mat)
-    box('ARCH_BackWall', (0.0,5.90,2.9), (12.0,0.28,5.8), arch, wall_mat)
-    box('ARCH_LeftWall', (-5.90,0.2,2.9), (0.28,11.5,5.8), arch, wall_mat)
-    box('ARCH_RightWall', (5.90,0.2,2.9), (0.28,11.5,5.8), arch, wall_mat)
+    box('ARCH_Floor', (0.0, 0.0, -0.08), (12.0, 13.0, 0.16), arch, floor_mat)
+    box('ARCH_BackWall', (0.0, 5.82, 2.90), (12.0, 0.28, 5.8), arch, wall_mat)
+    box('ARCH_LeftWall', (-5.90, 0.2, 2.90), (0.28, 11.5, 5.8), arch, wall_mat)
+    box('ARCH_RightWall', (5.90, 0.2, 2.90), (0.28, 11.5, 5.8), arch, wall_mat)
+    add_backdrop_ribs(arch, wall_mat, rib_accent)
 
-    box('STAGE_Plinth', (0.0,0.0,0.25), (3.05,2.15,0.50), arch, marble, 0.055)
-    anchor = empty('PRODUCT_ANCHOR', (0.0,0.0,1.38), guides)
+    # Layered marble stage reads richer than one generic block.
+    box('STAGE_Lower', (0.0, 0.0, 0.16), (3.65, 2.65, 0.32), arch, marble, 0.085)
+    box('STAGE_Upper', (0.0, -0.05, 0.39), (3.05, 2.12, 0.22), arch, marble, 0.070)
+    anchor = empty('PRODUCT_ANCHOR', (0.0, -0.05, 1.45), guides)
 
-    make_soft_panel('PROP_MagentaPanel', (-5.20,0.10,3.35), (0.16,1.95,2.90), anchor, steel, magenta_emit, (1.0,0.015,0.23), 920, props, lights)
-    make_soft_panel('PROP_CyanPanel', (5.20,0.35,3.40), (0.16,1.95,2.90), anchor, steel, cyan_emit, (0.015,0.22,1.0), 980, props, lights)
-    add_stand('PROP_MagentaStand', -5.20, 0.25, 3.1, props, steel)
-    add_stand('PROP_CyanStand', 5.20, 0.50, 3.1, props, steel)
+    add_practical_tube('PROP_Tube_Magenta', -4.35, 2.72, 2.70, props, magenta_emit)
+    add_practical_tube('PROP_Tube_Cyan', 4.35, 2.72, 2.70, props, cyan_emit)
+    add_practical_tube('PROP_Tube_Magenta_Inner', -3.10, 3.15, 1.65, props, magenta_emit)
+    add_practical_tube('PROP_Tube_Cyan_Inner', 3.10, 3.15, 1.65, props, cyan_emit)
 
-    box('PROP_RearStrip_L', (-4.25,5.02,2.55), (0.065,0.065,2.15), props, magenta_practical, 0.010)
-    box('PROP_RearStrip_R', (4.25,5.02,2.55), (0.065,0.065,2.15), props, cyan_practical, 0.010)
+    # Hidden photographic sources. No white softbox geometry can intrude into camera.
+    key = area_light('LIGHT_Magenta_Key', (-4.55, -0.15, 3.25), 1120, 3.2, (1.0, 0.012, 0.19), anchor, 'RECTANGLE', 2.1)
+    fill = area_light('LIGHT_Cyan_Key', (4.55, 0.10, 3.25), 1240, 3.2, (0.012, 0.22, 1.0), anchor, 'RECTANGLE', 2.1)
+    back_l = area_light('LIGHT_Back_Magenta', (-2.45, 4.25, 3.10), 440, 1.8, (1.0, 0.012, 0.18), anchor, 'RECTANGLE', 0.70)
+    back_r = area_light('LIGHT_Back_Cyan', (2.45, 4.25, 3.10), 470, 1.8, (0.012, 0.20, 1.0), anchor, 'RECTANGLE', 0.70)
+    top = area_light('LIGHT_Top_Neutral', (0.0, 0.25, 5.40), 255, 2.8, (0.76, 0.82, 1.0), anchor, 'RECTANGLE', 1.8)
+    for light in (key, fill, back_l, back_r, top):
+        move_to_collection(light, lights)
 
-    rear_l = area_light('LIGHT_Rear_Magenta', (-2.8,4.0,2.9), 420, 1.8, (1.0,0.01,0.20), anchor, 'RECTANGLE', 0.65)
-    move_to_collection(rear_l, lights)
-    rear_r = area_light('LIGHT_Rear_Cyan', (2.8,4.0,2.9), 450, 1.8, (0.02,0.20,1.0), anchor, 'RECTANGLE', 0.65)
-    move_to_collection(rear_r, lights)
-    top = area_light('LIGHT_Top_Neutral', (0.0,0.5,5.35), 210, 2.8, (0.74,0.80,1.0), anchor, 'RECTANGLE', 1.8)
-    move_to_collection(top, lights)
-
-    floor_l = area_light('LIGHT_Floor_Magenta', (-3.4,0.2,0.12), 150, 1.2, (1.0,0.01,0.24), (0.0,0.0,0.1), 'RECTANGLE', 0.30)
-    floor_l.rotation_euler.x = math.radians(90)
-    move_to_collection(floor_l, lights)
-    floor_r = area_light('LIGHT_Floor_Cyan', (3.4,0.25,0.12), 160, 1.2, (0.01,0.22,1.0), (0.0,0.0,0.1), 'RECTANGLE', 0.30)
-    floor_r.rotation_euler.x = math.radians(90)
-    move_to_collection(floor_r, lights)
-
-    flag_l = box('PROP_Flag_L', (-3.30,1.70,2.25), (0.08,1.35,3.05), props, steel, 0.025)
-    flag_r = box('PROP_Flag_R', (3.30,1.70,2.25), (0.08,1.35,3.05), props, steel, 0.025)
-    flag_l.visible_camera = False
-    flag_r.visible_camera = False
+    # Small black cutters remain physically present but invisible to camera.
+    for side in (-1.0, 1.0):
+        flag = box(
+            'PROP_Flag_L' if side < 0 else 'PROP_Flag_R',
+            (side * 3.25, 1.55, 2.35), (0.07, 1.25, 3.05), props, black, 0.022,
+        )
+        flag.visible_camera = False
 
     world = scene.world
     world.use_nodes = True
     bg = world.node_tree.nodes.get('Background')
-    bg.inputs['Color'].default_value = (0.002,0.004,0.012,1.0)
-    bg.inputs['Strength'].default_value = 0.075
+    bg.inputs['Color'].default_value = (0.0015, 0.003, 0.010, 1.0)
+    bg.inputs['Strength'].default_value = 0.065
 
-    cam = camera('CAM_Hero', (0.0,-11.8,2.22), (0.0,0.15,1.28), 60.0)
+    cam = camera('CAM_Hero', (0.0, -12.2, 2.25), (0.0, 0.25, 1.30), 64.0)
     cam.data.dof.use_dof = True
     cam.data.dof.focus_object = anchor
-    cam.data.dof.aperture_fstop = 4.2
+    cam.data.dof.aperture_fstop = 4.0
 
-    scene.render.filepath = str(HERE / 'generated' / 'dark_neon_v1.png')
-    scene['scene_lab_id'] = 'dark-neon-v1'
-    scene['scene_lab_status'] = 'visual-pass-3'
+    scene.render.filepath = str(HERE / 'generated' / 'dark_neon_v2.png')
+    scene['scene_lab_id'] = 'dark-neon-v2'
+    scene['scene_lab_status'] = 'clean-hidden-source-lighting'
     return scene
 
 
@@ -179,4 +173,4 @@ if __name__ == '__main__':
     options = args()
     build()
     save_blend(options.output)
-    print(f'DARK_NEON_READY {options.output}')
+    print(f'DARK_NEON_V2_READY {options.output}')
