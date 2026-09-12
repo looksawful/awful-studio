@@ -72,14 +72,18 @@ def main():
         check('normal Build creates no managed compositor', not managed_compositors(legacy),
               [group.name for group in managed_compositors(legacy)])
 
-        original_caps = dict(legacy.CAPS or {})
+        live_caps = dict(legacy.detect_blender_capabilities() or {})
         check('exact Blender exposes Light Group capability',
-              bool(original_caps.get('viewlayer_lightgroups')), original_caps)
+              bool(live_caps.get('viewlayer_lightgroups')), live_caps)
         check('exact Blender exposes compositor group API',
-              bool(original_caps.get('compositor_group_api')), original_caps)
+              bool(live_caps.get('compositor_group_api')), live_caps)
 
+        # Python module globals are not persisted in a .blend. A reopened studio
+        # must therefore refresh capabilities when Setup Post Pipeline is invoked.
+        legacy.CAPS = None
         result = bpy.ops.awful.build_post_pipeline_v4()
-        check('Setup Post Pipeline finishes', result == {'FINISHED'}, list(result))
+        check('Setup Post Pipeline refreshes capabilities after reopen and finishes',
+              result == {'FINISHED'}, list(result))
         check('Post Pipeline state becomes Ready only after setup', bool(scene.get(key, False)))
 
         groups_first = lightgroup_names(scene)
@@ -110,8 +114,6 @@ def main():
         compositor_count_first = len(managed_compositors(legacy))
         lightgroup_count_first = len(groups_first)
 
-        # Direct execute is used in background qualification. Interactive invoke
-        # must ask for confirmation before this same bounded rebuild path.
         result = bpy.ops.awful.build_post_pipeline_v4()
         check('repeated direct setup remains successful', result == {'FINISHED'}, list(result))
         groups_second = lightgroup_names(scene)
@@ -123,11 +125,14 @@ def main():
               {'before': compositor_count_first,
                'after': len(managed_compositors(legacy))})
 
-        # Unsupported capability must be an explicit no-op CANCELLED state.
+        # Unsupported capability must be an explicit no-op CANCELLED state. Patch
+        # the detector itself because production refreshes capability on each setup.
+        original_detect = legacy.detect_blender_capabilities
+        unsupported_caps = dict(live_caps)
+        unsupported_caps['viewlayer_lightgroups'] = False
+        legacy.detect_blender_capabilities = lambda: dict(unsupported_caps)
         bpy.ops.wm.open_mainfile(filepath=str(args.work / 'studio.blend'), use_scripts=False)
         scene = bpy.context.scene
-        legacy.CAPS = dict(original_caps)
-        legacy.CAPS['viewlayer_lightgroups'] = False
         before_groups = lightgroup_names(scene)
         before_compositors = len(managed_compositors(legacy))
         result = bpy.ops.awful.build_post_pipeline_v4()
@@ -140,7 +145,8 @@ def main():
               len(managed_compositors(legacy)) == before_compositors == 0,
               {'before': before_compositors,
                'after': len(managed_compositors(legacy))})
-        legacy.CAPS = original_caps
+        legacy.detect_blender_capabilities = original_detect
+        legacy.CAPS = live_caps
 
         REPORT['status'] = 'passed'
     except Exception:
@@ -148,8 +154,10 @@ def main():
         traceback.print_exc()
     finally:
         try:
-            if 'legacy' in locals() and 'original_caps' in locals():
-                legacy.CAPS = original_caps
+            if 'legacy' in locals() and 'original_detect' in locals():
+                legacy.detect_blender_capabilities = original_detect
+            if 'legacy' in locals() and 'live_caps' in locals():
+                legacy.CAPS = live_caps
         except Exception:
             pass
         (args.work / 'post_pipeline.json').write_text(
