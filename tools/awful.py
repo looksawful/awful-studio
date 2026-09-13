@@ -69,13 +69,14 @@ def doctor():
     except Exception as exc:
         add('runtime lock', False, str(exc))
 
-    add('manifest', MANIFEST.is_file() and manifest_version() == '0.0.17',
+    add('manifest', MANIFEST.is_file() and manifest_version() == '1.0.0',
         str(MANIFEST.relative_to(ROOT)))
     historical_ok = HISTORICAL.is_file() and sha256(HISTORICAL) == HISTORICAL_SHA256
     add('historical baseline', historical_ok, HISTORICAL_SHA256)
     for relative in (
         'AGENTS.md', 'STATE.md', 'tools/setup_blender.py', 'tools/verify_extension.py',
         'tests/runtime/extension_contract.py', '.github/workflows/extension-ci.yml',
+        '.github/workflows/release.yml',
     ):
         path = ROOT / relative
         add(relative, path.is_file(), 'present' if path.is_file() else 'missing')
