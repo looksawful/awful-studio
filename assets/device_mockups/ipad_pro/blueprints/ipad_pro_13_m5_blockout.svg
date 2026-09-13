@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+<rect width="100%" height="100%" fill="#f7f7f4"/>
+<g fill="none" stroke="#111" stroke-width="2">
+<rect x="160" y="110" width="520.0" height="679.4988399071926" rx="22.92343387470998"/>
+<rect x="1000" y="110" width="98.45011600928073" height="679.4988399071926" rx="12"/>
+<line x1="160" y1="844.4988399071926" x2="680.0" y2="844.4988399071926"/>
+<line x1="105" y1="110" x2="105" y2="789.4988399071926"/>
+</g>
+<g font-family="Arial, sans-serif" fill="#111"><text x="80" y="65" font-size="34" font-weight="700">iPad Pro 13-inch M5 / BLOCKOUT BLUEPRINT</text>
+<text x="360.0" y="884.4988399071926" font-size="24">215.50 mm</text>
+<text x="15" y="449.7494199535963" font-size="24" transform="rotate(-90 15,449.7494199535963)">281.60 mm</text>
+<text x="1000" y="844.4988399071926" font-size="24">depth 5.10 mm</text>
+<text x="80" y="950" font-size="20">AWFUL STUDIO · metric source of truth · V = verified envelope</text></g></svg>
