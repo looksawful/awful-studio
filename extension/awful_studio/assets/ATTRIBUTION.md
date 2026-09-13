@@ -1,4 +1,4 @@
-# AWFUL STUDIO bundled asset attribution
+# AWFUL STUDIO third-party asset attribution
 
 ## Painted Plaster 017
 
@@ -7,10 +7,8 @@
 - Source page: https://ambientcg.com/view?id=PaintedPlaster017
 - License: Creative Commons CC0 1.0 Universal
 - License URL: https://docs.ambientcg.com/license/
-- Bundled files:
-  - assets/painted_plaster017/painted_plaster017_color.png
-  - assets/painted_plaster017/painted_plaster017_roughness.png
-  - assets/painted_plaster017/painted_plaster017_normalgl.png
-  - assets/painted_plaster017/painted_plaster017_displacement.png
+- Distribution in AWFUL STUDIO 1.0.0: reference-only; no PaintedPlaster binary maps are bundled.
 
-These maps are bundled to keep the default floor/cyclorama material deterministic and offline-ready.
+The pre-release copies were removed after byte-level inspection proved that Git text EOL normalization had corrupted their PNG signatures. AWFUL STUDIO 1.0.0 uses the existing procedural/offline material fallback instead of shipping invalid third-party media.
+
+A future patch may reintroduce selected maps only after restoring them from the reviewed upstream archive and validating the exact packaged bytes with Blender.
