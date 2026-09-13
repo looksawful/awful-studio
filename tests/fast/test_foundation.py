@@ -16,7 +16,7 @@ class FoundationTests(unittest.TestCase):
 
     def test_manifest(self):
         data = tomllib.loads((EXT / 'blender_manifest.toml').read_text())
-        self.assertEqual(data['version'], '0.0.17')
+        self.assertEqual(data['version'], '1.0.0')
         self.assertEqual(data['blender_version_min'], '5.2.0')
         self.assertEqual(data['license'], ['SPDX:GPL-3.0-or-later'])
 
@@ -25,10 +25,10 @@ class FoundationTests(unittest.TestCase):
         ownership_source = (EXT / 'ownership.py').read_text(encoding='utf-8')
         verifier_source = (ROOT / 'tools' / 'verify_extension.py').read_text(encoding='utf-8')
         workflow_source = (ROOT / '.github' / 'workflows' / 'extension-ci.yml').read_text(encoding='utf-8')
-        self.assertIn('VERSION = (0, 0, 17)', init_source)
-        self.assertIn("block[VERSION_KEY] = '0.0.17'", ownership_source)
-        self.assertIn("awful_studio-0.0.17.zip", verifier_source)
-        self.assertIn("awful_studio-0.0.17.zip", workflow_source)
+        self.assertIn('VERSION = (1, 0, 0)', init_source)
+        self.assertIn("block[VERSION_KEY] = '1.0.0'", ownership_source)
+        self.assertIn("awful_studio-1.0.0.zip", verifier_source)
+        self.assertIn("awful_studio-1.0.0.zip", workflow_source)
 
     def test_no_eager_scene_registry(self):
         tree = ast.parse((EXT / 'core/legacy.py').read_text())
