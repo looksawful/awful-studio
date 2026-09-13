@@ -1,8 +1,8 @@
 # Third-party assets
 
-AWFUL STUDIO code is licensed separately under GPL-3.0-or-later. Optional third-party media is not relicensed as AWFUL code.
+AWFUL STUDIO code is licensed under GPL-3.0-or-later. Third-party media keeps its own source/license provenance and is not relicensed as AWFUL code.
 
-The machine-readable source of truth is `extension/awful_studio/assets/provenance.json`. A remote asset must be present there before the Extension cache will authorize its download.
+The machine-readable source of truth is `extension/awful_studio/assets/provenance.json`. A remote asset must be present there and explicitly active before the Extension cache can authorize its download.
 
 ## Active optional HDRIs
 
@@ -18,35 +18,38 @@ All active HDRIs are remote-only, lazy, explicit opt-in cache assets. They are n
 
 Poly Haven license source: `https://polyhaven.com/license`.
 
-## Bundled floor/cyclorama PBR maps
+## PaintedPlaster017 reference
 
-The current Extension bundles four reviewed ambientCG `PaintedPlaster017` maps so the default visible floor and cyclorama material work offline and do not fall back to a missing-texture/magenta state.
+ambientCG `PaintedPlaster017` remains recorded because the immutable historical implementation references its 2K PNG archive and it may be reintroduced after a verified binary restoration.
+
+It is **not bundled in AWFUL STUDIO 1.0.0**. The pre-release copies were proven corrupt after Git text EOL normalization changed the PNG signature. Shipping knowingly invalid media would be worse than using the existing procedural fallback, so 1.0.0 contains no third-party binary texture maps for this surface.
 
 | AWFUL key | Asset | Provider | Source | License | Packaged? |
 | --- | --- | --- | --- | --- | --- |
-| `painted_plaster017` | Painted Plaster 017 | ambientCG | `https://ambientcg.com/view?id=PaintedPlaster017` | CC0-1.0 | Yes, selected 2K PNG maps |
-
-Bundled files are listed in `extension/awful_studio/assets/ATTRIBUTION.md` and in the `bundled_files` field of `extension/awful_studio/assets/provenance.json`. The historical 2K PNG ZIP URL remains recorded because the immutable 0.0.15 fixture still contains it, but the current Extension does not authorize that ZIP as an active network download.
+| `painted_plaster017` | Painted Plaster 017 | ambientCG | `https://ambientcg.com/view?id=PaintedPlaster017` | CC0-1.0 | No, reference-only in 1.0.0 |
 
 ambientCG license source: `https://docs.ambientcg.com/license/` (CC0 1.0 Universal).
 
 ## Cache policy
 
 - Network access requires both Blender online access and the AWFUL `Allow Network Assets` preference.
-- Only `active: true`, `distribution: remote-only` provenance records are downloadable. Bundled records are local package assets and are never fetched over the network.
+- Only `active: true`, `distribution: remote-only` provenance records are downloadable.
+- Reference-only records are documentation/provenance entries and are not authorized for runtime download.
 - The requested destination must exactly match the provenance-derived AWFUL cache path.
 - HDR downloads are bounded by the configured maximum size and checked for a Radiance header before they replace the cache target.
 - Sidecar metadata records provider, asset id, source page, direct source URL, license, hash and byte count.
 - Cache cleanup iterates exact active provenance records only. It never recursively deletes a user-selected directory and never follows cache symlinks.
-- A third-party binary asset must not be added to the Extension package without a separate explicit review, attribution file entry and corresponding provenance/distribution change.
+- A third-party binary asset must not be added to the Extension package without explicit source/license review and byte-level/package-runtime validation.
+- `.gitattributes` marks common media formats as `-text` so Git cannot newline-normalize them.
 
-## Adding an asset
+## Adding or reintroducing an asset
 
-1. Add a complete record to `assets/provenance.json`.
-2. Mark it active only if the Extension is intended to fetch it.
-3. Keep provider source and license URLs separate from the direct download URL.
-4. Add the runtime/preset reference.
-5. Run fast tests. `test_asset_provenance_contract.py` rejects unrecorded third-party `.hdr`/`.zip` URLs and any bundled third-party binary media except the reviewed floor maps listed in provenance.
-6. Let packaged Blender 5.2.1 CI verify offline Build/preset behavior and the official Extension package.
+1. Verify the upstream source and license.
+2. Record or update the complete provenance record.
+3. If the asset is bundled, verify its binary signature/hash before commit and again from the built ZIP.
+4. If the asset is remote, mark it active only when runtime download is intended and reviewed.
+5. Add runtime/preset integration without creating implicit network access.
+6. Run fast tests and packaged Blender runtime checks.
+7. For image media, prove Blender can actually decode the package bytes before release.
 
-Do not add a remote URL first and promise to document it later. That is how provenance turns into archaeology.
+Do not add a URL or binary first and promise to document/validate it later. That is how asset provenance becomes archaeology with extra magenta pixels.
