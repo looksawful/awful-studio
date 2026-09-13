@@ -39,7 +39,7 @@ def mark(block, role='', scene=None):
     block[MANAGED] = True
     block[KEY] = owner(scene)
     block[ROLE] = role
-    block[VERSION_KEY] = '0.0.17'
+    block[VERSION_KEY] = '1.0.0'
     return block
 
 
@@ -72,16 +72,11 @@ def preflight(scene):
     if oid and any(s != scene and hasattr(s, 'awful_state') and owner(s) == oid for s in bpy.data.scenes):
         raise RuntimeError('AWFUL scene ownership is shared; make an independent studio before rebuilding')
     objects = {o for o in scene.objects if owned(o, scene)}
-    # Include unlinked internal collections (for example light-link receiver
-    # collections) so moving one into another scene cannot bypass preflight.
     collections = {c for c in bpy.data.collections if owned(c, scene)}
     for other in bpy.data.scenes:
         if other != scene and (objects.intersection(other.objects[:]) or
                               collections.intersection(other.collection.children_recursive)):
             raise RuntimeError('AWFUL data is linked to another scene; unlink it before rebuilding')
-    # Parenting is global object state. Removing a parent owned by this scene would
-    # mutate a child that lives only in another scene, even when the parent itself
-    # is not linked there. Refuse rather than silently altering foreign scene data.
     scene_objects = set(scene.objects)
     if any(obj not in scene_objects and obj.parent in objects for obj in bpy.data.objects):
         raise RuntimeError('External scene object is parented to AWFUL data; detach it before rebuilding')
@@ -110,9 +105,6 @@ def detach_retained(scene):
 
 def remove(scene):
     preflight(scene)
-    # Collections in the scene tree can contain user data that must remain visible.
-    # Internal light-link receiver collections are deliberately unlinked from that
-    # tree, but they are still AWFUL-owned and must be removed on rebuild too.
     scene_managed_cols = [c for c in scene.collection.children_recursive if owned(c, scene)]
     managed_cols = [c for c in bpy.data.collections if owned(c, scene)]
     for col in scene_managed_cols:
@@ -139,7 +131,6 @@ def remove(scene):
             bpy.data.objects.remove(obj, do_unlink=True)
     for col in managed_cols:
         bpy.data.collections.remove(col)
-    # Multiple passes resolve dependency order (mesh -> material -> image, action).
     for _ in range(len(GROUPS)):
         count = 0
         for name in GROUPS[2:]:
@@ -150,8 +141,6 @@ def remove(scene):
                     count += 1
         if not count:
             break
-    # Any generated datablock deliberately retained because a user datablock still
-    # references it is no longer safe to treat as destructively managed by AWFUL.
     detach_retained(scene)
     scene['awful_post_pipeline_enabled'] = False
     scene.awful_state.built = False
