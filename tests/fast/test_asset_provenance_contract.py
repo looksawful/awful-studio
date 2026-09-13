@@ -54,24 +54,24 @@ class AssetProvenanceContractTests(unittest.TestCase):
         self.assertTrue(historical_urls)
         self.assertTrue(historical_urls.issubset(recorded), historical_urls - recorded)
 
-    def test_only_reviewed_floor_maps_are_bundled_with_attribution(self):
+    def test_stable_release_bundles_no_third_party_binary_media(self):
         binary_suffixes = {'.hdr', '.exr', '.png', '.jpg', '.jpeg', '.zip', '.tif', '.tiff'}
         bundled = {
             str(path.relative_to(EXT)).replace('\\', '/') for path in EXT.rglob('*')
             if path.is_file() and path.suffix.lower() in binary_suffixes
         }
-        expected = {
-            'assets/painted_plaster017/painted_plaster017_color.png',
-            'assets/painted_plaster017/painted_plaster017_roughness.png',
-            'assets/painted_plaster017/painted_plaster017_normalgl.png',
-            'assets/painted_plaster017/painted_plaster017_displacement.png',
-        }
-        self.assertEqual(bundled, expected)
+        self.assertEqual(bundled, set())
         record = self.load_inventory()['assets']['painted_plaster017']
         self.assertEqual(record['provider'], 'ambientCG')
-        self.assertEqual(record['distribution'], 'bundled')
-        self.assertEqual(set(record['bundled_files']), expected)
+        self.assertEqual(record['distribution'], 'reference-only')
+        self.assertFalse(record['active'])
+        self.assertNotIn('bundled_files', record)
         self.assertTrue((EXT / 'assets' / 'ATTRIBUTION.md').is_file())
+
+    def test_binary_asset_patterns_are_never_text_normalized(self):
+        attributes = (ROOT / '.gitattributes').read_text(encoding='utf-8')
+        for suffix in ('png', 'jpg', 'jpeg', 'hdr', 'exr', 'zip'):
+            self.assertIn(f'extension/awful_studio/assets/**/*.{suffix} -text', attributes)
 
     def test_cache_uses_provenance_for_authorization_and_metadata(self):
         source = (EXT / 'asset_cache.py').read_text(encoding='utf-8')
