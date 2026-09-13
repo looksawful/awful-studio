@@ -19,7 +19,7 @@ playback_policy.install(legacy)
 product_placement.install(legacy)
 product_quality.install(legacy)
 
-VERSION = (0, 0, 17)
+VERSION = (1, 0, 0)
 _registered = []
 
 
@@ -30,7 +30,7 @@ class AWFUL_AddonPreferences(bpy.types.AddonPreferences):
     diagnostics: BoolProperty(name='Diagnostics', default=False)
 
     def draw(self, context):
-        self.layout.label(text='AWFUL STUDIO 0.0.17 — Blender 5.2 LTS')
+        self.layout.label(text='AWFUL STUDIO 1.0.0 — Blender 5.2 LTS')
         self.layout.prop(self, 'asset_cache_path')
         self.layout.prop(self, 'allow_network_assets')
         self.layout.prop(self, 'diagnostics')
