@@ -14,7 +14,7 @@ import subprocess
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED_PACKAGE = 'awful_studio-0.0.17.zip'
+EXPECTED_PACKAGE = 'awful_studio-1.0.0.zip'
 
 
 def _timing_summary(operations):
