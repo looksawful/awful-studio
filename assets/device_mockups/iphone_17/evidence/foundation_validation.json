@@ -1,0 +1,24 @@
+{
+  "asset_id": "iphone_17",
+  "stage": "BLOCKOUT",
+  "blender_version": "5.2.1 LTS",
+  "expected_mm": {
+    "width": 71.5,
+    "height": 149.6,
+    "depth": 7.95
+  },
+  "actual_mm": {
+    "width": 71.500003,
+    "height": 149.599999,
+    "depth": 7.95
+  },
+  "delta_mm": {
+    "width": 3e-06,
+    "height": -1e-06,
+    "depth": 0.0
+  },
+  "body_non_manifold_edges": 0,
+  "object_count": 31,
+  "material_count": 8,
+  "passed": true
+}
