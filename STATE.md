@@ -1,36 +1,51 @@
 # AWFUL STUDIO Current State
 
-Last reviewed: 2026-09-12
+Last reviewed: 2026-09-13
 
-This is the short engineering handoff. Product requirements live in the accepted specs; implementation status/evidence lives in GitHub Issues, PRs and CI.
+This is the short engineering handoff. Product requirements live in accepted specs; implementation status/evidence lives in released source, GitHub Issues, PRs and CI.
 
 ## Release state
 
+- Current release: 1.0.0.
 - Historical baseline: Alpha 0.0.15, immutable source at `historical/0.0.15/awful_studio_v4_2_gpu_perf.py`.
 - Historical SHA-256: `5d14513b699a0c0a0e693bba7c31111f264ac5988cf1abb85c7153f6a2e7e56b`.
-- Current target: Alpha 0.0.17 corrective pre-release candidate.
-- Blender target: 5.2 LTS; exact verified runtime is Blender 5.2.1 build `9e2066aef7ef`.
+- Blender target: 5.2 LTS; exact qualification runtime is Blender 5.2.1 build `9e2066aef7ef`.
 - Exact official Windows/Linux distribution pins are recorded in `runtime/blender.lock`.
-- The old pre-smoke ZIP with SHA-256 `cc3a404ecc00e82e82716c91aece6260affd3c30d92bff1330b540965e489540` is defect-reproduction evidence only and must not be released.
-- Manual-smoke corrective work is tracked by #39 / draft PR #46.
-- #40 product grounding, #41 Timeline synchronization, #42 Hybrid lighting/background, #43 HDRI workflow and #44 Post Pipeline are engineering-complete.
-- #45 viewport performance is structurally implemented; its final acceptance is the manual Rendered Viewport check on the new exact candidate with a deliberately configured Blender GPU scene.
-- PR #46 run #240 (`34692939833`) passed fast checks, exact Blender 5.2.1 packaged runtime and native Extension Repository install on Ubuntu and Windows using one canonical ZIP.
-- The final manual UI smoke remains the last human acceptance gate before tag/publication/deploy. Structural CI does not replace it.
+- 1.0.0 is based on the corrective 0.0.17 feature set from PR #46, with stable-version metadata and release hardening.
+- The invalid pre-release PaintedPlaster PNG bundle is excluded from 1.0.0; procedural/offline material fallback remains the supported path until a verified source bundle is restored in a patch.
+- Remaining visual libraries, device-model production passes and research integrations are post-1.0 work, not stable-core blockers.
+
+## Stable core in 1.0.0
+
+Packaged Blender 5.2 structural evidence covers:
+
+- explicit install/enable/disable/re-enable/restart lifecycle;
+- ownership-safe Build/Rebuild/Remove and unmanaged-data preservation;
+- explicit historical migration;
+- product/support grounding from world-space bounds and Auto Fit;
+- Bottle / Jar / Box / Can / Phone / Tablet procedural starters;
+- Product and Camera Once / Loop / Ping-Pong with synchronized Preview Range;
+- metric cyclorama and independent room/architecture visibility controls;
+- photographic lighting, Flash, Natural Light, Physical Sky and Hybrid Studio + World behavior;
+- independent environment illumination and camera-visible background brightness;
+- reviewed HDRI workflow, explicit network permissions, status/error handling and provenance-safe cache behavior;
+- optional Post Pipeline with live capability detection, Light Groups, passes, compositor, idempotent rebuild and save/reopen safety;
+- Fast/Quality viewport profiles and non-render device diagnostics;
+- native Blender Extension package/repository generation and install verification.
 
 ## Canonical runtime architecture
 
-There is one canonical path. Do not build another pytest/bootstrap/runtime stack.
+There is one canonical path. Do not create a parallel runtime/bootstrap/test stack.
 
-- Fast/pure gate: `python -m unittest discover -s tests/fast -v`.
-- Agent entrypoint: `python tools/awful.py status|doctor|fast|bootstrap|test-runtime`.
+- Fast gate: `python -m unittest discover -s tests/fast -v`.
+- Entry point: `python tools/awful.py status|doctor|fast|bootstrap|test-runtime`.
 - Exact Blender bootstrap: `tools/setup_blender.py`.
 - Exact Extension ZIP verifier: `tools/verify_extension.py`.
 - Blender lifecycle contract: `tests/runtime/extension_contract.py`.
 - Batched structural contracts: `tests/runtime/p0_suite.py` plus focused packaged-runtime phases.
-- CI: `.github/workflows/extension-ci.yml` on GitHub-hosted Windows and Ubuntu runners.
+- CI: `.github/workflows/extension-ci.yml` on GitHub-hosted Ubuntu and Windows runners.
 
-The harness validates Blender's official Extension build output and runs the exact generated ZIP inside isolated Blender profiles. One cloud-built candidate is reused byte-for-byte on Windows rather than rebuilt per OS.
+The harness builds one canonical Extension ZIP, validates it with Blender's official CLI and reuses that exact artifact byte-for-byte on Windows rather than rebuilding per OS.
 
 ## Runtime and performance policy
 
@@ -38,24 +53,8 @@ The harness validates Blender's official Extension build output and runs the exa
 - `tools/verify_extension.py` refuses local full runtime unless `--allow-local-blender` is explicitly supplied; CI is allowed automatically.
 - Structural runtime contains no render invocation.
 - Build/Rebuild preserves Blender's native Cycles device/backend selection and never silently rewrites CUDA/OPTIX/HIP/ONEAPI/METAL preferences.
-- AWFUL exposes explicit `Fast Preview` and `Quality Preview` modes that change viewport-only Cycles settings, not final render settings.
-- AWFUL diagnostics make CPU-backed Cycles sessions visible to the user instead of silently presenting them as an AWFUL slowdown.
-- Local smoke evidence on the target RTX workstation showed the original isolated smoke profile used `compute_device_type = NONE` and `scene.cycles.device = CPU`; the user's normal Blender profile has OPTIX configured, but a new scene can still remain on CPU until Blender's scene Device is set to GPU Compute.
-- Structural contracts share Blender processes where safe instead of relaunching Blender for every assertion.
-
-Cloud Build/Rebuild remains sub-second; Rendered Viewport performance is a separate user-machine/device concern and is not measured by render CI.
-
-## Verified 0.0.17 corrective behavior
-
-Packaged Blender 5.2.1 structural evidence now covers:
-
-- deterministic product/support grounding from real world-space bounds, including built-in Bottle / Jar / Box / Can / Phone / Tablet and Auto Fit/Rebuild paths;
-- Product and Camera Once / Loop / Ping-Pong with synchronized Blender Preview Range, independent actions and bounded modifiers;
-- Hybrid Studio + World lighting with independent environment illumination and camera-visible background brightness;
-- reviewed HDRI bulk download workflow, explicit Blender/AWFUL network permissions, status/error handling and Physical Sky fallback without changing selected HDRI intent;
-- optional `Setup Post Pipeline` with live Blender 5.2 capability detection, Light Groups, render passes, managed compositor, idempotent rebuild and save/reopen ownership safety;
-- explicit Fast/Quality viewport profiles and non-render performance diagnostics;
-- existing photographic lighting, camera framing, cyclorama/architecture, Natural Light, ownership safety, asset provenance, migration and native Extension Repository contracts.
+- AWFUL exposes explicit Fast Preview and Quality Preview modes that change viewport-only settings, not final render settings.
+- AWFUL diagnostics make CPU-backed Cycles sessions visible rather than silently presenting them as an AWFUL slowdown.
 
 ## Safety invariants
 
@@ -65,20 +64,24 @@ Packaged Blender 5.2.1 structural evidence now covers:
 - Unmanaged nested/shared/multi-scene data has runtime safety coverage.
 - Base Build/preset switching is offline; optional remote assets require explicit user/network permission.
 - Historical migration is explicit and the baseline stays byte-identical.
-- Exact generated ZIP is validated/installed in isolated Blender profiles in CI on Windows and Ubuntu.
+- Exact generated ZIP is validated/installed in isolated Blender profiles on Windows and Ubuntu.
 - Product mockup replacement may remove only AWFUL-owned mockup data; unmanaged user products survive.
 - Post Pipeline creates managed data only inside the existing scene owner scope, including after save/reopen.
-- Render/image regression remains separate and non-blocking for this release candidate.
+- Render/image regression remains a separate evidence layer and is not claimed by 1.0.0.
+- Third-party binary media must be byte-safe and explicitly reviewed before bundling.
 
-## Remaining gate to MVP/release
+## Post-1.0 backlog
 
-1. finish release-document reconciliation on PR #46;
-2. run the fresh canonical `awful_studio-0.0.17.zip` gate after the documentation commit;
-3. merge the accepted corrective PR into `feature/extension-foundation` and run the integrated exact-candidate gate;
-4. identify/download the exact integrated candidate and its SHA-256;
-5. run the final manual UI smoke on that exact ZIP, including Rendered Viewport with Blender scene Device deliberately set to GPU Compute for the performance check;
-6. if smoke passes, tag and publish 0.0.17 using the repository's actual release process.
+Existing issues remain the source of truth rather than being hidden behind an artificial "done" label:
 
-No tag or public release is created before the manual smoke passes.
+- #4 deterministic rendered visual regression;
+- #48 Scene Lab v3 visual/scene-quality work;
+- #49–#54 production device mockups, materials, bakes and Extension delivery contract;
+- #55 physical studio-equipment research plus subsequent modeling work;
+- #1 Flue evaluation;
+- #2 Blender Agent Studio evaluation;
+- expanded motion/HDRI/fixture/volumetric libraries.
 
-Use `AGENTS.md`, this file, the owning GitHub issue/PR and only the relevant `.skills/` before editing. Evidence before claims.
+Patch releases should fix contained correctness, packaging and compatibility problems. Minor 1.x releases should add qualified workflows/assets without breaking the stable Extension contract. 2.0.0 is reserved for an intentional incompatible contract change.
+
+Use `AGENTS.md`, this file, the owning issue/PR and only the relevant `.skills/` before editing. Evidence before claims.
