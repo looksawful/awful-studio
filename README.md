@@ -4,18 +4,35 @@ AWFUL STUDIO is a Blender-native virtual product and advertising studio for buil
 
 ## Status
 
+- Current release: **1.0.0**.
 - Historical baseline: **Alpha 0.0.15** (`historical/0.0.15/awful_studio_v4_2_gpu_perf.py`).
-- Current target: **Alpha 0.0.17 pre-release candidate**.
-- Blender target: **5.2 LTS**; exact verified runtime: **Blender 5.2.1**, build `9e2066aef7ef`.
+- Blender target: **5.2 LTS**; exact qualification runtime: **Blender 5.2.1**, build `9e2066aef7ef`.
+- Manifest compatibility: Blender `>= 5.2.0` and `< 5.3.0`.
 - Exact official Windows/Linux distribution pins: `runtime/blender.lock`.
-- Structural/runtime qualification is cloud-first and uses the exact built Extension ZIP on Windows and Ubuntu.
-- The final manual UI smoke remains the last human gate before 0.0.17 is tagged or published.
+- Structural/runtime qualification uses one exact built Extension ZIP on Ubuntu and Windows.
 
 Historical source SHA-256:
 
 ```text
 5d14513b699a0c0a0e693bba7c31111f264ac5988cf1abb85c7153f6a2e7e56b
 ```
+
+## What ships in 1.0.0
+
+- ownership-safe Build / Rebuild / Remove and explicit historical migration;
+- metric cyclorama and independent studio architecture visibility;
+- commercial/product lighting, photographic Flash, Natural Light, Physical Sky and Hybrid Studio + World modes;
+- independent environment illumination and camera-visible background brightness;
+- product-bounds camera framing and Auto Fit;
+- Product / Camera Once, Loop and Ping-Pong with synchronized Preview Range;
+- procedural Bottle / Jar / Box / Can / Phone / Tablet starter mockups;
+- deterministic offline starter materials;
+- explicit optional HDRI download workflow with provenance-safe cache behavior;
+- optional professional Post Pipeline with Light Groups, passes and managed compositor;
+- Fast Preview / Quality Preview viewport profiles without silently changing Blender's Cycles device;
+- native Blender Extension package/repository validation and cross-platform packaged-runtime QA.
+
+The invalid PaintedPlaster PNGs found in the pre-release candidate are deliberately **not** bundled in 1.0.0. The affected surfaces use the existing procedural/offline fallback instead. A verified texture bundle can return in a patch release after binary integrity validation.
 
 ## Repository map
 
@@ -25,31 +42,24 @@ historical/0.0.15/        immutable historical baseline
 runtime/blender.lock      exact verified Blender runtime pins
 tests/fast/               pure/static policy and tooling tests
 tests/runtime/            real Blender packaged-runtime contracts
-tools/awful.py            agent/human status, doctor, fast, bootstrap, runtime entrypoint
+tools/awful.py            status, doctor, fast, bootstrap, runtime entrypoint
 tools/setup_blender.py    official Blender download/checksum bootstrap
 tools/verify_extension.py official build + exact-ZIP runtime verifier
-integrations/             external integration status/pins
-.skills/                  thin AWFUL-specific workflow adapters
-.agents/                  research/checkpoint/evidence notes
-docs/                     install, release, engineering plans and references
-AGENTS.md                  default instructions for agents/contributors
+docs/                     install, releases, engineering plans and references
+AGENTS.md                  default contributor/agent instructions
 STATE.md                   current engineering handoff
 ```
 
-## Development rules
-
-Start with `AGENTS.md`, then `STATE.md`, the owning GitHub issue/PR and only the `.skills/` needed for the task.
-
-Key invariants:
+## Development invariants
 
 - Blender behavior requires real Blender 5.2 runtime evidence; static tests are not proof of `bpy` behavior.
 - Import/register/enable/restart must not build or mutate a scene.
 - Build/Rebuild are explicit user actions and preserve Blender's native device selection.
 - Base studio operation is offline; optional asset downloads require explicit opt-in.
 - Rebuild/Remove/migration preserve unmanaged and shared user data.
-- Heavy post/compositor/volume paths remain opt-in.
-- Ordinary structural QA contains no render invocation and must not probe local GPU hardware automatically.
-- Notion owns product/business/accepted architecture requirements. GitHub Issues own implementation work/status/evidence.
+- Heavy post/compositor paths remain opt-in.
+- Ordinary structural QA contains no render invocation and does not probe local GPU hardware automatically.
+- Binary media under the Extension asset tree must never be Git text-normalized.
 
 ## Tests and runtime
 
@@ -59,17 +69,13 @@ Fast checks, no Blender:
 python -m unittest discover -s tests/fast -v
 ```
 
-Agent-oriented pure status/health checks:
+Agent/human health checks:
 
 ```sh
 python tools/awful.py status
 python tools/awful.py doctor
 python tools/awful.py fast
 ```
-
-`status` and `doctor` do not launch Blender and do not use the network.
-
-The canonical runtime is cloud-first. GitHub Actions downloads the exact official Blender 5.2.1 distribution, verifies Blender's official SHA-256, validates/builds the Extension with Blender's own CLI, then executes the **exact generated ZIP** in isolated profiles on Windows and Ubuntu.
 
 Explicit runtime bootstrap:
 
@@ -83,49 +89,24 @@ Explicit full runtime verification:
 python tools/awful.py test-runtime --blender <path-to-blender>
 ```
 
-Outside CI the underlying verifier refuses to launch full Blender runtime unless the caller deliberately adds `--allow-local-blender`. Ordinary development should use fast tests locally and packaged runtime in CI.
+The canonical CI path downloads the exact official Blender 5.2.1 distribution, verifies Blender's published SHA-256, validates/builds the Extension with Blender's CLI, then tests the same generated ZIP in isolated profiles on Ubuntu and Windows.
 
-## 0.0.17 scope
+## Installation
 
-The current candidate includes:
+Use the release artifact `awful_studio-1.0.0.zip` with Blender **Edit → Preferences → Extensions → Install from Disk**. Installation and enabling are scene-clean; run **Build Studio** explicitly from `N → AWFUL STUDIO`.
 
-- ownership-safe Build/Rebuild/Remove and historical migration;
-- photographic lighting and Flash family;
-- metric cyclorama and independent studio architecture visibility;
-- full product-bounds camera framing;
-- Pure HDRI / Physical Sky / managed Sun natural-light semantics;
-- independent Product/Camera Once / Loop / Ping-Pong playback;
-- reviewed optional-asset provenance and offline cache safety;
-- procedural Bottle / Jar / Box / Can / Phone / Tablet mockups;
-- deterministic offline starter materials and Auto Fit integration;
-- native static Blender Extension repository generation/sync/install verification.
+See `docs/INSTALL_UPDATE.md` for installation, GPU/Rendered Viewport notes, optional HDRIs, Post Pipeline and troubleshooting.
 
-The separate visual-regression/render harness is not a release blocker. The required remaining human acceptance step is the manual UI smoke documented in `docs/releases/0.0.17.md`.
+## Post-1.0 work
 
-## Extension installation and update
-
-Use `docs/INSTALL_UPDATE.md` for the verified Install from Disk and Blender Extension Repository workflows, update rules and troubleshooting.
-
-Candidate packages are built with Blender's official Extension CLI. A package is not considered published merely because it imports or passes CI: tagging/release/deploy happens only after the final manual UI smoke.
-
-## Optional third-party assets
-
-Base Build contains no mandatory media downloads. Optional HDRIs are explicit opt-in cache assets. Provenance and third-party licenses are documented in `docs/THIRD_PARTY_ASSETS.md`.
-
-## Agent skills and integrations
-
-`.skills/README.md` lists project-local workflow adapters for TDD, debugging, verification, Git isolation/review, Blender runtime/lifecycle/data safety, network/cache safety, performance, release and handoff.
-
-External tools such as Blender Agent Studio and Flue remain optional research items. They are not required for AWFUL STUDIO 0.0.17 readiness and must not replace the canonical runtime path.
+Unfinished Scene Lab visuals, production device mockups, physical studio-equipment assets, visual-regression automation and optional external bridges remain in GitHub Issues. They are deliberately not treated as blockers for the stable core release and will be delivered through patch/minor versions when qualified.
 
 ## Release references
 
-- Current handoff: `STATE.md`
+- Current state: `STATE.md`
 - Install/update: `docs/INSTALL_UPDATE.md`
-- 0.0.17 release notes and final smoke gate: `docs/releases/0.0.17.md`
+- 1.0.0 release notes: `docs/releases/1.0.0.md`
 - Third-party assets: `docs/THIRD_PARTY_ASSETS.md`
 - Official Blender Extension references: `docs/references/blender-extension-development.md`
-- Completed product roadmap: GitHub issue #27
-- Pre-smoke release prep: GitHub issue #37
 
-Current implementation truth is the latest accepted GitHub issue/PR/CI evidence, not stale prose claims.
+Implementation truth is the released source plus current GitHub issue/PR/CI evidence, not stale planning prose.
