@@ -1,7 +1,7 @@
 name: Extension QA
 on:
   push:
-    branches: [main, 'feature/**']
+    branches: [main, 'feature/**', 'release/**']
   pull_request:
   workflow_dispatch:
 permissions:
@@ -33,7 +33,7 @@ jobs:
         run: python tools/verify_extension.py --blender "$BLENDER"
       - name: Verify native static Extension repository install on Ubuntu
         shell: bash
-        run: python tools/verify_repository.py --blender "$BLENDER" --package dist/awful_studio-0.0.17.zip --output dist
+        run: python tools/verify_repository.py --blender "$BLENDER" --package dist/awful_studio-1.0.0.zip --output dist
       - name: Upload Ubuntu runtime evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -48,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: extension-candidate
-          path: dist/awful_studio-0.0.17.zip
+          path: dist/awful_studio-1.0.0.zip
           if-no-files-found: error
 
   runtime-windows:
@@ -69,10 +69,10 @@ jobs:
           echo "BLENDER=$(tail -n 1 blender-path.txt)" >> "$GITHUB_ENV"
       - name: Validate and test the exact Ubuntu-built candidate on Windows
         shell: bash
-        run: python tools/verify_extension.py --blender "$BLENDER" --package dist/awful_studio-0.0.17.zip
+        run: python tools/verify_extension.py --blender "$BLENDER" --package dist/awful_studio-1.0.0.zip
       - name: Verify native static Extension repository install on Windows
         shell: bash
-        run: python tools/verify_repository.py --blender "$BLENDER" --package dist/awful_studio-0.0.17.zip --output dist
+        run: python tools/verify_repository.py --blender "$BLENDER" --package dist/awful_studio-1.0.0.zip --output dist
       - name: Upload Windows runtime evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
