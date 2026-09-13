@@ -1,0 +1,202 @@
+name: Alpha Release Candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      license_approved:
+        description: 'Owner explicitly approves public GPL-3.0-or-later release for this candidate'
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  fast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - run: python3 -m unittest discover -s tests/fast -v
+      - run: git diff --check
+
+  candidate:
+    needs: fast
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Install exact official Blender
+        shell: bash
+        run: |
+          python tools/setup_blender.py --destination .blender > blender-path.txt
+          echo "BLENDER=$(tail -n 1 blender-path.txt)" >> "$GITHUB_ENV"
+      - name: Validate and build exact candidate
+        shell: bash
+        run: |
+          "$BLENDER" --background --factory-startup --command extension validate --source-dir extension/awful_studio
+          "$BLENDER" --background --factory-startup --command extension build --source-dir extension/awful_studio --output-dir dist
+          "$BLENDER" --background --factory-startup --command extension validate dist/awful_studio-0.0.16.zip
+      - name: Upload exact candidate
+        uses: actions/upload-artifact@v7
+        with:
+          name: candidate-zip
+          path: dist/awful_studio-0.0.16.zip
+          if-no-files-found: error
+
+  runtime:
+    needs: candidate
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux-x64
+          - os: windows-latest
+            platform: windows-x64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Download exact candidate
+        uses: actions/download-artifact@v6
+        with:
+          name: candidate-zip
+          path: dist
+      - name: Install exact official Blender
+        shell: bash
+        run: |
+          python tools/setup_blender.py --destination .blender > blender-path.txt
+          echo "BLENDER=$(tail -n 1 blender-path.txt)" >> "$GITHUB_ENV"
+      - name: Test downloaded candidate in isolated Blender user data
+        shell: bash
+        run: |
+          work="$RUNNER_TEMP/awful-release-runtime"
+          mkdir -p "$work/installed" evidence
+          export BLENDER_USER_CONFIG="$work/config"
+          export BLENDER_USER_SCRIPTS="$work/scripts"
+          export BLENDER_USER_DATAFILES="$work/datafiles"
+          export BLENDER_USER_EXTENSIONS="$work/extensions"
+          for phase in historical install reopen migrate; do
+            startup=()
+            if [[ "$phase" == "historical" || "$phase" == "install" ]]; then startup=(--factory-startup); fi
+            "$BLENDER" --background --disable-autoexec --offline-mode "${startup[@]}" --python-exit-code 1 \
+              --python tests/runtime/extension_contract.py -- \
+              --phase "$phase" --work "$work" --zip dist/awful_studio-0.0.16.zip \
+              --source historical/0.0.15/awful_studio_v4_2_gpu_perf.py \
+              > "evidence/${phase}.log" 2>&1
+            cp "$work/${phase}.json" "evidence/${phase}.json"
+          done
+      - name: Write release runtime evidence
+        shell: bash
+        env:
+          RELEASE_PLATFORM: ${{ matrix.platform }}
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          package = Path('dist/awful_studio-0.0.16.zip')
+          reports = [json.loads(Path(f'evidence/{phase}.json').read_text()) for phase in ('historical','install','reopen','migrate')]
+          distribution = json.loads(Path('.blender/distribution.json').read_text())
+          if any(report.get('status') != 'passed' for report in reports):
+              raise SystemExit('Runtime phase report is not passed')
+          payload = {
+              'status': 'passed',
+              'platform': os.environ['RELEASE_PLATFORM'],
+              'blender_version': distribution['version'],
+              'package': package.name,
+              'sha256': hashlib.sha256(package.read_bytes()).hexdigest(),
+              'phases': ['historical', 'install', 'reopen', 'migrate'],
+          }
+          Path('evidence/release-runtime.json').write_text(json.dumps(payload, indent=2, sort_keys=True) + '\n')
+          PY
+      - name: Upload runtime evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: runtime-${{ matrix.platform }}
+          path: |
+            evidence/*.json
+            evidence/*.log
+            .blender/distribution.json
+          if-no-files-found: error
+
+  repository:
+    needs: [candidate, runtime]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Enforce owner-only license approval
+        if: inputs.license_approved && github.actor != github.repository_owner
+        shell: bash
+        run: |
+          echo 'license approval may only be asserted by the repository owner' >&2
+          exit 1
+      - name: Download exact candidate
+        uses: actions/download-artifact@v6
+        with:
+          name: candidate-zip
+          path: dist
+      - name: Download Linux evidence
+        uses: actions/download-artifact@v6
+        with:
+          name: runtime-linux-x64
+          path: evidence/linux
+      - name: Download Windows evidence
+        uses: actions/download-artifact@v6
+        with:
+          name: runtime-windows-x64
+          path: evidence/windows
+      - name: Install exact official Blender for repository generation
+        shell: bash
+        run: |
+          python tools/setup_blender.py --destination .blender > blender-path.txt
+          echo "BLENDER=$(tail -n 1 blender-path.txt)" >> "$GITHUB_ENV"
+      - name: Evaluate release gate and write deterministic metadata
+        id: gate
+        continue-on-error: true
+        shell: bash
+        run: |
+          args=(python tools/release_pipeline.py metadata
+            --package dist/awful_studio-0.0.16.zip
+            --source-sha "$GITHUB_SHA"
+            --evidence evidence/linux/release-runtime.json
+            --evidence evidence/windows/release-runtime.json
+            --output dist/release-metadata.json)
+          if [[ "${{ inputs.license_approved }}" == "true" ]]; then args+=(--license-approved); fi
+          "${args[@]}"
+      - name: Generate Blender static Extension repository
+        if: steps.gate.outcome == 'success'
+        shell: bash
+        run: |
+          python tools/release_pipeline.py repository \
+            --blender "$BLENDER" \
+            --package dist/awful_studio-0.0.16.zip \
+            --metadata dist/release-metadata.json \
+            --output-dir pages
+      - name: Upload release evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-candidate-evidence
+          path: dist/release-metadata.json
+          if-no-files-found: error
+      - name: Upload raw static repository
+        if: steps.gate.outcome == 'success'
+        uses: actions/upload-artifact@v7
+        with:
+          name: extension-repository-pages
+          path: pages/
+          if-no-files-found: error
+      - name: Upload GitHub Pages-ready artifact without deploying
+        if: steps.gate.outcome == 'success'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: pages/
+      - name: Keep a closed release gate visibly failing
+        if: steps.gate.outcome != 'success'
+        shell: bash
+        run: |
+          echo 'Release repository was not generated because the release gate is closed.' >&2
+          exit 1
