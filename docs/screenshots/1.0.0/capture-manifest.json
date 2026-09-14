@@ -1,0 +1,43 @@
+{
+  "release": "1.0.0",
+  "blender": "5.2.1 LTS",
+  "capture_policy": {
+    "ui": "real Blender window capture with installed AWFUL STUDIO extension",
+    "renders": "real EEVEE renders from AWFUL STUDIO generated scenes",
+    "generated_ui": false,
+    "ai_generated": false,
+    "camera_fit": "world-space bounds of PRODUCT_CONTENT renderable meshes",
+    "lens_mm": 55,
+    "resolution": [1600, 1000]
+  },
+  "states": [
+    {
+      "id": "dark_bottle",
+      "frame": 1,
+      "ui_panel": "Lighting",
+      "ui_file": "ui-lighting-dark-bottle.png",
+      "render_file": "render-dark-bottle-framed.png"
+    },
+    {
+      "id": "white_jar",
+      "frame": 1,
+      "ui_panel": "Environment",
+      "ui_file": "ui-environment-white-jar.png",
+      "render_file": "render-white-jar-framed.png"
+    },
+    {
+      "id": "tech_phone",
+      "frame": 36,
+      "ui_panel": "Camera",
+      "ui_file": "ui-camera-tech-phone.png",
+      "render_file": "render-tech-phone-framed.png"
+    },
+    {
+      "id": "commercial_can",
+      "frame": 48,
+      "ui_panel": "Setup",
+      "ui_file": "ui-setup-commercial-can.png",
+      "render_file": "render-commercial-can-framed.png"
+    }
+  ]
+}
