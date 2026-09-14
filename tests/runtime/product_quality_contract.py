@@ -133,6 +133,48 @@ def main():
                   all(int(modifier.segments) <= int(spec['bevel_segments']) for modifier in bevels),
                   [int(modifier.segments) for modifier in bevels])
 
+        device_asset_loader = importlib.import_module(MODULE + '.device_asset_loader')
+        scene.awful_studio.auto_fit = True
+        for key in device_asset_loader.device_asset_keys():
+            spec = device_asset_loader.device_asset_spec(key)
+            scene.awful_studio.product_mockup = key
+            with ownership.for_scene(scene):
+                root = product_quality.replace_mockup(legacy, scene, key)
+            check(f'{key} root is scene-owned', ownership.owned(root, scene))
+            check(f'{key} root role', root.get(legacy.ROLE_KEY) == 'MOCKUP_ROOT')
+            check(f'{key} metadata key', product_quality.mockup_key(root) == key)
+            check(f'{key} asset id', root.get('awful_asset_id') == spec['asset_id'])
+            check(f'{key} stage is honest', root.get('awful_asset_stage') == spec['stage'])
+            check(f'{key} variant', root.get('awful_asset_variant') == spec['variant'])
+            hierarchy = [root] + legacy.descendants(root)
+            meshes = [obj for obj in hierarchy if obj.type == 'MESH']
+            check(f'{key} has measurable meshes', bool(meshes) and legacy.world_bbox(meshes) is not None)
+            check(f'{key} hierarchy is owned', all(ownership.owned(obj, scene) for obj in hierarchy))
+            check(f'{key} excludes preview cameras', all(obj.type != 'CAMERA' for obj in hierarchy))
+            check(f'{key} excludes preview lights', all(obj.type != 'LIGHT' for obj in hierarchy))
+            check(f'{key} has screen content', any(obj.name.startswith('SCREEN_CONTENT') for obj in hierarchy))
+            metrics = legacy.get_product_metrics(scene)
+            check(f'{key} Auto Fit metrics are positive',
+                  min(metrics.width, metrics.depth, metrics.height, metrics.scale) > 0.0)
+            if key == 'DEVICE_MACBOOK_PRO_14':
+                check('MacBook bundled hinge control exists',
+                      any(obj.name.startswith('CTRL_HINGE') for obj in hierarchy))
+        scene.awful_studio.product_mockup = 'DEVICE_MACBOOK_PRO_14'
+        rebuild = bpy.ops.awful.rebuild_studio()
+        check('device rebuild finishes', rebuild == {'FINISHED'}, list(rebuild))
+        restored = product_quality.mockup_roots(legacy, scene)
+        check('device rebuild restores selected asset',
+              len(restored) == 1 and product_quality.mockup_key(restored[0]) == 'DEVICE_MACBOOK_PRO_14')
+        restored_hierarchy = [restored[0]] + legacy.descendants(restored[0])
+        check('device rebuild restores hinge control',
+              any(obj.name.startswith('CTRL_HINGE') for obj in restored_hierarchy))
+        scene.awful_studio.auto_fit = False
+        scene.awful_studio.product_mockup = 'BOTTLE'
+        with ownership.for_scene(scene):
+            product_quality.replace_mockup(legacy, scene, 'BOTTLE')
+        stale = [c.name for c in bpy.data.collections if c.name.startswith('AWFUL_DEVICE_')]
+        check('device replacement purges orphan bundled collections', not stale, stale)
+
         # Explicit UI generation must never displace a measurable unmanaged product.
         check('mockup selector scene state exists', hasattr(scene.awful_studio, 'product_mockup'))
         bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.0, 0.0, 0.5))
@@ -256,6 +298,24 @@ def main():
                            if obj.type == 'MESH']
         check('mockup geometry measurable after save/reopen',
               legacy.world_bbox(reopened_meshes) is not None)
+        scene.awful_studio.product_mockup = 'DEVICE_MACBOOK_PRO_14'
+        scene.awful_studio.auto_fit = True
+        with ownership.for_scene(scene):
+            product_quality.replace_mockup(legacy, scene, 'DEVICE_MACBOOK_PRO_14')
+        device_reopen_path = args.work / 'device_asset_reopen.blend'
+        bpy.ops.wm.save_as_mainfile(filepath=str(device_reopen_path))
+        bpy.ops.wm.open_mainfile(filepath=str(device_reopen_path), use_scripts=False)
+        scene = bpy.context.scene
+        reopened_device = product_quality.mockup_roots(legacy, scene)
+        check('device selection survives save/reopen',
+              scene.awful_studio.product_mockup == 'DEVICE_MACBOOK_PRO_14')
+        check('one device root survives save/reopen', len(reopened_device) == 1)
+        check('device metadata survives save/reopen',
+              reopened_device[0].get('awful_asset_stage') == 'RELEASE_CANDIDATE')
+        reopened_device_hierarchy = [reopened_device[0]] + legacy.descendants(reopened_device[0])
+        check('MacBook hinge survives save/reopen',
+              any(obj.name.startswith('CTRL_HINGE') for obj in reopened_device_hierarchy))
+
         check('product-quality operations make zero network attempts',
               REPORT['network_attempts'] == 0, REPORT['network_attempts'])
 

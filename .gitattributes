@@ -6,3 +6,5 @@ extension/awful_studio/assets/**/*.hdr -text
 extension/awful_studio/assets/**/*.exr -text
 extension/awful_studio/assets/**/*.zip -text
 historical/0.0.15/awful_studio_v4_2_gpu_perf.py -text
+
+extension/awful_studio/**/*.blend -text
