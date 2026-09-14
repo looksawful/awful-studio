@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "assets": {
+    "studio_support_cstand_01": {
+      "file": "glb/studio_support_cstand_01.glb",
+      "bytes": 300960,
+      "nodes": 32,
+      "meshes": 29,
+      "primitives": 29,
+      "vertices": 15904,
+      "triangles": 23196,
+      "materials": 5,
+      "meshopt": true,
+      "cameras": 0,
+      "lights": false,
+      "reference_nodes": [],
+      "stable_root": true,
+      "pass": true
+    },
+    "profoto_d1_500_air": {
+      "file": "glb/profoto_d1_500_air.glb",
+      "bytes": 632800,
+      "nodes": 53,
+      "meshes": 48,
+      "primitives": 48,
+      "vertices": 42706,
+      "triangles": 43824,
+      "materials": 8,
+      "meshopt": true,
+      "cameras": 0,
+      "lights": false,
+      "reference_nodes": [],
+      "stable_root": true,
+      "pass": true
+    },
+    "profoto_magnum_100624": {
+      "file": "glb/profoto_magnum_100624.glb",
+      "bytes": 214428,
+      "nodes": 8,
+      "meshes": 7,
+      "primitives": 7,
+      "vertices": 13403,
+      "triangles": 25592,
+      "materials": 3,
+      "meshopt": true,
+      "cameras": 0,
+      "lights": false,
+      "reference_nodes": [],
+      "stable_root": true,
+      "pass": true
+    },
+    "studio_sandbag_01": {
+      "file": "glb/studio_sandbag_01.glb",
+      "bytes": 438708,
+      "nodes": 16,
+      "meshes": 15,
+      "primitives": 15,
+      "vertices": 25447,
+      "triangles": 36396,
+      "materials": 3,
+      "meshopt": true,
+      "cameras": 0,
+      "lights": false,
+      "reference_nodes": [],
+      "stable_root": true,
+      "pass": true
+    }
+  },
+  "pass": true
+}

@@ -59,6 +59,90 @@
       }
     },
     {
+      "check": "magnum_outer_black",
+      "pass": true,
+      "details": {
+        "MAGNUM_OUTER_SHELL": [
+          "MAT_BLACK_POWDER"
+        ],
+        "MAGNUM_INNER_REFLECTOR": [
+          "MAT_REFLECTOR_SILVER"
+        ],
+        "MAGNUM_COLLAR_REAR": [
+          "MAT_BLACK_POWDER"
+        ],
+        "MAGNUM_COLLAR_FRONT": [
+          "MAT_BLACK_POWDER"
+        ],
+        "MAGNUM_FRONT_RIM": [
+          "MAT_ALUMINUM"
+        ]
+      }
+    },
+    {
+      "check": "magnum_inner_silver",
+      "pass": true,
+      "details": {
+        "MAGNUM_OUTER_SHELL": [
+          "MAT_BLACK_POWDER"
+        ],
+        "MAGNUM_INNER_REFLECTOR": [
+          "MAT_REFLECTOR_SILVER"
+        ],
+        "MAGNUM_COLLAR_REAR": [
+          "MAT_BLACK_POWDER"
+        ],
+        "MAGNUM_COLLAR_FRONT": [
+          "MAT_BLACK_POWDER"
+        ],
+        "MAGNUM_FRONT_RIM": [
+          "MAT_ALUMINUM"
+        ]
+      }
+    },
+    {
+      "check": "magnum_collar_black",
+      "pass": true,
+      "details": {
+        "MAGNUM_OUTER_SHELL": [
+          "MAT_BLACK_POWDER"
+        ],
+        "MAGNUM_INNER_REFLECTOR": [
+          "MAT_REFLECTOR_SILVER"
+        ],
+        "MAGNUM_COLLAR_REAR": [
+          "MAT_BLACK_POWDER"
+        ],
+        "MAGNUM_COLLAR_FRONT": [
+          "MAT_BLACK_POWDER"
+        ],
+        "MAGNUM_FRONT_RIM": [
+          "MAT_ALUMINUM"
+        ]
+      }
+    },
+    {
+      "check": "magnum_front_rim_silver",
+      "pass": true,
+      "details": {
+        "MAGNUM_OUTER_SHELL": [
+          "MAT_BLACK_POWDER"
+        ],
+        "MAGNUM_INNER_REFLECTOR": [
+          "MAT_REFLECTOR_SILVER"
+        ],
+        "MAGNUM_COLLAR_REAR": [
+          "MAT_BLACK_POWDER"
+        ],
+        "MAGNUM_COLLAR_FRONT": [
+          "MAT_BLACK_POWDER"
+        ],
+        "MAGNUM_FRONT_RIM": [
+          "MAT_ALUMINUM"
+        ]
+      }
+    },
+    {
       "check": "magnum_visible_assembly_bounds_mm",
       "pass": true,
       "details": {

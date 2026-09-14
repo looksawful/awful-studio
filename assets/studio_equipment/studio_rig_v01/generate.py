@@ -552,7 +552,7 @@ def build_magnum(mats, sem, mount_modifier):
     )
     add_cylinder(
         "MAGNUM_COLLAR_FRONT", 0.057, 0.020,
-        (0, overall_start + 0.030, z), mats["aluminum"], col,
+        (0, overall_start + 0.030, z), mats["black_metal"], col,
         axis="Y", parent=root, bevel=0.0005
     )
     add_torus(
@@ -563,7 +563,7 @@ def build_magnum(mats, sem, mount_modifier):
     add_torus(
         "MAGNUM_FRONT_RIM", 0.1690, 0.0035,
         (0, front - 0.0035, z), (math.radians(90), 0, 0),
-        mats["black_metal"], col, root
+        mats["aluminum"], col, root
     )
     add_torus(
         "MAGNUM_INNER_RIM", 0.1630, 0.0018,

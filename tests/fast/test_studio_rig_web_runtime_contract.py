@@ -38,3 +38,42 @@ class StudioRigWebRuntimeContractTests(unittest.TestCase):
             self.assertIn("root", entry)
             self.assertIn("glb", entry)
             self.assertIn("interaction", entry)
+
+    def test_blender_exporter_emits_clean_meshopt_glb_candidates(self):
+        exporter = RUNTIME / "export_glb.py"
+        self.assertTrue(exporter.is_file())
+        source = exporter.read_text(encoding="utf-8")
+        for token in (
+            "export_format=\"GLB\"",
+            "export_meshopt_compression_enable=True",
+            "export_yup=True",
+            "export_apply=True",
+            "export_extras=True",
+            "export_cameras=False",
+            "export_lights=False",
+        ):
+            self.assertIn(token, source)
+        manifest = json.loads((RUNTIME / "asset_manifest.json").read_text(encoding="utf-8"))
+        for entry in manifest["assets"].values():
+            self.assertTrue((RUNTIME / entry["glb"]).is_file(), entry["glb"])
+
+    def test_headless_exporter_never_waits_for_overwrite_confirmation(self):
+        exporter = (RUNTIME / "export_glb.py").read_text(encoding="utf-8")
+        self.assertIn("check_existing=False", exporter)
+
+    def test_glb_runtime_validation_evidence_exists(self):
+        validator = RUNTIME / "validate_glb.py"
+        evidence = RUNTIME / "glb_validation.json"
+        self.assertTrue(validator.is_file())
+        self.assertTrue(evidence.is_file())
+        data = json.loads(evidence.read_text(encoding="utf-8"))
+        self.assertTrue(data["pass"])
+        self.assertEqual(set(data["assets"]), {
+            "studio_support_cstand_01", "profoto_d1_500_air",
+            "profoto_magnum_100624", "studio_sandbag_01"
+        })
+        for item in data["assets"].values():
+            self.assertTrue(item["meshopt"])
+            self.assertEqual(item["cameras"], 0)
+            self.assertFalse(item["lights"])
+            self.assertEqual(item["reference_nodes"], [])

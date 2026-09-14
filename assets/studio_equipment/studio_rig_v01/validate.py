@@ -77,6 +77,19 @@ def main():
         {"actual": magnum, "sorted": sorted(magnum)},
         results,
     )
+    magnum_materials = {
+        name: [slot.material.name for slot in bpy.data.objects[name].material_slots if slot.material]
+        for name in ("MAGNUM_OUTER_SHELL", "MAGNUM_INNER_REFLECTOR",
+                     "MAGNUM_COLLAR_REAR", "MAGNUM_COLLAR_FRONT", "MAGNUM_FRONT_RIM")
+    }
+    check("MAT_BLACK_POWDER" in magnum_materials["MAGNUM_OUTER_SHELL"],
+          "magnum_outer_black", magnum_materials, results)
+    check("MAT_REFLECTOR_SILVER" in magnum_materials["MAGNUM_INNER_REFLECTOR"],
+          "magnum_inner_silver", magnum_materials, results)
+    check("MAT_BLACK_POWDER" in magnum_materials["MAGNUM_COLLAR_FRONT"],
+          "magnum_collar_black", magnum_materials, results)
+    check("MAT_ALUMINUM" in magnum_materials["MAGNUM_FRONT_RIM"],
+          "magnum_front_rim_silver", magnum_materials, results)
     magnum_visible = collection_bounds_mm("AS_MOD_PROFOTO_MAGNUM")
     check(
         close(sorted(magnum_visible), [265, 345, 345], tol=1.5),

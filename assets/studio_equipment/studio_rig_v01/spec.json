@@ -60,7 +60,14 @@
     "depth_mm": 265,
     "identity_class": "VERIFIED_MODEL",
     "weight_kg": 0.8,
-    "reference": "Profoto Magnum Reflector product sheet / official product page"
+    "reference": "Profoto Magnum Reflector product sheet / official product page",
+    "material_zones": {
+      "outer_shell": "matte_black",
+      "inner_reflector": "high_reflectance_silver",
+      "collar": "matte_black",
+      "front_rim": "silver_metal",
+      "label_zone": "black_with_white_marking"
+    }
   },
   "sandbag": {
     "asset_id": "AS_ACC_SANDBAG_01",
