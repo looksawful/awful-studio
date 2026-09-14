@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import math
 from pathlib import Path
 
 
@@ -17,6 +18,8 @@ DEVICE_ASSET_SPECS = {
         'entry_collection': 'AWFUL_DEVICE_IPHONE_17',
         'root_name': 'CTRL_IPHONE_17',
         'source_revision': 'a1003c674ed83182cee6bf70816168f2c6533947594553d9cba6d2a6bc75d586',
+        'screen_object': 'SCREEN_CONTENT',
+        'screen_material': 'MAT_SCREEN_CONTENT',
     },
     'DEVICE_IPAD_PRO_11': {
         'label': 'iPad Pro 11 M5',
@@ -28,6 +31,8 @@ DEVICE_ASSET_SPECS = {
         'entry_collection': 'AWFUL_DEVICE_IPAD_PRO_11',
         'root_name': 'CTRL_IPAD_PRO_11',
         'source_revision': '379f203ee49f97f11ecb13b7a1d4b31141330c18fff509b769543d4dd1b21900',
+        'screen_object': 'SCREEN_CONTENT',
+        'screen_material': 'MAT_SCREEN_CONTENT',
     },
     'DEVICE_IPAD_PRO_13': {
         'label': 'iPad Pro 13 M5',
@@ -39,6 +44,8 @@ DEVICE_ASSET_SPECS = {
         'entry_collection': 'AWFUL_DEVICE_IPAD_PRO_13',
         'root_name': 'CTRL_IPAD_PRO_13',
         'source_revision': '3eca4df4deaf161ee2bedc8a4a5b9d0d43e2a5342dbd5deff994e385f07c7a74',
+        'screen_object': 'SCREEN_CONTENT',
+        'screen_material': 'MAT_SCREEN_CONTENT',
     },
     'DEVICE_MACBOOK_PRO_14': {
         'label': 'MacBook Pro 14 M5',
@@ -50,8 +57,18 @@ DEVICE_ASSET_SPECS = {
         'entry_collection': 'AWFUL_DEVICE_MACBOOK_PRO_14',
         'root_name': 'CTRL_MACBOOK_PRO_14',
         'source_revision': '6c5c67ae9aac7b0888ee226ffce3071052eb32b42d86ddff14c0c89e755c0530',
+        'screen_object': 'SCREEN_CONTENT',
+        'screen_material': 'MAT_SCREEN_CONTENT',
         'controls': ('CTRL_HINGE',),
     },
+}
+
+HINGE_PRESETS_DEGREES = {
+    'CLOSED': 0.0,
+    '30': 30.0,
+    '60': 60.0,
+    '90': 90.0,
+    '102': 102.0,
 }
 
 
@@ -66,6 +83,22 @@ def device_asset_spec(key: str) -> dict:
         raise ValueError(f'Unknown AWFUL device asset: {key}') from exc
 
 
+
+def hinge_preset_keys(key: str) -> tuple[str, ...]:
+    spec = device_asset_spec(key)
+    if 'CTRL_HINGE' not in spec.get('controls', ()):
+        raise ValueError(f'AWFUL device asset has no hinge presets: {key}')
+    return tuple(HINGE_PRESETS_DEGREES)
+
+
+def hinge_angle_degrees(key: str, preset: str) -> float:
+    hinge_preset_keys(key)
+    try:
+        return float(HINGE_PRESETS_DEGREES[preset])
+    except KeyError as exc:
+        raise ValueError(f'Unknown AWFUL hinge preset: {preset}') from exc
+
+
 def device_asset_path(key: str) -> Path:
     spec = device_asset_spec(key)
     return Path(__file__).resolve().parent / spec['blend_path']
@@ -73,6 +106,95 @@ def device_asset_path(key: str) -> Path:
 
 def is_device_asset_key(key: str) -> bool:
     return key in DEVICE_ASSET_SPECS
+
+
+
+def _active_device_root(legacy, scene):
+    roots = [obj for obj in scene.objects
+             if legacy.ownership.owned(obj, scene)
+             and obj.get(legacy.ROLE_KEY, '') == 'MOCKUP_ROOT'
+             and is_device_asset_key(str(obj.get('awful_mockup_key', '')))]
+    if len(roots) != 1:
+        raise RuntimeError('Exactly one AWFUL device asset must be active')
+    return roots[0]
+
+
+def _screen_object(legacy, root, spec):
+    expected = spec['screen_object']
+    for obj in [root] + legacy.descendants(root):
+        if obj.name == expected or obj.name.startswith(expected + '.'):
+            return obj
+    raise RuntimeError(f'AWFUL device asset is missing {expected}')
+
+
+def _principled(material):
+    for node in material.node_tree.nodes:
+        if node.bl_idname == 'ShaderNodeBsdfPrincipled':
+            return node
+    raise RuntimeError(f'{material.name} is missing Principled BSDF')
+
+
+def apply_screen_image(legacy, scene, filepath):
+    root = _active_device_root(legacy, scene)
+    spec = device_asset_spec(str(root['awful_mockup_key']))
+    path = Path(filepath).expanduser().resolve()
+    if not path.is_file():
+        raise ValueError(f'Screen artwork file does not exist: {path}')
+    screen = _screen_object(legacy, root, spec)
+    material = next((m for m in screen.data.materials if m is not None), None)
+    if material is None:
+        raise RuntimeError(f'{screen.name} has no screen material')
+    material.use_nodes = True
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    shader = _principled(material)
+    image_node = nodes.get('AWFUL_SCREEN_IMAGE')
+    if image_node is None:
+        image_node = nodes.new('ShaderNodeTexImage')
+        image_node.name = 'AWFUL_SCREEN_IMAGE'
+        image_node.label = 'AWFUL Screen Artwork'
+    previous_image = image_node.image
+    with legacy.ownership.for_scene(scene):
+        image = legacy.bpy.data.images.load(str(path), check_existing=False)
+        image.pack()
+        legacy.mark_managed(image, _managed_role('MOCKUP_DEVICE_SCREEN_IMAGE', str(root['awful_mockup_key']), path.stem))
+    image_node.image = image
+    if (previous_image is not None and previous_image != image
+            and legacy.ownership.owned(previous_image, scene)
+            and previous_image.users == 0):
+        legacy.bpy.data.images.remove(previous_image)
+    for socket_name in ('Base Color', 'Emission Color', 'Emission'):
+        socket = shader.inputs.get(socket_name)
+        if socket is not None:
+            for old in list(socket.links):
+                links.remove(old)
+            links.new(image_node.outputs['Color'], socket)
+    strength = shader.inputs.get('Emission Strength')
+    if strength is not None:
+        strength.default_value = 1.0
+    root['awful_screen_artwork_name'] = path.name
+    screen['awful_screen_artwork_name'] = path.name
+    return screen
+
+
+def apply_hinge_preset(legacy, scene, preset: str):
+    root = _active_device_root(legacy, scene)
+    key = str(root['awful_mockup_key'])
+    angle = hinge_angle_degrees(key, preset)
+    controls = device_asset_spec(key).get('controls', ())
+    hinge_name = 'CTRL_HINGE'
+    if hinge_name not in controls:
+        raise ValueError(f'AWFUL device asset has no hinge control: {key}')
+    hinge = next((obj for obj in [root] + legacy.descendants(root)
+                  if obj.name == hinge_name or obj.name.startswith(hinge_name + '.')), None)
+    if hinge is None:
+        raise RuntimeError(f'AWFUL device asset is missing {hinge_name}')
+    hinge.rotation_mode = 'XYZ'
+    hinge.rotation_euler.x = math.radians(90.0 - angle)
+    hinge['open_angle_deg'] = angle
+    hinge['preset'] = preset
+    root['awful_hinge_preset'] = preset
+    return hinge
 
 
 def _managed_role(prefix: str, key: str, name: str = '') -> str:
@@ -135,3 +257,9 @@ def purge_orphan_device_collections(legacy, scene):
                 and role.startswith('MOCKUP_DEVICE_COLLECTION_')
                 and len(collection.objects) == 0):
             bpy.data.collections.remove(collection)
+    for image in list(bpy.data.images):
+        role = str(image.get(legacy.ROLE_KEY, ''))
+        if (legacy.ownership.owned(image, scene)
+                and role.startswith('MOCKUP_DEVICE_SCREEN_IMAGE_')
+                and image.users == 0):
+            bpy.data.images.remove(image)
