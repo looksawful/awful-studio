@@ -1,14 +1,14 @@
 {
   "asset_id": "AS_RIG_STUDIO_V01",
   "blender_version": "5.2.1 LTS",
-  "object_count": 113,
-  "mesh_count": 93,
-  "material_count": 8,
+  "object_count": 126,
+  "mesh_count": 102,
+  "material_count": 13,
   "visible_bounds_mm": {
     "d1": [
-      175.0,
-      307.0,
-      177.0
+      188.0,
+      300.85,
+      150.0
     ],
     "magnum": [
       345.0,
@@ -33,6 +33,13 @@
           300.0,
           170.0
         ]
+      }
+    },
+    {
+      "check": "d1_visible_depth_mm",
+      "pass": true,
+      "details": {
+        "actual": 300.85
       }
     },
     {
@@ -72,6 +79,50 @@
       "pass": true,
       "details": {
         "actual": 1750.0
+      }
+    },
+    {
+      "check": "support_footprint_mm",
+      "pass": true,
+      "details": {
+        "actual": [
+          941.448,
+          911.37
+        ]
+      }
+    },
+    {
+      "check": "support_tube_diameters_mm",
+      "pass": true,
+      "details": {
+        "actual": [
+          35.0,
+          30.0,
+          25.0
+        ]
+      }
+    },
+    {
+      "check": "support_leg_diameter_mm",
+      "pass": true,
+      "details": {
+        "actual": 25.0
+      }
+    },
+    {
+      "check": "sandbag_soft_surface_modifiers",
+      "pass": true,
+      "details": {
+        "SANDBAG_POUCH_1": [
+          "MICRO_SAG",
+          "SOFT_BEVEL",
+          "SOFT_SUBDIV"
+        ],
+        "SANDBAG_POUCH_2": [
+          "MICRO_SAG",
+          "SOFT_BEVEL",
+          "SOFT_SUBDIV"
+        ]
       }
     },
     {

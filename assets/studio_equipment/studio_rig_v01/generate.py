@@ -203,6 +203,40 @@ def add_profile_shell(name, profile, loc, mat, col, parent=None, segments=128, t
     obj.parent = parent
     return obj
 
+def add_arc_band(name, center, outer_radius, inner_radius, depth_y,
+                 start_deg, end_deg, mat, col, parent=None, segments=64):
+    verts, faces = [], []
+    cx, cy, cz = center
+    for i in range(segments + 1):
+        a = math.radians(start_deg + (end_deg - start_deg) * i / segments)
+        c, s = math.cos(a), math.sin(a)
+        for yoff in (-depth_y * 0.5, depth_y * 0.5):
+            verts.append((cx + outer_radius * c, cy + yoff, cz + outer_radius * s))
+            verts.append((cx + inner_radius * c, cy + yoff, cz + inner_radius * s))
+    for i in range(segments):
+        a = i * 4
+        b = (i + 1) * 4
+        faces += [
+            (a, b, b + 2, a + 2),
+            (a + 1, a + 3, b + 3, b + 1),
+            (a, a + 1, b + 1, b),
+            (a + 2, b + 2, b + 3, a + 3),
+        ]
+    faces += [(0, 2, 3, 1)]
+    end = segments * 4
+    faces += [(end, end + 1, end + 3, end + 2)]
+    mesh = bpy.data.meshes.new(f"{name}_MESH")
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    col.objects.link(obj)
+    obj.data.materials.append(mat)
+    bevel = obj.modifiers.new("EDGE_BEVEL", "BEVEL")
+    bevel.width = 0.0015
+    bevel.segments = 3
+    obj.parent = parent
+    return obj
+
 def add_sphere(name, radius, loc, scale, mat, col, parent=None):
     bpy.ops.mesh.primitive_uv_sphere_add(
         segments=64, ring_count=32, radius=radius, location=loc
@@ -241,16 +275,60 @@ def rod_between(name, a, b, radius, mat, col, parent=None, vertices=48):
     return obj
 
 
+def make_glass_material(name, tint=(0.78, 0.82, 0.86), roughness=0.28):
+    mat = bpy.data.materials.new(name)
+    mat.use_nodes = True
+    bsdf = mat.node_tree.nodes.get("Principled BSDF")
+    bsdf.inputs["Base Color"].default_value = (*tint, 1.0)
+    bsdf.inputs["Roughness"].default_value = roughness
+    if "Transmission Weight" in bsdf.inputs:
+        bsdf.inputs["Transmission Weight"].default_value = 0.82
+    if "IOR" in bsdf.inputs:
+        bsdf.inputs["IOR"].default_value = 1.46
+    return mat
+
+
+def make_emission_material(name, color, strength=2.0):
+    mat = bpy.data.materials.new(name)
+    mat.use_nodes = True
+    bsdf = mat.node_tree.nodes.get("Principled BSDF")
+    bsdf.inputs["Base Color"].default_value = (*color, 1.0)
+    bsdf.inputs["Roughness"].default_value = 0.25
+    if "Emission Color" in bsdf.inputs:
+        bsdf.inputs["Emission Color"].default_value = (*color, 1.0)
+    if "Emission Strength" in bsdf.inputs:
+        bsdf.inputs["Emission Strength"].default_value = strength
+    return mat
+
+def apply_boolean_difference(target, cutter, name):
+    mod = target.modifiers.new(name, "BOOLEAN")
+    mod.operation = "DIFFERENCE"
+    mod.solver = "EXACT"
+    mod.object = cutter
+    bpy.context.view_layer.objects.active = target
+    target.select_set(True)
+    bpy.ops.object.modifier_apply(modifier=mod.name)
+    target.select_set(False)
+    mesh = cutter.data
+    bpy.data.objects.remove(cutter, do_unlink=True)
+    if mesh.users == 0:
+        bpy.data.meshes.remove(mesh)
+
 def build_materials():
     return {
-        "chrome": make_material("MAT_CHROME", (0.42, 0.46, 0.50), 0.92, 0.13, 70, 0.025),
-        "black_metal": make_material("MAT_BLACK_POWDER", (0.025, 0.028, 0.032), 0.48, 0.31, 55, 0.035),
-        "black_plastic": make_material("MAT_BLACK_PLASTIC", (0.018, 0.020, 0.023), 0.0, 0.42, 110, 0.045),
-        "silver": make_material("MAT_REFLECTOR_SILVER", (0.72, 0.76, 0.79), 0.94, 0.10, 180, 0.018),
-        "aluminum": make_material("MAT_ALUMINUM", (0.34, 0.37, 0.40), 0.86, 0.22, 90, 0.025),
-        "rubber": make_material("MAT_RUBBER", (0.012, 0.014, 0.016), 0.0, 0.68, 95, 0.055),
-        "fabric": make_material("MAT_SANDBAG_FABRIC", (0.025, 0.027, 0.029), 0.0, 0.86, 220, 0.11),
-        "label": make_material("MAT_LABEL_WHITE", (0.82, 0.82, 0.80), 0.0, 0.44),
+        "chrome": make_material("MAT_CHROME", (0.48, 0.52, 0.56), 1.0, 0.16, 90, 0.018),
+        "black_metal": make_material("MAT_BLACK_POWDER", (0.018, 0.020, 0.023), 0.0, 0.34, 70, 0.025),
+        "black_plastic": make_material("MAT_BLACK_PLASTIC", (0.015, 0.017, 0.020), 0.0, 0.40, 120, 0.035),
+        "silver": make_material("MAT_REFLECTOR_SILVER", (0.78, 0.80, 0.82), 1.0, 0.075, 220, 0.012),
+        "aluminum": make_material("MAT_ALUMINUM", (0.40, 0.43, 0.46), 1.0, 0.22, 120, 0.020),
+        "rubber": make_material("MAT_RUBBER", (0.010, 0.011, 0.013), 0.0, 0.72, 110, 0.050),
+        "fabric": make_material("MAT_SANDBAG_FABRIC", (0.020, 0.022, 0.025), 0.0, 0.88, 240, 0.12),
+        "webbing": make_material("MAT_WEBBING", (0.012, 0.014, 0.017), 0.0, 0.72, 180, 0.07),
+        "label": make_material("MAT_LABEL_WHITE", (0.88, 0.88, 0.86), 0.0, 0.46),
+        "glass": make_glass_material("MAT_FROSTED_GLASS"),
+        "flash": make_emission_material("MAT_FLASH_TUBE", (0.88, 0.94, 1.0), 2.4),
+        "lamp": make_emission_material("MAT_MODELING_LAMP", (1.0, 0.72, 0.42), 1.2),
+        "indicator": make_emission_material("MAT_INDICATOR", (0.30, 0.78, 0.42), 1.5),
     }
 
 
@@ -278,12 +356,12 @@ def build_cstand(mats, sem):
         end = radial * length + Vector((0, 0, 0.035))
         hinge = start + radial * 0.025
         add_cube(f"CSTAND_LEG_HINGE_{idx}", (0.060, 0.038, 0.025), hinge, mats["black_metal"], col, 0.006, root)
-        rod_between(f"CSTAND_LEG_{idx}", start + radial * 0.035, end, 0.0115, mats["chrome"], col, root)
+        rod_between(f"CSTAND_LEG_{idx}", start + radial * 0.035, end, 0.0125, mats["chrome"], col, root)
         add_cylinder(f"CSTAND_FOOT_{idx}", 0.017, 0.058, (end.x, end.y, 0.029), mats["rubber"], col, axis="Z", parent=root)
     # Three telescoping risers with decreasing diameters.
     add_cylinder("CSTAND_RISER_01", 0.0175, 0.700, (0, 0, 0.445), mats["chrome"], col, parent=root)
-    add_cylinder("CSTAND_RISER_02", 0.0145, 0.590, (0, 0, 1.070), mats["chrome"], col, parent=root)
-    add_cylinder("CSTAND_RISER_03", 0.0115, 0.355, (0, 0, 1.535), mats["chrome"], col, parent=root)
+    add_cylinder("CSTAND_RISER_02", 0.0150, 0.590, (0, 0, 1.070), mats["chrome"], col, parent=root)
+    add_cylinder("CSTAND_RISER_03", 0.0125, 0.355, (0, 0, 1.535), mats["chrome"], col, parent=root)
     # Riser collars and T-handle knobs.
     for idx, z in enumerate((0.785, 1.365), start=1):
         add_cylinder(f"CSTAND_COLLAR_{idx}", 0.027, 0.046, (0, 0, z), mats["black_metal"], col, parent=root)
@@ -309,45 +387,120 @@ def build_d1(mats, sem, support_mount):
                     "AS_FIX_PROFOTO_D1_500", "VERIFIED_MODEL")
     root.location = (0, 0, 0)
     z = 1.835
-    reference = add_cube("D1_REFERENCE_ENVELOPE", (0.130, 0.300, 0.170), (0, 0, z), None, col, 0.0, root)
+    reference = add_cube("D1_REFERENCE_ENVELOPE", (0.130, 0.300, 0.170),
+                         (0, 0, z), None, col, 0.0, root)
     reference.display_type = "WIRE"
     reference.hide_render = True
     reference.hide_viewport = True
-    add_cylinder("D1_MAIN_SHELL", 0.057, 0.190, (0, -0.015, z), mats["black_plastic"], col, axis="Y", parent=root, bevel=0.0012)
-    add_cylinder("D1_REAR_RING", 0.065, 0.034, (0, -0.132, z), mats["black_metal"], col, axis="Y", parent=root, bevel=0.0010)
-    add_cylinder("D1_FRONT_RING", 0.065, 0.036, (0, 0.088, z), mats["black_metal"], col, axis="Y", parent=root, bevel=0.0010)
-    add_cylinder("D1_FRONT_NECK", 0.052, 0.026, (0, 0.119, z), mats["black_metal"], col, axis="Y", parent=root, bevel=0.0008)
-    add_cylinder("D1_FRONT_BAYONET", 0.048, 0.018, (0, 0.141, z), mats["aluminum"], col, axis="Y", parent=root, bevel=0.0006)
-    add_torus("D1_LOCK_RING", 0.050, 0.004, (0, 0.146, z), (math.radians(90), 0, 0), mats["black_metal"], col, root)
-    add_cylinder("D1_REAR_PANEL", 0.052, 0.010, (0, -0.145, z), mats["black_metal"], col, axis="Y", parent=root, bevel=0.0004)
-    add_cube("D1_DISPLAY", (0.050, 0.006, 0.024), (0, -0.151, z + 0.024), mats["label"], col, 0.0025, root)
-    add_cylinder("D1_REAR_DIAL", 0.017, 0.012, (0.027, -0.151, z - 0.021), mats["black_plastic"], col, axis="Y", parent=root)
-    for i, x in enumerate((-0.034, -0.018, -0.002, 0.014), start=1):
-        add_cube(f"D1_REAR_BUTTON_{i}", (0.009, 0.005, 0.007), (x, -0.151, z - 0.025), mats["black_plastic"], col, 0.0016, root)
-    for side_y in (-0.100, 0.072):
-        for idx in range(12):
-            a = math.tau * idx / 12.0
-            x = math.cos(a) * 0.058
-            zz = z + math.sin(a) * 0.058
-            slot = add_cube(f"D1_VENT_{'R' if side_y < 0 else 'F'}_{idx:02d}", (0.006, 0.014, 0.017), (x, side_y, zz), mats["black_metal"], col, 0.0010, root)
-            slot.rotation_euler.y = -a
-    rod_between("D1_BRACKET_LEFT", (-0.056, -0.020, z - 0.010), (-0.056, -0.020, z - 0.060), 0.0065, mats["black_metal"], col, root)
-    rod_between("D1_BRACKET_RIGHT", (0.056, -0.020, z - 0.010), (0.056, -0.020, z - 0.060), 0.0065, mats["black_metal"], col, root)
-    rod_between("D1_BRACKET_BOTTOM", (-0.056, -0.020, z - 0.060), (0.056, -0.020, z - 0.060), 0.0075, mats["black_metal"], col, root)
-    add_cylinder("D1_TILT_PIVOT_L", 0.021, 0.018, (-0.066, -0.020, z - 0.012), mats["black_metal"], col, axis="X", parent=root)
-    add_cylinder("D1_TILT_PIVOT_R", 0.021, 0.018, (0.066, -0.020, z - 0.012), mats["black_metal"], col, axis="X", parent=root)
-    add_cylinder("D1_TILT_KNOB", 0.018, 0.028, (0.086, -0.020, z - 0.012), mats["black_plastic"], col, axis="X", parent=root)
-    add_cylinder("D1_STAND_SOCKET", 0.015, 0.050, (0, -0.020, z - 0.060), mats["black_metal"], col, parent=root, bevel=0.0007)
-    rod_between("D1_HANDLE_LEFT", (-0.040, -0.075, z + 0.055), (-0.040, -0.105, z + 0.085), 0.006, mats["black_metal"], col, root)
-    rod_between("D1_HANDLE_RIGHT", (0.040, -0.075, z + 0.055), (0.040, -0.105, z + 0.085), 0.006, mats["black_metal"], col, root)
-    rod_between("D1_HANDLE_TOP", (-0.040, -0.105, z + 0.085), (0.040, -0.105, z + 0.085), 0.007, mats["black_metal"], col, root)
-    mount_fixture = add_empty("MOUNT_FIXTURE", sem, (0, -0.020, z - 0.085), 0.045)
+
+    # Main housing: stepped cylindrical Profoto D1 silhouette.
+    body = add_cylinder("D1_MAIN_SHELL", 0.055, 0.190, (0, -0.015, z),
+                      mats["black_plastic"], col, axis="Y", parent=root, bevel=0.0)
+    add_cylinder("D1_REAR_SHOULDER", 0.065, 0.042, (0, -0.129, z),
+                 mats["black_plastic"], col, axis="Y", parent=root, bevel=0.0012)
+    add_cylinder("D1_FRONT_SHOULDER", 0.065, 0.040, (0, 0.086, z),
+                 mats["black_plastic"], col, axis="Y", parent=root, bevel=0.0012)
+    add_cylinder("D1_FRONT_BARREL", 0.052, 0.036, (0, 0.124, z),
+                 mats["black_plastic"], col, axis="Y", parent=root, bevel=0.0009)
+    add_cylinder("D1_FRONT_BAYONET", 0.049, 0.016, (0, 0.142, z),
+                 mats["aluminum"], col, axis="Y", parent=root, bevel=0.0006)
+    add_torus("D1_LOCK_RING", 0.050, 0.0036, (0, 0.147, z),
+              (math.radians(90), 0, 0), mats["black_metal"], col, root)
+
+    # Optical assembly behind the flat-front cover.
+    add_cylinder("D1_GLASS_PLATE", 0.043, 0.0022, (0, 0.148, z),
+                 mats["glass"], col, axis="Y", parent=root, bevel=0.0002)
+    add_torus("D1_FLASHTUBE", 0.030, 0.0022, (0, 0.147, z),
+              (math.radians(90), 0, 0), mats["flash"], col, root)
+    add_sphere("D1_MODELING_LAMP", 0.013, (0, 0.1405, z),
+               (1.0, 0.72, 1.0), mats["lamp"], col, root)
+
+    # Five true recessed cooling slots on each side of the housing.
+    for side_name, x, liner_x in (("L", -0.0545, -0.0477), ("R", 0.0545, 0.0477)):
+        for idx, zz in enumerate((z + 0.026, z + 0.013, z, z - 0.013, z - 0.026), start=1):
+            cutter = add_cube(f"CUT_D1_VENT_{side_name}_{idx:02d}",
+                              (0.014, 0.054, 0.0065), (x, -0.035, zz),
+                              None, col, 0.0006, root)
+            apply_boolean_difference(body, cutter, f"VENT_{side_name}_{idx:02d}")
+            add_cube(f"D1_SIDE_VENT_{side_name}_{idx:02d}",
+                     (0.0010, 0.050, 0.0052), (liner_x, -0.035, zz),
+                     mats["black_metal"], col, 0.0004, root)
+    shell_bevel = body.modifiers.new("EDGE_BEVEL", "BEVEL")
+    shell_bevel.width = 0.0010
+    shell_bevel.segments = 3
+    shell_bevel.limit_method = "ANGLE"
+
+    # Molded ergonomic yoke/handle wraps around the lower rear housing.
+    add_arc_band("D1_YOKE_BAND", (0, -0.020, z), 0.080, 0.062, 0.032,
+                 130, 410, mats["black_plastic"], col, root, segments=72)
+    # Recessed circular rear control panel. The outer shoulder remains the deepest surface.
+    add_cylinder("D1_REAR_PANEL", 0.055, 0.006, (0, -0.145, z),
+                 mats["black_metal"], col, axis="Y", parent=root, bevel=0.0005)
+    add_cube("D1_REAR_DISPLAY", (0.040, 0.0015, 0.020),
+             (0, -0.1490, z + 0.035), mats["black_plastic"], col, 0.0018, root)
+    for idx, x in enumerate((-0.010, 0.000, 0.010), start=1):
+        add_cube(f"D1_DISPLAY_SEG_{idx}", (0.005, 0.0008, 0.011),
+                 (x, -0.14985, z + 0.035), mats["indicator"], col, 0.00025, root)
+    add_cylinder("D1_SETTING_KNOB", 0.0155, 0.0020, (0, -0.1490, z - 0.002),
+                 mats["black_plastic"], col, axis="Y", parent=root, bevel=0.0005)
+
+    button_positions = [
+        (-0.032, z + 0.013), (0.032, z + 0.013),
+        (-0.032, z - 0.007), (0.032, z - 0.007),
+        (-0.032, z - 0.027), (0.032, z - 0.027),
+    ]
+    for idx, (x, zz) in enumerate(button_positions, start=1):
+        add_cube(f"D1_REAR_BUTTON_{idx}", (0.022, 0.0014, 0.012),
+                 (x, -0.1490, zz), mats["black_plastic"], col, 0.0015, root)
+    add_cylinder("D1_READY_INDICATOR", 0.0032, 0.0012,
+                 (-0.043, -0.1494, z + 0.015), mats["indicator"], col,
+                 axis="Y", parent=root, bevel=0.00015)
+    # Side pivots, stand adapter and locking hardware.
+    add_cylinder("D1_TILT_PIVOT_L", 0.021, 0.018,
+                 (-0.071, -0.020, z - 0.018), mats["black_metal"], col,
+                 axis="X", parent=root)
+    add_cylinder("D1_TILT_PIVOT_R", 0.021, 0.018,
+                 (0.071, -0.020, z - 0.018), mats["black_metal"], col,
+                 axis="X", parent=root)
+    add_cylinder("D1_TILT_KNOB", 0.022, 0.032,
+                 (0.092, -0.020, z - 0.018), mats["black_plastic"], col,
+                 axis="X", parent=root)
+    add_cylinder("D1_STAND_SOCKET", 0.016, 0.050,
+                 (0, 0.0, z - 0.060), mats["black_metal"], col,
+                 parent=root, bevel=0.0008)
+    add_cylinder("D1_STAND_LOCK_KNOB", 0.011, 0.026,
+                 (0.027, 0.0, z - 0.070), mats["black_plastic"], col,
+                 axis="X", parent=root)
+
+    # Mains/sync interfaces are kept near the lower stand-adapter area.
+    add_cube("D1_AC_CONNECTOR", (0.022, 0.016, 0.014),
+             (-0.030, -0.010, z - 0.065), mats["black_plastic"], col, 0.0020, root)
+    add_cylinder("D1_FUSE_HOLDER", 0.0065, 0.008,
+                 (-0.054, -0.010, z - 0.060), mats["black_plastic"], col,
+                 axis="X", parent=root, bevel=0.00025)
+    add_cylinder("D1_SYNC_PORT", 0.0060, 0.008,
+                 (0.054, -0.010, z - 0.060), mats["black_plastic"], col,
+                 axis="X", parent=root, bevel=0.00025)
+    add_cylinder("D1_UMBRELLA_TUBE", 0.005, 0.100,
+                 (0.034, 0.018, z - 0.055), mats["aluminum"], col,
+                 axis="Y", parent=root, bevel=0.00035)
+    add_torus("D1_UMBRELLA_TUBE_RIM", 0.0062, 0.0012,
+              (0.034, 0.068, z - 0.055), (math.radians(90), 0, 0),
+              mats["black_metal"], col, root)
+
+    # Physical scale marks for Profoto's reflector zoom position.
+    for idx, yy in enumerate((0.102, 0.111, 0.120, 0.129, 0.138), start=1):
+        add_cube(f"D1_ZOOM_TICK_{idx:02d}", (0.0022, 0.0045, 0.011),
+                 (-0.052, yy, z + 0.022), mats["label"], col, 0.00035, root)
+
+    mount_fixture = add_empty("MOUNT_FIXTURE", sem, (0, 0.0, z - 0.085), 0.045)
     mount_fixture.parent = root
-    mount_modifier = add_empty("MOUNT_MODIFIER", sem, (0, 0.146, z), 0.045)
+    mount_modifier = add_empty("MOUNT_MODIFIER", sem, (0, 0.150, z), 0.045)
     mount_modifier.parent = root
-    emitter = add_empty("EMITTER_ORIGIN", sem, (0, 0.154, z), 0.035)
+    emitter = add_empty("EMITTER_ORIGIN", sem, (0, 0.149, z), 0.035)
     emitter.parent = root
-    target = add_empty("LIGHT_TARGET", sem, (0, 2.5, 1.55), 0.08)
+    add_empty("LIGHT_TARGET", sem, (0, 2.5, 1.55), 0.08).parent = root
+
     light_data = bpy.data.lights.new("LIGHT_D1_NATIVE", type="AREA")
     light_data.shape = "DISK"
     light_data.size = 0.085
@@ -425,16 +578,52 @@ def build_sandbag(mats):
     col = collection("AS_ACC_SANDBAG_01")
     root = tag_root(add_empty("ROOT_ACC_SANDBAG", col),
                     "AS_ACC_SANDBAG_01", "REPRESENTATIVE_STANDARD")
-    left = add_cube("SANDBAG_POUCH_1", (0.150, 0.235, 0.072), (0.175, 0.0, 0.060), mats["fabric"], col, 0.032, root)
-    right = add_cube("SANDBAG_POUCH_2", (0.150, 0.235, 0.072), (0.325, 0.0, 0.060), mats["fabric"], col, 0.032, root)
-    left.rotation_euler.z = math.radians(2.5)
-    right.rotation_euler.z = math.radians(-2.5)
-    add_cube("SANDBAG_CENTER_STRAP", (0.060, 0.250, 0.025), (0.250, 0.0, 0.087), mats["black_metal"], col, 0.009, root)
-    add_cube("SANDBAG_SEAM_LEFT", (0.006, 0.220, 0.008), (0.248, 0.0, 0.098), mats["fabric"], col, 0.002, root)
-    add_cube("SANDBAG_SEAM_RIGHT", (0.006, 0.220, 0.008), (0.252, 0.0, 0.098), mats["fabric"], col, 0.002, root)
-    rod_between("SANDBAG_HANDLE_A", (0.225, -0.115, 0.100), (0.225, -0.165, 0.150), 0.006, mats["fabric"], col, root)
-    rod_between("SANDBAG_HANDLE_B", (0.275, -0.115, 0.100), (0.275, -0.165, 0.150), 0.006, mats["fabric"], col, root)
-    rod_between("SANDBAG_HANDLE_TOP", (0.225, -0.165, 0.150), (0.275, -0.165, 0.150), 0.006, mats["fabric"], col, root)
+    ref = add_cube("SANDBAG_REFERENCE_ENVELOPE", (0.360, 0.250, 0.070),
+                   (0.250, 0.0, 0.035), None, col, 0.0, root)
+    ref.display_type = "WIRE"
+    ref.hide_render = True
+    ref.hide_viewport = True
+
+    for idx, (x, angle) in enumerate(((0.160, 1.8), (0.340, -1.8)), start=1):
+        pouch = add_cube(f"SANDBAG_POUCH_{idx}", (0.180, 0.245, 0.064),
+                         (x, 0.0, 0.052), mats["fabric"], col, 0.024, root)
+        pouch.rotation_euler.z = math.radians(angle)
+        bevel = pouch.modifiers.get("EDGE_BEVEL")
+        bevel.name = "SOFT_BEVEL"
+        bevel.segments = 8
+        bevel.width = 0.024
+        subdiv = pouch.modifiers.new("SOFT_SUBDIV", "SUBSURF")
+        subdiv.subdivision_type = "CATMULL_CLARK"
+        subdiv.levels = 2
+        subdiv.render_levels = 2
+        tex = bpy.data.textures.new(f"TEX_SANDBAG_SAG_{idx}", type="CLOUDS")
+        tex.noise_scale = 0.045
+        disp = pouch.modifiers.new("MICRO_SAG", "DISPLACE")
+        disp.texture = tex
+        disp.strength = 0.0022
+        disp.mid_level = 0.5
+        for poly in pouch.data.polygons:
+            poly.use_smooth = True
+        # Raised stitched seam guides on the top perimeter.
+        for sy in (-0.116, 0.116):
+            add_cube(f"SANDBAG_SEAM_{idx}_Y_{'A' if sy < 0 else 'B'}",
+                     (0.150, 0.004, 0.003), (x, sy, 0.083),
+                     mats["fabric"], col, 0.0012, root)
+        for sx in (x - 0.083, x + 0.083):
+            add_cube(f"SANDBAG_SEAM_{idx}_X_{'A' if sx < x else 'B'}",
+                     (0.004, 0.210, 0.003), (sx, 0.0, 0.083),
+                     mats["fabric"], col, 0.0012, root)
+
+    add_cube("SANDBAG_CENTER_STRAP", (0.058, 0.252, 0.020),
+             (0.250, 0.0, 0.088), mats["webbing"], col, 0.008, root)
+    add_cube("SANDBAG_LABEL_PATCH", (0.044, 0.070, 0.004),
+             (0.250, 0.020, 0.101), mats["label"], col, 0.002, root)
+    rod_between("SANDBAG_HANDLE_A", (0.225, -0.118, 0.092),
+                (0.225, -0.170, 0.145), 0.006, mats["webbing"], col, root)
+    rod_between("SANDBAG_HANDLE_B", (0.275, -0.118, 0.092),
+                (0.275, -0.170, 0.145), 0.006, mats["webbing"], col, root)
+    rod_between("SANDBAG_HANDLE_TOP", (0.225, -0.170, 0.145),
+                (0.275, -0.170, 0.145), 0.006, mats["webbing"], col, root)
     return root
 
 
@@ -473,6 +662,10 @@ def build_preview_rig():
         "three_quarter": add_camera("CAM_THREE_QUARTER", (3.4, 3.5, 2.35), target, 58, col),
         "side": add_camera("CAM_SIDE", (4.3, 0.15, 1.48), target, 62, col),
         "rear": add_camera("CAM_REAR", (0.0, -4.2, 1.50), target, 62, col),
+        "fixture_detail": add_camera("CAM_FIXTURE_DETAIL", (1.05, 0.80, 2.08), (0.0, 0.02, 1.84), 85, col),
+        "fixture_rear_detail": add_camera("CAM_FIXTURE_REAR_DETAIL", (0.35, -0.82, 1.93), (0.0, -0.11, 1.835), 95, col),
+        "magnum_profile_detail": add_camera("CAM_MAGNUM_PROFILE_DETAIL", (0.95, 0.28, 1.90), (0.0, 0.29, 1.835), 90, col),
+        "base_detail": add_camera("CAM_BASE_DETAIL", (1.45, 1.30, 0.72), (0.0, 0.0, 0.10), 70, col),
     }
     return cameras
 

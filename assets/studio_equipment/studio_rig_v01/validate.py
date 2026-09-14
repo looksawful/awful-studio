@@ -50,12 +50,26 @@ def main():
         "LIGHT_D1_NATIVE",
         "D1_REFERENCE_ENVELOPE",
         "MAGNUM_REFERENCE_ENVELOPE",
+        "D1_GLASS_PLATE",
+        "D1_FLASHTUBE",
+        "D1_MODELING_LAMP",
+        "D1_SYNC_PORT",
+        "D1_AC_CONNECTOR",
+        "D1_FUSE_HOLDER",
+        "D1_UMBRELLA_TUBE",
+        "D1_ZOOM_TICK_01",
+        "D1_YOKE_BAND",
+        "D1_SIDE_VENT_L_01",
+        "D1_SIDE_VENT_R_01",
+        "D1_REAR_DISPLAY",
     }
     missing = sorted(required - set(bpy.data.objects.keys()))
     check(not missing, "required_objects", {"missing": missing}, results)
 
     d1 = dims_mm("D1_REFERENCE_ENVELOPE")
     check(close(d1, [130, 300, 170]), "d1_envelope_mm", {"actual": d1}, results)
+    d1_visible = collection_bounds_mm("AS_FIX_PROFOTO_D1_500")
+    check(d1_visible[1] <= 301.0, "d1_visible_depth_mm", {"actual": d1_visible[1]}, results)
     magnum = dims_mm("MAGNUM_REFERENCE_ENVELOPE")
     check(
         close(sorted(magnum), [265, 345, 345], tol=1.0),
@@ -72,6 +86,20 @@ def main():
     )
     mount_z = round(bpy.data.objects["MOUNT_SUPPORT"].matrix_world.translation.z * 1000, 3)
     check(abs(mount_z - 1750.0) <= 10.0, "support_mount_height_mm", {"actual": mount_z}, results)
+    support_bounds = collection_bounds_mm("AS_SUPPORT_CSTAND_01")
+    check(max(support_bounds[0], support_bounds[1]) <= 950.0,
+          "support_footprint_mm", {"actual": support_bounds[:2]}, results)
+    riser_diameters = [dims_mm(name)[0] for name in
+                       ("CSTAND_RISER_01", "CSTAND_RISER_02", "CSTAND_RISER_03")]
+    check(close(riser_diameters, [35.0, 30.0, 25.0], tol=0.2),
+          "support_tube_diameters_mm", {"actual": riser_diameters}, results)
+    leg_diameter = dims_mm("CSTAND_LEG_1")[0]
+    check(abs(leg_diameter - 25.0) <= 0.2,
+          "support_leg_diameter_mm", {"actual": leg_diameter}, results)
+    pouch_mods = {name: {m.name for m in bpy.data.objects[name].modifiers}
+                  for name in ("SANDBAG_POUCH_1", "SANDBAG_POUCH_2")}
+    check(all({"SOFT_BEVEL", "SOFT_SUBDIV", "MICRO_SAG"} <= mods for mods in pouch_mods.values()),
+          "sandbag_soft_surface_modifiers", {k: sorted(v) for k, v in pouch_mods.items()}, results)
     scene = bpy.context.scene
     check(scene.unit_settings.system == "METRIC", "metric_units", {"system": scene.unit_settings.system}, results)
 

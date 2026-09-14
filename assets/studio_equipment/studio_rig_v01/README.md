@@ -1,4 +1,4 @@
-﻿# AWFUL STUDIO — Studio Rig v01
+# AWFUL STUDIO — Studio Rig v01
 
 Issue: #59  
 Target: Blender 5.2.1 LTS  
@@ -37,7 +37,7 @@ Asset root: `AS_RIG_STUDIO_V01`
 
 ## Reproduction
 
-Run `generate.py` using the pinned Blender 5.2.1 runtime. It writes the generated `.blend` and four deterministic preview renders. Then open that `.blend` headlessly and execute `validate.py`.
+Run `generate.py` using the pinned Blender 5.2.1 runtime. It writes the generated `.blend` and eight deterministic diagnostic renders. Then open that `.blend` headlessly and execute `validate.py`.
 
 Current visual gate is intentionally **not final**. This slice has passed dimensional/runtime validation, but hero-detail, UV/bake, decals, surface wear and AWFUL STUDIO runtime catalog integration remain later stages.
 
@@ -53,3 +53,20 @@ These are deterministic Blender 5.2.1 diagnostic renders of the current candidat
 | Side | Rear |
 |---|---|
 | ![Side](previews/studio_rig_v01_side.png) | ![Rear](previews/studio_rig_v01_rear.png) |
+
+## Macro QA gallery
+
+| D1 / fixture | D1 rear controls |
+|---|---|
+| ![Fixture detail](previews/studio_rig_v01_fixture_detail.png) | ![Fixture rear detail](previews/studio_rig_v01_fixture_rear_detail.png) |
+
+| Magnum profile | C-Stand base + sandbag |
+|---|---|
+| ![Magnum profile](previews/studio_rig_v01_magnum_profile_detail.png) | ![Base detail](previews/studio_rig_v01_base_detail.png) |
+
+## Reference contract
+
+- Profoto D1 500 Air: official Profoto user guide and discontinued product page.
+- Profoto Magnum Reflector 100624: official Profoto product page and product sheet.
+- C-Stand geometry reference: Avenger A2025F official Manfrotto / Avenger specification.
+- Sandbag: representative professional studio pattern; no historical Sensetique SKU is claimed.
