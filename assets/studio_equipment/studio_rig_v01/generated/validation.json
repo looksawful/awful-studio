@@ -1,0 +1,82 @@
+{
+  "asset_id": "AS_RIG_STUDIO_V01",
+  "blender_version": "5.2.1 LTS",
+  "object_count": 113,
+  "mesh_count": 93,
+  "material_count": 8,
+  "visible_bounds_mm": {
+    "d1": [
+      175.0,
+      307.0,
+      177.0
+    ],
+    "magnum": [
+      347.0,
+      292.5,
+      347.0
+    ]
+  },
+  "checks": [
+    {
+      "check": "required_objects",
+      "pass": true,
+      "details": {
+        "missing": []
+      }
+    },
+    {
+      "check": "d1_envelope_mm",
+      "pass": true,
+      "details": {
+        "actual": [
+          130.0,
+          300.0,
+          170.0
+        ]
+      }
+    },
+    {
+      "check": "magnum_envelope_mm",
+      "pass": true,
+      "details": {
+        "actual": [
+          345.661,
+          265.04,
+          345.661
+        ],
+        "sorted": [
+          265.04,
+          345.661,
+          345.661
+        ]
+      }
+    },
+    {
+      "check": "support_mount_height_mm",
+      "pass": true,
+      "details": {
+        "actual": 1750.0
+      }
+    },
+    {
+      "check": "metric_units",
+      "pass": true,
+      "details": {
+        "system": "METRIC"
+      }
+    },
+    {
+      "check": "no_absolute_image_paths",
+      "pass": true,
+      "details": []
+    },
+    {
+      "check": "rig_metadata",
+      "pass": true,
+      "details": {
+        "asset_id": "AS_RIG_STUDIO_V01"
+      }
+    }
+  ],
+  "pass": true
+}

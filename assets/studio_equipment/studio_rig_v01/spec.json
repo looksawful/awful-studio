@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "asset_id": "AS_RIG_STUDIO_V01",
+  "blender_target": "5.2.1",
+  "unit_scale": "meters",
+  "support": {
+    "asset_id": "AS_SUPPORT_CSTAND_01",
+    "identity_class": "REPRESENTATIVE_STANDARD",
+    "reference_family": "Avenger-style C-Stand",
+    "nominal_height_mm": 1750,
+    "baby_pin_mm": 16
+  },
+  "d1_500_air": {
+    "asset_id": "AS_FIX_PROFOTO_D1_500",
+    "manufacturer": "Profoto",
+    "model": "D1 500 Air",
+    "envelope_mm": [300, 130, 170],
+    "identity_class": "VERIFIED_MODEL"
+  },
+  "magnum_100624": {
+    "asset_id": "AS_MOD_PROFOTO_MAGNUM",
+    "manufacturer": "Profoto",
+    "model": "Magnum Reflector 100624",
+    "diameter_mm": 345,
+    "depth_mm": 265,
+    "identity_class": "VERIFIED_MODEL"
+  },
+  "sandbag": {
+    "asset_id": "AS_ACC_SANDBAG_01",
+    "identity_class": "REPRESENTATIVE_STANDARD",
+    "nominal_size_mm": [360, 250, 70]
+  },
+  "semantic_mounts": [
+    "FLOOR_CONTACT",
+    "MOUNT_SUPPORT",
+    "MOUNT_FIXTURE",
+    "MOUNT_MODIFIER",
+    "EMITTER_ORIGIN",
+    "LIGHT_TARGET"
+  ],
+  "preview": {
+    "resolution": [1024, 1024],
+    "transparent": true,
+    "views": ["front", "three_quarter", "side", "rear"]
+  },
+  "tolerances_mm": {
+    "verified_envelope": 1.0,
+    "representative_support": 10.0
+  }
+}
