@@ -177,10 +177,12 @@ def mockup_keys() -> tuple[str, ...]:
 
 
 def mockup_spec(key: str) -> dict:
-    try:
+    if key in MOCKUP_SPECS:
         return deepcopy(MOCKUP_SPECS[key])
-    except KeyError as exc:
-        raise ValueError(f'Unknown AWFUL mockup: {key}') from exc
+    if key.startswith('DEVICE_'):
+        from . import device_asset_loader
+        return device_asset_loader.device_asset_spec(key)
+    raise ValueError(f'Unknown AWFUL mockup: {key}')
 
 
 def material_spec(key: str) -> dict:
@@ -192,9 +194,13 @@ def material_spec(key: str) -> dict:
 
 def mockup_key(root) -> str:
     key = str(root.get('awful_mockup_key', ''))
-    if key not in MOCKUP_SPECS:
-        raise ValueError('Object is not an AWFUL procedural mockup root')
-    return key
+    if key in MOCKUP_SPECS:
+        return key
+    if key.startswith('DEVICE_'):
+        from . import device_asset_loader
+        device_asset_loader.device_asset_spec(key)
+        return key
+    raise ValueError('Object is not an AWFUL mockup root')
 
 
 def mockup_roots(legacy, scene) -> list:
@@ -371,6 +377,9 @@ def _build_device(legacy, scene, collection, root, spec, materials, label):
 
 
 def create_mockup(legacy, scene, key):
+    if key.startswith('DEVICE_'):
+        from . import device_asset_loader
+        return device_asset_loader.create_device_asset(legacy, scene, key)
     spec = mockup_spec(key)
     collection = legacy.REG.collection('COL_PRODUCT')
     if collection is None:
@@ -436,6 +445,8 @@ def _purge_orphan_mockup_data(legacy, scene):
                 and str(material.get(legacy.ROLE_KEY, '')).startswith('MOCKUP_MAT_')
                 and material.users == 0):
             bpy.data.materials.remove(material)
+    from . import device_asset_loader
+    device_asset_loader.purge_orphan_device_collections(legacy, scene)
 
 
 def _remove_owned_mockups(legacy, scene):
@@ -468,6 +479,10 @@ def install(legacy):
     items = [('NONE', 'None', 'Keep the diagnostic fixture or mounted user product')]
     items.extend((key, MOCKUP_SPECS[key]['label'], f'Generate AWFUL {MOCKUP_SPECS[key]["label"]} mockup')
                  for key in mockup_keys())
+    from . import device_asset_loader
+    items.extend((key, device_asset_loader.device_asset_spec(key)['label'],
+                  f'Add bundled {device_asset_loader.device_asset_spec(key)["label"]} asset')
+                 for key in device_asset_loader.device_asset_keys())
     annotations = legacy.AWFUL_StudioSettings.__annotations__
     annotations['product_mockup'] = legacy.EnumProperty(
         name='Mockup', items=items, default='NONE')
@@ -479,11 +494,11 @@ def install(legacy):
         layout = self.layout
         settings = context.scene.awful_studio
         box = layout.box()
-        box.label(text='Procedural Mockup')
-        box.prop(settings, 'product_mockup', text='Mockup')
+        box.label(text='Product Asset')
+        box.prop(settings, 'product_mockup', text='Asset')
         row = box.row()
         row.enabled = settings.product_mockup != 'NONE'
-        row.operator('awful.generate_mockup', text='Generate / Replace AWFUL Mockup')
+        row.operator('awful.generate_mockup', text='Generate / Replace Product')
 
     legacy.AWFUL_PT_Product.draw = draw_product
 
