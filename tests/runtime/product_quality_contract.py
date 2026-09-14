@@ -95,6 +95,10 @@ def main():
 
         check('product-quality Blender adapter exists',
               callable(getattr(product_quality, 'replace_mockup', None)))
+        check('device screen path property registered',
+              hasattr(scene.awful_studio, 'device_screen_path'))
+        check('device hinge preset property registered',
+              hasattr(scene.awful_studio, 'device_hinge_preset'))
 
         for key in product_quality.mockup_keys():
             spec = product_quality.mockup_spec(key)
@@ -134,6 +138,13 @@ def main():
                   [int(modifier.segments) for modifier in bevels])
 
         device_asset_loader = importlib.import_module(MODULE + '.device_asset_loader')
+        screen_path = args.work / 'device_screen_test.png'
+        generated_screen = bpy.data.images.new('AWFUL_RUNTIME_SCREEN_ART', width=2, height=2)
+        generated_screen.generated_color = (0.9, 0.1, 0.2, 1.0)
+        generated_screen.filepath_raw = str(screen_path)
+        generated_screen.file_format = 'PNG'
+        generated_screen.save()
+        bpy.data.images.remove(generated_screen)
         scene.awful_studio.auto_fit = True
         for key in device_asset_loader.device_asset_keys():
             spec = device_asset_loader.device_asset_spec(key)
@@ -153,12 +164,51 @@ def main():
             check(f'{key} excludes preview cameras', all(obj.type != 'CAMERA' for obj in hierarchy))
             check(f'{key} excludes preview lights', all(obj.type != 'LIGHT' for obj in hierarchy))
             check(f'{key} has screen content', any(obj.name.startswith('SCREEN_CONTENT') for obj in hierarchy))
+            screen = device_asset_loader.apply_screen_image(legacy, scene, screen_path)
+            check(f'{key} screen object selected', screen.name.startswith('SCREEN_CONTENT'), screen.name)
+            screen_material = next((m for m in screen.data.materials if m is not None), None)
+            check(f'{key} screen material exists', screen_material is not None)
+            image_node = screen_material.node_tree.nodes.get('AWFUL_SCREEN_IMAGE')
+            check(f'{key} screen image node exists', image_node is not None)
+            check(f'{key} screen image is packed',
+                  image_node is not None and image_node.image is not None and image_node.image.packed_file is not None)
+            check(f'{key} screen artwork metadata',
+                  root.get('awful_screen_artwork_name') == screen_path.name,
+                  root.get('awful_screen_artwork_name'))
+            scene.awful_studio.device_screen_path = str(screen_path)
+            screen_op = bpy.ops.awful.apply_device_screen()
+            check(f'{key} Apply Screen operator finishes', screen_op == {'FINISHED'}, list(screen_op))
+            managed_screen_images = [img for img in bpy.data.images
+                                     if ownership.owned(img, scene)
+                                     and str(img.get(legacy.ROLE_KEY, '')).startswith('MOCKUP_DEVICE_SCREEN_IMAGE_')]
+            check(f'{key} repeated screen apply keeps one managed image',
+                  len(managed_screen_images) == 1,
+                  [img.name for img in managed_screen_images])
             metrics = legacy.get_product_metrics(scene)
             check(f'{key} Auto Fit metrics are positive',
                   min(metrics.width, metrics.depth, metrics.height, metrics.scale) > 0.0)
             if key == 'DEVICE_MACBOOK_PRO_14':
                 check('MacBook bundled hinge control exists',
                       any(obj.name.startswith('CTRL_HINGE') for obj in hierarchy))
+                for preset in device_asset_loader.hinge_preset_keys(key):
+                    hinge = device_asset_loader.apply_hinge_preset(legacy, scene, preset)
+                    angle = device_asset_loader.hinge_angle_degrees(key, preset)
+                    expected_rotation = math.radians(90.0 - angle)
+                    check(f'MacBook hinge preset {preset} rotation',
+                          abs(float(hinge.rotation_euler.x) - expected_rotation) < 1e-6,
+                          float(hinge.rotation_euler.x))
+                    check(f'MacBook hinge preset {preset} metadata angle',
+                          abs(float(hinge.get('open_angle_deg', -999.0)) - angle) < 1e-6,
+                          hinge.get('open_angle_deg'))
+                    check(f'MacBook hinge preset {preset} metadata name',
+                          str(hinge.get('preset', '')) == preset,
+                          hinge.get('preset'))
+                scene.awful_studio.device_hinge_preset = '60'
+                hinge_op = bpy.ops.awful.apply_device_hinge()
+                check('MacBook Set Hinge operator finishes', hinge_op == {'FINISHED'}, list(hinge_op))
+                hinge_after_op = next(obj for obj in hierarchy if obj.name.startswith('CTRL_HINGE'))
+                check('MacBook Set Hinge operator applies selected preset',
+                      abs(float(hinge_after_op.get('open_angle_deg', -999.0)) - 60.0) < 1e-6)
         scene.awful_studio.product_mockup = 'DEVICE_MACBOOK_PRO_14'
         rebuild = bpy.ops.awful.rebuild_studio()
         check('device rebuild finishes', rebuild == {'FINISHED'}, list(rebuild))
@@ -168,12 +218,30 @@ def main():
         restored_hierarchy = [restored[0]] + legacy.descendants(restored[0])
         check('device rebuild restores hinge control',
               any(obj.name.startswith('CTRL_HINGE') for obj in restored_hierarchy))
+        rebuilt_screen = next(obj for obj in restored_hierarchy if obj.name.startswith('SCREEN_CONTENT'))
+        rebuilt_screen_material = next((m for m in rebuilt_screen.data.materials if m is not None), None)
+        rebuilt_image_node = (rebuilt_screen_material.node_tree.nodes.get('AWFUL_SCREEN_IMAGE')
+                              if rebuilt_screen_material is not None else None)
+        check('device rebuild preserves selected screen artwork',
+              restored[0].get('awful_screen_artwork_name') == screen_path.name
+              and rebuilt_image_node is not None
+              and rebuilt_image_node.image is not None
+              and rebuilt_image_node.image.packed_file is not None)
+        rebuilt_hinge = next(obj for obj in restored_hierarchy if obj.name.startswith('CTRL_HINGE'))
+        check('device rebuild preserves selected hinge preset',
+              str(rebuilt_hinge.get('preset', '')) == '60'
+              and abs(float(rebuilt_hinge.get('open_angle_deg', -999.0)) - 60.0) < 1e-6)
         scene.awful_studio.auto_fit = False
         scene.awful_studio.product_mockup = 'BOTTLE'
         with ownership.for_scene(scene):
             product_quality.replace_mockup(legacy, scene, 'BOTTLE')
         stale = [c.name for c in bpy.data.collections if c.name.startswith('AWFUL_DEVICE_')]
         check('device replacement purges orphan bundled collections', not stale, stale)
+        stale_screen_images = [img.name for img in bpy.data.images
+                               if ownership.owned(img, scene)
+                               and str(img.get(legacy.ROLE_KEY, '')).startswith('MOCKUP_DEVICE_SCREEN_IMAGE_')]
+        check('device replacement purges orphan screen images',
+              not stale_screen_images, stale_screen_images)
 
         # Explicit UI generation must never displace a measurable unmanaged product.
         check('mockup selector scene state exists', hasattr(scene.awful_studio, 'product_mockup'))

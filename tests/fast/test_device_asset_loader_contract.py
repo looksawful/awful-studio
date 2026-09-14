@@ -57,6 +57,23 @@ class DeviceAssetLoaderContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             loader.device_asset_spec('DEVICE_IMAGINARY')
 
+    def test_all_devices_declare_replaceable_screen_contract(self):
+        loader = load_module()
+        for key in EXPECTED_KEYS:
+            item = loader.device_asset_spec(key)
+            self.assertEqual(item['screen_object'], 'SCREEN_CONTENT')
+            self.assertEqual(item['screen_material'], 'MAT_SCREEN_CONTENT')
+
+    def test_macbook_hinge_presets_match_asset_contract(self):
+        loader = load_module()
+        self.assertEqual(loader.hinge_preset_keys('DEVICE_MACBOOK_PRO_14'),
+                         ('CLOSED', '30', '60', '90', '102'))
+        expected = {'CLOSED': 0.0, '30': 30.0, '60': 60.0, '90': 90.0, '102': 102.0}
+        for preset, angle in expected.items():
+            self.assertEqual(loader.hinge_angle_degrees('DEVICE_MACBOOK_PRO_14', preset), angle)
+        with self.assertRaises(ValueError):
+            loader.hinge_preset_keys('DEVICE_IPHONE_17')
+
     def test_product_ui_registers_device_catalog(self):
         source = PRODUCT_PATH.read_text(encoding='utf-8')
         self.assertIn('device_asset_loader', source)

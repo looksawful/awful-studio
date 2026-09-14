@@ -3,7 +3,7 @@
 import time
 import bpy
 from bpy.props import BoolProperty, StringProperty, IntProperty, PointerProperty, EnumProperty
-from . import ownership, migrations, asset_cache, asset_workflow, post_pipeline, photography, camera_policy, studio_geometry, natural_light, runtime_performance, playback_policy, product_placement, product_quality
+from . import ownership, migrations, asset_cache, asset_workflow, post_pipeline, photography, camera_policy, studio_geometry, natural_light, runtime_performance, playback_policy, product_placement, product_quality, device_asset_loader
 from .core import legacy
 
 # Policy installation mutates only in-memory preset metadata/callables. It must run
@@ -239,9 +239,56 @@ class AWFUL_OT_GenerateMockup(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class AWFUL_OT_ApplyDeviceScreen(bpy.types.Operator):
+    bl_idname = 'awful.apply_device_screen'
+    bl_label = 'Apply Device Screen'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        if context.scene is None or legacy.REG.object('CYC') is None:
+            return False
+        settings = context.scene.awful_studio
+        return (device_asset_loader.is_device_asset_key(settings.product_mockup)
+                and bool(settings.device_screen_path))
+
+    def execute(self, context):
+        try:
+            path = bpy.path.abspath(context.scene.awful_studio.device_screen_path)
+            screen = device_asset_loader.apply_screen_image(legacy, context.scene, path)
+            self.report({'INFO'}, f'Screen updated: {screen.name}')
+        except Exception as exc:
+            self.report({'ERROR'}, str(exc))
+            return {'CANCELLED'}
+        return {'FINISHED'}
+
+
+class AWFUL_OT_ApplyDeviceHinge(bpy.types.Operator):
+    bl_idname = 'awful.apply_device_hinge'
+    bl_label = 'Set Device Hinge'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return (context.scene is not None
+                and legacy.REG.object('CYC') is not None
+                and context.scene.awful_studio.product_mockup == 'DEVICE_MACBOOK_PRO_14')
+
+    def execute(self, context):
+        try:
+            preset = context.scene.awful_studio.device_hinge_preset
+            hinge = device_asset_loader.apply_hinge_preset(legacy, context.scene, preset)
+            self.report({'INFO'}, f'Hinge {preset}: {hinge.name}')
+        except Exception as exc:
+            self.report({'ERROR'}, str(exc))
+            return {'CANCELLED'}
+        return {'FINISHED'}
+
+
 CLASSES = (AWFUL_AddonPreferences, AWFUL_SceneState, *legacy.CLASSES,
            AWFUL_OT_Build, AWFUL_OT_Rebuild, AWFUL_OT_Remove, AWFUL_OT_ResetSystem,
-           AWFUL_OT_Migrate, AWFUL_OT_ClearCache, AWFUL_OT_GenerateMockup)
+           AWFUL_OT_Migrate, AWFUL_OT_ClearCache, AWFUL_OT_GenerateMockup,
+           AWFUL_OT_ApplyDeviceScreen, AWFUL_OT_ApplyDeviceHinge)
 
 
 def register():
