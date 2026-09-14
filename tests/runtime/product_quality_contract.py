@@ -138,6 +138,8 @@ def main():
                   [int(modifier.segments) for modifier in bevels])
 
         device_asset_loader = importlib.import_module(MODULE + '.device_asset_loader')
+        check('device LOD property registered', hasattr(scene.awful_studio, 'device_lod'))
+        scene.awful_studio.device_lod = 'LOW'
         screen_path = args.work / 'device_screen_test.png'
         generated_screen = bpy.data.images.new('AWFUL_RUNTIME_SCREEN_ART', width=2, height=2)
         generated_screen.generated_color = (0.9, 0.1, 0.2, 1.0)
@@ -155,8 +157,12 @@ def main():
             check(f'{key} root role', root.get(legacy.ROLE_KEY) == 'MOCKUP_ROOT')
             check(f'{key} metadata key', product_quality.mockup_key(root) == key)
             check(f'{key} asset id', root.get('awful_asset_id') == spec['asset_id'])
+            lod_item = device_asset_loader.lod_spec(key, scene.awful_studio.device_lod)
             check(f'{key} stage is honest', root.get('awful_asset_stage') == spec['stage'])
-            check(f'{key} variant', root.get('awful_asset_variant') == spec['variant'])
+            check(f'{key} LOD metadata', root.get('awful_asset_lod') == scene.awful_studio.device_lod,
+                  root.get('awful_asset_lod'))
+            check(f'{key} variant', root.get('awful_asset_variant') == lod_item['variant'])
+            check(f'{key} LOD does not promote stage', root.get('awful_asset_stage') == spec['stage'])
             hierarchy = [root] + legacy.descendants(root)
             meshes = [obj for obj in hierarchy if obj.type == 'MESH']
             check(f'{key} has measurable meshes', bool(meshes) and legacy.world_bbox(meshes) is not None)

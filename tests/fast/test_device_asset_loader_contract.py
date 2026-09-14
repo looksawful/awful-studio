@@ -40,7 +40,8 @@ class DeviceAssetLoaderContractTests(unittest.TestCase):
             self.assertTrue(item['label'])
             self.assertEqual(len(tuple(item['dimensions_m'])), 3)
             self.assertGreater(min(item['dimensions_m']), 0.0)
-            self.assertTrue(item['source_revision'])
+            default_lod = item['default_lod']
+            self.assertTrue(item['lods'][default_lod]['source_revision'])
 
     def test_catalog_is_offline_and_bundled(self):
         loader = load_module()
@@ -74,11 +75,32 @@ class DeviceAssetLoaderContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             loader.hinge_preset_keys('DEVICE_IPHONE_17')
 
+    def test_lod_contract_is_manifest_driven(self):
+        loader = load_module()
+        for key in EXPECTED_KEYS:
+            item = loader.device_asset_spec(key)
+            self.assertEqual(item['default_lod'], 'LOW')
+            self.assertEqual(loader.lod_keys(key), ('LOW',))
+            self.assertEqual(loader.device_asset_path(key),
+                             loader.device_asset_path(key, 'LOW'))
+            self.assertIn('LOW', item['lods'])
+            self.assertTrue(item['lods']['LOW']['blend_path'])
+            self.assertTrue(item['lods']['LOW']['source_revision'])
+        with self.assertRaises(ValueError):
+            loader.device_asset_path('DEVICE_IPHONE_17', 'HIGH')
+
+    def test_lod_does_not_promote_asset_stage(self):
+        loader = load_module()
+        item = loader.device_asset_spec('DEVICE_IPHONE_17')
+        self.assertEqual(item['default_lod'], 'LOW')
+        self.assertEqual(item['stage'], 'LOW_DRAFT')
+
     def test_product_ui_registers_device_catalog(self):
         source = PRODUCT_PATH.read_text(encoding='utf-8')
         self.assertIn('device_asset_loader', source)
         self.assertIn('device_asset_loader.device_asset_keys()', source)
         self.assertIn('device_asset_loader.device_asset_spec(key)', source)
+        self.assertIn("annotations['device_lod']", source)
 
 
 class BinaryAssetAttributesTests(unittest.TestCase):

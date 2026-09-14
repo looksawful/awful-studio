@@ -12,12 +12,10 @@ DEVICE_ASSET_SPECS = {
         'label': 'iPhone 17 (LOW draft)',
         'asset_id': 'iphone_17',
         'stage': 'LOW_DRAFT',
-        'variant': 'low_v10',
         'dimensions_m': (0.0715, 0.00795, 0.1496),
-        'blend_path': 'assets/devices/iphone_17_low_v10.blend',
-        'entry_collection': 'AWFUL_DEVICE_IPHONE_17',
+        'default_lod': 'LOW',
+        'lods': {'LOW': {'variant': 'low_v10', 'blend_path': 'assets/devices/iphone_17_low_v10.blend', 'entry_collection': 'AWFUL_DEVICE_IPHONE_17', 'source_revision': 'a1003c674ed83182cee6bf70816168f2c6533947594553d9cba6d2a6bc75d586'}},
         'root_name': 'CTRL_IPHONE_17',
-        'source_revision': 'a1003c674ed83182cee6bf70816168f2c6533947594553d9cba6d2a6bc75d586',
         'screen_object': 'SCREEN_CONTENT',
         'screen_material': 'MAT_SCREEN_CONTENT',
     },
@@ -25,12 +23,10 @@ DEVICE_ASSET_SPECS = {
         'label': 'iPad Pro 11 M5',
         'asset_id': 'ipad_pro_11_m5',
         'stage': 'RELEASE_CANDIDATE',
-        'variant': 'low_v1_release',
         'dimensions_m': (0.1775, 0.0053, 0.2497),
-        'blend_path': 'assets/devices/ipad_pro_11_m5_low_v1_release.blend',
-        'entry_collection': 'AWFUL_DEVICE_IPAD_PRO_11',
+        'default_lod': 'LOW',
+        'lods': {'LOW': {'variant': 'low_v1_release', 'blend_path': 'assets/devices/ipad_pro_11_m5_low_v1_release.blend', 'entry_collection': 'AWFUL_DEVICE_IPAD_PRO_11', 'source_revision': '379f203ee49f97f11ecb13b7a1d4b31141330c18fff509b769543d4dd1b21900'}},
         'root_name': 'CTRL_IPAD_PRO_11',
-        'source_revision': '379f203ee49f97f11ecb13b7a1d4b31141330c18fff509b769543d4dd1b21900',
         'screen_object': 'SCREEN_CONTENT',
         'screen_material': 'MAT_SCREEN_CONTENT',
     },
@@ -38,12 +34,10 @@ DEVICE_ASSET_SPECS = {
         'label': 'iPad Pro 13 M5',
         'asset_id': 'ipad_pro_13_m5',
         'stage': 'RELEASE_CANDIDATE',
-        'variant': 'low_v1_release',
         'dimensions_m': (0.2155, 0.0051, 0.2816),
-        'blend_path': 'assets/devices/ipad_pro_13_m5_low_v1_release.blend',
-        'entry_collection': 'AWFUL_DEVICE_IPAD_PRO_13',
+        'default_lod': 'LOW',
+        'lods': {'LOW': {'variant': 'low_v1_release', 'blend_path': 'assets/devices/ipad_pro_13_m5_low_v1_release.blend', 'entry_collection': 'AWFUL_DEVICE_IPAD_PRO_13', 'source_revision': '3eca4df4deaf161ee2bedc8a4a5b9d0d43e2a5342dbd5deff994e385f07c7a74'}},
         'root_name': 'CTRL_IPAD_PRO_13',
-        'source_revision': '3eca4df4deaf161ee2bedc8a4a5b9d0d43e2a5342dbd5deff994e385f07c7a74',
         'screen_object': 'SCREEN_CONTENT',
         'screen_material': 'MAT_SCREEN_CONTENT',
     },
@@ -51,12 +45,10 @@ DEVICE_ASSET_SPECS = {
         'label': 'MacBook Pro 14 M5',
         'asset_id': 'macbook_pro_14_m5',
         'stage': 'RELEASE_CANDIDATE',
-        'variant': 'low_v1_release',
         'dimensions_m': (0.3126, 0.2212, 0.0155),
-        'blend_path': 'assets/devices/macbook_pro_14_m5_low_v1_release.blend',
-        'entry_collection': 'AWFUL_DEVICE_MACBOOK_PRO_14',
+        'default_lod': 'LOW',
+        'lods': {'LOW': {'variant': 'low_v1_release', 'blend_path': 'assets/devices/macbook_pro_14_m5_low_v1_release.blend', 'entry_collection': 'AWFUL_DEVICE_MACBOOK_PRO_14', 'source_revision': '6c5c67ae9aac7b0888ee226ffce3071052eb32b42d86ddff14c0c89e755c0530'}},
         'root_name': 'CTRL_MACBOOK_PRO_14',
-        'source_revision': '6c5c67ae9aac7b0888ee226ffce3071052eb32b42d86ddff14c0c89e755c0530',
         'screen_object': 'SCREEN_CONTENT',
         'screen_material': 'MAT_SCREEN_CONTENT',
         'controls': ('CTRL_HINGE',),
@@ -99,9 +91,22 @@ def hinge_angle_degrees(key: str, preset: str) -> float:
         raise ValueError(f'Unknown AWFUL hinge preset: {preset}') from exc
 
 
-def device_asset_path(key: str) -> Path:
+def lod_keys(key: str) -> tuple[str, ...]:
+    return tuple(device_asset_spec(key)['lods'])
+
+
+def lod_spec(key: str, lod: str | None = None) -> dict:
     spec = device_asset_spec(key)
-    return Path(__file__).resolve().parent / spec['blend_path']
+    selected = lod or spec['default_lod']
+    try:
+        return deepcopy(spec['lods'][selected])
+    except KeyError as exc:
+        raise ValueError(f'Unknown AWFUL device LOD {selected}: {key}') from exc
+
+
+def device_asset_path(key: str, lod: str | None = None) -> Path:
+    item = lod_spec(key, lod)
+    return Path(__file__).resolve().parent / item['blend_path']
 
 
 def is_device_asset_key(key: str) -> bool:
@@ -201,9 +206,11 @@ def _managed_role(prefix: str, key: str, name: str = '') -> str:
     suffix = name.replace(' ', '_').upper() if name else key
     return f'{prefix}_{key}_{suffix}'
 
-def create_device_asset(legacy, scene, key):
+def create_device_asset(legacy, scene, key, lod=None):
     spec = device_asset_spec(key)
-    path = device_asset_path(key)
+    selected_lod = lod or getattr(scene.awful_studio, 'device_lod', '') or spec['default_lod']
+    lod_item = lod_spec(key, selected_lod)
+    path = device_asset_path(key, selected_lod)
     if not path.is_file():
         raise RuntimeError(f'Bundled AWFUL device asset is missing: {path.name}')
     product_collection = legacy.REG.collection('COL_PRODUCT')
@@ -212,7 +219,7 @@ def create_device_asset(legacy, scene, key):
 
     bpy = legacy.bpy
     with bpy.data.libraries.load(str(path), link=False) as (data_from, data_to):
-        entry = spec['entry_collection']
+        entry = lod_item['entry_collection']
         if entry not in data_from.collections:
             raise RuntimeError(f'{path.name} is missing collection {entry}')
         data_to.collections = [entry]
@@ -230,8 +237,9 @@ def create_device_asset(legacy, scene, key):
     root['awful_mockup_source_dimensions_m'] = tuple(float(v) for v in spec['dimensions_m'])
     root['awful_asset_id'] = spec['asset_id']
     root['awful_asset_stage'] = spec['stage']
-    root['awful_asset_variant'] = spec['variant']
-    root['awful_asset_source_revision'] = spec['source_revision']
+    root['awful_asset_lod'] = selected_lod
+    root['awful_asset_variant'] = lod_item['variant']
+    root['awful_asset_source_revision'] = lod_item['source_revision']
 
     for obj in [root] + legacy.descendants(root):
         if obj != root:
