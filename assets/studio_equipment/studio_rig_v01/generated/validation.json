@@ -1,8 +1,8 @@
 {
   "asset_id": "AS_RIG_STUDIO_V01",
   "blender_version": "5.2.1 LTS",
-  "object_count": 126,
-  "mesh_count": 102,
+  "object_count": 138,
+  "mesh_count": 110,
   "material_count": 13,
   "visible_bounds_mm": {
     "d1": [

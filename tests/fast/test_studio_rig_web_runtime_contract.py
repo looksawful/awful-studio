@@ -45,7 +45,9 @@ class StudioRigWebRuntimeContractTests(unittest.TestCase):
         source = exporter.read_text(encoding="utf-8")
         for token in (
             "export_format=\"GLB\"",
-            "export_meshopt_compression_enable=True",
+            "export_meshopt_compression_enable=meshopt",
+            "meshopt=True",
+            "meshopt=False",
             "export_yup=True",
             "export_apply=True",
             "export_extras=True",
@@ -77,3 +79,17 @@ class StudioRigWebRuntimeContractTests(unittest.TestCase):
             self.assertEqual(item["cameras"], 0)
             self.assertFalse(item["lights"])
             self.assertEqual(item["reference_nodes"], [])
+
+    def test_collision_assets_ship_separately_from_visual_glb(self):
+        manifest = json.loads((RUNTIME / "asset_manifest.json").read_text(encoding="utf-8"))
+        evidence = json.loads((RUNTIME / "glb_validation.json").read_text(encoding="utf-8"))
+        self.assertIn("collision_assets", evidence)
+        for key, entry in manifest["assets"].items():
+            self.assertIn("collision_glb", entry)
+            self.assertTrue((RUNTIME / entry["collision_glb"]).is_file())
+            visual = evidence["assets"][key]
+            collision = evidence["collision_assets"][key]
+            self.assertEqual(visual.get("collision_nodes", []), [])
+            self.assertLessEqual(collision["triangles"], 256)
+            self.assertEqual(collision["materials"], 0)
+            self.assertTrue(collision["stable_root"])

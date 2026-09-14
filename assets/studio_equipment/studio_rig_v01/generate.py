@@ -627,6 +627,88 @@ def build_sandbag(mats):
     return root
 
 
+
+def _mark_collision(obj, kind):
+    obj.display_type = "WIRE"
+    obj.hide_render = True
+    obj["awful_collision"] = True
+    obj["awful_collider_kind"] = kind
+    return obj
+
+
+def _collision_rod(name, a, b, radius, col, parent):
+    a, b = Vector(a), Vector(b)
+    delta = b - a
+    bpy.ops.mesh.primitive_cylinder_add(
+        vertices=10, radius=radius, depth=delta.length,
+        location=(a + b) * 0.5,
+    )
+    obj = bpy.context.object
+    obj.name = name
+    obj.rotation_euler = delta.to_track_quat("Z", "Y").to_euler()
+    move_to(obj, col)
+    obj.parent = parent
+    return _mark_collision(obj, "capsule_approx")
+
+
+def build_collision_proxies(cstand_root, d1_root, magnum_root, sandbag_root):
+    col = collection("RUNTIME_COLLIDERS")
+
+    support = add_empty("COL_SUPPORT", col)
+    support.parent = cstand_root
+    support["awful_collision_group"] = "compound"
+    mast = add_cylinder(
+        "COL_SUPPORT_MAST", 0.030, 1.72, (0, 0, 0.86),
+        None, col, vertices=12, parent=support, bevel=0.0,
+    )
+    _mark_collision(mast, "cylinder")
+    leg_data = ((5, 0.60, 0.030), (125, 0.54, 0.050), (245, 0.48, 0.070))
+    for idx, (angle_deg, length, z) in enumerate(leg_data, start=1):
+        angle = math.radians(angle_deg)
+        radial = Vector((math.cos(angle), math.sin(angle), 0))
+        start = radial * 0.083 + Vector((0, 0, z))
+        end = radial * length + Vector((0, 0, 0.035))
+        _collision_rod(
+            f"COL_SUPPORT_LEG_{idx}", start, end, 0.020, col, support
+        )
+
+    fixture = add_empty("COL_FIXTURE", col)
+    fixture.parent = d1_root
+    fixture["awful_collision_group"] = "compound"
+    body = add_cube(
+        "COL_FIXTURE_BODY", (0.188, 0.300, 0.150),
+        (0, 0, 1.835), None, col, 0.0, fixture,
+    )
+    _mark_collision(body, "box")
+    mount = add_cylinder(
+        "COL_FIXTURE_MOUNT", 0.025, 0.100, (0, 0, 1.785),
+        None, col, vertices=12, parent=fixture, bevel=0.0,
+    )
+    _mark_collision(mount, "cylinder")
+
+    modifier = add_empty("COL_MODIFIER", col)
+    modifier.parent = magnum_root
+    modifier["awful_collision_group"] = "convex_approx"
+    bpy.ops.mesh.primitive_cone_add(
+        vertices=12, radius1=0.060, radius2=0.1725, depth=0.265,
+        location=(0, 0.2825, 1.835), rotation=(math.radians(-90), 0, 0),
+    )
+    mod_body = bpy.context.object
+    mod_body.name = "COL_MODIFIER_BODY"
+    move_to(mod_body, col)
+    mod_body.parent = modifier
+    _mark_collision(mod_body, "convex_frustum")
+
+    sandbag = add_empty("COL_SANDBAG", col)
+    sandbag.parent = sandbag_root
+    sandbag["awful_collision_group"] = "single"
+    bag = add_cube(
+        "COL_SANDBAG_BODY", (0.360, 0.250, 0.100),
+        (0.250, 0.0, 0.050), None, col, 0.0, sandbag,
+    )
+    _mark_collision(bag, "box")
+    return support, fixture, modifier, sandbag
+
 def add_camera(name, location, target, lens, col):
     data = bpy.data.cameras.new(name)
     data.lens = lens
@@ -693,6 +775,7 @@ def main():
     sandbag_root = build_sandbag(mats)
     for root in (cstand_root, d1_root, magnum_root, sandbag_root):
         root.parent = rig_root
+    build_collision_proxies(cstand_root, d1_root, magnum_root, sandbag_root)
     scene["awful_asset_id"] = "AS_RIG_STUDIO_V01"
     scene["awful_asset_version"] = "0.1.0"
     scene["awful_blender_target"] = SPEC["blender_target"]

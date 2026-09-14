@@ -62,6 +62,18 @@ def main():
         "D1_SIDE_VENT_L_01",
         "D1_SIDE_VENT_R_01",
         "D1_REAR_DISPLAY",
+        "COL_SUPPORT",
+        "COL_SUPPORT_MAST",
+        "COL_SUPPORT_LEG_1",
+        "COL_SUPPORT_LEG_2",
+        "COL_SUPPORT_LEG_3",
+        "COL_FIXTURE",
+        "COL_FIXTURE_BODY",
+        "COL_FIXTURE_MOUNT",
+        "COL_MODIFIER",
+        "COL_MODIFIER_BODY",
+        "COL_SANDBAG",
+        "COL_SANDBAG_BODY",
     }
     missing = sorted(required - set(bpy.data.objects.keys()))
     check(not missing, "required_objects", {"missing": missing}, results)

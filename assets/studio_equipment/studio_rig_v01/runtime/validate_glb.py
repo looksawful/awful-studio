@@ -36,10 +36,8 @@ def geometry_stats(doc):
     return primitives, vertices, triangles
 
 
-def inspect_asset(asset_key, entry):
+def inspect_visual(entry):
     path = ROOT / entry["glb"]
-    if not path.is_file() or path.stat().st_size == 0:
-        raise FileNotFoundError(path)
     doc = read_glb(path)
     names = [node.get("name", "") for node in doc.get("nodes", [])]
     primitives, vertices, triangles = geometry_stats(doc)
@@ -57,6 +55,7 @@ def inspect_asset(asset_key, entry):
         "cameras": len(doc.get("cameras", [])),
         "lights": "KHR_lights_punctual" in extensions,
         "reference_nodes": [n for n in names if "REFERENCE_ENVELOPE" in n],
+        "collision_nodes": [n for n in names if n.startswith("COL_")],
         "stable_root": entry["root"] in names,
     }
     item["pass"] = all((
@@ -64,30 +63,61 @@ def inspect_asset(asset_key, entry):
         item["cameras"] == 0,
         not item["lights"],
         item["reference_nodes"] == [],
+        item["collision_nodes"] == [],
         item["stable_root"],
         item["triangles"] > 0,
     ))
     return item
 
 
+def inspect_collision(entry):
+    path = ROOT / entry["collision_glb"]
+    doc = read_glb(path)
+    names = [node.get("name", "") for node in doc.get("nodes", [])]
+    primitives, vertices, triangles = geometry_stats(doc)
+    item = {
+        "file": entry["collision_glb"],
+        "bytes": path.stat().st_size,
+        "nodes": len(names),
+        "meshes": len(doc.get("meshes", [])),
+        "primitives": primitives,
+        "vertices": vertices,
+        "triangles": triangles,
+        "materials": len(doc.get("materials", [])),
+        "stable_root": entry["collider"] in names,
+    }
+    item["pass"] = all((
+        item["triangles"] > 0,
+        item["triangles"] <= 256,
+        item["materials"] == 0,
+        item["stable_root"],
+    ))
+    return item
+
+
 def main():
-    assets = {
-        key: inspect_asset(key, entry)
-        for key, entry in MANIFEST["assets"].items()
+    assets = {key: inspect_visual(entry) for key, entry in MANIFEST["assets"].items()}
+    collision_assets = {
+        key: inspect_collision(entry) for key, entry in MANIFEST["assets"].items()
     }
     result = {
-        "schema_version": 1,
+        "schema_version": 2,
         "assets": assets,
-        "pass": all(item["pass"] for item in assets.values()),
+        "collision_assets": collision_assets,
+        "pass": (
+            all(item["pass"] for item in assets.values())
+            and all(item["pass"] for item in collision_assets.values())
+        ),
     }
     EVIDENCE.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     for key, item in assets.items():
+        print("AWFUL_GLTF_VALIDATE", key, f"{item['bytes']}B", f"{item['triangles']}tris", "PASS" if item["pass"] else "FAIL")
+    for key, item in collision_assets.items():
         print(
-            "AWFUL_GLTF_VALIDATE",
+            "AWFUL_COLLISION_VALIDATE",
             key,
             f"{item['bytes']}B",
             f"{item['triangles']}tris",
-            f"{item['materials']}mats",
             "PASS" if item["pass"] else "FAIL",
         )
     if not result["pass"]:

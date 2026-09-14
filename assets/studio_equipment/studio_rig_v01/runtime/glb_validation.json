@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "assets": {
     "studio_support_cstand_01": {
       "file": "glb/studio_support_cstand_01.glb",
@@ -14,12 +14,13 @@
       "cameras": 0,
       "lights": false,
       "reference_nodes": [],
+      "collision_nodes": [],
       "stable_root": true,
       "pass": true
     },
     "profoto_d1_500_air": {
       "file": "glb/profoto_d1_500_air.glb",
-      "bytes": 632800,
+      "bytes": 632804,
       "nodes": 53,
       "meshes": 48,
       "primitives": 48,
@@ -30,12 +31,13 @@
       "cameras": 0,
       "lights": false,
       "reference_nodes": [],
+      "collision_nodes": [],
       "stable_root": true,
       "pass": true
     },
     "profoto_magnum_100624": {
       "file": "glb/profoto_magnum_100624.glb",
-      "bytes": 214428,
+      "bytes": 214432,
       "nodes": 8,
       "meshes": 7,
       "primitives": 7,
@@ -46,22 +48,74 @@
       "cameras": 0,
       "lights": false,
       "reference_nodes": [],
+      "collision_nodes": [],
       "stable_root": true,
       "pass": true
     },
     "studio_sandbag_01": {
       "file": "glb/studio_sandbag_01.glb",
-      "bytes": 438708,
+      "bytes": 438844,
       "nodes": 16,
       "meshes": 15,
       "primitives": 15,
-      "vertices": 25447,
+      "vertices": 25448,
       "triangles": 36396,
       "materials": 3,
       "meshopt": true,
       "cameras": 0,
       "lights": false,
       "reference_nodes": [],
+      "collision_nodes": [],
+      "stable_root": true,
+      "pass": true
+    }
+  },
+  "collision_assets": {
+    "studio_support_cstand_01": {
+      "file": "collision/studio_support_cstand_01_collision.glb",
+      "bytes": 4556,
+      "nodes": 5,
+      "meshes": 4,
+      "primitives": 4,
+      "vertices": 84,
+      "triangles": 152,
+      "materials": 0,
+      "stable_root": true,
+      "pass": true
+    },
+    "profoto_d1_500_air": {
+      "file": "collision/profoto_d1_500_air_collision.glb",
+      "bytes": 2368,
+      "nodes": 3,
+      "meshes": 2,
+      "primitives": 2,
+      "vertices": 32,
+      "triangles": 56,
+      "materials": 0,
+      "stable_root": true,
+      "pass": true
+    },
+    "profoto_magnum_100624": {
+      "file": "collision/profoto_magnum_100624_collision.glb",
+      "bytes": 1672,
+      "nodes": 2,
+      "meshes": 1,
+      "primitives": 1,
+      "vertices": 24,
+      "triangles": 44,
+      "materials": 0,
+      "stable_root": true,
+      "pass": true
+    },
+    "studio_sandbag_01": {
+      "file": "collision/studio_sandbag_01_collision.glb",
+      "bytes": 1172,
+      "nodes": 2,
+      "meshes": 1,
+      "primitives": 1,
+      "vertices": 8,
+      "triangles": 12,
+      "materials": 0,
       "stable_root": true,
       "pass": true
     }

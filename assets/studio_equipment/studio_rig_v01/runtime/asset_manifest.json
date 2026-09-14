@@ -4,50 +4,93 @@
     "studio_support_cstand_01": {
       "root": "ROOT_SUPPORT_CSTAND",
       "glb": "glb/studio_support_cstand_01.glb",
-      "lods": ["LOD0", "LOD1", "LOD2"],
+      "lods": [
+        "LOD0",
+        "LOD1",
+        "LOD2"
+      ],
       "collider": "COL_SUPPORT",
       "interaction": {
         "kind": "adjustable_support",
         "state_owner": "simulation",
-        "controls": ["height", "leg_spread"],
-        "anchors": ["FLOOR_CONTACT", "MOUNT_SUPPORT"]
-      }
+        "controls": [
+          "height",
+          "leg_spread"
+        ],
+        "anchors": [
+          "FLOOR_CONTACT",
+          "MOUNT_SUPPORT"
+        ]
+      },
+      "collision_glb": "collision/studio_support_cstand_01_collision.glb"
     },
     "profoto_d1_500_air": {
       "root": "ROOT_FIX_PROFOTO_D1_500",
       "glb": "glb/profoto_d1_500_air.glb",
-      "lods": ["LOD0", "LOD1", "LOD2"],
+      "lods": [
+        "LOD0",
+        "LOD1",
+        "LOD2"
+      ],
       "collider": "COL_FIXTURE",
       "interaction": {
         "kind": "studio_fixture",
         "state_owner": "simulation",
-        "controls": ["tilt", "pan"],
-        "anchors": ["MOUNT_FIXTURE", "MOUNT_MODIFIER", "EMITTER_ORIGIN", "LIGHT_TARGET"]
-      }
+        "controls": [
+          "tilt",
+          "pan"
+        ],
+        "anchors": [
+          "MOUNT_FIXTURE",
+          "MOUNT_MODIFIER",
+          "EMITTER_ORIGIN",
+          "LIGHT_TARGET"
+        ]
+      },
+      "collision_glb": "collision/profoto_d1_500_air_collision.glb"
     },
     "profoto_magnum_100624": {
       "root": "ROOT_MOD_PROFOTO_MAGNUM",
       "glb": "glb/profoto_magnum_100624.glb",
-      "lods": ["LOD0", "LOD1", "LOD2"],
+      "lods": [
+        "LOD0",
+        "LOD1",
+        "LOD2"
+      ],
       "collider": "COL_MODIFIER",
       "interaction": {
         "kind": "swappable_modifier",
         "state_owner": "simulation",
-        "controls": ["rotation"],
-        "anchors": ["MOUNT_MODIFIER"]
-      }
+        "controls": [
+          "rotation"
+        ],
+        "anchors": [
+          "MOUNT_MODIFIER"
+        ]
+      },
+      "collision_glb": "collision/profoto_magnum_100624_collision.glb"
     },
     "studio_sandbag_01": {
       "root": "ROOT_ACC_SANDBAG",
       "glb": "glb/studio_sandbag_01.glb",
-      "lods": ["LOD0", "LOD1", "LOD2"],
+      "lods": [
+        "LOD0",
+        "LOD1",
+        "LOD2"
+      ],
       "collider": "COL_SANDBAG",
       "interaction": {
         "kind": "movable_weight",
         "state_owner": "simulation",
-        "controls": ["pickup", "place"],
-        "anchors": ["FLOOR_CONTACT"]
-      }
+        "controls": [
+          "pickup",
+          "place"
+        ],
+        "anchors": [
+          "FLOOR_CONTACT"
+        ]
+      },
+      "collision_glb": "collision/studio_sandbag_01_collision.glb"
     }
   }
 }
