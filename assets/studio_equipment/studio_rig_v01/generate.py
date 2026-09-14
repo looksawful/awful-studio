@@ -364,30 +364,62 @@ def build_magnum(mats, sem, mount_modifier):
     col = collection("AS_MOD_PROFOTO_MAGNUM")
     root = tag_root(add_empty("ROOT_MOD_PROFOTO_MAGNUM", col),
                     "AS_MOD_PROFOTO_MAGNUM", "VERIFIED_MODEL")
-    back_y = mount_modifier.location.y + 0.004
+    overall_start = mount_modifier.location.y
+    z = mount_modifier.location.z
     depth = SPEC["magnum_100624"]["depth_mm"] * MM
+    collar_len = 0.040
+    bowl_start = overall_start + collar_len
+    front = overall_start + depth
+    bowl_depth = depth - collar_len
+    reference = add_cube(
+        "MAGNUM_REFERENCE_ENVELOPE", (0.345, depth, 0.345),
+        (0, overall_start + depth * 0.5, z), None, col, 0.0, root
+    )
+    reference.display_type = "WIRE"
+    reference.hide_render = True
+    reference.hide_viewport = True
     profile = [
-        (0.000, 0.054),
-        (0.020, 0.058),
-        (0.050, 0.065),
-        (0.085, 0.077),
-        (0.125, 0.096),
-        (0.165, 0.119),
-        (0.205, 0.143),
-        (0.238, 0.161),
-        (depth, 0.1725),
+        (0.000, 0.0540), (0.020, 0.0580), (0.050, 0.0670),
+        (0.085, 0.0810), (0.120, 0.1010), (0.155, 0.1250),
+        (0.188, 0.1490), (0.218, 0.1685),
     ]
-    outer = add_profile_shell("MAGNUM_OUTER_SHELL", profile, (0, back_y, 1.90), mats["black_metal"], col, root, thickness=0.0011)
+    outer = add_profile_shell(
+        "MAGNUM_OUTER_SHELL", profile, (0, bowl_start, z),
+        mats["black_metal"], col, root, thickness=0.0011
+    )
     inner_profile = [(y + 0.0015, max(0.001, r - 0.0035)) for y, r in profile]
-    add_profile_shell("MAGNUM_INNER_REFLECTOR", inner_profile, (0, back_y, 1.90), mats["silver"], col, root, thickness=0.00055)
-    add_cylinder("MAGNUM_COLLAR_01", 0.060, 0.026, (0, back_y - 0.010, 1.90), mats["black_metal"], col, axis="Y", parent=root)
-    add_cylinder("MAGNUM_COLLAR_02", 0.056, 0.020, (0, back_y + 0.010, 1.90), mats["aluminum"], col, axis="Y", parent=root)
-    add_torus("MAGNUM_COLLAR_GROOVE_01", 0.057, 0.0025, (0, back_y + 0.001, 1.90), (math.radians(90), 0, 0), mats["black_metal"], col, root)
-    add_torus("MAGNUM_COLLAR_GROOVE_02", 0.059, 0.0023, (0, back_y + 0.020, 1.90), (math.radians(90), 0, 0), mats["black_metal"], col, root)
-    add_torus("MAGNUM_FRONT_RIM", 0.169, 0.0045, (0, back_y + depth, 1.90), (math.radians(90), 0, 0), mats["black_metal"], col, root)
-    add_torus("MAGNUM_INNER_RIM", 0.163, 0.0020, (0, back_y + depth - 0.001, 1.90), (math.radians(90), 0, 0), mats["silver"], col, root)
+    add_profile_shell(
+        "MAGNUM_INNER_REFLECTOR", inner_profile, (0, bowl_start, z),
+        mats["silver"], col, root, thickness=0.00055
+    )
+    add_cylinder(
+        "MAGNUM_COLLAR_REAR", 0.060, 0.020,
+        (0, overall_start + 0.010, z), mats["black_metal"], col,
+        axis="Y", parent=root, bevel=0.0006
+    )
+    add_cylinder(
+        "MAGNUM_COLLAR_FRONT", 0.057, 0.020,
+        (0, overall_start + 0.030, z), mats["aluminum"], col,
+        axis="Y", parent=root, bevel=0.0005
+    )
+    add_torus(
+        "MAGNUM_COLLAR_GROOVE_01", 0.0575, 0.0022,
+        (0, overall_start + 0.019, z), (math.radians(90), 0, 0),
+        mats["black_metal"], col, root
+    )
+    add_torus(
+        "MAGNUM_FRONT_RIM", 0.1690, 0.0035,
+        (0, front - 0.0035, z), (math.radians(90), 0, 0),
+        mats["black_metal"], col, root
+    )
+    add_torus(
+        "MAGNUM_INNER_RIM", 0.1630, 0.0018,
+        (0, front - 0.0038, z), (math.radians(90), 0, 0),
+        mats["silver"], col, root
+    )
+    root["awful_mount_start_y_m"] = overall_start
+    root["awful_front_y_m"] = front
     return root, outer
-
 
 def build_sandbag(mats):
     col = collection("AS_ACC_SANDBAG_01")

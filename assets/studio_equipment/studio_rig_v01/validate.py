@@ -49,17 +49,25 @@ def main():
         "LIGHT_TARGET",
         "LIGHT_D1_NATIVE",
         "D1_REFERENCE_ENVELOPE",
+        "MAGNUM_REFERENCE_ENVELOPE",
     }
     missing = sorted(required - set(bpy.data.objects.keys()))
     check(not missing, "required_objects", {"missing": missing}, results)
 
     d1 = dims_mm("D1_REFERENCE_ENVELOPE")
     check(close(d1, [130, 300, 170]), "d1_envelope_mm", {"actual": d1}, results)
-    magnum = dims_mm("MAGNUM_OUTER_SHELL")
+    magnum = dims_mm("MAGNUM_REFERENCE_ENVELOPE")
     check(
         close(sorted(magnum), [265, 345, 345], tol=1.0),
         "magnum_envelope_mm",
         {"actual": magnum, "sorted": sorted(magnum)},
+        results,
+    )
+    magnum_visible = collection_bounds_mm("AS_MOD_PROFOTO_MAGNUM")
+    check(
+        close(sorted(magnum_visible), [265, 345, 345], tol=1.5),
+        "magnum_visible_assembly_bounds_mm",
+        {"actual": magnum_visible, "sorted": sorted(magnum_visible)},
         results,
     )
     mount_z = round(bpy.data.objects["MOUNT_SUPPORT"].matrix_world.translation.z * 1000, 3)

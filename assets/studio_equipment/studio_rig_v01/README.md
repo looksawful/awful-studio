@@ -1,4 +1,4 @@
-# AWFUL STUDIO — Studio Rig v01
+﻿# AWFUL STUDIO — Studio Rig v01
 
 Issue: #59  
 Target: Blender 5.2.1 LTS  
@@ -20,7 +20,7 @@ Asset root: `AS_RIG_STUDIO_V01`
 - Support mount height in this rig preset: 1750 mm.
 - Scene unit contract: 1 Blender unit = 1 metre.
 
-`D1_REFERENCE_ENVELOPE` is a non-rendering reference object used only to preserve the manufacturer dimension contract. Visible assembly bounds are recorded separately by `validate.py`.
+`D1_REFERENCE_ENVELOPE` and `MAGNUM_REFERENCE_ENVELOPE` are non-rendering reference objects used only to preserve manufacturer dimension contracts. `validate.py` also measures visible assemblies separately, so decorative geometry cannot silently exceed the contract.
 
 ## Current geometry state
 
@@ -40,3 +40,4 @@ Asset root: `AS_RIG_STUDIO_V01`
 Run `generate.py` using the pinned Blender 5.2.1 runtime. It writes the generated `.blend` and four deterministic preview renders. Then open that `.blend` headlessly and execute `validate.py`.
 
 Current visual gate is intentionally **not final**. This slice has passed dimensional/runtime validation, but hero-detail, UV/bake, decals, surface wear and AWFUL STUDIO runtime catalog integration remain later stages.
+
