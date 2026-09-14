@@ -41,3 +41,15 @@ Run `generate.py` using the pinned Blender 5.2.1 runtime. It writes the generate
 
 Current visual gate is intentionally **not final**. This slice has passed dimensional/runtime validation, but hero-detail, UV/bake, decals, surface wear and AWFUL STUDIO runtime catalog integration remain later stages.
 
+
+## Preview gallery
+
+These are deterministic Blender 5.2.1 diagnostic renders of the current candidate.
+
+| Front | Three-quarter |
+|---|---|
+| ![Front](previews/studio_rig_v01_front.png) | ![Three-quarter](previews/studio_rig_v01_three_quarter.png) |
+
+| Side | Rear |
+|---|---|
+| ![Side](previews/studio_rig_v01_side.png) | ![Rear](previews/studio_rig_v01_rear.png) |
