@@ -9,12 +9,12 @@ from pathlib import Path
 
 DEVICE_ASSET_SPECS = {
     'DEVICE_IPHONE_17': {
-        'label': 'iPhone 17 v15 (LOW draft)',
+        'label': 'iPhone 17 v20 (LOW draft)',
         'asset_id': 'iphone_17',
         'stage': 'LOW_DRAFT',
         'dimensions_m': (0.0715, 0.00795, 0.1496),
         'default_lod': 'LOW',
-        'lods': {'LOW': {'variant': 'low_v15', 'blend_path': 'assets/devices/iphone_17_low_v15.blend', 'entry_collection': 'AWFUL_DEVICE_IPHONE_17', 'source_revision': '86fee1af8953057dc40e6f4ce2f781015029ffc6b9967e05569ad22b2cdde167'}},
+        'lods': {'LOW': {'variant': 'low_v20', 'blend_path': 'assets/devices/iphone_17_low_v20.blend', 'entry_collection': 'AWFUL_DEVICE_IPHONE_17', 'source_revision': '89f7f254c5619013f6b7117861af026e72bddd3612c572f3b562e3900ef33b1e'}},
         'root_name': 'CTRL_IPHONE_17',
         'screen_object': 'SCREEN_CONTENT',
         'screen_material': 'MAT_SCREEN_CONTENT',
