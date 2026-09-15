@@ -6,7 +6,7 @@ These are the latest real preview renders currently present in the active device
 
 ## iPhone 17
 
-Source: `asset/iphone-17`, current working preview set `low_v15`.
+Source: `asset/iphone-17` at `aca3652`, current geometry preview set `low_v21`.
 
 ![iPhone 17 current contact sheet](./iphone-17/contact-current.jpg)
 
