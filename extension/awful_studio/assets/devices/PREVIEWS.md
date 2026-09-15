@@ -1,48 +1,23 @@
 # Current bundled device previews
 
-These are the current device preview sets shown using the established diagnostic scheme. The packaged device assets integrated by PR #61 remain the source-of-truth runtime copies; these images link back to the current asset branches used for visual review.
+This directory is the runtime device bundle used by the AWFUL STUDIO Product workflow. The source-of-truth review gallery lives in `docs/screenshots/devices/current` on `main`.
 
-## iPhone 17
+## Current runtime assets
 
-Stage in PR #61: `LOW_DRAFT` (`low_v10`).
+| Device | Stage | Runtime variant | Review gallery |
+| --- | --- | --- | --- |
+| iPhone 17 | `LOW_DRAFT` | `low_v15` | [`docs/screenshots/devices/current/iphone-17`](../../../../docs/screenshots/devices/current/iphone-17) |
+| iPad Pro 11 M5 | `LOW_DRAFT` | `low_v6` | [`docs/screenshots/devices/current/ipad-pro-11`](../../../../docs/screenshots/devices/current/ipad-pro-11) |
+| iPad Pro 13 M5 | `LOW_DRAFT` | `low_v6` | [`docs/screenshots/devices/current/ipad-pro-13`](../../../../docs/screenshots/devices/current/ipad-pro-13) |
+| MacBook Pro 14 M5 | `RELEASE_CANDIDATE` | `low_v1_release` | [`docs/screenshots/devices/current/macbook-pro-14`](../../../../docs/screenshots/devices/current/macbook-pro-14) |
 
-| Front | Back | Three-quarter |
-| --- | --- | --- |
-| ![iPhone 17 front](https://github.com/looksawful/awful-studio/blob/asset/iphone-17/assets/device_mockups/iphone_17/previews/iphone_17_front.png?raw=1) | ![iPhone 17 back](https://github.com/looksawful/awful-studio/blob/asset/iphone-17/assets/device_mockups/iphone_17/previews/iphone_17_back.png?raw=1) | ![iPhone 17 three-quarter](https://github.com/looksawful/awful-studio/blob/asset/iphone-17/assets/device_mockups/iphone_17/previews/iphone_17_three_quarter.png?raw=1) |
+The stage and LOD are deliberately separate. A runtime `LOW` LOD does not promote a `LOW_DRAFT` or `RELEASE_CANDIDATE` asset to approved production LOW.
 
-## iPad Pro 11 M5
+## Packaged Blender libraries
 
-Stage in PR #61: `RELEASE_CANDIDATE` (`low_v1_release`).
-
-| Front | Back | Three-quarter |
-| --- | --- | --- |
-| ![iPad Pro 11 front](https://github.com/looksawful/awful-studio/blob/asset/ipad-pro/assets/device_mockups/ipad_pro/previews/11/ipad_pro_11_front.png?raw=1) | ![iPad Pro 11 back](https://github.com/looksawful/awful-studio/blob/asset/ipad-pro/assets/device_mockups/ipad_pro/previews/11/ipad_pro_11_back.png?raw=1) | ![iPad Pro 11 three-quarter](https://github.com/looksawful/awful-studio/blob/asset/ipad-pro/assets/device_mockups/ipad_pro/previews/11/ipad_pro_11_three_quarter.png?raw=1) |
-
-## iPad Pro 13 M5
-
-Stage in PR #61: `RELEASE_CANDIDATE` (`low_v1_release`).
-
-| Front | Back | Three-quarter |
-| --- | --- | --- |
-| ![iPad Pro 13 front](https://github.com/looksawful/awful-studio/blob/asset/ipad-pro/assets/device_mockups/ipad_pro/previews/13/ipad_pro_13_front.png?raw=1) | ![iPad Pro 13 back](https://github.com/looksawful/awful-studio/blob/asset/ipad-pro/assets/device_mockups/ipad_pro/previews/13/ipad_pro_13_back.png?raw=1) | ![iPad Pro 13 three-quarter](https://github.com/looksawful/awful-studio/blob/asset/ipad-pro/assets/device_mockups/ipad_pro/previews/13/ipad_pro_13_three_quarter.png?raw=1) |
-
-## MacBook Pro 14 M5
-
-Stage in PR #61: `RELEASE_CANDIDATE` (`low_v1_release`). The explicit `current` preview set is used here rather than the older root-level views.
-
-| Front | Hero / three-quarter | Side |
-| --- | --- | --- |
-| ![MacBook Pro 14 front](https://github.com/looksawful/awful-studio/blob/asset/macbook-pro/assets/device_mockups/macbook_pro_14/previews/current/macbook_pro_14_current_front.png?raw=1) | ![MacBook Pro 14 hero](https://github.com/looksawful/awful-studio/blob/asset/macbook-pro/assets/device_mockups/macbook_pro_14/previews/current/macbook_pro_14_current_hero.png?raw=1) | ![MacBook Pro 14 side](https://github.com/looksawful/awful-studio/blob/asset/macbook-pro/assets/device_mockups/macbook_pro_14/previews/current/macbook_pro_14_current_side.png?raw=1) |
-
-### Additional MacBook diagnostics
-
-- [Hinge](https://github.com/looksawful/awful-studio/blob/asset/macbook-pro/assets/device_mockups/macbook_pro_14/previews/current/macbook_pro_14_current_hinge.png)
-- [Keyboard](https://github.com/looksawful/awful-studio/blob/asset/macbook-pro/assets/device_mockups/macbook_pro_14/previews/current/macbook_pro_14_current_keyboard.png)
-- [Ports](https://github.com/looksawful/awful-studio/blob/asset/macbook-pro/assets/device_mockups/macbook_pro_14/previews/current/macbook_pro_14_current_ports.png)
-
-## Runtime copies in PR #61
-
-- `iphone_17_low_v10.blend`
-- `ipad_pro_11_m5_low_v1_release.blend`
-- `ipad_pro_13_m5_low_v1_release.blend`
+- `iphone_17_low_v15.blend`
+- `ipad_pro_11_m5_low_v6.blend`
+- `ipad_pro_13_m5_low_v6.blend`
 - `macbook_pro_14_m5_low_v1_release.blend`
+
+Each package contains one `AWFUL_DEVICE_*` entry collection, the device root hierarchy, packed image dependencies, and no diagnostic cameras or studio lights.

@@ -14,9 +14,21 @@ EXPECTED_KEYS = {
 }
 EXPECTED_STAGES = {
     'DEVICE_IPHONE_17': 'LOW_DRAFT',
-    'DEVICE_IPAD_PRO_11': 'RELEASE_CANDIDATE',
-    'DEVICE_IPAD_PRO_13': 'RELEASE_CANDIDATE',
+    'DEVICE_IPAD_PRO_11': 'LOW_DRAFT',
+    'DEVICE_IPAD_PRO_13': 'LOW_DRAFT',
     'DEVICE_MACBOOK_PRO_14': 'RELEASE_CANDIDATE',
+}
+EXPECTED_VARIANTS = {
+    'DEVICE_IPHONE_17': 'low_v15',
+    'DEVICE_IPAD_PRO_11': 'low_v6',
+    'DEVICE_IPAD_PRO_13': 'low_v6',
+    'DEVICE_MACBOOK_PRO_14': 'low_v1_release',
+}
+EXPECTED_FILES = {
+    'DEVICE_IPHONE_17': 'iphone_17_low_v15.blend',
+    'DEVICE_IPAD_PRO_11': 'ipad_pro_11_m5_low_v6.blend',
+    'DEVICE_IPAD_PRO_13': 'ipad_pro_13_m5_low_v6.blend',
+    'DEVICE_MACBOOK_PRO_14': 'macbook_pro_14_m5_low_v1_release.blend',
 }
 
 
@@ -42,6 +54,8 @@ class DeviceAssetLoaderContractTests(unittest.TestCase):
             self.assertGreater(min(item['dimensions_m']), 0.0)
             default_lod = item['default_lod']
             self.assertTrue(item['lods'][default_lod]['source_revision'])
+            self.assertEqual(item['lods'][default_lod]['variant'], EXPECTED_VARIANTS[key])
+            self.assertEqual(Path(item['lods'][default_lod]['blend_path']).name, EXPECTED_FILES[key])
 
     def test_catalog_is_offline_and_bundled(self):
         loader = load_module()
