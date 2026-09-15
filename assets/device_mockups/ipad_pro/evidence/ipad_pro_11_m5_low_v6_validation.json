@@ -1,0 +1,56 @@
+{
+  "asset_id": "ipad_pro_11_m5",
+  "stage": "LOW_DRAFT",
+  "blender_version": "5.2.1 LTS",
+  "expected_mm": {
+    "width": 177.5,
+    "depth": 5.3,
+    "height": 249.7
+  },
+  "actual_mm": {
+    "width": 177.499995,
+    "depth": 5.3,
+    "height": 249.699995
+  },
+  "delta_mm": {
+    "width": -5e-06,
+    "depth": -0.0,
+    "height": -5e-06
+  },
+  "body_non_manifold_edges": 0,
+  "mandatory_missing": [],
+  "object_count": 62,
+  "material_count": 13,
+  "passed": true,
+  "boolean_cut_count": 28,
+  "boolean_cuts": [
+    "USB_C",
+    "SPK_BOTTOM_-1_1",
+    "SPK_BOTTOM_-1_2",
+    "SPK_BOTTOM_-1_3",
+    "SPK_BOTTOM_-1_4",
+    "SPK_BOTTOM_-1_5",
+    "SPK_BOTTOM_-1_6",
+    "SPK_BOTTOM_1_1",
+    "SPK_BOTTOM_1_2",
+    "SPK_BOTTOM_1_3",
+    "SPK_BOTTOM_1_4",
+    "SPK_BOTTOM_1_5",
+    "SPK_BOTTOM_1_6",
+    "SPK_TOP_-1_1",
+    "SPK_TOP_-1_2",
+    "SPK_TOP_-1_3",
+    "SPK_TOP_-1_4",
+    "SPK_TOP_-1_5",
+    "SPK_TOP_-1_6",
+    "SPK_TOP_1_1",
+    "SPK_TOP_1_2",
+    "SPK_TOP_1_3",
+    "SPK_TOP_1_4",
+    "SPK_TOP_1_5",
+    "SPK_TOP_1_6",
+    "TOP_BUTTON",
+    "VOL_UP",
+    "VOL_DOWN"
+  ]
+}
