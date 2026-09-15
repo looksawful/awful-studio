@@ -126,10 +126,16 @@ def install(legacy, cache):
         return str(resolution['effective_preset'])
 
     def apply_environment_preset(scene, preset_id, reset_defaults=True):
-        """Apply an effective source but keep the user's selected environment intent."""
+        """Apply an effective source but keep the user's selected environment intent.
+
+        A reopened .blend has no process-local ownership mark scope. Environment
+        image loading can create a managed Image datablock, so rebind ownership to
+        the persisted studio scene for the duration of the apply operation.
+        """
         selected = str(preset_id)
         effective = resolve_environment_preset(scene, selected)
-        result = original_apply_environment(scene, effective, reset_defaults)
+        with legacy.ownership.for_scene(scene):
+            result = original_apply_environment(scene, effective, reset_defaults)
         if effective != selected:
             scene.awful_studio.world_preset = selected
         return result
