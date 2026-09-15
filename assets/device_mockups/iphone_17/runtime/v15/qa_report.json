@@ -1,0 +1,74 @@
+{
+  "asset_id": "iphone_17",
+  "revision": "v15",
+  "blender": "5.2.1 LTS (9e2066aef7ef)",
+  "geometry_validation": {
+    "evidence": "../../evidence/low_v15_validation.json",
+    "passed": true,
+    "body_non_manifold_edges": 0,
+    "actual_mm": [
+      71.500003,
+      149.599999,
+      7.95
+    ]
+  },
+  "compat_glb": {
+    "file": "iphone_17_v15_web.glb",
+    "bytes": 960428,
+    "sha256": "C2EE15AA10122B28412D7451D5D3D2A8B929C1413F51F9719886EF47EB8610F6"
+  },
+  "meshopt_glb": {
+    "file": "iphone_17_v15_web_meshopt.glb",
+    "bytes": 218420,
+    "sha256": "72E8E07763ECD664AAFBAAE261B8C8841AD86304E001F34571CC8032322B1C32",
+    "ratio_to_compat": 0.2274,
+    "extensions_required": [
+      "EXT_meshopt_compression",
+      "KHR_mesh_quantization"
+    ]
+  },
+  "threejs_runtime": {
+    "loader": "GLTFLoader",
+    "meshopt_decoder": "MeshoptDecoder",
+    "views_checked": [
+      "front",
+      "rear",
+      "threequarter"
+    ],
+    "runtime_bounds_m": [
+      0.0716,
+      0.1496,
+      0.01
+    ],
+    "anchors_present": "4/4",
+    "critical_parts_present": "4/4",
+    "compat_load_passed": true,
+    "meshopt_load_passed": true,
+    "meshopt_visual_passed": true
+  },
+  "critical_parts": [
+    "DYNAMIC_ISLAND",
+    "FRONT_SENSOR_PILL",
+    "FRONT_CAMERA_GLASS",
+    "APPLE_LOGO_DECAL"
+  ],
+  "notes": [
+    "Meshopt output is derived from the canonical Blender GLB with pinned @gltf-transform/cli@4.5.0.",
+    "Blender built-in Meshopt was rejected after browser visual QA damaged thin front sensor geometry."
+  ],
+  "gltf_validator": {
+    "package": "gltf-validator@2.0.0-dev.3.10",
+    "compat": {
+      "errors": 0,
+      "warnings": 0,
+      "infos": 43,
+      "hints": 0
+    },
+    "meshopt": {
+      "errors": 0,
+      "warnings": 0,
+      "infos": 44,
+      "hints": 0
+    }
+  }
+}
