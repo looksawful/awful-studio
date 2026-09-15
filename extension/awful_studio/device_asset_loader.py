@@ -16,6 +16,7 @@ DEVICE_ASSET_SPECS = {
         'default_lod': 'LOW',
         'lods': {'LOW': {'variant': 'low_v20', 'blend_path': 'assets/devices/iphone_17_low_v20.blend', 'entry_collection': 'AWFUL_DEVICE_IPHONE_17', 'source_revision': '89f7f254c5619013f6b7117861af026e72bddd3612c572f3b562e3900ef33b1e'}},
         'root_name': 'CTRL_IPHONE_17',
+        'orientation_axis': 'Y',
         'screen_object': 'SCREEN_CONTENT',
         'screen_material': 'MAT_SCREEN_CONTENT',
     },
@@ -27,6 +28,7 @@ DEVICE_ASSET_SPECS = {
         'default_lod': 'LOW',
         'lods': {'LOW': {'variant': 'low_v6', 'blend_path': 'assets/devices/ipad_pro_11_m5_low_v6.blend', 'entry_collection': 'AWFUL_DEVICE_IPAD_PRO_11', 'source_revision': '8dfdb09f561c22ad884b1b2e98a0c37bb8f922deb259f7d11237e4957f4ab39c'}},
         'root_name': 'CTRL_IPAD_PRO_11',
+        'orientation_axis': 'Y',
         'screen_object': 'SCREEN_CONTENT',
         'screen_material': 'MAT_SCREEN_CONTENT',
     },
@@ -38,6 +40,7 @@ DEVICE_ASSET_SPECS = {
         'default_lod': 'LOW',
         'lods': {'LOW': {'variant': 'low_v6', 'blend_path': 'assets/devices/ipad_pro_13_m5_low_v6.blend', 'entry_collection': 'AWFUL_DEVICE_IPAD_PRO_13', 'source_revision': 'a9ef8324a767fe72bfb5df34f85f5d5906a0822b08809374f9a901083ad9f462'}},
         'root_name': 'CTRL_IPAD_PRO_13',
+        'orientation_axis': 'Y',
         'screen_object': 'SCREEN_CONTENT',
         'screen_material': 'MAT_SCREEN_CONTENT',
     },
@@ -61,6 +64,13 @@ HINGE_PRESETS_DEGREES = {
     '60': 60.0,
     '90': 90.0,
     '102': 102.0,
+}
+
+ORIENTATION_PRESETS_DEGREES = {
+    'PORTRAIT': 0.0,
+    'LANDSCAPE_LEFT': 90.0,
+    'LANDSCAPE_RIGHT': -90.0,
+    'PORTRAIT_INVERTED': 180.0,
 }
 
 
@@ -89,6 +99,21 @@ def hinge_angle_degrees(key: str, preset: str) -> float:
         return float(HINGE_PRESETS_DEGREES[preset])
     except KeyError as exc:
         raise ValueError(f'Unknown AWFUL hinge preset: {preset}') from exc
+
+
+def orientation_preset_keys(key: str) -> tuple[str, ...]:
+    spec = device_asset_spec(key)
+    if spec.get('orientation_axis') != 'Y':
+        raise ValueError(f'AWFUL device asset has no orientation presets: {key}')
+    return tuple(ORIENTATION_PRESETS_DEGREES)
+
+
+def orientation_angle_degrees(key: str, preset: str) -> float:
+    orientation_preset_keys(key)
+    try:
+        return float(ORIENTATION_PRESETS_DEGREES[preset])
+    except KeyError as exc:
+        raise ValueError(f'Unknown AWFUL orientation preset: {preset}') from exc
 
 
 def lod_keys(key: str) -> tuple[str, ...]:
@@ -206,6 +231,43 @@ def _managed_role(prefix: str, key: str, name: str = '') -> str:
     suffix = name.replace(' ', '_').upper() if name else key
     return f'{prefix}_{key}_{suffix}'
 
+def apply_orientation_preset_to_root(root, key: str, preset: str):
+    spec = device_asset_spec(key)
+    axis = spec.get('orientation_axis')
+    if axis != 'Y':
+        raise ValueError(f'AWFUL device asset has no orientation presets: {key}')
+    angle = orientation_angle_degrees(key, preset)
+    root.rotation_mode = 'XYZ'
+    base = float(root.get('awful_orientation_base_y', root.rotation_euler.y))
+    if 'awful_orientation_base_y' not in root:
+        root['awful_orientation_base_y'] = base
+    root.rotation_euler.y = base + math.radians(angle)
+    root['awful_orientation_preset'] = preset
+    root['awful_orientation_angle_deg'] = angle
+    return root
+
+
+def apply_orientation_preset(legacy, scene, preset: str):
+    root = _active_device_root(legacy, scene)
+    key = str(root['awful_mockup_key'])
+    selected = str(getattr(scene.awful_studio, 'product_mockup', ''))
+    if selected != key:
+        raise RuntimeError('Generate the selected AWFUL device before changing orientation')
+    orientation_preset_keys(key)
+    foreign = [obj for obj in legacy.descendants(root)
+               if not legacy.ownership.owned(obj, scene)]
+    if foreign:
+        raise RuntimeError('User data is parented under the AWFUL device; detach it before changing orientation')
+    content = root.parent
+    if content is None or content.get(legacy.ROLE_KEY, '') != 'PRODUCT_CONTENT':
+        raise RuntimeError('AWFUL device is not mounted in PRODUCT_CONTENT')
+    legacy.parent_keep_world(root, None)
+    apply_orientation_preset_to_root(root, key, preset)
+    legacy.bpy.context.view_layer.update()
+    legacy.mount_product([root], bool(scene.awful_studio.auto_fit))
+    return root
+
+
 def create_device_asset(legacy, scene, key, lod=None):
     spec = device_asset_spec(key)
     selected_lod = lod or getattr(scene.awful_studio, 'device_lod', '') or spec['default_lod']
@@ -240,6 +302,9 @@ def create_device_asset(legacy, scene, key, lod=None):
     root['awful_asset_lod'] = selected_lod
     root['awful_asset_variant'] = lod_item['variant']
     root['awful_asset_source_revision'] = lod_item['source_revision']
+    if spec.get('orientation_axis') == 'Y':
+        preset = getattr(scene.awful_studio, 'device_orientation_preset', 'PORTRAIT') or 'PORTRAIT'
+        apply_orientation_preset_to_root(root, key, preset)
 
     for obj in [root] + legacy.descendants(root):
         if obj != root:
