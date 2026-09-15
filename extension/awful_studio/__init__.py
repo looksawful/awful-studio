@@ -30,7 +30,7 @@ class AWFUL_AddonPreferences(bpy.types.AddonPreferences):
     diagnostics: BoolProperty(name='Diagnostics', default=False)
 
     def draw(self, context):
-        self.layout.label(text='AWFUL STUDIO 1.0.0 — Blender 5.2 LTS')
+        self.layout.label(text='AWFUL STUDIO 1.0.0 Р Р†Р вЂљРІР‚Сњ Blender 5.2 LTS')
         self.layout.prop(self, 'asset_cache_path')
         self.layout.prop(self, 'allow_network_assets')
         self.layout.prop(self, 'diagnostics')
@@ -263,6 +263,38 @@ class AWFUL_OT_ApplyDeviceScreen(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class AWFUL_OT_ApplyDeviceOrientation(bpy.types.Operator):
+    bl_idname = 'awful.apply_device_orientation'
+    bl_label = 'Set Device Orientation'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        if context.scene is None or legacy.REG.object('CYC') is None:
+            return False
+        key = context.scene.awful_studio.product_mockup
+        try:
+            device_asset_loader.orientation_preset_keys(key)
+            root = device_asset_loader._active_device_root(legacy, context.scene)
+        except (ValueError, RuntimeError):
+            return False
+        return str(root.get('awful_mockup_key', '')) == key
+
+    def execute(self, context):
+        scene = context.scene
+        settings = scene.awful_studio
+        key = settings.product_mockup
+        try:
+            preset = settings.device_orientation_preset
+            with ownership.for_scene(scene):
+                root = device_asset_loader.apply_orientation_preset(legacy, scene, preset)
+            self.report({'INFO'}, f'Orientation {preset}: {root.name}')
+        except Exception as exc:
+            self.report({'ERROR'}, str(exc))
+            return {'CANCELLED'}
+        return {'FINISHED'}
+
+
 class AWFUL_OT_ApplyDeviceHinge(bpy.types.Operator):
     bl_idname = 'awful.apply_device_hinge'
     bl_label = 'Set Device Hinge'
@@ -288,7 +320,8 @@ class AWFUL_OT_ApplyDeviceHinge(bpy.types.Operator):
 CLASSES = (AWFUL_AddonPreferences, AWFUL_SceneState, *legacy.CLASSES,
            AWFUL_OT_Build, AWFUL_OT_Rebuild, AWFUL_OT_Remove, AWFUL_OT_ResetSystem,
            AWFUL_OT_Migrate, AWFUL_OT_ClearCache, AWFUL_OT_GenerateMockup,
-           AWFUL_OT_ApplyDeviceScreen, AWFUL_OT_ApplyDeviceHinge)
+           AWFUL_OT_ApplyDeviceScreen, AWFUL_OT_ApplyDeviceOrientation,
+           AWFUL_OT_ApplyDeviceHinge)
 
 
 def register():

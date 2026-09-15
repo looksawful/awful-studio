@@ -489,6 +489,12 @@ def install(legacy):
     lod_items = sorted({lod for key in device_asset_loader.device_asset_keys() for lod in device_asset_loader.lod_keys(key)})
     annotations['device_lod'] = legacy.EnumProperty(
         name='LOD', items=[(lod, lod, f'Use {lod} device geometry') for lod in lod_items], default='LOW')
+    orientation_items = [
+        (preset, preset.replace('_', ' ').title(), f'Set device orientation to {preset}')
+        for preset in device_asset_loader.orientation_preset_keys('DEVICE_IPHONE_17')
+    ]
+    annotations['device_orientation_preset'] = legacy.EnumProperty(
+        name='Orientation', items=orientation_items, default='PORTRAIT')
     annotations['device_screen_path'] = legacy.StringProperty(
         name='Screen Artwork', subtype='FILE_PATH', default='')
     annotations['device_hinge_preset'] = legacy.EnumProperty(
@@ -514,6 +520,9 @@ def install(legacy):
             spec = device_asset_loader.device_asset_spec(selected)
             box.label(text=f"Stage: {spec['stage'].replace('_', ' ').title()}")
             box.prop(settings, 'device_lod', text='LOD')
+            if spec.get('orientation_axis') == 'Y':
+                box.prop(settings, 'device_orientation_preset', text='Orientation')
+                box.operator('awful.apply_device_orientation', text='Set Orientation')
             box.prop(settings, 'device_screen_path', text='Screen')
             screen_row = box.row()
             screen_row.enabled = bool(settings.device_screen_path)
