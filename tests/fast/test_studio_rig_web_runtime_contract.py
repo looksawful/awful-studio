@@ -93,3 +93,18 @@ class StudioRigWebRuntimeContractTests(unittest.TestCase):
             self.assertLessEqual(collision["triangles"], 256)
             self.assertEqual(collision["materials"], 0)
             self.assertTrue(collision["stable_root"])
+
+    def test_lod_runtime_assets_are_separate_and_monotonic(self):
+        manifest = json.loads((RUNTIME / "asset_manifest.json").read_text(encoding="utf-8"))
+        evidence = json.loads((RUNTIME / "glb_validation.json").read_text(encoding="utf-8"))
+        self.assertIn("lod_assets", evidence)
+        for key, entry in manifest["assets"].items():
+            self.assertEqual(set(entry["lod_glb"]), {"LOD0", "LOD1", "LOD2"})
+            for path in entry["lod_glb"].values():
+                self.assertTrue((RUNTIME / path).is_file(), path)
+            lod = evidence["lod_assets"][key]
+            self.assertEqual(lod["LOD0"]["triangles"], evidence["assets"][key]["triangles"])
+            self.assertLess(lod["LOD1"]["triangles"], lod["LOD0"]["triangles"])
+            self.assertLess(lod["LOD2"]["triangles"], lod["LOD1"]["triangles"])
+            self.assertLessEqual(lod["LOD1"]["triangles"], int(lod["LOD0"]["triangles"] * 0.75))
+            self.assertLessEqual(lod["LOD2"]["triangles"], int(lod["LOD0"]["triangles"] * 0.35))

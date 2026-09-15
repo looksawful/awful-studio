@@ -36,14 +36,14 @@ def geometry_stats(doc):
     return primitives, vertices, triangles
 
 
-def inspect_visual(entry):
-    path = ROOT / entry["glb"]
+def inspect_visual(entry, relative_path):
+    path = ROOT / relative_path
     doc = read_glb(path)
     names = [node.get("name", "") for node in doc.get("nodes", [])]
     primitives, vertices, triangles = geometry_stats(doc)
     extensions = set(doc.get("extensionsUsed", []))
     item = {
-        "file": entry["glb"],
+        "file": relative_path,
         "bytes": path.stat().st_size,
         "nodes": len(names),
         "meshes": len(doc.get("meshes", [])),
@@ -95,31 +95,55 @@ def inspect_collision(entry):
     return item
 
 
+def lod_budget_pass(lods):
+    l0 = lods["LOD0"]["triangles"]
+    l1 = lods["LOD1"]["triangles"]
+    l2 = lods["LOD2"]["triangles"]
+    return (
+        l1 < l0
+        and l2 < l1
+        and l1 <= int(l0 * 0.75)
+        and l2 <= int(l0 * 0.35)
+    )
+
+
 def main():
-    assets = {key: inspect_visual(entry) for key, entry in MANIFEST["assets"].items()}
-    collision_assets = {
-        key: inspect_collision(entry) for key, entry in MANIFEST["assets"].items()
-    }
+    assets = {}
+    lod_assets = {}
+    collision_assets = {}
+    for key, entry in MANIFEST["assets"].items():
+        lods = {
+            level: inspect_visual(entry, path)
+            for level, path in entry["lod_glb"].items()
+        }
+        lods["budget_pass"] = lod_budget_pass(lods)
+        assets[key] = lods["LOD0"]
+        lod_assets[key] = lods
+        collision_assets[key] = inspect_collision(entry)
+
     result = {
-        "schema_version": 2,
+        "schema_version": 3,
         "assets": assets,
+        "lod_assets": lod_assets,
         "collision_assets": collision_assets,
         "pass": (
             all(item["pass"] for item in assets.values())
+            and all(item["budget_pass"] for item in lod_assets.values())
             and all(item["pass"] for item in collision_assets.values())
         ),
     }
     EVIDENCE.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
-    for key, item in assets.items():
-        print("AWFUL_GLTF_VALIDATE", key, f"{item['bytes']}B", f"{item['triangles']}tris", "PASS" if item["pass"] else "FAIL")
-    for key, item in collision_assets.items():
+
+    for key, lods in lod_assets.items():
         print(
-            "AWFUL_COLLISION_VALIDATE",
-            key,
-            f"{item['bytes']}B",
-            f"{item['triangles']}tris",
-            "PASS" if item["pass"] else "FAIL",
+            "AWFUL_LOD_VALIDATE", key,
+            f"LOD0={lods['LOD0']['triangles']}",
+            f"LOD1={lods['LOD1']['triangles']}",
+            f"LOD2={lods['LOD2']['triangles']}",
+            "PASS" if lods["budget_pass"] else "FAIL",
         )
+    for key, item in collision_assets.items():
+        print("AWFUL_COLLISION_VALIDATE", key, f"{item['triangles']}tris", "PASS" if item["pass"] else "FAIL")
     if not result["pass"]:
         raise SystemExit(1)
 
