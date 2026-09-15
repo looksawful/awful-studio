@@ -86,6 +86,38 @@ def main():
               linked_node(mix.inputs[2]) == nodes.get('AWFUL_CAMERA_BG_NISHITA_DAY'),
               linked_node(mix.inputs[2]).name if linked_node(mix.inputs[2]) else None)
 
+        # A saved studio reopens in a fresh process without a process-local
+        # ownership mark scope. A cached/valid HDRI must still load, be owned by
+        # this scene, and bind to the managed Environment Texture node.
+        fixture_path = args.work / 'cached-hdri-reopen-fixture.png'
+        fixture = bpy.data.images.new('__AWFUL_HDRI_REOPEN_FIXTURE', width=1, height=1)
+        fixture.pixels = (0.25, 0.35, 0.45, 1.0)
+        fixture.filepath_raw = str(fixture_path)
+        fixture.file_format = 'PNG'
+        fixture.save()
+        bpy.data.images.remove(fixture)
+
+        reopen_preset = 'BELFAST'
+        reopen_env = nodes.get(f'AWFUL_ENV_{reopen_preset}')
+        reopen_env.image = None
+        original_ready = workflow._asset_ready
+        original_hdri_path = legacy.hdri_asset_path
+        workflow._asset_ready = lambda _legacy, _cache, _preset: True
+        legacy.hdri_asset_path = lambda _key: str(fixture_path)
+        settings.natural_light_enabled = True
+        try:
+            legacy.apply_environment_preset(scene, reopen_preset, reset_defaults=False)
+        finally:
+            workflow._asset_ready = original_ready
+            legacy.hdri_asset_path = original_hdri_path
+
+        check('cached HDRI loads after process reopen without external ownership scope',
+              reopen_env.image is not None,
+              reopen_env.image.name if reopen_env.image else None)
+        check('reopened cached HDRI image is owned by the studio scene',
+              reopen_env.image is not None and ext.ownership.owned(reopen_env.image, scene),
+              dict(reopen_env.image.items()) if reopen_env.image else None)
+
         # Bulk workflow is proven without performing real network I/O.
         reviewed = workflow.reviewed_hdri_records()
         expected_urls = {record['download_url'] for record in reviewed}
