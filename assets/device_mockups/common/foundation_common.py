@@ -1,7 +1,7 @@
 import math
 import os
 import bpy
-from mathutils import Vector
+from mathutils import Vector, Matrix
 
 MM = 0.001
 
@@ -72,8 +72,8 @@ def rounded_outline(width, height, radius, segments=12):
     return points
 
 
-def rounded_prism(name, width, height, depth, radius, material, collection, axis="Y", location=(0, 0, 0), edge_bevel=0.0):
-    outline = rounded_outline(width, height, radius)
+def rounded_prism(name, width, height, depth, radius, material, collection, axis="Y", location=(0, 0, 0), edge_bevel=0.0, outline_segments=12):
+    outline = rounded_outline(width, height, radius, segments=outline_segments)
     count = len(outline)
     verts = []
     if axis == "Y":
@@ -228,3 +228,81 @@ def make_screen_material(name="MAT_SCREEN_CONTENT", color=(0.006, 0.008, 0.012),
     bsdf.inputs["Emission Color"].default_value = (*color, 1.0)
     bsdf.inputs["Emission Strength"].default_value = emission
     return material
+
+
+def rounded_rect_edge_point(width, height, radius, edge, coord):
+    """Return (x, z, nx, nz) on a rounded-rectangle boundary in the X/Z plane."""
+    hw, hh = width * 0.5, height * 0.5
+    r = min(radius, hw, hh)
+    edge = edge.upper()
+    if edge in {"TOP", "BOTTOM"}:
+        x = max(-hw, min(hw, coord))
+        sign_z = 1.0 if edge == "TOP" else -1.0
+        if abs(x) <= hw - r:
+            return x, sign_z * hh, 0.0, sign_z
+        cx = math.copysign(hw - r, x)
+        dx = x - cx
+        dz = math.sqrt(max(0.0, r * r - dx * dx))
+        z = sign_z * (hh - r + dz)
+        return x, z, dx / r, sign_z * dz / r
+    if edge in {"LEFT", "RIGHT"}:
+        z = max(-hh, min(hh, coord))
+        sign_x = 1.0 if edge == "RIGHT" else -1.0
+        if abs(z) <= hh - r:
+            return sign_x * hw, z, sign_x, 0.0
+        cz = math.copysign(hh - r, z)
+        dz = z - cz
+        dx = math.sqrt(max(0.0, r * r - dz * dz))
+        x = sign_x * (hw - r + dx)
+        return x, z, sign_x * dx / r, dz / r
+    raise ValueError(f"Unsupported rounded-rectangle edge: {edge}")
+
+
+def align_local_axis(obj, local_axis, target_axis):
+    """Rotate an object so a chosen local axis points along target_axis."""
+    source = Vector(local_axis).normalized()
+    target = Vector(target_axis).normalized()
+    obj.rotation_euler = source.rotation_difference(target).to_euler()
+    return obj
+
+
+def place_on_rounded_edge(obj, width, height, radius, edge, coord, outward=0.0, local_normal=(0, 0, 1)):
+    """Place on X/Z silhouette with stable local Y along device depth."""
+    x, z, nx, nz = rounded_rect_edge_point(width, height, radius, edge, coord)
+    obj.location.x = x + nx * outward
+    obj.location.z = z + nz * outward
+    target = Vector((nx, 0.0, nz)).normalized()
+    local = Vector(local_normal).normalized()
+    y = Vector((0.0, 1.0, 0.0))
+    if (local - Vector((1.0, 0.0, 0.0))).length < 1e-6:
+        x_axis = target; z_axis = x_axis.cross(y).normalized()
+        obj.rotation_euler = Matrix((x_axis, y, z_axis)).transposed().to_euler()
+    elif (local - Vector((0.0, 0.0, 1.0))).length < 1e-6:
+        z_axis = target; x_axis = y.cross(z_axis).normalized()
+        obj.rotation_euler = Matrix((x_axis, y, z_axis)).transposed().to_euler()
+    else:
+        align_local_axis(obj, local_normal, target)
+    return obj
+
+
+def boolean_difference(target, cutter, name=None, apply=True, keep_cutter=False):
+    modifier = target.modifiers.new(name or f"BOOL_{cutter.name}", "BOOLEAN")
+    modifier.operation = "DIFFERENCE"
+    modifier.solver = "EXACT"
+    modifier.object = cutter
+    if apply:
+        bpy.context.view_layer.objects.active = target
+        target.select_set(True)
+        bpy.ops.object.modifier_apply(modifier=modifier.name)
+        target.select_set(False)
+    if not keep_cutter:
+        bpy.data.objects.remove(cutter, do_unlink=True)
+    return modifier
+
+
+def add_bevel(obj, width, segments=4, limit_method="ANGLE"):
+    modifier = obj.modifiers.new("EDGE_BEVEL", "BEVEL")
+    modifier.width = width
+    modifier.segments = segments
+    modifier.limit_method = limit_method
+    return modifier
