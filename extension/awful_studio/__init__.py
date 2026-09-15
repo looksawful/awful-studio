@@ -30,7 +30,7 @@ class AWFUL_AddonPreferences(bpy.types.AddonPreferences):
     diagnostics: BoolProperty(name='Diagnostics', default=False)
 
     def draw(self, context):
-        self.layout.label(text='AWFUL STUDIO 1.0.0 Р Р†Р вЂљРІР‚Сњ Blender 5.2 LTS')
+        self.layout.label(text='AWFUL STUDIO 1.0.0 — Blender 5.2 LTS')
         self.layout.prop(self, 'asset_cache_path')
         self.layout.prop(self, 'allow_network_assets')
         self.layout.prop(self, 'diagnostics')
