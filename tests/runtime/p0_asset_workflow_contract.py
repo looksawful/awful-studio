@@ -88,14 +88,16 @@ def main():
 
         # A saved studio reopens in a fresh process without a process-local
         # ownership mark scope. A cached/valid HDRI must still load, be owned by
-        # this scene, and bind to the managed Environment Texture node.
-        fixture_path = args.work / 'cached-hdri-reopen-fixture.png'
-        fixture = bpy.data.images.new('__AWFUL_HDRI_REOPEN_FIXTURE', width=1, height=1)
-        fixture.pixels = (0.25, 0.35, 0.45, 1.0)
+        # this scene, and bind to the managed Environment Texture node. TARGA_RAW
+        # keeps the fixture above legacy's >4096-byte asset validity threshold.
+        fixture_path = args.work / 'cached-hdri-reopen-fixture.tga'
+        fixture = bpy.data.images.new('__AWFUL_HDRI_REOPEN_FIXTURE', width=64, height=64)
         fixture.filepath_raw = str(fixture_path)
-        fixture.file_format = 'PNG'
+        fixture.file_format = 'TARGA_RAW'
         fixture.save()
         bpy.data.images.remove(fixture)
+        check('reopen fixture satisfies runtime asset size guard',
+              fixture_path.stat().st_size > 4096, fixture_path.stat().st_size)
 
         reopen_preset = 'BELFAST'
         reopen_env = nodes.get(f'AWFUL_ENV_{reopen_preset}')
