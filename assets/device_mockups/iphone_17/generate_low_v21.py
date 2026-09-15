@@ -11,6 +11,16 @@ if COMMON not in sys.path:
 import foundation_common as fc
 
 MM = fc.MM
+
+def reverse_prism_caps(obj):
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    bm.faces.ensure_lookup_table()
+    bmesh.ops.reverse_faces(bm, faces=[bm.faces[0], bm.faces[1]])
+    bm.to_mesh(obj.data)
+    bm.free()
+    obj.data.update()
+
 W, H, D = 71.5 * MM, 149.6 * MM, 7.95 * MM
 BODY_R = 13.6 * MM
 METAL_D = 7.25 * MM
@@ -101,6 +111,7 @@ back_seat.hide_render = True
 back_glass = fc.rounded_prism("BACK_GLASS", COVER_W, COVER_H, GLASS_T, COVER_R,
                               back_mat, body_c, axis="Y", location=(0, back_y, 0),
                               edge_bevel=0.0, outline_segments=48)
+reverse_prism_caps(back_glass)
 
 front_seat = fc.rounded_prism("DISPLAY_GLASS_SEAT", COVER_W + 0.10*MM, COVER_H + 0.10*MM, 0.07*MM,
                               COVER_R + 0.05*MM, gap_mat, screen_c, axis="Y",
@@ -159,6 +170,7 @@ housing_z = 52.32*MM
 housing_seat = fc.rounded_prism("CAMERA_HOUSING_SEAT", 20.74*MM, 43.82*MM, 0.10*MM, 10.27*MM, gap_mat, detail_c, axis="Y", location=(housing_x, D*0.5 + 0.08*MM, housing_z), outline_segments=96)
 housing_seat.hide_render = True
 housing = fc.rounded_prism("CAMERA_HOUSING", 20.54*MM, 43.62*MM, 0.94*MM, 10.27*MM, camera_housing_mat, detail_c, axis="Y", location=(housing_x, D*0.5 + 0.54*MM, housing_z), edge_bevel=0.00018, outline_segments=96)
+reverse_prism_caps(housing)
 for idx,(x_mm,z_mm) in enumerate(((22.13,61.18),(22.13,43.46)),1):
     seat=fc.cylinder(f"CAMERA_{idx}_SEAT",8.18*MM,0.14*MM,gap_mat,detail_c,(x_mm*MM,D*0.5+0.88*MM,z_mm*MM),axis="Y",vertices=192); seat.hide_render=True
     fc.cylinder(f"CAMERA_{idx}_RING",8.00*MM,0.36*MM,metal_dark,detail_c,(x_mm*MM,D*0.5+1.09*MM,z_mm*MM),axis="Y",vertices=192)
