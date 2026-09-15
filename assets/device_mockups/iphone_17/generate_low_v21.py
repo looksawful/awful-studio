@@ -167,8 +167,16 @@ receiver = fc.rounded_cube("FRONT_RECEIVER_MIC", (14.02*MM, 0.020*MM, 0.30*MM), 
 
 housing_x = 20.55*MM
 housing_z = 52.32*MM
-housing_seat = fc.rounded_prism("CAMERA_HOUSING_SEAT", 20.74*MM, 43.82*MM, 0.10*MM, 10.27*MM, gap_mat, detail_c, axis="Y", location=(housing_x, D*0.5 + 0.08*MM, housing_z), outline_segments=96)
-housing_seat.hide_render = True
+housing_seat = fc.rounded_prism("CAMERA_HOUSING_SEAT", 21.30*MM, 44.38*MM, 0.42*MM, 10.60*MM, back_mat, detail_c, axis="Y", location=(housing_x, D*0.5 + 0.21*MM, housing_z), edge_bevel=0.00010, outline_segments=96)
+reverse_prism_caps(housing_seat)
+housing_seat_bevel = housing_seat.modifiers.get("EDGE_BEVEL")
+if housing_seat_bevel:
+    housing_seat_bevel.harden_normals = True
+for poly in housing_seat.data.polygons[2:]:
+    poly.use_smooth = True
+housing_seat_wn = housing_seat.modifiers.new("WEIGHTED_NORMAL", "WEIGHTED_NORMAL")
+housing_seat_wn.keep_sharp = True
+housing_seat_wn.weight = 50
 housing = fc.rounded_prism("CAMERA_HOUSING", 20.54*MM, 43.62*MM, 0.94*MM, 10.27*MM, camera_housing_mat, detail_c, axis="Y", location=(housing_x, D*0.5 + 0.54*MM, housing_z), edge_bevel=0.00018, outline_segments=96)
 reverse_prism_caps(housing)
 for idx,(x_mm,z_mm) in enumerate(((22.13,61.18),(22.13,43.46)),1):
@@ -213,7 +221,7 @@ mesh.from_pydata(verts, [], [(0,3,2,1)])
 mesh.update()
 logo = bpy.data.objects.new("APPLE_LOGO_DECAL", mesh)
 detail_c.objects.link(logo)
-logo.location = (0, D*0.5 + 0.006*MM, (H*0.5 - 73.18*MM))
+logo.location = (0, D*0.5 + 0.050*MM, (H*0.5 - 73.18*MM))
 logo.data.materials.append(logo_mat)
 uv = mesh.uv_layers.new(name="UVMap")
 for loop, coord in zip(mesh.loops, ((1,0),(1,1),(0,1),(0,0))):
@@ -381,17 +389,21 @@ mandatory = [
     "DYNAMIC_ISLAND", "FRONT_SENSOR_PILL", "FRONT_CAMERA_RING", "FRONT_CAMERA_GLASS", "FRONT_CAMERA_IRIS", "FRONT_CAMERA_PUPIL", "FRONT_RECEIVER_MIC", "APPLE_LOGO_DECAL",
     "ACTION_BUTTON", "VOL_UP", "VOL_DOWN", "SIDE_BUTTON", "CAMERA_CONTROL",
     "USB_C_CAVITY", "BOTTOM_MIC_APERTURE_03", "BOTTOM_SPEAKER_APERTURE_05",
-    "CAMERA_HOUSING", "CAMERA_1_GLASS", "CAMERA_2_GLASS", "FLASH", "REAR_MIC"
+    "CAMERA_HOUSING_SEAT", "CAMERA_HOUSING", "CAMERA_1_GLASS", "CAMERA_2_GLASS", "FLASH", "REAR_MIC"
 ]
 missing = [name for name in mandatory if bpy.data.objects.get(name) is None]
 forbidden = [name for name in ("FRONT_SENSOR_L", "FRONT_SENSOR_R", "FRONT_SENSOR_DOT") if bpy.data.objects.get(name) is not None]
 expected_boolean_cuts = 2 + 5 + 1 + 8 + 2
+back_outer_y = back_glass.location.y + max(v.co.y for v in back_glass.data.vertices)
+backing_outer_y = housing_seat.location.y + max(v.co.y for v in housing_seat.data.vertices)
+camera_backing_protrusion_mm = (backing_outer_y - back_outer_y) / MM
 passed = (
     non_manifold == 0
     and not missing
     and not forbidden
     and len(boolean_cuts) == expected_boolean_cuts
     and all(abs(v) <= 0.01 for v in delta_mm.values())
+    and camera_backing_protrusion_mm >= 0.35
 )
 evidence = {
     "asset_id": "iphone_17",
@@ -412,6 +424,8 @@ evidence = {
     "official_reference": "Apple iPhone 17 Dimensional Drawings 2025-09-09",
     "cover_glass_mm": [69.45, 147.61],
     "display_active_area_mm": [66.57, 144.79],
+    "camera_backing_protrusion_mm": round(camera_backing_protrusion_mm, 4),
+    "camera_backing_visible": not housing_seat.hide_render,
     "passed": passed,
 }
 os.makedirs(os.path.dirname(EVIDENCE), exist_ok=True)

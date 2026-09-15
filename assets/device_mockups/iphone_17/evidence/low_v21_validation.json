@@ -55,5 +55,7 @@
     66.57,
     144.79
   ],
+  "camera_backing_protrusion_mm": 0.42,
+  "camera_backing_visible": true,
   "passed": true
 }
