@@ -40,7 +40,8 @@ class Release100HygieneTests(unittest.TestCase):
         self.assertIn('Known limitations', notes_text)
 
     def test_release_tree_has_no_dev_junk_or_machine_specific_paths(self):
-        forbidden_suffixes = {'.pyc', '.pyo', '.blend', '.blend1', '.exe', '.dll', '.zip'}
+        forbidden_suffixes = {'.pyc', '.pyo', '.blend1', '.exe', '.dll', '.zip'}
+        bundled_blend_prefix = ('extension', 'awful_studio', 'assets', 'devices')
         tracked = tracked_files()
         violations = []
 
@@ -49,7 +50,12 @@ class Release100HygieneTests(unittest.TestCase):
                 relative = path.relative_to(ROOT)
             except ValueError:
                 continue
-            if relative.parts[:2] == ('extension', 'awful_studio') and path.suffix.lower() in forbidden_suffixes:
+            if relative.parts[:2] != ('extension', 'awful_studio'):
+                continue
+            suffix = path.suffix.lower()
+            if suffix == '.blend' and relative.parts[:4] != bundled_blend_prefix:
+                violations.append(f'unapproved Blender file in Extension package: {relative}')
+            elif suffix in forbidden_suffixes:
                 violations.append(f'dev junk in Extension package: {relative}')
 
         patterns = (
