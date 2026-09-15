@@ -132,8 +132,8 @@ def hard_surface_glass(obj):
     weighted.keep_sharp = True
     weighted.weight = 50
 
-for poly in back_glass.data.polygons[2:]:
-    poly.use_smooth = True
+for poly in back_glass.data.polygons:
+    poly.use_smooth = False
 hard_surface_glass(screen_glass)
 # Screen material doubles as the clean glossy active glass surface for the current publishable LOW asset.
 sbsdf = screen_mat.node_tree.nodes.get("Principled BSDF")
@@ -439,4 +439,4 @@ for cam, filename in renders:
     render_profile(cam, filename)
 print("AWFUL_IPHONE17_V21_VALIDATION", json.dumps(evidence, sort_keys=True))
 if not passed:
-    raise RuntimeError("iPhone 17 LOW v15 validation failed")
+    raise RuntimeError("iPhone 17 LOW v21 validation failed")
