@@ -1,0 +1,59 @@
+{
+  "asset_id": "iphone_17",
+  "stage": "LOW_DRAFT",
+  "revision": "hard_surface_camera_housing_v21",
+  "blender_version": "5.2.1 LTS",
+  "expected_mm": {
+    "width": 71.5,
+    "depth": 7.95,
+    "height": 149.6
+  },
+  "actual_mm": {
+    "width": 71.500003,
+    "depth": 7.95,
+    "height": 149.599999
+  },
+  "delta_mm": {
+    "width": 3e-06,
+    "depth": 0.0,
+    "height": -1e-06
+  },
+  "body_non_manifold_edges": 0,
+  "body_vertices": 3638,
+  "body_faces": 2732,
+  "boolean_cuts": [
+    "DISPLAY_POCKET",
+    "SCREEN_ACTIVE",
+    "ACTION_BUTTON",
+    "VOL_UP",
+    "VOL_DOWN",
+    "SIDE_BUTTON",
+    "CAMERA_CONTROL",
+    "USB_C",
+    "BOTTOM_MIC_APERTURE_01",
+    "BOTTOM_MIC_APERTURE_02",
+    "BOTTOM_MIC_APERTURE_03",
+    "BOTTOM_SPEAKER_APERTURE_01",
+    "BOTTOM_SPEAKER_APERTURE_02",
+    "BOTTOM_SPEAKER_APERTURE_03",
+    "BOTTOM_SPEAKER_APERTURE_04",
+    "BOTTOM_SPEAKER_APERTURE_05",
+    "SCREW_L",
+    "SCREW_R"
+  ],
+  "boolean_cut_count": 18,
+  "mandatory_missing": [],
+  "forbidden_front_nodes": [],
+  "object_count": 78,
+  "material_count": 19,
+  "official_reference": "Apple iPhone 17 Dimensional Drawings 2025-09-09",
+  "cover_glass_mm": [
+    69.45,
+    147.61
+  ],
+  "display_active_area_mm": [
+    66.57,
+    144.79
+  ],
+  "passed": true
+}
