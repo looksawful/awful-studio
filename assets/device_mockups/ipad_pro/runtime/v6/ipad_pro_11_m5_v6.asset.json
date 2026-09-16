@@ -1,0 +1,205 @@
+{
+  "asset_id": "ipad_pro_11_m5",
+  "version": "v6",
+  "stage": "LOW_DRAFT",
+  "source_blend": "generated/ipad_pro_11_m5_low_v6.blend",
+  "delivery_blend": "runtime/v6/ipad_pro_11_m5_v6_delivery.blend",
+  "glb": "runtime/v6/ipad_pro_11_m5_v6_web.glb",
+  "body_dimensions_mm": [
+    177.5,
+    249.7,
+    5.3
+  ],
+  "dimension_order": [
+    "width_x",
+    "height_y",
+    "depth_z"
+  ],
+  "runtime_bounds_mm": [
+    177.578,
+    249.788,
+    6.764
+  ],
+  "units": "meters",
+  "source_up_axis": "+Z",
+  "source_forward_axis": "-Y",
+  "up_axis": "+Y",
+  "forward_axis": "+Z",
+  "root": "CTRL_IPAD_PRO_11",
+  "screen_object": "SCREEN_CONTENT",
+  "anchors": [
+    "ANCHOR_CENTER",
+    "ANCHOR_BOTTOM_CENTER",
+    "ANCHOR_SCREEN_CENTER",
+    "ANCHOR_REAR_CAMERA"
+  ],
+  "lods": [
+    {
+      "name": "LOD0",
+      "file": "ipad_pro_11_m5_v6_web.glb"
+    }
+  ],
+  "materials": [
+    "MAT_APPLE_LOGO_DECAL",
+    "MAT_ASSEMBLY_GAP",
+    "MAT_DISPLAY_BEZEL",
+    "MAT_DISPLAY_GLASS",
+    "MAT_FLASH",
+    "MAT_FRONT_OPTIC",
+    "MAT_IPAD_ALUMINUM",
+    "MAT_IPAD_EDGE",
+    "MAT_OPTICAL_GLASS",
+    "MAT_OPTICS_BLACK",
+    "MAT_SCREEN_CONTENT"
+  ],
+  "exported_objects": [
+    "CTRL_IPAD_PRO_11",
+    "ANCHOR_BOTTOM_CENTER",
+    "ANCHOR_CENTER",
+    "ANCHOR_REAR_CAMERA",
+    "ANCHOR_SCREEN_CENTER",
+    "APPLE_LOGO_DECAL",
+    "BODY_ALUMINUM",
+    "BOTTOM_L_SPEAKER_01",
+    "BOTTOM_L_SPEAKER_02",
+    "BOTTOM_L_SPEAKER_03",
+    "BOTTOM_L_SPEAKER_04",
+    "BOTTOM_L_SPEAKER_05",
+    "BOTTOM_L_SPEAKER_06",
+    "BOTTOM_R_SPEAKER_01",
+    "BOTTOM_R_SPEAKER_02",
+    "BOTTOM_R_SPEAKER_03",
+    "BOTTOM_R_SPEAKER_04",
+    "BOTTOM_R_SPEAKER_05",
+    "BOTTOM_R_SPEAKER_06",
+    "CAMERA_HOUSING",
+    "DISPLAY_BEZEL",
+    "DISPLAY_GLASS_SEAT",
+    "FLASH",
+    "FRONT_CAMERA_GLASS",
+    "FRONT_CAMERA_INNER",
+    "FRONT_CAMERA_PUPIL",
+    "LIDAR",
+    "LIDAR_RING",
+    "PENCIL_MAGNETIC_RAIL",
+    "REAR_CAMERA_GLASS",
+    "REAR_CAMERA_INNER",
+    "REAR_CAMERA_PUPIL",
+    "REAR_CAMERA_RING",
+    "REAR_MIC",
+    "SCREEN_CONTENT",
+    "SCREEN_GLASS",
+    "SMART_CONNECTOR_1",
+    "SMART_CONNECTOR_2",
+    "SMART_CONNECTOR_3",
+    "TOP_BUTTON",
+    "TOP_L_SPEAKER_01",
+    "TOP_L_SPEAKER_02",
+    "TOP_L_SPEAKER_03",
+    "TOP_L_SPEAKER_04",
+    "TOP_L_SPEAKER_05",
+    "TOP_L_SPEAKER_06",
+    "TOP_R_SPEAKER_01",
+    "TOP_R_SPEAKER_02",
+    "TOP_R_SPEAKER_03",
+    "TOP_R_SPEAKER_04",
+    "TOP_R_SPEAKER_05",
+    "TOP_R_SPEAKER_06",
+    "USB_C_CAVITY",
+    "VOL_DOWN",
+    "VOL_UP"
+  ],
+  "runtime_roles": {
+    "BODY_ALUMINUM": "body",
+    "SCREEN_CONTENT": "screen",
+    "SCREEN_GLASS": "screen_glass",
+    "FRONT_CAMERA_GLASS": "front_camera_optic",
+    "TOP_BUTTON": "control",
+    "VOL_UP": "control",
+    "VOL_DOWN": "control",
+    "USB_C_CAVITY": "port",
+    "CAMERA_HOUSING": "camera_housing",
+    "REAR_CAMERA_GLASS": "camera_optic",
+    "LIDAR": "depth_sensor",
+    "APPLE_LOGO_DECAL": "branding"
+  },
+  "threejs_loader": "GLTFLoader",
+  "requires_meshopt_decoder": false,
+  "web_variants": {
+    "compat": {
+      "file": "ipad_pro_11_m5_v6_web.glb",
+      "requires": []
+    },
+    "meshopt": {
+      "file": "ipad_pro_11_m5_v6_web_meshopt.glb",
+      "requires": [
+        "MeshoptDecoder"
+      ],
+      "extensions_required": [
+        "EXT_meshopt_compression",
+        "KHR_mesh_quantization"
+      ]
+    }
+  },
+  "camera_fit": "runtime_bounds",
+  "source_revision": "09d90dd24e472c7f037f8006ded4bce995980229919292d07c29121d77bc9caa",
+  "source_commit": "05ce2a03027df1ba4d2a8679cda9d291f8c4d17a",
+  "plugin_source_revision": "8dfdb09f561c22ad884b1b2e98a0c37bb8f922deb259f7d11237e4957f4ab39c",
+  "generator_version": "ipad_v6_packaged_blend_web_delivery",
+  "delivery_profile": {
+    "simplification": "none",
+    "compression": "compat+meshopt",
+    "node_preservation": "required"
+  },
+  "default_web_variant": "compat",
+  "preferred_web_variant": "meshopt",
+  "web_optimizer": {
+    "tool": "@gltf-transform/cli",
+    "version": "4.5.0",
+    "command": "meshopt --level high"
+  },
+  "source_files": {
+    "assets/device_mockups/ipad_pro/export_runtime_v6.py": "061d6198795b7a2d120bdcc276946c0b9c6bfa4f5ee5959147e1d875d4509a09",
+    "assets/device_mockups/ipad_pro/optimize_runtime_v6.py": "153535fe4835764088ad4a540e5f8b119915022594eda52ff4ac17790a44cdc7",
+    "assets/device_mockups/ipad_pro/reference/apple_logo_alpha.png": "50209309a1cf3bcb874118b27fe9c9779aaafabaf79bb304cf0aa3a2898c9833",
+    "extension/awful_studio/assets/devices/ipad_pro_11_m5_low_v6.blend": "06023295eb77052446c25a0dbe0d27c590abf9e1d56f6e022e2f356bdf7b16e3"
+  },
+  "glb_qa": {
+    "triangle_count": 20696,
+    "required_nodes": [
+      "ANCHOR_BOTTOM_CENTER",
+      "ANCHOR_CENTER",
+      "ANCHOR_REAR_CAMERA",
+      "ANCHOR_SCREEN_CENTER",
+      "APPLE_LOGO_DECAL",
+      "CAMERA_HOUSING",
+      "CTRL_IPAD_PRO_11",
+      "FRONT_CAMERA_GLASS",
+      "LIDAR",
+      "REAR_CAMERA_GLASS",
+      "SCREEN_CONTENT",
+      "SCREEN_GLASS"
+    ],
+    "node_count": 55,
+    "material_count": 11,
+    "runtime_bounds_mm": [
+      177.578,
+      249.788,
+      6.764
+    ]
+  },
+  "artifacts": {
+    "delivery_blend": {
+      "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_delivery.blend",
+      "sha256": "928879804fd1f0ec6572c418edb1a5ffec00c929933effc9aa5e1fea8e9cbda2"
+    },
+    "compat_glb": {
+      "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_web.glb",
+      "sha256": "4986eb650340df6448e3f8812f56991560ade5b46bc0955dfc89f65f03cd4045"
+    },
+    "meshopt_glb": {
+      "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_web_meshopt.glb",
+      "sha256": "e94a8774d2375ebe2baea6483b4360ad2c08a1e201c485b167c97f1f1ab313b2"
+    }
+  }
+}
