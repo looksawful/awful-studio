@@ -15,3 +15,9 @@ assets/device_mockups/iphone_17/optimize_runtime_v29.py text eol=lf
 assets/device_mockups/iphone_17/evidence/low_v29_validation.json text eol=lf
 assets/device_mockups/iphone_17/runtime/v29/*.json text eol=lf
 tools/build_iphone17_v29.py text eol=lf
+
+assets/device_mockups/ipad_pro/export_runtime_v6.py text eol=lf
+assets/device_mockups/ipad_pro/optimize_runtime_v6.py text eol=lf
+assets/device_mockups/ipad_pro/runtime/v6/*.json text eol=lf
+tools/build_ipad_v6_web.py text eol=lf
+tests/fast/test_ipad_web_delivery_contract.py text eol=lf
