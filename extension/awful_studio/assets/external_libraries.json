@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "license_reviewed_at": "2026-09-16",
+  "libraries": {
+    "quaternius_downtown_city": {"provider":"Quaternius","title":"Downtown City MegaKit","source_page":"https://quaternius.com/packs/downtowncitymegakit.html","license":"CC0-1.0","license_url":"https://creativecommons.org/publicdomain/zero/1.0/","distribution":"user-acquired-local","categories":["environment","modular","city","props"],"formats":["obj","fbx","gltf"]},
+    "quaternius_medieval_village": {"provider":"Quaternius","title":"Medieval Village MegaKit","source_page":"https://quaternius.com/packs/medievalvillagemegakit.html","license":"CC0-1.0","license_url":"https://creativecommons.org/publicdomain/zero/1.0/","distribution":"user-acquired-local","categories":["environment","modular","village","props"],"formats":["obj","fbx","gltf"]},
+    "quaternius_modular_scifi": {"provider":"Quaternius","title":"Modular Sci-Fi MegaKit","source_page":"https://quaternius.com/packs/modularscifimegakit.html","license":"CC0-1.0","license_url":"https://creativecommons.org/publicdomain/zero/1.0/","distribution":"user-acquired-local","categories":["environment","modular","scifi","props"],"formats":["obj","fbx","gltf"]},
+    "quaternius_stylized_nature": {"provider":"Quaternius","title":"Stylized Nature MegaKit","source_page":"https://quaternius.com/packs/stylizednaturemegakit.html","license":"CC0-1.0","license_url":"https://creativecommons.org/publicdomain/zero/1.0/","distribution":"user-acquired-local","categories":["environment","nature","vegetation","props"],"formats":["obj","fbx","gltf"]},
+    "quaternius_sushi_restaurant": {"provider":"Quaternius","title":"Sushi Restaurant Kit","source_page":"https://quaternius.com/packs/sushirestaurantkit.html","license":"CC0-1.0","license_url":"https://creativecommons.org/publicdomain/zero/1.0/","distribution":"user-acquired-local","categories":["environment","interior","restaurant","props"],"formats":["obj","fbx","gltf"]}
+  }
+}
