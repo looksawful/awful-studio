@@ -19,8 +19,8 @@
     "height": -2e-06
   },
   "body_non_manifold_edges": 0,
-  "body_vertices": 4385,
-  "body_faces": 3335,
+  "body_vertices": 4035,
+  "body_faces": 2951,
   "boolean_cuts": [
     "DISPLAY_POCKET",
     "SCREEN_ACTIVE",
@@ -59,6 +59,6 @@
   "camera_backing_protrusion_mm": 0.26,
   "camera_backing_visible": true,
   "button_min_protrusion_mm": 0.62,
-  "camera_control_protrusion_mm": 0.19,
+  "camera_control_protrusion_mm": 0.08,
   "passed": true
 }

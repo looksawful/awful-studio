@@ -1,4 +1,5 @@
 ﻿import json
+import math
 import os
 import sys
 import bmesh
@@ -25,6 +26,13 @@ W, H, D = 71.45 * MM, 149.61 * MM, 7.95 * MM
 BODY_R = 13.6 * MM
 METAL_D = 7.25 * MM
 GLASS_T = 0.35 * MM
+DISPLAY_SURFACE_T = 0.030 * MM
+DISPLAY_GAP = 0.080 * MM
+CAMERA_HOUSING_R = 10.27 * MM
+CAMERA_HOUSING_SEAT_R = 10.37 * MM
+CAMERA_CONTROL_LENGTH = 17.10 * MM
+CAMERA_CONTROL_FACE_W = 3.03 * MM
+CAMERA_CONTROL_PROTRUSION = 0.08 * MM
 COVER_W, COVER_H, COVER_R = 69.45 * MM, 147.61 * MM, 12.0 * MM
 SCREEN_W, SCREEN_H, SCREEN_R = 66.57 * MM, 144.79 * MM, 10.55 * MM
 
@@ -81,7 +89,7 @@ lbsdf.inputs["Coat Roughness"].default_value = 0.008
 gap_mat = fc.make_material("MAT_ASSEMBLY_GAP", (0.0005, 0.0006, 0.0008), 0.0, 0.32)
 bezel_mat = fc.make_material("MAT_DISPLAY_BEZEL", (0.001, 0.0012, 0.0015), 0.0, 0.10)
 screen_mat = fc.make_material("MAT_SCREEN_CONTENT", (0.0038, 0.0052, 0.0078), 0.0, 0.085)
-screen_texture_path = os.path.join(HERE, "reference", "ios26_home_screen_1206x2622.png")
+screen_texture_path = os.path.join(HERE, "reference", "awful_screen_gradient_1440x3132.png")
 screen_tex = screen_mat.node_tree.nodes.new("ShaderNodeTexImage")
 screen_tex.image = bpy.data.images.load(screen_texture_path, check_existing=True)
 screen_tex.image.colorspace_settings.name = "sRGB"
@@ -137,9 +145,10 @@ active_cut = fc.rounded_prism("SCREEN_ACTIVE_CUTTER", SCREEN_W + 0.12*MM, SCREEN
                               location=(0, front_y, 0), outline_segments=48)
 fc.boolean_difference(screen_glass, active_cut, name="CUT_ACTIVE_AREA")
 
-screen_content = fc.rounded_prism("SCREEN_CONTENT", SCREEN_W, SCREEN_H, GLASS_T - 0.025*MM,
+screen_content_y = front_y + GLASS_T*0.5 + DISPLAY_GAP + DISPLAY_SURFACE_T*0.5
+screen_content = fc.rounded_prism("SCREEN_CONTENT", SCREEN_W, SCREEN_H, DISPLAY_SURFACE_T,
                                   SCREEN_R, screen_mat, screen_c, axis="Y",
-                                  location=(0, front_y + 0.010*MM, 0), edge_bevel=0.00004,
+                                  location=(0, screen_content_y, 0), edge_bevel=0.00001,
                                   outline_segments=48)
 # Planar UVs map the real raster screen image to the active display surface.
 uv = screen_content.data.uv_layers.new(name="UVMap")
@@ -181,7 +190,7 @@ receiver = fc.rounded_cube("FRONT_RECEIVER_MIC", (14.02*MM, 0.020*MM, 0.30*MM), 
 
 housing_x = W*0.5 - 20.54*MM*0.5
 housing_z = H*0.5 - 43.62*MM*0.5
-housing_seat = fc.rounded_prism("CAMERA_HOUSING_SEAT", 20.74*MM, 43.82*MM, 0.30*MM, 3.25*MM, back_mat, detail_c, axis="Y", location=(housing_x, back_y + GLASS_T*0.5 + 0.11*MM, housing_z), edge_bevel=0.00010, outline_segments=96)
+housing_seat = fc.rounded_prism("CAMERA_HOUSING_SEAT", 20.74*MM, 43.82*MM, 0.30*MM, CAMERA_HOUSING_SEAT_R, back_mat, detail_c, axis="Y", location=(housing_x, back_y + GLASS_T*0.5 + 0.11*MM, housing_z), edge_bevel=0.00010, outline_segments=96)
 reverse_prism_caps(housing_seat)
 housing_seat_bevel = housing_seat.modifiers.get("EDGE_BEVEL")
 if housing_seat_bevel:
@@ -191,7 +200,7 @@ for poly in housing_seat.data.polygons:
 housing_seat_wn = housing_seat.modifiers.new("WEIGHTED_NORMAL", "WEIGHTED_NORMAL")
 housing_seat_wn.keep_sharp = True
 housing_seat_wn.weight = 50
-housing = fc.rounded_prism("CAMERA_HOUSING", 20.54*MM, 43.62*MM, 0.72*MM, 3.25*MM, camera_housing_mat, detail_c, axis="Y", location=(housing_x, back_y + GLASS_T*0.5 + 0.36*MM, housing_z), edge_bevel=0.00018, outline_segments=96)
+housing = fc.rounded_prism("CAMERA_HOUSING", 20.54*MM, 43.62*MM, 0.72*MM, CAMERA_HOUSING_R, back_mat, detail_c, axis="Y", location=(housing_x, back_y + GLASS_T*0.5 + 0.36*MM, housing_z), edge_bevel=0.00018, outline_segments=96)
 reverse_prism_caps(housing)
 for idx,(x_mm,z_mm) in enumerate(((22.13,61.18),(22.13,43.46)),1):
     seat=fc.cylinder(f"CAMERA_{idx}_SEAT",8.18*MM,0.14*MM,gap_mat,detail_c,(x_mm*MM,D*0.5+0.88*MM,z_mm*MM),axis="Y",vertices=192); seat.hide_render=True
@@ -257,14 +266,29 @@ def physical_side_button(name, edge, z_mm, length_mm, face_width_mm=0.72, protru
     fc.place_on_rounded_edge(button, W, H, BODY_R, edge, z_mm*MM, outward=center_out, local_normal=(1,0,0))
     return button
 
-def camera_control(edge, z_mm, diameter_mm=2.55):
-    # Recessed black circular Camera Control face from visual QA.
-    cutter = fc.cylinder("CAMERA_CONTROL_CUTTER", (diameter_mm*0.5 + 0.20)*MM, 0.42*MM, None, detail_c, axis="Z", vertices=96)
-    fc.place_on_rounded_edge(cutter, W, H, BODY_R, edge, z_mm*MM, outward=-0.12*MM, local_normal=(0,0,1))
+def side_capsule(name, face_width, length, thickness, radius, material):
+    obj = fc.rounded_prism(name, face_width, length, thickness, radius, material, detail_c,
+                           axis="Y", outline_segments=32)
+    obj.rotation_euler[2] = math.radians(90.0)
+    bpy.context.view_layer.objects.active = obj
+    obj.select_set(True)
+    bpy.ops.object.transform_apply(location=False, rotation=True, scale=False)
+    obj.select_set(False)
+    return obj
+
+def camera_control(edge, z_mm):
+    # Apple iPhone 17 side drawing: Camera Control is a 17.10 x 3.03 mm capsule, centered at 98.20 mm from the top datum.
+    cutter = side_capsule("CAMERA_CONTROL_CUTTER", CAMERA_CONTROL_FACE_W + 0.22*MM,
+                          CAMERA_CONTROL_LENGTH + 0.22*MM, 0.42*MM,
+                          (CAMERA_CONTROL_FACE_W + 0.22*MM)*0.5, None)
+    fc.place_on_rounded_edge(cutter, W, H, BODY_R, edge, z_mm*MM, outward=-0.12*MM, local_normal=(1,0,0))
     fc.boolean_difference(body, cutter, name="CUT_CAMERA_CONTROL")
     boolean_cuts.append("CAMERA_CONTROL")
-    control = fc.cylinder("CAMERA_CONTROL", diameter_mm*0.5*MM, 0.18*MM, black, detail_c, axis="Z", vertices=96)
-    fc.place_on_rounded_edge(control, W, H, BODY_R, edge, z_mm*MM, outward=0.10*MM, local_normal=(0,0,1))
+    thickness = 0.24*MM
+    control = side_capsule("CAMERA_CONTROL", CAMERA_CONTROL_FACE_W, CAMERA_CONTROL_LENGTH,
+                           thickness, CAMERA_CONTROL_FACE_W*0.5, black)
+    center_out = CAMERA_CONTROL_PROTRUSION - thickness*0.5
+    fc.place_on_rounded_edge(control, W, H, BODY_R, edge, z_mm*MM, outward=center_out, local_normal=(1,0,0))
     return control
 
 # Apple drawing datums retained from v21; only the physical side-control profiles change.
@@ -272,7 +296,7 @@ physical_side_button("ACTION_BUTTON", "LEFT", 40.72, 11.6, 0.72)
 physical_side_button("VOL_UP", "LEFT", 26.57, 9.2, 0.72)
 physical_side_button("VOL_DOWN", "LEFT", 12.37, 9.2, 0.72)
 physical_side_button("SIDE_BUTTON", "RIGHT", 19.48, 17.7, 0.82)
-camera_control("RIGHT", -23.40, 2.55)
+camera_control("RIGHT", -23.40)
 for side, edge in (("L", "LEFT"), ("R", "RIGHT")):
     for z_mm in (55.0, -55.0):
         strip = fc.rounded_cube(f"ANTENNA_SIDE_{side}_{int(z_mm)}", (0.10*MM, 1.02*MM, 4.3*MM),
@@ -334,8 +358,8 @@ root["asset_version"] = "low_v27_0.9"
 root["stage"] = "LOW_DRAFT"
 root["dimensions_mm"] = "71.5 x 149.6 x 7.95"
 root["screen_object"] = "SCREEN_CONTENT"
-root["screen_texture"] = "reference/ios26_home_screen_1206x2622.png"
-root["screen_texture_px"] = "1206 x 2622"
+root["screen_texture"] = "reference/awful_screen_gradient_1440x3132.png"
+root["screen_texture_px"] = "1440 x 3132"
 root["surface_aware_controls"] = True
 root["surface_aware_bottom"] = True
 root["real_display_pocket"] = True
