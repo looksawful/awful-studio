@@ -18,6 +18,22 @@ All active HDRIs are remote-only, lazy, explicit opt-in cache assets. They are n
 
 Poly Haven license source: `https://polyhaven.com/license`.
 
+## Curated PBR material catalog
+
+AWFUL STUDIO now records a small, production-oriented starter catalog of Poly Haven PBR materials alongside the HDRIs. These records are metadata only: they do not bundle media and they are deliberately inactive for the direct cache downloader. The Poly Haven live API is free for commercial use as of 18 July 2026, requires a unique User-Agent and clear Poly Haven attribution when the live API is used. The underlying assets are CC0.
+
+| AWFUL key | Asset | Use | Preferred maps | Resolution | Distribution |
+| --- | --- | --- | --- | --- | --- |
+| `material_blue_metal_plate` | Blue Metal Plate | coated/painted product metal, props | Diffuse, OpenGL normal, Roughness, Displacement | 2K | API catalog metadata |
+| `material_brushed_concrete` | Brushed Concrete | studio floor/wall, architectural surfaces | Diffuse, OpenGL normal, Roughness, Displacement | 2K | API catalog metadata |
+| `material_american_walnut` | American Walnut Veneer | furniture, desks, premium product staging | Diffuse, OpenGL normal, Roughness, Displacement | 2K | API catalog metadata |
+
+Source pages are stored in `assets/provenance.json`; live file manifests use `https://api.polyhaven.com/files/{asset_id}`. We prefer 2K for interactive production defaults and keep higher resolutions an explicit later choice instead of quietly filling the disk because apparently storage also deserves boundaries.
+
+`extension/awful_studio/material_catalog.py` exposes pure catalog helpers. It performs no network access. A later UI/import operator can resolve the manifest only after explicit network consent, present the Poly Haven credit, select the requested maps/resolution, then reuse the provenance-backed cache rules.
+
+Poly Haven API terms/source: `https://polyhaven.com/our-api`; asset license: `https://polyhaven.com/license`.
+
 ## PaintedPlaster017 reference
 
 ambientCG `PaintedPlaster017` remains recorded because the immutable historical implementation references its 2K PNG archive and it may be reintroduced after a verified binary restoration.

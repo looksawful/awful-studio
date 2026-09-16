@@ -90,6 +90,75 @@
       "media_type": "application/zip",
       "active": false,
       "historical_reference": true
+    },
+    "material_blue_metal_plate": {
+      "provider": "Poly Haven",
+      "asset_id": "blue_metal_plate",
+      "title": "Blue Metal Plate",
+      "source_page": "https://polyhaven.com/a/blue_metal_plate",
+      "download_url": "https://api.polyhaven.com/files/blue_metal_plate",
+      "filename": "blue_metal_plate.polyhaven.json",
+      "license": "CC0-1.0",
+      "license_url": "https://polyhaven.com/license",
+      "distribution": "api-catalog",
+      "cache_subdir": "materials/blue_metal_plate",
+      "media_type": "application/json",
+      "active": false,
+      "asset_kind": "pbr-material",
+      "preferred_resolution": "2k",
+      "preferred_maps": [
+        "Diffuse",
+        "nor_gl",
+        "Rough",
+        "Displacement"
+      ],
+      "api_attribution_required": true
+    },
+    "material_brushed_concrete": {
+      "provider": "Poly Haven",
+      "asset_id": "brushed_concrete",
+      "title": "Brushed Concrete",
+      "source_page": "https://polyhaven.com/a/brushed_concrete",
+      "download_url": "https://api.polyhaven.com/files/brushed_concrete",
+      "filename": "brushed_concrete.polyhaven.json",
+      "license": "CC0-1.0",
+      "license_url": "https://polyhaven.com/license",
+      "distribution": "api-catalog",
+      "cache_subdir": "materials/brushed_concrete",
+      "media_type": "application/json",
+      "active": false,
+      "asset_kind": "pbr-material",
+      "preferred_resolution": "2k",
+      "preferred_maps": [
+        "Diffuse",
+        "nor_gl",
+        "Rough",
+        "Displacement"
+      ],
+      "api_attribution_required": true
+    },
+    "material_american_walnut": {
+      "provider": "Poly Haven",
+      "asset_id": "american_walnut_veneer",
+      "title": "American Walnut Veneer",
+      "source_page": "https://polyhaven.com/a/american_walnut_veneer",
+      "download_url": "https://api.polyhaven.com/files/american_walnut_veneer",
+      "filename": "american_walnut_veneer.polyhaven.json",
+      "license": "CC0-1.0",
+      "license_url": "https://polyhaven.com/license",
+      "distribution": "api-catalog",
+      "cache_subdir": "materials/american_walnut_veneer",
+      "media_type": "application/json",
+      "active": false,
+      "asset_kind": "pbr-material",
+      "preferred_resolution": "2k",
+      "preferred_maps": [
+        "Diffuse",
+        "nor_gl",
+        "Rough",
+        "Displacement"
+      ],
+      "api_attribution_required": true
     }
   }
 }
