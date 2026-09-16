@@ -155,8 +155,8 @@
   },
   "camera_fit": "runtime_bounds",
   "source_reference": "Apple iPhone 17 Dimensional Drawings 2025-09-09",
-  "source_revision": "a1f11d575dc61d33ed9e14d5669f8c6526299a400aa9698188fd11db8dd59465",
-  "source_commit": "857f75fddb8dc375265561f6cdbcaf35cb6ebdd4",
+  "source_revision": "bda3a6bf4b543878197aa285f5eda74585b59f246ef7812e57779585d058df12",
+  "source_commit": "80a3af3aa41f4466c2e3368e9693e248afb0f385",
   "generator_version": "web_delivery_camera_logo_normals_v29",
   "delivery_profile": {
     "simplification": "none",
@@ -172,7 +172,7 @@
   },
   "source_files": {
     "assets/device_mockups/common/foundation_common.py": "1d68c3fff908b7ae149f74c31a19064eb6d2384234d33bd71071fea70d651d12",
-    "assets/device_mockups/iphone_17/generate_low_v29.py": "7bfb82140b4eb0243e38cd04a26fc88f7aa1968514f9f540fe0a8d08461eb8f6",
+    "assets/device_mockups/iphone_17/generate_low_v29.py": "d15dd31a5dd1f562e7715fa433d2ed0dff67cd7c8150a24743c2e305b1d1e2fa",
     "assets/device_mockups/iphone_17/reference/apple_logo_glb_mask.png": "8359212a9b1663f4449675604ae1b9aa14e325a99306e77175d938dfae04a9da",
     "assets/device_mockups/iphone_17/reference/ios26_home_screen_1206x2622.png": "dedb0095d0dcdba59baff26cf4267560409f4434da0d54600a9619d1df05a445"
   },
@@ -197,27 +197,27 @@
   "artifacts": {
     "generated_blend": {
       "path": "assets/device_mockups/iphone_17/generated/iphone_17_low_v29.blend",
-      "sha256": "cf15b5b9baee2ffe9a39a75a5e4f7bc0416bd3d33f8666bb3fbd1728ddfd42ce"
+      "sha256": "87cf55fe7394bd65afe14a60ec8321f42e21d568f4b043bac901132390769b8c"
     },
     "validation": {
       "path": "assets/device_mockups/iphone_17/evidence/low_v29_validation.json",
-      "sha256": "522bf1f13a39a87e55e24cc24ee3331c7b5b169d08e3c4a1b945c8598e88fcbe"
+      "sha256": "73d0ff1a3b34bf0e32f6962c54a4f5fe1422d31888e47fcabd5a385d9f51b34a"
     },
     "delivery_blend": {
       "path": "assets/device_mockups/iphone_17/runtime/v29/iphone_17_v29_delivery.blend",
-      "sha256": "3abf9438f227fcee91681757f17f3819ea5954f4af751d321066bc00994fe68c"
+      "sha256": "0e67fb2b6a15167c73f5a1d955d52ca8898083fa9d0cedbffb642b2f71667e0f"
     },
     "compat_glb": {
       "path": "assets/device_mockups/iphone_17/runtime/v29/iphone_17_v29_web.glb",
-      "sha256": "97398bcc4a7f0e62d68848190795781c791a311fa0d49bee8b8c50dc47edec46"
+      "sha256": "9201c80b302199766e18d9fbb3c0bd84923008339fec37137bc34303050a7737"
     },
     "meshopt_glb": {
       "path": "assets/device_mockups/iphone_17/runtime/v29/iphone_17_v29_web_meshopt.glb",
-      "sha256": "84832395e9efeb2455518867e4fa74769819485fb03d37f28c7ffcdcb8203a4b"
+      "sha256": "c8c64918ad99215609f08c4a24b6452ec1e17b57cc74587259d06fb35d9db73b"
     },
     "plugin_bundle": {
       "path": "extension/awful_studio/assets/devices/iphone_17_low_v29.blend",
-      "sha256": "aad40b73ba211992d92a3c6a951adc9c6cbae707d8034d0fe9c6e8915186fc39"
+      "sha256": "08146f83e05b67a1e64097eb02d555be5e3cd6fc7a7f5c75647fa0ba26fb2d3b"
     }
   }
 }

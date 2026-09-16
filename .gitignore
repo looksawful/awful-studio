@@ -6,4 +6,5 @@ evidence/
 .blender/
 *.blend
 *.blend1
+*.blend[0-9]*
 *.zip
