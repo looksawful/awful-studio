@@ -479,7 +479,7 @@ evidence = {
     "passed": passed,
 }
 os.makedirs(os.path.dirname(EVIDENCE), exist_ok=True)
-with open(EVIDENCE, "w", encoding="utf-8") as handle:
+with open(EVIDENCE, "w", encoding="utf-8", newline="\n") as handle:
     json.dump(evidence, handle, indent=2)
 
 fc.save_blend(OUT)
