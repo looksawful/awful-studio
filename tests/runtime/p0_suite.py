@@ -20,6 +20,7 @@ CONTRACTS = (
     ('post_pipeline', 'p0_post_pipeline_contract.py'),
     ('playback', 'p0_playback_contract.py'),
     ('product_quality', 'product_quality_contract.py'),
+    ('product_material_registry', 'product_material_registry_contract.py'),
     ('product_placement', 'product_placement_contract.py'),
 )
 
