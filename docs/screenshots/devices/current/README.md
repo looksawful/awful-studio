@@ -1,4 +1,4 @@
-﻿# Current device screenshots
+# Current device screenshots
 
 Snapshot: 2026-09-16
 

@@ -1,4 +1,4 @@
-﻿from pathlib import Path
+from pathlib import Path
 import sys
 p=Path(sys.argv[1]) if len(sys.argv)>1 else Path(__file__).with_name('generate_low_v30.py')
 s=p.read_text(encoding='utf-8')
