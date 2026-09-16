@@ -20,13 +20,13 @@ EXPECTED_STAGES = {
     'DEVICE_MACBOOK_PRO_14': 'RELEASE_CANDIDATE',
 }
 EXPECTED_VARIANTS = {
-    'DEVICE_IPHONE_17': 'low_v20',
+    'DEVICE_IPHONE_17': 'low_v29',
     'DEVICE_IPAD_PRO_11': 'low_v6',
     'DEVICE_IPAD_PRO_13': 'low_v6',
     'DEVICE_MACBOOK_PRO_14': 'low_v1_release',
 }
 EXPECTED_FILES = {
-    'DEVICE_IPHONE_17': 'iphone_17_low_v20.blend',
+    'DEVICE_IPHONE_17': 'iphone_17_low_v29.blend',
     'DEVICE_IPAD_PRO_11': 'ipad_pro_11_m5_low_v6.blend',
     'DEVICE_IPAD_PRO_13': 'ipad_pro_13_m5_low_v6.blend',
     'DEVICE_MACBOOK_PRO_14': 'macbook_pro_14_m5_low_v1_release.blend',
