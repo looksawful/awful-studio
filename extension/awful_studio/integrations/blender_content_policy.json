@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "policy": "awful-owned-declarative-content-no-user-profile-overwrite",
+  "presets": {
+    "storage": "extension-owned",
+    "namespace": "awful_studio",
+    "user_space_export": "explicit-only",
+    "overwrite_existing": false,
+    "binary_payloads": false
+  },
+  "templates": {
+    "storage": "declarative-spec",
+    "startup_blend_mutation": false,
+    "user_template_mutation": false,
+    "binary_blend_in_repo": false
+  }
+}

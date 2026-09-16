@@ -2,11 +2,22 @@
   "schema": 1,
   "policy": "declarative-only-no-implicit-install-or-enable",
   "tools": [
-    {"id":"node_wrangler","name":"Node Wrangler","kind":"add-on","provider":"Blender","license":"GPL-2.0-or-later","automation":"builtin","purpose":["materials","node-editing"]},
-    {"id":"looptools","name":"LoopTools","kind":"extension","provider":"Blender Extensions","license":"GPL-2.0-or-later","automation":"extension-repository","purpose":["modeling","mockups"]},
-    {"id":"bool_tool","name":"Bool Tool","kind":"extension","provider":"Blender Extensions","license":"GPL-2.0-or-later","automation":"extension-repository","purpose":["modeling","mockups"]},
-    {"id":"measureit","name":"MeasureIt","kind":"extension","provider":"Blender Extensions","license":"GPL-2.0-or-later","automation":"extension-repository","purpose":["dimensions","mockups"]},
-    {"id":"blenderkit","name":"BlenderKit","kind":"add-on","provider":"BlenderKit","license":"free-tier-service","automation":"manual","purpose":["assets","materials","models"]},
-    {"id":"makehuman","name":"MakeHuman for Blender","kind":"add-on","provider":"MakeHuman Community","license":"free-open-source","automation":"manual","purpose":["characters","mockups"]}
+    {"id":"node_wrangler","name":"Node Wrangler","kind":"add-on","provider":"Blender","license":"GPL-2.0-or-later","automation":"builtin","tier":"core","purpose":["materials","node-editing"]},
+    {"id":"looptools","name":"LoopTools","kind":"extension","provider":"Blender Extensions","license":"GPL-2.0-or-later","automation":"extension-repository","tier":"core","purpose":["modeling","mockups"]},
+    {"id":"bool_tool","name":"Bool Tool","kind":"extension","provider":"Blender Extensions","license":"GPL-2.0-or-later","automation":"extension-repository","tier":"core","purpose":["modeling","mockups"]},
+    {"id":"measureit","name":"MeasureIt","kind":"extension","provider":"Blender Extensions","license":"GPL-2.0-or-later","automation":"extension-repository","tier":"core","purpose":["dimensions","mockups"]},
+    {"id":"images_as_planes","name":"Images as Planes","kind":"extension","provider":"Blender Extensions","license":"open-source","automation":"extension-repository","tier":"core","purpose":["references","decals","mockups"]},
+    {"id":"material_utils","name":"Material Utilities","kind":"extension","provider":"Blender Extensions","license":"open-source","automation":"extension-repository","tier":"core","purpose":["materials","assets"]},
+    {"id":"collection_manager","name":"Collection Manager","kind":"extension","provider":"Blender Extensions","license":"open-source","automation":"extension-repository","tier":"useful","purpose":["scene-organization","assets"]},
+    {"id":"camera_rigs","name":"Add Camera Rigs","kind":"extension","provider":"Blender Extensions","license":"open-source","automation":"extension-repository","tier":"useful","purpose":["camera","mockups"]},
+    {"id":"tri_lighting","name":"Tri-Lighting","kind":"extension","provider":"Blender Extensions","license":"open-source","automation":"extension-repository","tier":"useful","purpose":["lighting","mockups"]},
+    {"id":"extra_mesh_objects","name":"Extra Mesh Objects","kind":"extension","provider":"Blender Extensions","license":"open-source","automation":"extension-repository","tier":"useful","purpose":["modeling","assets"]},
+    {"id":"extra_curve_objects","name":"Extra Curve Objects","kind":"extension","provider":"Blender Extensions","license":"open-source","automation":"extension-repository","tier":"useful","purpose":["modeling","assets"]},
+    {"id":"copy_global_transform","name":"Copy Global Transform","kind":"extension","provider":"Blender Extensions","license":"open-source","automation":"extension-repository","tier":"useful","purpose":["layout","mockups"]},
+    {"id":"node_arrange","name":"Node Arrange","kind":"extension","provider":"Blender Extensions","license":"open-source","automation":"extension-repository","tier":"useful","purpose":["materials","node-editing"]},
+    {"id":"node_presets","name":"Node Presets","kind":"extension","provider":"Blender Extensions","license":"open-source","automation":"extension-repository","tier":"useful","purpose":["materials","node-editing"]},
+    {"id":"amaranth","name":"Amaranth","kind":"extension","provider":"Blender Extensions","license":"open-source","automation":"extension-repository","tier":"optional","purpose":["workflow"]},
+    {"id":"blenderkit","name":"BlenderKit","kind":"add-on","provider":"BlenderKit","license":"free-tier-service","automation":"manual","tier":"core","purpose":["assets","materials","models"]},
+    {"id":"makehuman","name":"MakeHuman for Blender","kind":"add-on","provider":"MakeHuman Community","license":"free-open-source","automation":"manual","tier":"optional","purpose":["characters","mockups"]}
   ]
 }
