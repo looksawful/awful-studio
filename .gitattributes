@@ -8,3 +8,10 @@ extension/awful_studio/assets/**/*.zip -text
 historical/0.0.15/awful_studio_v4_2_gpu_perf.py -text
 
 extension/awful_studio/**/*.blend -text
+
+assets/device_mockups/iphone_17/generate_low_v29.py text eol=lf
+assets/device_mockups/iphone_17/export_runtime_v29.py text eol=lf
+assets/device_mockups/iphone_17/optimize_runtime_v29.py text eol=lf
+assets/device_mockups/iphone_17/evidence/low_v29_validation.json text eol=lf
+assets/device_mockups/iphone_17/runtime/v29/*.json text eol=lf
+tools/build_iphone17_v29.py text eol=lf
