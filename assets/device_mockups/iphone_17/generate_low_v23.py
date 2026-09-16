@@ -148,7 +148,7 @@ for loop in screen_content.data.loops:
     uv.data[loop.index].uv = ((co.x / SCREEN_W) + 0.5, (co.z / SCREEN_H) + 0.5)
 # A dedicated image plane guarantees the raster UI is visible above the active glass cutout.
 ui_mesh=bpy.data.meshes.new("SCREEN_UI_DECAL_MESH")
-ui_mesh.from_pydata([(-SCREEN_W/2,0,-SCREEN_H/2),(SCREEN_W/2,0,-SCREEN_H/2),(SCREEN_W/2,0,SCREEN_H/2),(-SCREEN_W/2,0,SCREEN_H/2)],[],[(0,3,2,1)])
+ui_mesh.from_pydata([(-SCREEN_W/2,0,-SCREEN_H/2),(SCREEN_W/2,0,-SCREEN_H/2),(SCREEN_W/2,0,SCREEN_H/2),(-SCREEN_W/2,0,SCREEN_H/2)],[],[(0,1,2,3)])
 ui_mesh.update()
 screen_ui=bpy.data.objects.new("SCREEN_UI_DECAL",ui_mesh); screen_c.objects.link(screen_ui)
 screen_ui.location=(0,front_surface-0.007*MM,0); screen_ui.data.materials.append(screen_mat)
@@ -239,7 +239,7 @@ except Exception:
 lw, lh = 15.75*MM, 19.34*MM
 verts = [(-lw/2,0,-lh/2),(lw/2,0,-lh/2),(lw/2,0,lh/2),(-lw/2,0,lh/2)]
 mesh = bpy.data.meshes.new("APPLE_LOGO_MESH")
-mesh.from_pydata(verts, [], [(0,3,2,1)])
+mesh.from_pydata(verts, [], [(0,1,2,3)])
 mesh.update()
 logo = bpy.data.objects.new("APPLE_LOGO_DECAL", mesh)
 detail_c.objects.link(logo)
@@ -512,8 +512,3 @@ for cam, filename in renders:
 print("AWFUL_IPHONE17_V23_VALIDATION", json.dumps(evidence, sort_keys=True))
 if not passed:
     raise RuntimeError("iPhone 17 LOW v23 validation failed")
-
-
-
-
-
