@@ -32,9 +32,9 @@ def cli(flag, default):
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
     return argv[argv.index(flag) + 1] if flag in argv else default
 
-OUT = os.path.abspath(cli("--out", os.path.join(HERE, "generated", "iphone_17_low_v26.blend")))
-EVIDENCE = os.path.abspath(cli("--evidence", os.path.join(HERE, "evidence", "low_v26_validation.json")))
-PREVIEWS = os.path.abspath(cli("--previews", os.path.join(HERE, "previews", "low_v26")))
+OUT = os.path.abspath(cli("--out", os.path.join(HERE, "generated", "iphone_17_low_v27.blend")))
+EVIDENCE = os.path.abspath(cli("--evidence", os.path.join(HERE, "evidence", "low_v27_validation.json")))
+PREVIEWS = os.path.abspath(cli("--previews", os.path.join(HERE, "previews", "low_v27")))
 fc.clear_scene()
 fc.setup_scene()
 scene = bpy.context.scene
@@ -264,7 +264,7 @@ def camera_control(edge, z_mm, diameter_mm=2.55):
     fc.boolean_difference(body, cutter, name="CUT_CAMERA_CONTROL")
     boolean_cuts.append("CAMERA_CONTROL")
     control = fc.cylinder("CAMERA_CONTROL", diameter_mm*0.5*MM, 0.18*MM, black, detail_c, axis="Z", vertices=96)
-    fc.place_on_rounded_edge(control, W, H, BODY_R, edge, z_mm*MM, outward=-0.11*MM, local_normal=(0,0,1))
+    fc.place_on_rounded_edge(control, W, H, BODY_R, edge, z_mm*MM, outward=0.10*MM, local_normal=(0,0,1))
     return control
 
 # Apple drawing datums retained from v21; only the physical side-control profiles change.
@@ -330,7 +330,7 @@ for collection in (body_c, detail_c, screen_c):
     for obj in collection.objects:
         obj.parent = root
 root["asset_id"] = "iphone_17"
-root["asset_version"] = "low_v26_0.8"
+root["asset_version"] = "low_v27_0.9"
 root["stage"] = "LOW_DRAFT"
 root["dimensions_mm"] = "71.5 x 149.6 x 7.95"
 root["screen_object"] = "SCREEN_CONTENT"
@@ -456,7 +456,7 @@ evidence = {
     "camera_backing_protrusion_mm": round(camera_backing_protrusion_mm, 4),
     "camera_backing_visible": not housing_seat.hide_render,
     "button_min_protrusion_mm": round(button_protrusion_mm, 4),
-    "camera_control_protrusion_mm": max(0.0, round(camera_control_protrusion_mm, 4)),
+    "camera_control_protrusion_mm": round(camera_control_protrusion_mm, 4),
     "passed": passed,
 }
 os.makedirs(os.path.dirname(EVIDENCE), exist_ok=True)
@@ -465,16 +465,16 @@ with open(EVIDENCE, "w", encoding="utf-8") as handle:
 
 fc.save_blend(OUT)
 renders = (
-    (cam_front, "iphone_17_low_v26_front.png"),
-    (cam_back, "iphone_17_low_v26_back.png"),
-    (cam_three, "iphone_17_low_v26_three_quarter.png"),
-    (cam_left, "iphone_17_low_v26_left_side.png"),
-    (cam_right, "iphone_17_low_v26_right_side.png"),
-    (cam_bottom, "iphone_17_low_v26_bottom_macro.png"),
-    (cam_screen, "iphone_17_low_v26_screen_edge_macro.png"),
-    (cam_camera, "iphone_17_low_v26_camera_macro.png"),
-    (cam_front_sensor, "iphone_17_low_v26_front_sensor_macro.png"),
-    (cam_back_three, "iphone_17_low_v26_back_three_quarter.png"),
+    (cam_front, "iphone_17_low_v27_front.png"),
+    (cam_back, "iphone_17_low_v27_back.png"),
+    (cam_three, "iphone_17_low_v27_three_quarter.png"),
+    (cam_left, "iphone_17_low_v27_left_side.png"),
+    (cam_right, "iphone_17_low_v27_right_side.png"),
+    (cam_bottom, "iphone_17_low_v27_bottom_macro.png"),
+    (cam_screen, "iphone_17_low_v27_screen_edge_macro.png"),
+    (cam_camera, "iphone_17_low_v27_camera_macro.png"),
+    (cam_front_sensor, "iphone_17_low_v27_front_sensor_macro.png"),
+    (cam_back_three, "iphone_17_low_v27_back_three_quarter.png"),
 )
 def set_light(name, energy):
     obj = bpy.data.objects.get(name)
@@ -494,13 +494,7 @@ def render_profile(cam, filename):
 
 for cam, filename in renders:
     render_profile(cam, filename)
-print("AWFUL_IPHONE17_V23_VALIDATION", json.dumps(evidence, sort_keys=True))
+print("AWFUL_IPHONE17_V27_VALIDATION", json.dumps(evidence, sort_keys=True))
 if not passed:
-    raise RuntimeError("iPhone 17 LOW v23 validation failed")
-
-
-
-
-
-
+    raise RuntimeError("iPhone 17 LOW v27 validation failed")
 
