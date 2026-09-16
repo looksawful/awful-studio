@@ -29,6 +29,10 @@ class BlenderToolsContract(unittest.TestCase):
                 "makehuman",
             }.issubset(ids)
         )
+        tools = {tool["id"]: tool for tool in data["tools"]}
+        self.assertEqual(tools["node_wrangler"]["automation"], "extension-repository")
+        self.assertEqual(tools["blenderkit"]["automation"], "manual")
+        self.assertEqual(tools["makehuman"]["automation"], "manual")
         for tool in data["tools"]:
             self.assertIn(tool["automation"], {"builtin", "extension-repository", "manual"})
             self.assertIn(tool["tier"], {"core", "useful", "optional"})
