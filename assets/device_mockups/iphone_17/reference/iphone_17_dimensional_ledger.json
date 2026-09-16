@@ -1,0 +1,20 @@
+﻿{
+  "asset_id": "iphone_17",
+  "reference": "Apple iPhone 17 Dimensional Drawings 2025-09-09",
+  "units": "mm",
+  "dimensions": [
+    {"element":"body.width","source_class":"engineering","reference":71.45,"model":71.45,"delta":0.0,"confidence":"official","status":"match"},
+    {"element":"body.height","source_class":"engineering","reference":149.61,"model":149.61,"delta":0.0,"confidence":"official","status":"match"},
+    {"element":"body.depth","source_class":"engineering","reference":7.95,"model":7.95,"delta":0.0,"confidence":"official","status":"match"},
+    {"element":"cover_glass.width","source_class":"engineering","reference":69.45,"model":69.45,"delta":0.0,"confidence":"official","status":"match"},
+    {"element":"cover_glass.height","source_class":"engineering","reference":147.61,"model":147.61,"delta":0.0,"confidence":"official","status":"match"},
+    {"element":"display_active.width","source_class":"engineering","reference":66.57,"model":66.57,"delta":0.0,"confidence":"official","status":"match"},
+    {"element":"display_active.height","source_class":"engineering","reference":144.79,"model":144.79,"delta":0.0,"confidence":"official","status":"match"},
+    {"element":"rear_camera.outer_diameter","source_class":"engineering","reference":16.0,"model":16.0,"delta":0.0,"confidence":"official","status":"match"},
+    {"element":"rear_camera.optical_diameter","source_class":"engineering","reference":13.62,"model":13.62,"delta":0.0,"confidence":"official","status":"match"},
+    {"element":"flash.diameter","source_class":"engineering","reference":6.28,"model":6.28,"delta":0.0,"confidence":"official","status":"match"},
+    {"element":"rear_mic.diameter","source_class":"engineering","reference":1.0,"model":1.0,"delta":0.0,"confidence":"official","status":"match"},
+    {"element":"camera_plateau.profile","source_class":"engineering+visual","reference":null,"model":"generic_rounded_prism","delta":null,"confidence":"requires_trace","status":"repair"},
+    {"element":"camera_control.protrusion","source_class":"visual/internal","reference":null,"model":null,"delta":null,"confidence":"not_official","status":"validate_nonnegative"}
+  ]
+}
