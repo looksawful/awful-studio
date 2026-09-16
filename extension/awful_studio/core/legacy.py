@@ -1180,13 +1180,18 @@ def create_diagnostic_product(diag_col, material):
 
 
 def delete_object_hierarchy(root):
+    scene = bpy.context.scene
     for child in list(root.children):
-        if ownership.owned(child, bpy.context.scene):
+        if ownership.owned(child, scene):
             delete_object_hierarchy(child)
         else:
             parent_keep_world(child, None)
-    if ownership.owned(root, bpy.context.scene):
+    if ownership.owned(root, scene):
+        data = getattr(root, "data", None)
+        remove_data = data is not None and ownership.owned(data, scene)
         bpy.data.objects.remove(root, do_unlink=True)
+        if remove_data and data.users == 0:
+            bpy.data.batch_remove(ids=[data])
 
 def current_product_objects():
     content = REG.object("PRODUCT_CONTENT")
