@@ -41,6 +41,19 @@ class Release017HygieneTests(unittest.TestCase):
         self.assertIn('manual UI smoke', notes_text)
         self.assertIn('not tagged or published', notes_text)
 
+    def test_bundled_png_assets_have_real_png_signature(self):
+        asset_dir = EXT / 'assets' / 'painted_plaster017'
+        pngs = sorted(asset_dir.glob('*.png'))
+        self.assertTrue(pngs, 'bundled PaintedPlaster PNG assets are required')
+        expected = b'\x89PNG\r\n\x1a\n'
+        bad = []
+        for path in pngs:
+            with path.open('rb') as handle:
+                signature = handle.read(len(expected))
+            if signature != expected:
+                bad.append(f'{path.relative_to(ROOT)}: {signature.hex()}')
+        self.assertEqual(bad, [], '\n' + '\n'.join(bad))
+
     def test_release_tree_has_no_dev_junk_or_machine_specific_paths(self):
         forbidden_suffixes = {'.pyc', '.pyo', '.blend', '.blend1', '.exe', '.dll', '.zip'}
         tracked = tracked_files()
