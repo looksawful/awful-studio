@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: GPL-3.0-or-later
+﻿# SPDX-License-Identifier: GPL-3.0-or-later
 """Bundled device-asset catalog and Blender append adapter."""
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ DEVICE_ASSET_SPECS = {
         'stage': 'LOW_DRAFT',
         'dimensions_m': (0.07145, 0.00795, 0.14961),
         'default_lod': 'LOW',
-        'lods': {'LOW': {'variant': 'low_v30', 'blend_path': 'assets/devices/iphone_17_low_v30.blend', 'entry_collection': 'AWFUL_DEVICE_IPHONE_17', 'source_revision': 'af8b37229c665c6bd5bf1c96d0c9564f9a3f2aa45c552344cf292a23fdf84aa1'}},
+        'lods': {'LOW': {'variant': 'low_v30', 'blend_path': 'assets/devices/iphone_17_low_v30.blend', 'entry_collection': 'AWFUL_DEVICE_IPHONE_17', 'source_revision': '5037e09b3600eff1a03151982919ca3cf5f80d31a59f2c2191912b13a2fbd9bf'}},
         'root_name': 'CTRL_IPHONE_17',
         'orientation_axis': 'Y',
         'screen_object': 'SCREEN_CONTENT',
