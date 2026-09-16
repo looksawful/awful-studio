@@ -16,37 +16,29 @@ class BlenderToolsContract(unittest.TestCase):
         self.assertEqual(len(ids), len(set(ids)))
         self.assertTrue(
             {
-                "node_wrangler",
-                "looptools",
-                "bool_tool",
-                "nd",
-                "measureit",
-                "images_as_planes",
-                "material_utils",
-                "asset_library_tools",
-                "k_tools_texture_map_loader",
-                "magic_uv",
-                "ambientcg_material_importer",
-                "gather_resources",
-                "cad_sketcher",
-                "node_preview",
-                "blenderkit",
-                "makehuman",
+                "node_wrangler", "looptools", "bool_tool", "nd", "measureit",
+                "images_as_planes", "material_utils", "asset_library_tools",
+                "k_tools_texture_map_loader", "magic_uv", "ambientcg_material_importer",
+                "gather_resources", "cad_sketcher", "mpfb", "retarget", "retopoflow",
+                "bagapie", "modern_primitive", "f2", "batchforge_batch_export",
+                "batch_texture_converter", "geo_bake_batch", "hdr_rotation",
+                "node_group_presets", "enhanced_svg", "tissue", "blenderkit", "makehuman",
             }.issubset(ids)
         )
         tools = {tool["id"]: tool for tool in data["tools"]}
         for tool_id in (
-            "node_wrangler",
-            "nd",
-            "asset_library_tools",
-            "k_tools_texture_map_loader",
-            "ambientcg_material_importer",
-            "cad_sketcher",
+            "node_wrangler", "nd", "asset_library_tools", "k_tools_texture_map_loader",
+            "ambientcg_material_importer", "cad_sketcher", "mpfb", "retarget",
+            "bagapie", "modern_primitive", "f2", "batchforge_batch_export",
+            "batch_texture_converter", "geo_bake_batch", "hdr_rotation",
+            "node_group_presets", "enhanced_svg", "tissue",
         ):
             self.assertEqual(tools[tool_id]["automation"], "extension-repository", tool_id)
-        self.assertEqual(tools["blenderkit"]["automation"], "manual")
-        self.assertEqual(tools["makehuman"]["automation"], "manual")
-        self.assertEqual(tools["node_preview"]["tier"], "optional")
+        for tool_id in ("retopoflow", "blenderkit", "makehuman"):
+            self.assertEqual(tools[tool_id]["automation"], "manual", tool_id)
+        self.assertEqual(tools["mpfb"]["license"], "GPL-3.0-or-later")
+        self.assertEqual(tools["retopoflow"]["license"], "GPL-2.0-or-later")
+        self.assertEqual(tools["tissue"]["tier"], "optional")
         for tool in data["tools"]:
             self.assertIn(tool["automation"], {"builtin", "extension-repository", "manual"})
             self.assertIn(tool["tier"], {"core", "useful", "optional"})
