@@ -14,7 +14,7 @@ try:
 except ImportError:
     contract = None
 
-MANIFEST = ROOT / 'assets/device_mockups/iphone_17/runtime/v29/iphone_17_v29.asset.json'
+MANIFEST = ROOT / 'assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30.asset.json'
 LOADER = ROOT / 'extension/awful_studio/device_asset_loader.py'
 
 
@@ -26,27 +26,27 @@ def load_loader():
 
 
 class DeviceDeliveryContractTests(unittest.TestCase):
-    def test_v29_manifest_is_current_and_self_verifying(self):
-        self.assertTrue(MANIFEST.is_file(), f'missing canonical v29 manifest: {MANIFEST}')
+    def test_v30_manifest_is_current_and_self_verifying(self):
+        self.assertTrue(MANIFEST.is_file(), f'missing canonical v30 manifest: {MANIFEST}')
         self.assertIsNotNone(contract, 'device delivery contract helper is missing')
         manifest = contract.load_manifest(MANIFEST)
         self.assertEqual(manifest['asset_id'], 'iphone_17')
-        self.assertEqual(manifest['version'], 'v29')
+        self.assertEqual(manifest['version'], 'v30')
         self.assertEqual(manifest['stage'], 'LOW_DRAFT')
         self.assertEqual(manifest['delivery_profile']['simplification'], 'none')
         self.assertEqual(contract.verify_manifest(ROOT, manifest), [])
 
     def test_plugin_loader_matches_delivery_revision_and_stage(self):
-        self.assertTrue(MANIFEST.is_file(), f'missing canonical v29 manifest: {MANIFEST}')
+        self.assertTrue(MANIFEST.is_file(), f'missing canonical v30 manifest: {MANIFEST}')
         self.assertIsNotNone(contract, 'device delivery contract helper is missing')
         manifest = contract.load_manifest(MANIFEST)
         loader = load_loader()
         item = loader.device_asset_spec('DEVICE_IPHONE_17')
         lod = item['lods'][item['default_lod']]
         self.assertEqual(item['stage'], manifest['stage'])
-        self.assertEqual(lod['variant'], 'low_v29')
+        self.assertEqual(lod['variant'], 'low_v30')
         self.assertEqual(lod['source_revision'], manifest['source_revision'])
-        self.assertEqual(Path(lod['blend_path']).name, 'iphone_17_low_v29.blend')
+        self.assertEqual(Path(lod['blend_path']).name, 'iphone_17_low_v30.blend')
 
     def test_wrong_stage_or_revision_is_rejected(self):
         self.assertIsNotNone(contract, 'device delivery contract helper is missing')
