@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "policy": "declarative-only-no-implicit-install-or-enable",
+  "tools": [
+    {"id":"node_wrangler","name":"Node Wrangler","kind":"add-on","provider":"Blender","license":"GPL-2.0-or-later","automation":"builtin","purpose":["materials","node-editing"]},
+    {"id":"looptools","name":"LoopTools","kind":"extension","provider":"Blender Extensions","license":"GPL-2.0-or-later","automation":"extension-repository","purpose":["modeling","mockups"]},
+    {"id":"bool_tool","name":"Bool Tool","kind":"extension","provider":"Blender Extensions","license":"GPL-2.0-or-later","automation":"extension-repository","purpose":["modeling","mockups"]},
+    {"id":"measureit","name":"MeasureIt","kind":"extension","provider":"Blender Extensions","license":"GPL-2.0-or-later","automation":"extension-repository","purpose":["dimensions","mockups"]},
+    {"id":"blenderkit","name":"BlenderKit","kind":"add-on","provider":"BlenderKit","license":"free-tier-service","automation":"manual","purpose":["assets","materials","models"]},
+    {"id":"makehuman","name":"MakeHuman for Blender","kind":"add-on","provider":"MakeHuman Community","license":"free-open-source","automation":"manual","purpose":["characters","mockups"]}
+  ]
+}
