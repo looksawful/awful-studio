@@ -9,7 +9,7 @@ CONTENT_POLICY = INTEGRATIONS / "blender_content_policy.json"
 
 
 class BlenderToolsContract(unittest.TestCase):
-    def test_manifest_is_safe_and_declarative(self):
+    def test_manifest_is_safe_declarative_and_covers_titan_asset_workflow(self):
         data = json.loads(MANIFEST.read_text(encoding="utf-8-sig"))
         self.assertEqual(data["policy"], "declarative-only-no-implicit-install-or-enable")
         ids = [tool["id"] for tool in data["tools"]]
@@ -19,20 +19,34 @@ class BlenderToolsContract(unittest.TestCase):
                 "node_wrangler",
                 "looptools",
                 "bool_tool",
+                "nd",
                 "measureit",
                 "images_as_planes",
                 "material_utils",
-                "collection_manager",
-                "camera_rigs",
-                "tri_lighting",
+                "asset_library_tools",
+                "k_tools_texture_map_loader",
+                "magic_uv",
+                "ambientcg_material_importer",
+                "gather_resources",
+                "cad_sketcher",
+                "node_preview",
                 "blenderkit",
                 "makehuman",
             }.issubset(ids)
         )
         tools = {tool["id"]: tool for tool in data["tools"]}
-        self.assertEqual(tools["node_wrangler"]["automation"], "extension-repository")
+        for tool_id in (
+            "node_wrangler",
+            "nd",
+            "asset_library_tools",
+            "k_tools_texture_map_loader",
+            "ambientcg_material_importer",
+            "cad_sketcher",
+        ):
+            self.assertEqual(tools[tool_id]["automation"], "extension-repository", tool_id)
         self.assertEqual(tools["blenderkit"]["automation"], "manual")
         self.assertEqual(tools["makehuman"]["automation"], "manual")
+        self.assertEqual(tools["node_preview"]["tier"], "optional")
         for tool in data["tools"]:
             self.assertIn(tool["automation"], {"builtin", "extension-repository", "manual"})
             self.assertIn(tool["tier"], {"core", "useful", "optional"})
