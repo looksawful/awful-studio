@@ -1,0 +1,223 @@
+{
+  "asset_id": "iphone_17",
+  "version": "v29",
+  "stage": "LOW_DRAFT",
+  "source_blend": "generated/iphone_17_low_v29.blend",
+  "delivery_blend": "runtime/v29/iphone_17_v29_delivery.blend",
+  "glb": "runtime/v29/iphone_17_v29_web.glb",
+  "body_dimensions_mm": [
+    71.5,
+    149.6,
+    7.95
+  ],
+  "dimension_order": [
+    "width_x",
+    "height_y",
+    "depth_z"
+  ],
+  "runtime_bounds_mm": [
+    72.69,
+    149.61,
+    9.81
+  ],
+  "units": "meters",
+  "source_up_axis": "+Z",
+  "source_forward_axis": "-Y",
+  "up_axis": "+Y",
+  "forward_axis": "+Z",
+  "root": "CTRL_IPHONE_17",
+  "screen_object": "SCREEN_CONTENT",
+  "anchors": [
+    "ANCHOR_CENTER",
+    "ANCHOR_BOTTOM_CENTER",
+    "ANCHOR_SCREEN_CENTER",
+    "ANCHOR_REAR_CAMERA"
+  ],
+  "lods": [
+    {
+      "name": "LOD0",
+      "file": "iphone_17_v29_web.glb"
+    }
+  ],
+  "materials": [
+    "MAT_ALUMINUM_EDGE",
+    "MAT_ANODIZED_ALUMINUM",
+    "MAT_APPLE_LOGO_DECAL",
+    "MAT_ASSEMBLY_GAP",
+    "MAT_BACK_GLASS",
+    "MAT_CAMERA_HOUSING",
+    "MAT_DISPLAY_BEZEL",
+    "MAT_DISPLAY_GLASS",
+    "MAT_DYNAMIC_ISLAND",
+    "MAT_FASTENER",
+    "MAT_FLASH",
+    "MAT_FRONT_OPTIC",
+    "MAT_FRONT_SENSOR_PILL",
+    "MAT_LENS_GLASS",
+    "MAT_OPTICS_BLACK",
+    "MAT_SCREEN_CONTENT"
+  ],
+  "exported_objects": [
+    "CTRL_IPHONE_17",
+    "ACTION_BUTTON",
+    "ANCHOR_BOTTOM_CENTER",
+    "ANCHOR_CENTER",
+    "ANCHOR_REAR_CAMERA",
+    "ANCHOR_SCREEN_CENTER",
+    "ANTENNA_SIDE_L_-55",
+    "ANTENNA_SIDE_L_55",
+    "ANTENNA_SIDE_R_-55",
+    "ANTENNA_SIDE_R_55",
+    "APPLE_LOGO_DECAL",
+    "BACK_GLASS",
+    "BODY_ALUMINUM",
+    "BOTTOM_MIC_APERTURE_01",
+    "BOTTOM_MIC_APERTURE_02",
+    "BOTTOM_MIC_APERTURE_03",
+    "BOTTOM_SCREW_L",
+    "BOTTOM_SCREW_R",
+    "BOTTOM_SPEAKER_APERTURE_01",
+    "BOTTOM_SPEAKER_APERTURE_02",
+    "BOTTOM_SPEAKER_APERTURE_03",
+    "BOTTOM_SPEAKER_APERTURE_04",
+    "BOTTOM_SPEAKER_APERTURE_05",
+    "BOTTOM_SPEAKER_APERTURE_06",
+    "CAMERA_1_BEVEL",
+    "CAMERA_1_GLASS",
+    "CAMERA_1_INNER",
+    "CAMERA_1_IRIS",
+    "CAMERA_1_PUPIL",
+    "CAMERA_1_RING",
+    "CAMERA_2_BEVEL",
+    "CAMERA_2_GLASS",
+    "CAMERA_2_INNER",
+    "CAMERA_2_IRIS",
+    "CAMERA_2_PUPIL",
+    "CAMERA_2_RING",
+    "CAMERA_CONTROL",
+    "CAMERA_HOUSING",
+    "CAMERA_HOUSING_SEAT",
+    "DISPLAY_BEZEL",
+    "DISPLAY_GLASS_SEAT",
+    "DYNAMIC_ISLAND",
+    "FLASH",
+    "FLASH_RING",
+    "FRONT_CAMERA_GLASS",
+    "FRONT_CAMERA_INNER",
+    "FRONT_CAMERA_IRIS",
+    "FRONT_CAMERA_PUPIL",
+    "FRONT_CAMERA_RING",
+    "FRONT_RECEIVER_MIC",
+    "FRONT_SENSOR_PILL",
+    "REAR_MIC",
+    "SCREEN_CONTENT",
+    "SCREEN_GLASS",
+    "SIDE_BUTTON",
+    "USB_C_CAVITY",
+    "USB_C_TONGUE",
+    "VOL_DOWN",
+    "VOL_UP"
+  ],
+  "runtime_roles": {
+    "BODY_ALUMINUM": "body",
+    "SCREEN_CONTENT": "screen",
+    "SCREEN_GLASS": "screen_glass",
+    "DYNAMIC_ISLAND": "front_sensor_cluster",
+    "FRONT_SENSOR_PILL": "front_sensor",
+    "FRONT_CAMERA_GLASS": "front_camera_optic",
+    "ACTION_BUTTON": "control",
+    "VOL_UP": "control",
+    "VOL_DOWN": "control",
+    "SIDE_BUTTON": "control",
+    "CAMERA_CONTROL": "control",
+    "USB_C_CAVITY": "port",
+    "CAMERA_HOUSING": "camera_housing",
+    "CAMERA_1_GLASS": "camera_optic",
+    "CAMERA_2_GLASS": "camera_optic"
+  },
+  "threejs_loader": "GLTFLoader",
+  "requires_meshopt_decoder": false,
+  "web_variants": {
+    "compat": {
+      "file": "iphone_17_v29_web.glb",
+      "requires": []
+    },
+    "meshopt": {
+      "file": "iphone_17_v29_web_meshopt.glb",
+      "requires": [
+        "MeshoptDecoder"
+      ],
+      "extensions_required": [
+        "EXT_meshopt_compression",
+        "KHR_mesh_quantization"
+      ]
+    }
+  },
+  "camera_fit": "runtime_bounds",
+  "source_reference": "Apple iPhone 17 Dimensional Drawings 2025-09-09",
+  "source_revision": "86a2b88ab0993a5ddee2d027d092bcddb2055c52d2fda6131ed00d736ee1514f",
+  "source_commit": "d0a6c2366bfba552189336ad92db3398371fa12b",
+  "generator_version": "web_delivery_camera_logo_normals_v29",
+  "delivery_profile": {
+    "simplification": "none",
+    "compression": "compat+meshopt",
+    "node_preservation": "required"
+  },
+  "default_web_variant": "compat",
+  "preferred_web_variant": "meshopt",
+  "web_optimizer": {
+    "tool": "@gltf-transform/cli",
+    "version": "4.5.0",
+    "command": "meshopt --level high"
+  },
+  "source_files": {
+    "assets/device_mockups/common/foundation_common.py": "1d68c3fff908b7ae149f74c31a19064eb6d2384234d33bd71071fea70d651d12",
+    "assets/device_mockups/iphone_17/generate_low_v29.py": "4ba398309a4d0a01a2c59b32a5cb067cee1f4c93dad168b3b1623ed146c79a25",
+    "assets/device_mockups/iphone_17/reference/apple_logo_glb_mask.png": "8359212a9b1663f4449675604ae1b9aa14e325a99306e77175d938dfae04a9da",
+    "assets/device_mockups/iphone_17/reference/ios26_home_screen_1206x2622.png": "dedb0095d0dcdba59baff26cf4267560409f4434da0d54600a9619d1df05a445"
+  },
+  "glb_qa": {
+    "triangle_count": 33376,
+    "required_nodes": [
+      "APPLE_LOGO_DECAL",
+      "CTRL_IPHONE_17",
+      "DYNAMIC_ISLAND",
+      "FRONT_CAMERA_GLASS",
+      "FRONT_SENSOR_PILL",
+      "SCREEN_CONTENT"
+    ],
+    "node_count": 59,
+    "material_count": 16,
+    "runtime_bounds_mm": [
+      72.69,
+      149.61,
+      9.81
+    ]
+  },
+  "artifacts": {
+    "generated_blend": {
+      "path": "assets/device_mockups/iphone_17/generated/iphone_17_low_v29.blend",
+      "sha256": "5e04ed9289f38798f600c9307847f39f51ad42d2621be747498c2856dbd9bedb"
+    },
+    "validation": {
+      "path": "assets/device_mockups/iphone_17/evidence/low_v29_validation.json",
+      "sha256": "522bf1f13a39a87e55e24cc24ee3331c7b5b169d08e3c4a1b945c8598e88fcbe"
+    },
+    "delivery_blend": {
+      "path": "assets/device_mockups/iphone_17/runtime/v29/iphone_17_v29_delivery.blend",
+      "sha256": "50b71f5a8191d63bee7ef29b845675af898cf7b27c5a356a104015f3494a86ba"
+    },
+    "compat_glb": {
+      "path": "assets/device_mockups/iphone_17/runtime/v29/iphone_17_v29_web.glb",
+      "sha256": "797d0bcd06583abc0ee2ac72a2e2c5640200ea2b406f4aedfe3ce366b3a9af56"
+    },
+    "meshopt_glb": {
+      "path": "assets/device_mockups/iphone_17/runtime/v29/iphone_17_v29_web_meshopt.glb",
+      "sha256": "8fb7f58210a8e4601ca6055623834edd79a7c376bdb32d6b308aff11b0ea99d7"
+    },
+    "plugin_bundle": {
+      "path": "extension/awful_studio/assets/devices/iphone_17_low_v29.blend",
+      "sha256": "9eaa9717eae3008e775c0cfa79cc35b4eb3b1d51bf1afd378afcbea4b1141d8b"
+    }
+  }
+}
