@@ -1,0 +1,16 @@
+﻿AWFUL STUDIO DEVICE MOCKUPS — HANDOFF SNAPSHOT
+2026-09-16
+
+iphone_17_CURRENT_RELEASE_v15.blend
+  Last committed/public runtime-backed iPhone asset. Use for anything that must not regress today.
+
+iphone_17_WORKING_v19.blend
+  Newer geometry experiment. Rear cluster/logo QA passes, but front Dynamic Island/camera is currently hidden behind the screen stack. DO NOT publish as current.
+
+iPad Pro 11/13 CURRENT_WORKING_v6
+  QA passed, previews already published to asset/ipad-pro. Needs final visual approval + runtime packaging before LOW promotion.
+
+MacBook Pro 14 CURRENT_RELEASE_CANDIDATE_v1
+  QA passed and previews are published. Still needs major visual/mechanical LOW polish before publishable asset status.
+
+Source of truth remains each linked worktree under .worktrees/. This folder is review/handoff copies only.
