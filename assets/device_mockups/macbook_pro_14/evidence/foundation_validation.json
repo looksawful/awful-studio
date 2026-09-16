@@ -1,0 +1,38 @@
+{
+  "actual_mm": {
+    "closed_height": 15.5,
+    "depth": 221.200004,
+    "width": 312.599987
+  },
+  "asset_id": "macbook_pro_14_m5",
+  "base_non_manifold_edges": 0,
+  "blender_version": "5.2.1 LTS",
+  "delta_mm": {
+    "closed_height": 0.0,
+    "depth": 4e-06,
+    "width": -1.3e-05
+  },
+  "expected_mm": {
+    "closed_height": 15.5,
+    "depth": 221.2,
+    "width": 312.6
+  },
+  "hinge_children": [
+    "CAMERA_NOTCH",
+    "FACETIME_CAMERA",
+    "LID_UNIBODY",
+    "SCREEN_CONTENT",
+    "SCREEN_GLASS"
+  ],
+  "hinge_open_angle_deg": 102.0,
+  "lid_local_mm": {
+    "height": 211.999997,
+    "thickness": 4.7,
+    "width": 312.000006
+  },
+  "lid_non_manifold_edges": 0,
+  "material_count": 8,
+  "object_count": 184,
+  "passed": true,
+  "stage": "BLOCKOUT"
+}

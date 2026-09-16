@@ -1,0 +1,24 @@
+{
+  "asset_id": "ipad_pro_11_m5",
+  "stage": "BLOCKOUT",
+  "blender_version": "5.2.1 LTS",
+  "expected_mm": {
+    "width": 177.5,
+    "height": 249.7,
+    "depth": 5.3
+  },
+  "actual_mm": {
+    "width": 177.499995,
+    "height": 249.699995,
+    "depth": 5.3
+  },
+  "delta_mm": {
+    "width": -5e-06,
+    "height": -5e-06,
+    "depth": -0.0
+  },
+  "body_non_manifold_edges": 0,
+  "object_count": 35,
+  "material_count": 7,
+  "passed": true
+}
