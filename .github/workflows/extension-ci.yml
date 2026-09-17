@@ -1,7 +1,7 @@
 name: Extension QA
 on:
   push:
-    branches: [main, 'feature/**', 'release/**']
+    branches: [main]
   pull_request:
   workflow_dispatch:
 permissions:
@@ -23,6 +23,11 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Resolve package name
+        shell: bash
+        run: |
+          PACKAGE=$(python -c "import pathlib,tomllib; p=pathlib.Path('extension/awful_studio/blender_manifest.toml'); v=tomllib.loads(p.read_text(encoding='utf-8'))['version']; print(f'awful_studio-{v}.zip')")
+          echo "PACKAGE=$PACKAGE" >> "$GITHUB_ENV"
       - name: Install exact official Blender
         shell: bash
         run: |
@@ -33,7 +38,7 @@ jobs:
         run: python tools/verify_extension.py --blender "$BLENDER"
       - name: Verify native static Extension repository install on Ubuntu
         shell: bash
-        run: python tools/verify_repository.py --blender "$BLENDER" --package dist/awful_studio-1.0.0.zip --output dist
+        run: python tools/verify_repository.py --blender "$BLENDER" --package "dist/$PACKAGE" --output dist
       - name: Upload Ubuntu runtime evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -48,7 +53,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: extension-candidate
-          path: dist/awful_studio-1.0.0.zip
+          path: dist/${{ env.PACKAGE }}
           if-no-files-found: error
 
   runtime-windows:
@@ -57,6 +62,11 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Resolve package name
+        shell: bash
+        run: |
+          PACKAGE=$(python -c "import pathlib,tomllib; p=pathlib.Path('extension/awful_studio/blender_manifest.toml'); v=tomllib.loads(p.read_text(encoding='utf-8'))['version']; print(f'awful_studio-{v}.zip')")
+          echo "PACKAGE=$PACKAGE" >> "$GITHUB_ENV"
       - name: Download canonical candidate
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
@@ -69,10 +79,10 @@ jobs:
           echo "BLENDER=$(tail -n 1 blender-path.txt)" >> "$GITHUB_ENV"
       - name: Validate and test the exact Ubuntu-built candidate on Windows
         shell: bash
-        run: python tools/verify_extension.py --blender "$BLENDER" --package dist/awful_studio-1.0.0.zip
+        run: python tools/verify_extension.py --blender "$BLENDER" --package "dist/$PACKAGE"
       - name: Verify native static Extension repository install on Windows
         shell: bash
-        run: python tools/verify_repository.py --blender "$BLENDER" --package dist/awful_studio-1.0.0.zip --output dist
+        run: python tools/verify_repository.py --blender "$BLENDER" --package "dist/$PACKAGE" --output dist
       - name: Upload Windows runtime evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -83,3 +93,19 @@ jobs:
             dist/*.log
             .blender/distribution.json
           if-no-files-found: error
+
+  merge-gate:
+    if: always()
+    needs: [fast, candidate, runtime-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require successful Extension QA
+        shell: bash
+        env:
+          FAST: ${{ needs.fast.result }}
+          CANDIDATE: ${{ needs.candidate.result }}
+          WINDOWS: ${{ needs.runtime-windows.result }}
+        run: |
+          test "$FAST" = success
+          test "$CANDIDATE" = success
+          test "$WINDOWS" = success

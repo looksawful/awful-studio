@@ -36,7 +36,7 @@ class ReleaseRepositoryContractTests(unittest.TestCase):
 
     def test_ci_runs_repository_gate_after_exact_zip_verifier(self):
         source = WORKFLOW.read_text(encoding='utf-8')
-        package = 'dist/awful_studio-1.0.0.zip'
+        package = '--package \"dist/$PACKAGE\"'
         self.assertIn('python tools/verify_extension.py --blender "$BLENDER"', source)
         self.assertIn('python tools/verify_repository.py --blender "$BLENDER"', source)
         self.assertIn(package, source)

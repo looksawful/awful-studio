@@ -27,8 +27,10 @@ class FoundationTests(unittest.TestCase):
         workflow_source = (ROOT / '.github' / 'workflows' / 'extension-ci.yml').read_text(encoding='utf-8')
         self.assertIn('VERSION = (1, 0, 0)', init_source)
         self.assertIn("block[VERSION_KEY] = '1.0.0'", ownership_source)
-        self.assertIn("awful_studio-1.0.0.zip", verifier_source)
-        self.assertIn("awful_studio-1.0.0.zip", workflow_source)
+        self.assertIn("blender_manifest.toml", verifier_source)
+        self.assertIn("EXPECTED_PACKAGE = f\"awful_studio-{MANIFEST_DATA['version']}.zip\"", verifier_source)
+        self.assertIn("blender_manifest.toml", workflow_source)
+        self.assertIn("PACKAGE=$PACKAGE", workflow_source)
 
     def test_no_eager_scene_registry(self):
         tree = ast.parse((EXT / 'core/legacy.py').read_text())
