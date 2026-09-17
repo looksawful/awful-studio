@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "shipping_format": "GLB",
+  "source_units": "meters",
+  "source_up_axis": "Z",
+  "runtime_up_axis": "Y",
+  "mesh_compression": "meshopt",
+  "texture_container": "KTX2",
+  "material_model": "metallic_roughness_pbr",
+  "lod_levels": ["LOD0", "LOD1", "LOD2"],
+  "lod_hysteresis": 0.1,
+  "collision_proxies": [
+    "COL_SUPPORT",
+    "COL_FIXTURE",
+    "COL_MODIFIER",
+    "COL_SANDBAG"
+  ],
+  "stable_roots": [
+    "ROOT_SUPPORT_CSTAND",
+    "ROOT_FIX_PROFOTO_D1_500",
+    "ROOT_MOD_PROFOTO_MAGNUM",
+    "ROOT_ACC_SANDBAG"
+  ],
+  "semantic_nodes": [
+    "FLOOR_CONTACT",
+    "MOUNT_SUPPORT",
+    "MOUNT_FIXTURE",
+    "MOUNT_MODIFIER",
+    "EMITTER_ORIGIN",
+    "LIGHT_TARGET"
+  ],
+  "export_policy": {
+    "apply_transforms": true,
+    "exclude_preview_rig": true,
+    "exclude_reference_envelopes": true,
+    "preserve_stable_names": true,
+    "preserve_custom_properties": true
+  },
+  "runtime_policy": {
+    "renderer_is_not_state_owner": true,
+    "physics_bridge": "rapier_optional",
+    "instancing_candidates": ["studio_support_cstand_01", "studio_sandbag_01"],
+    "compression_rule": "meshopt_and_draco_are_mutually_exclusive"
+  }
+}

@@ -8,3 +8,30 @@ extension/awful_studio/assets/**/*.zip -text
 historical/0.0.15/awful_studio_v4_2_gpu_perf.py -text
 
 extension/awful_studio/**/*.blend -text
+
+assets/device_mockups/iphone_17/generate_low_v29.py text eol=lf
+assets/device_mockups/iphone_17/export_runtime_v29.py text eol=lf
+assets/device_mockups/iphone_17/optimize_runtime_v29.py text eol=lf
+assets/device_mockups/iphone_17/evidence/low_v29_validation.json text eol=lf
+assets/device_mockups/iphone_17/runtime/v29/*.json text eol=lf
+tools/build_iphone17_v29.py text eol=lf
+
+assets/device_mockups/iphone_17/generate_low_v30.py text eol=lf
+assets/device_mockups/iphone_17/export_runtime_v30.py text eol=lf
+assets/device_mockups/iphone_17/optimize_runtime_v30.py text eol=lf
+assets/device_mockups/iphone_17/evidence/low_v30_validation.json text eol=lf
+assets/device_mockups/iphone_17/runtime/v30/*.json text eol=lf
+tools/build_iphone17_v30.py text eol=lf
+tests/fast/test_device_delivery_contract.py text eol=lf
+
+assets/device_mockups/ipad_pro/export_runtime_v6.py text eol=lf
+assets/device_mockups/ipad_pro/optimize_runtime_v6.py text eol=lf
+assets/device_mockups/ipad_pro/runtime/v6/*.json text eol=lf
+tools/build_ipad_v6_web.py text eol=lf
+tests/fast/test_ipad_web_delivery_contract.py text eol=lf
+
+assets/device_mockups/macbook_pro_14/export_runtime_v1.py text eol=lf
+assets/device_mockups/macbook_pro_14/optimize_runtime_v1.py text eol=lf
+assets/device_mockups/macbook_pro_14/runtime/v1/*.json text eol=lf
+tools/build_macbook_v1_web.py text eol=lf
+tests/fast/test_macbook_web_delivery_contract.py text eol=lf

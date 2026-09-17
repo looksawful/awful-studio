@@ -1,0 +1,23 @@
+{
+  "version": "0.1.0",
+  "stages": ["BLOCKOUT", "LOW_DRAFT", "LOW", "MID", "HIGH", "DELIVERY"],
+  "materials": {
+    "ALUMINUM": {"canonical_name": "MAT_ALUMINUM", "source_mode": "procedural", "delivery_maps": ["base_color", "roughness", "metallic", "normal", "ao"], "geometry_policy": "keep_silhouette"},
+    "GLASS_DISPLAY": {"canonical_name": "MAT_GLASS_DISPLAY", "source_mode": "procedural", "delivery_maps": ["base_color", "roughness", "normal"], "geometry_policy": "keep_geometry"},
+    "GLASS_BACK": {"canonical_name": "MAT_GLASS_BACK", "source_mode": "procedural", "delivery_maps": ["base_color", "roughness", "normal"], "geometry_policy": "keep_geometry"},
+    "OPTICAL_GLASS": {"canonical_name": "MAT_OPTICAL_GLASS", "source_mode": "procedural", "delivery_maps": ["base_color", "roughness", "normal"], "geometry_policy": "keep_hero_geometry"},
+    "POLYMER_BLACK": {"canonical_name": "MAT_POLYMER_BLACK", "source_mode": "procedural", "delivery_maps": ["base_color", "roughness", "normal", "ao"], "geometry_policy": "keep_major_geometry"},
+    "RUBBER": {"canonical_name": "MAT_RUBBER", "source_mode": "procedural", "delivery_maps": ["base_color", "roughness", "normal", "ao"], "geometry_policy": "keep_major_geometry"},
+    "SCREEN": {"canonical_name": "MAT_SCREEN", "source_mode": "hybrid", "delivery_maps": ["base_color", "emissive", "roughness"], "geometry_policy": "keep_geometry"},
+    "DECAL": {"canonical_name": "MAT_DECAL", "source_mode": "image", "delivery_maps": ["base_color", "opacity", "normal"], "geometry_policy": "bake_or_decal"},
+    "GAP": {"canonical_name": "MAT_GAP", "source_mode": "procedural", "delivery_maps": ["base_color", "roughness", "ao"], "geometry_policy": "bake_when_subpixel"}
+  },
+  "bake_outputs": ["normal", "ao", "roughness", "metallic", "curvature", "material_id"],
+  "optional_bake_outputs": ["height", "thickness", "emissive", "opacity"],
+  "delivery": {
+    "quality_presets": [1024, 2048, 4096],
+    "packed_orm": {"r": "ao", "g": "roughness", "b": "metallic"},
+    "uv_gate": "LOW must be approved before production UV/bake starts",
+    "high_gate": "HIGH geometry exists only for hero geometry or details intended to bake"
+  }
+}

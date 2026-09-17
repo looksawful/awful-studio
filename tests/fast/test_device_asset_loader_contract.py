@@ -5,6 +5,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 MODULE_PATH = ROOT / 'extension' / 'awful_studio' / 'device_asset_loader.py'
 PRODUCT_PATH = ROOT / 'extension' / 'awful_studio' / 'product_quality.py'
+INIT_PATH = ROOT / 'extension' / 'awful_studio' / '__init__.py'
 
 EXPECTED_KEYS = {
     'DEVICE_IPHONE_17',
@@ -19,13 +20,13 @@ EXPECTED_STAGES = {
     'DEVICE_MACBOOK_PRO_14': 'RELEASE_CANDIDATE',
 }
 EXPECTED_VARIANTS = {
-    'DEVICE_IPHONE_17': 'low_v20',
+    'DEVICE_IPHONE_17': 'low_v30',
     'DEVICE_IPAD_PRO_11': 'low_v6',
     'DEVICE_IPAD_PRO_13': 'low_v6',
     'DEVICE_MACBOOK_PRO_14': 'low_v1_release',
 }
 EXPECTED_FILES = {
-    'DEVICE_IPHONE_17': 'iphone_17_low_v20.blend',
+    'DEVICE_IPHONE_17': 'iphone_17_low_v30.blend',
     'DEVICE_IPAD_PRO_11': 'ipad_pro_11_m5_low_v6.blend',
     'DEVICE_IPAD_PRO_13': 'ipad_pro_13_m5_low_v6.blend',
     'DEVICE_MACBOOK_PRO_14': 'macbook_pro_14_m5_low_v1_release.blend',
@@ -89,6 +90,22 @@ class DeviceAssetLoaderContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             loader.hinge_preset_keys('DEVICE_IPHONE_17')
 
+    def test_phone_tablet_orientation_presets_are_explicit(self):
+        loader = load_module()
+        expected = {
+            'PORTRAIT': 0.0,
+            'LANDSCAPE_LEFT': 90.0,
+            'LANDSCAPE_RIGHT': -90.0,
+            'PORTRAIT_INVERTED': 180.0,
+        }
+        for key in ('DEVICE_IPHONE_17', 'DEVICE_IPAD_PRO_11', 'DEVICE_IPAD_PRO_13'):
+            self.assertEqual(loader.device_asset_spec(key)['orientation_axis'], 'Y')
+            self.assertEqual(loader.orientation_preset_keys(key), tuple(expected))
+            for preset, angle in expected.items():
+                self.assertEqual(loader.orientation_angle_degrees(key, preset), angle)
+        with self.assertRaises(ValueError):
+            loader.orientation_preset_keys('DEVICE_MACBOOK_PRO_14')
+
     def test_lod_contract_is_manifest_driven(self):
         loader = load_module()
         for key in EXPECTED_KEYS:
@@ -115,6 +132,10 @@ class DeviceAssetLoaderContractTests(unittest.TestCase):
         self.assertIn('device_asset_loader.device_asset_keys()', source)
         self.assertIn('device_asset_loader.device_asset_spec(key)', source)
         self.assertIn("annotations['device_lod']", source)
+        self.assertIn("annotations['device_orientation_preset']", source)
+        self.assertIn("device_orientation_preset", source)
+        init_source = INIT_PATH.read_text(encoding='utf-8')
+        self.assertIn("awful.apply_device_orientation", init_source)
 
 
 class BinaryAssetAttributesTests(unittest.TestCase):

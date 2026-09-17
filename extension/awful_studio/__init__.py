@@ -3,7 +3,7 @@
 import time
 import bpy
 from bpy.props import BoolProperty, StringProperty, IntProperty, PointerProperty, EnumProperty
-from . import ownership, migrations, asset_cache, asset_workflow, post_pipeline, photography, camera_policy, studio_geometry, natural_light, runtime_performance, playback_policy, product_placement, product_quality, device_asset_loader
+from . import ownership, migrations, asset_cache, asset_workflow, post_pipeline, photography, camera_policy, studio_geometry, natural_light, runtime_performance, playback_policy, product_placement, product_quality, device_asset_loader, external_asset_library
 from .core import legacy
 
 # Policy installation mutates only in-memory preset metadata/callables. It must run
@@ -26,12 +26,15 @@ _registered = []
 class AWFUL_AddonPreferences(bpy.types.AddonPreferences):
     bl_idname = __package__
     asset_cache_path: StringProperty(name='Asset Cache Directory', subtype='DIR_PATH')
+    external_asset_library_path: StringProperty(name='External Asset Library', subtype='DIR_PATH')
     allow_network_assets: BoolProperty(name='Allow Network Assets', default=False)
     diagnostics: BoolProperty(name='Diagnostics', default=False)
 
     def draw(self, context):
-        self.layout.label(text='AWFUL STUDIO 1.0.0 — Blender 5.2 LTS')
+        self.layout.label(text='AWFUL STUDIO 1.0.0 Р Р†Р вЂљРІР‚Сњ Blender 5.2 LTS')
         self.layout.prop(self, 'asset_cache_path')
+        self.layout.prop(self, 'external_asset_library_path')
+        self.layout.operator('awful.register_external_asset_library')
         self.layout.prop(self, 'allow_network_assets')
         self.layout.prop(self, 'diagnostics')
         self.layout.operator('awful.clear_asset_cache')
@@ -204,6 +207,21 @@ class AWFUL_OT_Migrate(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class AWFUL_OT_RegisterExternalAssetLibrary(bpy.types.Operator):
+    bl_idname = 'awful.register_external_asset_library'
+    bl_label = 'Register External Asset Library'
+
+    def execute(self, context):
+        prefs = context.preferences.addons[__package__].preferences
+        try:
+            external_asset_library.register_asset_browser_root(bpy, prefs.external_asset_library_path)
+        except (OSError, ValueError) as exc:
+            self.report({'ERROR'}, str(exc))
+            return {'CANCELLED'}
+        self.report({'INFO'}, 'External asset root registered in Blender Asset Libraries')
+        return {'FINISHED'}
+
+
 class AWFUL_OT_ClearCache(bpy.types.Operator):
     bl_idname = 'awful.clear_asset_cache'
     bl_label = 'Clear Downloaded Asset Cache'
@@ -263,6 +281,38 @@ class AWFUL_OT_ApplyDeviceScreen(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class AWFUL_OT_ApplyDeviceOrientation(bpy.types.Operator):
+    bl_idname = 'awful.apply_device_orientation'
+    bl_label = 'Set Device Orientation'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        if context.scene is None or legacy.REG.object('CYC') is None:
+            return False
+        key = context.scene.awful_studio.product_mockup
+        try:
+            device_asset_loader.orientation_preset_keys(key)
+            root = device_asset_loader._active_device_root(legacy, context.scene)
+        except (ValueError, RuntimeError):
+            return False
+        return str(root.get('awful_mockup_key', '')) == key
+
+    def execute(self, context):
+        scene = context.scene
+        settings = scene.awful_studio
+        key = settings.product_mockup
+        try:
+            preset = settings.device_orientation_preset
+            with ownership.for_scene(scene):
+                root = device_asset_loader.apply_orientation_preset(legacy, scene, preset)
+            self.report({'INFO'}, f'Orientation {preset}: {root.name}')
+        except Exception as exc:
+            self.report({'ERROR'}, str(exc))
+            return {'CANCELLED'}
+        return {'FINISHED'}
+
+
 class AWFUL_OT_ApplyDeviceHinge(bpy.types.Operator):
     bl_idname = 'awful.apply_device_hinge'
     bl_label = 'Set Device Hinge'
@@ -287,8 +337,9 @@ class AWFUL_OT_ApplyDeviceHinge(bpy.types.Operator):
 
 CLASSES = (AWFUL_AddonPreferences, AWFUL_SceneState, *legacy.CLASSES,
            AWFUL_OT_Build, AWFUL_OT_Rebuild, AWFUL_OT_Remove, AWFUL_OT_ResetSystem,
-           AWFUL_OT_Migrate, AWFUL_OT_ClearCache, AWFUL_OT_GenerateMockup,
-           AWFUL_OT_ApplyDeviceScreen, AWFUL_OT_ApplyDeviceHinge)
+           AWFUL_OT_Migrate, AWFUL_OT_RegisterExternalAssetLibrary, AWFUL_OT_ClearCache, AWFUL_OT_GenerateMockup,
+           AWFUL_OT_ApplyDeviceScreen, AWFUL_OT_ApplyDeviceOrientation,
+           AWFUL_OT_ApplyDeviceHinge)
 
 
 def register():

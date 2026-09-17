@@ -1,0 +1,3762 @@
+{
+  "asset_count": 66,
+  "assets": [
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "DEVICE_MOCKUP",
+      "components": [
+        "unibody",
+        "display_stack",
+        "dynamic_island",
+        "front_camera",
+        "rear_camera_system",
+        "buttons",
+        "ports",
+        "logo"
+      ],
+      "dimensions": {
+        "body_mm": {
+          "confidence": "VERIFIED",
+          "value": [
+            71.5,
+            149.6,
+            7.95
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/iphone_17.md",
+      "id": "iphone_17",
+      "identity_class": "PROJECT_VERIFIED",
+      "materials": [
+        "anodized_aluminum",
+        "display_glass",
+        "optical_glass",
+        "matte_black",
+        "decal"
+      ],
+      "mounts": [
+        "SCREEN_PLANE",
+        "FLOOR_CONTACT"
+      ],
+      "name": "iPhone 17",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "iphone17_current"
+      ],
+      "stage": "LOW_V15",
+      "tier": "HERO",
+      "variants": [
+        "Space Black",
+        "Silver"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "DEVICE_MOCKUP",
+      "components": [
+        "unibody",
+        "display_stack",
+        "camera_housing",
+        "rear_camera",
+        "flash",
+        "lidar",
+        "front_camera",
+        "side_controls",
+        "smart_connector"
+      ],
+      "dimensions": {
+        "body_mm": {
+          "confidence": "VERIFIED",
+          "value": [
+            177.5,
+            249.7,
+            5.3
+          ]
+        },
+        "screen_mm": {
+          "confidence": "PROJECT_VERIFIED",
+          "value": [
+            160.13,
+            232.32
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/ipad_pro_11_m5.md",
+      "id": "ipad_pro_11_m5",
+      "identity_class": "PROJECT_VERIFIED",
+      "materials": [
+        "anodized_aluminum",
+        "display_glass",
+        "optical_glass",
+        "matte_black",
+        "decal"
+      ],
+      "mounts": [
+        "SCREEN_PLANE",
+        "FLOOR_CONTACT"
+      ],
+      "name": "iPad Pro 11 M5",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "ipad_current"
+      ],
+      "stage": "RELEASE_CANDIDATE",
+      "tier": "HERO",
+      "variants": [
+        "Space Black",
+        "Silver"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "DEVICE_MOCKUP",
+      "components": [
+        "unibody",
+        "display_stack",
+        "camera_housing",
+        "rear_camera",
+        "flash",
+        "lidar",
+        "front_camera",
+        "side_controls",
+        "smart_connector"
+      ],
+      "dimensions": {
+        "body_mm": {
+          "confidence": "VERIFIED",
+          "value": [
+            215.5,
+            281.6,
+            5.1
+          ]
+        },
+        "screen_mm": {
+          "confidence": "PROJECT_VERIFIED",
+          "value": [
+            199.14,
+            265.19
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/ipad_pro_13_m5.md",
+      "id": "ipad_pro_13_m5",
+      "identity_class": "PROJECT_VERIFIED",
+      "materials": [
+        "anodized_aluminum",
+        "display_glass",
+        "optical_glass",
+        "matte_black",
+        "decal"
+      ],
+      "mounts": [
+        "SCREEN_PLANE",
+        "FLOOR_CONTACT"
+      ],
+      "name": "iPad Pro 13 M5",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "ipad_current"
+      ],
+      "stage": "RELEASE_CANDIDATE",
+      "tier": "HERO",
+      "variants": [
+        "Space Black",
+        "Silver"
+      ]
+    },
+    {
+      "articulation": [
+        "lid_hinge: reviewed preset 102deg"
+      ],
+      "category": "DEVICE_MOCKUP",
+      "components": [
+        "base_unibody",
+        "lid_unibody",
+        "hinge",
+        "display_stack",
+        "keyboard",
+        "trackpad",
+        "speaker_fields",
+        "touch_id",
+        "ports",
+        "feet",
+        "logo"
+      ],
+      "dimensions": {
+        "closed_mm": {
+          "confidence": "VERIFIED",
+          "value": [
+            312.6,
+            221.2,
+            15.5
+          ]
+        },
+        "lid_mm": {
+          "confidence": "PROJECT_VERIFIED",
+          "value": [
+            312,
+            212,
+            4.7
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/macbook_pro_14_m5.md",
+      "id": "macbook_pro_14_m5",
+      "identity_class": "PROJECT_VERIFIED",
+      "materials": [
+        "anodized_aluminum",
+        "display_glass",
+        "keycap_polymer",
+        "trackpad_glass",
+        "optical_glass",
+        "rubber",
+        "decal"
+      ],
+      "mounts": [
+        "CTRL_HINGE",
+        "SCREEN_PLANE",
+        "FLOOR_CONTACT"
+      ],
+      "name": "MacBook Pro 14 M5",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "macbook_current"
+      ],
+      "stage": "RELEASE_CANDIDATE",
+      "tier": "HERO",
+      "variants": [
+        "Space Black",
+        "Silver"
+      ]
+    },
+    {
+      "articulation": [
+        "fixture_tilt"
+      ],
+      "category": "LIGHT_FIXTURE",
+      "components": [
+        "cylindrical_body",
+        "front_rings",
+        "frosted_glass",
+        "flash_tube",
+        "modeling_lamp",
+        "rear_control_panel",
+        "vents",
+        "handle_yoke",
+        "stand_adapter",
+        "umbrella_tube",
+        "sync_ac_fuse"
+      ],
+      "dimensions": {
+        "body_mm": {
+          "confidence": "VERIFIED",
+          "value": [
+            300,
+            130
+          ]
+        },
+        "height_with_adapter_mm": {
+          "confidence": "VERIFIED",
+          "value": 170
+        },
+        "mass_kg": {
+          "confidence": "VERIFIED",
+          "value": 2.43
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/profoto_d1_500_air.md",
+      "id": "profoto_d1_500_air",
+      "identity_class": "HISTORICAL_CONFIRMED",
+      "materials": [
+        "black_polymer",
+        "powder_coated_metal",
+        "frosted_glass",
+        "clear_glass",
+        "rubber",
+        "printed_decals"
+      ],
+      "mounts": [
+        "MOUNT_SUPPORT",
+        "MOUNT_MODIFIER",
+        "MOUNT_UMBRELLA",
+        "EMITTER_ORIGIN",
+        "LIGHT_TARGET"
+      ],
+      "name": "Profoto D1 500 Air",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "sensetique_current",
+        "profoto_d1_manual"
+      ],
+      "stage": "MID",
+      "tier": "HERO",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "fixture_tilt"
+      ],
+      "category": "LIGHT_FIXTURE",
+      "components": [
+        "head_body",
+        "reflector_collar",
+        "glass_cover",
+        "flash_tube",
+        "modeling_lamp",
+        "power_cable",
+        "stand_adapter",
+        "umbrella_holder"
+      ],
+      "dimensions": {
+        "cable_m": {
+          "confidence": "VERIFIED",
+          "value": 3
+        },
+        "envelope_mm": {
+          "confidence": "VERIFIED",
+          "value": [
+            100,
+            100,
+            220
+          ]
+        },
+        "mass_kg": {
+          "confidence": "VERIFIED",
+          "value": 1.55
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/profoto_acute_d4_head.md",
+      "id": "profoto_acute_d4_head",
+      "identity_class": "HISTORICAL_CONFIRMED",
+      "materials": [
+        "black_polymer",
+        "painted_metal",
+        "frosted_uv_glass",
+        "clear_glass",
+        "rubber",
+        "cable_jacket"
+      ],
+      "mounts": [
+        "MOUNT_SUPPORT",
+        "MOUNT_MODIFIER",
+        "MOUNT_UMBRELLA",
+        "EMITTER_ORIGIN"
+      ],
+      "name": "Profoto Acute/D4 Head",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "sensetique_current",
+        "profoto_acute_d4_manual"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "HERO",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "LIGHT_FIXTURE",
+      "components": [
+        "generator_shell",
+        "carry_handle",
+        "front_controls",
+        "flash_sockets",
+        "mains_socket",
+        "sync_input",
+        "slave_sensor",
+        "feet",
+        "labels"
+      ],
+      "dimensions": {
+        "1200_mm": {
+          "confidence": "VERIFIED",
+          "value": [
+            220,
+            190,
+            130
+          ]
+        },
+        "2400_mm": {
+          "confidence": "VERIFIED",
+          "value": [
+            300,
+            190,
+            130
+          ]
+        },
+        "mass_kg": {
+          "confidence": "VERIFIED",
+          "value": {
+            "1200": 4.1,
+            "2400": 5.9
+          }
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/profoto_acute2_generator.md",
+      "id": "profoto_acute2_generator",
+      "identity_class": "HISTORICAL_CONFIRMED",
+      "materials": [
+        "painted_sheet_metal",
+        "black_polymer",
+        "rubber",
+        "screen_print_decals"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT",
+        "CABLE_PORT_A",
+        "CABLE_PORT_B"
+      ],
+      "name": "Profoto Acute2 Generator",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "sensetique_current",
+        "profoto_acute2_manual"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "1200Ws",
+        "2400Ws"
+      ]
+    },
+    {
+      "articulation": [
+        "focus: 4.5-48deg",
+        "fixture_tilt"
+      ],
+      "category": "LIGHT_FIXTURE",
+      "components": [
+        "focus_head",
+        "aspheric_optics",
+        "barn_door_receiver",
+        "focus_mechanism",
+        "yoke",
+        "power_electronics",
+        "cable",
+        "16mm_mount"
+      ],
+      "dimensions": {
+        "envelope_mm": {
+          "confidence": "SECONDARY_VERIFIED",
+          "value": [
+            171,
+            132,
+            174
+          ]
+        },
+        "mass_kg": {
+          "confidence": "VERIFIED",
+          "value": 1.02
+        },
+        "power_w": {
+          "confidence": "VERIFIED",
+          "value": 150
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/dedolight_dlhm4_300.md",
+      "id": "dedolight_dlhm4_300",
+      "identity_class": "HISTORICAL_CONFIRMED",
+      "materials": [
+        "black_cast_metal",
+        "anodized_metal",
+        "optical_glass",
+        "heat_resistant_polymer",
+        "rubber_cable"
+      ],
+      "mounts": [
+        "MOUNT_SUPPORT",
+        "LIGHT_TARGET",
+        "EMITTER_ORIGIN"
+      ],
+      "name": "Dedolight DLHM4-300",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "sensetique_current",
+        "dedolight_dlhm4"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "HERO",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "focus: 14-53deg",
+        "fixture_tilt"
+      ],
+      "category": "LIGHT_FIXTURE",
+      "components": [
+        "aluminum_housing",
+        "fresnel",
+        "lamp_holder",
+        "focus_slide",
+        "ventilation",
+        "yoke",
+        "16mm_pin",
+        "barndoor_receiver",
+        "cable"
+      ],
+      "dimensions": {
+        "body_mm": {
+          "confidence": "VERIFIED",
+          "value": [
+            187,
+            160,
+            209
+          ]
+        },
+        "lens_diameter_mm": {
+          "confidence": "VERIFIED",
+          "value": 80
+        },
+        "mass_kg": {
+          "confidence": "VERIFIED",
+          "value": 2
+        },
+        "with_pin_mm": {
+          "confidence": "VERIFIED",
+          "value": [
+            187,
+            160,
+            254
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/arri_300_plus.md",
+      "id": "arri_300_plus",
+      "identity_class": "HISTORICAL_CONFIRMED",
+      "materials": [
+        "painted_aluminum",
+        "optical_glass",
+        "stainless_fasteners",
+        "heat_resistant_polymer",
+        "rubber_cable"
+      ],
+      "mounts": [
+        "MOUNT_SUPPORT",
+        "LIGHT_TARGET",
+        "EMITTER_ORIGIN"
+      ],
+      "name": "ARRI 300 Plus",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "sensetique_current",
+        "arri_300_plus"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "HERO",
+      "variants": [
+        "blue/silver",
+        "black"
+      ]
+    },
+    {
+      "articulation": [
+        "zoom_position: 4-10"
+      ],
+      "category": "LIGHT_MODIFIER",
+      "components": [
+        "curved_bowl",
+        "black_outer_shell",
+        "silver_inner_reflector",
+        "ribbed_collar",
+        "front_rim",
+        "label_zone"
+      ],
+      "dimensions": {
+        "depth_mm": {
+          "confidence": "VERIFIED",
+          "value": 265
+        },
+        "diameter_mm": {
+          "confidence": "VERIFIED",
+          "value": 345
+        },
+        "mass_kg": {
+          "confidence": "VERIFIED",
+          "value": 0.8
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/profoto_magnum_100624.md",
+      "id": "profoto_magnum_100624",
+      "identity_class": "HISTORICAL_CONFIRMED",
+      "materials": [
+        "matte_black_coating",
+        "high_reflectance_silver",
+        "aluminum_rim",
+        "printed_label"
+      ],
+      "mounts": [
+        "MOUNT_MODIFIER"
+      ],
+      "name": "Profoto Magnum Reflector 100624",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "sensetique_current",
+        "profoto_magnum_sheet"
+      ],
+      "stage": "MID",
+      "tier": "HERO",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "zoom_position: 4-10"
+      ],
+      "category": "LIGHT_MODIFIER",
+      "components": [
+        "faceted_reflector_bowl",
+        "zoom_collar",
+        "front_rim",
+        "scale_marks",
+        "locking_interface"
+      ],
+      "dimensions": {
+        "depth_mm": {
+          "confidence": "VERIFIED",
+          "value": 180
+        },
+        "diameter_mm": {
+          "confidence": "VERIFIED",
+          "value": 193
+        },
+        "mass_kg": {
+          "confidence": "VERIFIED",
+          "value": 0.3
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/profoto_zoom_100785.md",
+      "id": "profoto_zoom_100785",
+      "identity_class": "HISTORICAL_CONFIRMED",
+      "materials": [
+        "textured_silver_reflector",
+        "black_polymer",
+        "anodized_aluminum",
+        "printed_scale"
+      ],
+      "mounts": [
+        "MOUNT_MODIFIER"
+      ],
+      "name": "Profoto Zoom Reflector 100785",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "sensetique_current",
+        "profoto_zoom_sheet"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "HERO",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "LIGHT_MODIFIER",
+      "components": [
+        "shallow_dish",
+        "central_deflector_mount",
+        "rubber_collar",
+        "front_rim"
+      ],
+      "dimensions": {
+        "depth_mm": {
+          "confidence": "SHARED_GEOMETRY_VERIFIED",
+          "value": 190
+        },
+        "front_diameter_mm": {
+          "confidence": "VERIFIED",
+          "value": 525
+        },
+        "mass_kg": {
+          "confidence": "VERIFIED",
+          "value": 1.25
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/profoto_softlight_silver_100607.md",
+      "id": "profoto_softlight_silver_100607",
+      "identity_class": "HISTORICAL_CONFIRMED",
+      "materials": [
+        "painted_outer_metal",
+        "silver_reflective_inner",
+        "rubber_collar",
+        "aluminum_fasteners"
+      ],
+      "mounts": [
+        "MOUNT_MODIFIER"
+      ],
+      "name": "Profoto Softlight Reflector Silver 100607",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "sensetique_current",
+        "profoto_softlight_silver"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "HERO",
+      "variants": [
+        "silver"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "LIGHT_MODIFIER",
+      "components": [
+        "shallow_dish",
+        "central_deflector_mount",
+        "rubber_collar",
+        "front_rim"
+      ],
+      "dimensions": {
+        "depth_mm": {
+          "confidence": "VERIFIED",
+          "value": 190
+        },
+        "front_diameter_mm": {
+          "confidence": "VERIFIED",
+          "value": 525
+        },
+        "mass_kg": {
+          "confidence": "VERIFIED",
+          "value": 1.25
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/profoto_softlight_white_100608.md",
+      "id": "profoto_softlight_white_100608",
+      "identity_class": "HISTORICAL_CONFIRMED",
+      "materials": [
+        "painted_outer_metal",
+        "matte_white_inner",
+        "rubber_collar",
+        "aluminum_fasteners"
+      ],
+      "mounts": [
+        "MOUNT_MODIFIER"
+      ],
+      "name": "Profoto Softlight Reflector White 100608",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "sensetique_current",
+        "profoto_softlight_white"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "HERO",
+      "variants": [
+        "white"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "LIGHT_MODIFIER",
+      "components": [
+        "8_rod_shell",
+        "outer_black_fabric",
+        "silver_lining",
+        "inner_diffuser",
+        "front_diffuser",
+        "speedring_interface"
+      ],
+      "dimensions": {
+        "front_diameter_mm": {
+          "confidence": "VERIFIED",
+          "value": 950
+        },
+        "rod_count": {
+          "confidence": "VERIFIED",
+          "value": 8
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/grifon_sb_fw95.md",
+      "id": "grifon_sb_fw95",
+      "identity_class": "HISTORICAL_CONFIRMED",
+      "materials": [
+        "black_nylon",
+        "silver_reflective_textile",
+        "diffusion_textile",
+        "spring_steel_rods"
+      ],
+      "mounts": [
+        "MOUNT_MODIFIER"
+      ],
+      "name": "Grifon SB-FW95 Octabox",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "sensetique_current",
+        "grifon_sb_fw95"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "open",
+        "collapsed"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "LIGHT_MODIFIER",
+      "components": [
+        "octagonal_shell",
+        "8_rods",
+        "speedring_receiver",
+        "inner_diffuser",
+        "front_diffuser",
+        "silver_lining"
+      ],
+      "dimensions": {
+        "depth_mm": {
+          "confidence": "VERIFIED",
+          "value": 470
+        },
+        "front_diameter_mm": {
+          "confidence": "VERIFIED",
+          "value": 1500
+        },
+        "rod_count": {
+          "confidence": "VERIFIED",
+          "value": 8
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/profoto_rfi_octa_150_254712.md",
+      "id": "profoto_rfi_octa_150_254712",
+      "identity_class": "HISTORICAL_CONFIRMED",
+      "materials": [
+        "black_textile",
+        "silver_textile",
+        "diffusion_textile",
+        "spring_steel"
+      ],
+      "mounts": [
+        "MOUNT_MODIFIER"
+      ],
+      "name": "Profoto RFi Softbox 5 ft Octa 254712",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "sensetique_current",
+        "profoto_rfi_5_octa",
+        "profoto_rfi_system"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "HERO",
+      "variants": [
+        "open",
+        "collapsed"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "LIGHT_MODIFIER",
+      "components": [
+        "rectangular_shell",
+        "4_rods",
+        "speedring_receiver",
+        "inner_diffuser",
+        "front_diffuser",
+        "silver_lining"
+      ],
+      "dimensions": {
+        "front_mm": {
+          "confidence": "VERIFIED",
+          "value": [
+            900,
+            1200
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/profoto_rfi_3x4_254704.md",
+      "id": "profoto_rfi_3x4_254704",
+      "identity_class": "HISTORICAL_CONFIRMED",
+      "materials": [
+        "black_textile",
+        "silver_textile",
+        "diffusion_textile",
+        "spring_steel"
+      ],
+      "mounts": [
+        "MOUNT_MODIFIER"
+      ],
+      "name": "Profoto RFi Softbox 3x4 ft / 90x120 cm 254704",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "sensetique_current",
+        "profoto_rfi_3x4",
+        "profoto_rfi_system"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "HERO",
+      "variants": [
+        "open",
+        "collapsed"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "LIGHT_MODIFIER",
+      "components": [
+        "strip_shell",
+        "rods",
+        "speedring_receiver",
+        "inner_diffuser",
+        "front_diffuser",
+        "silver_lining"
+      ],
+      "dimensions": {
+        "front_mm": {
+          "confidence": "VERIFIED",
+          "value": [
+            300,
+            1600
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/fotokvant_evenly_30x160.md",
+      "id": "fotokvant_evenly_30x160",
+      "identity_class": "HISTORICAL_CONFIRMED",
+      "materials": [
+        "black_textile",
+        "silver_textile",
+        "diffusion_textile",
+        "spring_steel"
+      ],
+      "mounts": [
+        "MOUNT_MODIFIER"
+      ],
+      "name": "Fotokvant Evenly Stripbox 30x160 cm",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "sensetique_current",
+        "fotokvant_evenly"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "open",
+        "collapsed"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "LIGHT_MODIFIER",
+      "components": [
+        "central_shaft",
+        "fiberglass_ribs",
+        "white_reflective_canopy",
+        "runner",
+        "tips"
+      ],
+      "dimensions": {
+        "diameter_mm": {
+          "confidence": "VERIFIED",
+          "value": 1040
+        },
+        "mass_kg": {
+          "confidence": "VERIFIED",
+          "value": 0.4
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/fotokvant_u104w_para.md",
+      "id": "fotokvant_u104w_para",
+      "identity_class": "HISTORICAL_CONFIRMED",
+      "materials": [
+        "metal_shaft",
+        "fiberglass",
+        "white_textile",
+        "black_trim"
+      ],
+      "mounts": [
+        "MOUNT_UMBRELLA"
+      ],
+      "name": "Fotokvant U-104W Para White Umbrella",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "sensetique_current",
+        "fotokvant_u104w"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "open",
+        "collapsed"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "LIGHT_MODIFIER",
+      "components": [
+        "central_shaft",
+        "ribs",
+        "silver_canopy",
+        "black_outer_canopy",
+        "runner",
+        "tips"
+      ],
+      "dimensions": {
+        "diameter_mm": {
+          "confidence": "VERIFIED",
+          "value": 1010
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/fotokvant_u101s_silver.md",
+      "id": "fotokvant_u101s_silver",
+      "identity_class": "HISTORICAL_CONFIRMED",
+      "materials": [
+        "metal_shaft",
+        "fiberglass",
+        "silver_textile",
+        "black_textile"
+      ],
+      "mounts": [
+        "MOUNT_UMBRELLA"
+      ],
+      "name": "Fotokvant U-101S Silver Umbrella",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "sensetique_current",
+        "fotokvant_u101s"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "open",
+        "collapsed"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "LIGHT_MODIFIER",
+      "components": [
+        "central_shaft",
+        "16_ribs",
+        "translucent_canopy",
+        "runner",
+        "tips"
+      ],
+      "dimensions": {
+        "diameter_mm": {
+          "confidence": "VERIFIED",
+          "value": 1800
+        },
+        "rib_count": {
+          "confidence": "VERIFIED",
+          "value": 16
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/lumifor_lusl_18016.md",
+      "id": "lumifor_lusl_18016",
+      "identity_class": "HISTORICAL_CONFIRMED",
+      "materials": [
+        "metal_shaft",
+        "fiberglass",
+        "translucent_textile"
+      ],
+      "mounts": [
+        "MOUNT_UMBRELLA"
+      ],
+      "name": "Lumifor LUSL-18016 ULTRA Shoot-through Umbrella",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "sensetique_current",
+        "lumifor_18016"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "open",
+        "collapsed"
+      ]
+    },
+    {
+      "articulation": [
+        "stand_height",
+        "leg_spread"
+      ],
+      "category": "LIGHT_SUPPORT",
+      "components": [
+        "turtle_base",
+        "three_legs",
+        "three_risers",
+        "collars",
+        "baby_pin",
+        "hinges"
+      ],
+      "dimensions": {
+        "footprint_mm": {
+          "confidence": "PROJECT_VERIFIED",
+          "value": [
+            941,
+            911
+          ]
+        },
+        "leg_diameter_mm": {
+          "confidence": "VERIFIED",
+          "value": 25
+        },
+        "riser_diameters_mm": {
+          "confidence": "VERIFIED",
+          "value": [
+            35,
+            30,
+            25
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/avenger_a2025f_cstand.md",
+      "id": "avenger_a2025f_cstand",
+      "identity_class": "REFERENCE_STANDARD",
+      "materials": [
+        "chrome_steel",
+        "cast_aluminum",
+        "black_polymer",
+        "rubber"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT",
+        "MOUNT_SUPPORT"
+      ],
+      "name": "Avenger A2025F C-Stand Reference",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "avenger_a2025f"
+      ],
+      "stage": "MID",
+      "tier": "HERO",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "grip_rotation"
+      ],
+      "category": "LIGHT_ACCESSORY",
+      "components": [
+        "two_grip_discs",
+        "receiver",
+        "locking_handle",
+        "washers"
+      ],
+      "dimensions": {
+        "disc_diameter_mm": {
+          "confidence": "VERIFIED",
+          "value": 63.5
+        },
+        "receiver_mm": {
+          "confidence": "VERIFIED",
+          "value": 16
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/avenger_d200_grip_head.md",
+      "id": "avenger_d200_grip_head",
+      "identity_class": "REFERENCE_STANDARD",
+      "materials": [
+        "cast_aluminum",
+        "steel",
+        "black_polymer"
+      ],
+      "mounts": [
+        "MOUNT_SUPPORT",
+        "MOUNT_GRIP"
+      ],
+      "name": "Avenger D200 Grip Head Reference",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "avenger_d200"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "grip_rotation"
+      ],
+      "category": "LIGHT_ACCESSORY",
+      "components": [
+        "steel_arm",
+        "fixed_grip_head",
+        "locking_handle"
+      ],
+      "dimensions": {
+        "arm_length_mm": {
+          "confidence": "VERIFIED",
+          "value": 510
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/avenger_d500_grip_arm.md",
+      "id": "avenger_d500_grip_arm",
+      "identity_class": "REFERENCE_STANDARD",
+      "materials": [
+        "chrome_steel",
+        "cast_aluminum",
+        "black_polymer"
+      ],
+      "mounts": [
+        "MOUNT_GRIP",
+        "MOUNT_ACCESSORY"
+      ],
+      "name": "Avenger D500 Extension Grip Arm Reference",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "avenger_d500"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "height_adjustment"
+      ],
+      "category": "LIGHT_SUPPORT",
+      "components": [
+        "tripod_base",
+        "telescopic_risers",
+        "collars",
+        "spigot"
+      ],
+      "dimensions": {
+        "footprint_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 1000
+        },
+        "height_range_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            1000,
+            3000
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/air_cushioned_light_stand.md",
+      "id": "air_cushioned_light_stand",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "aluminum",
+        "steel",
+        "polymer",
+        "rubber"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT",
+        "MOUNT_SUPPORT"
+      ],
+      "name": "Air-cushioned Light Stand",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "height_adjustment"
+      ],
+      "category": "LIGHT_SUPPORT",
+      "components": [
+        "tripod_base",
+        "short_risers",
+        "collars",
+        "spigot"
+      ],
+      "dimensions": {
+        "footprint_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 700
+        },
+        "height_range_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            200,
+            900
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/low_light_stand.md",
+      "id": "low_light_stand",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "aluminum",
+        "steel",
+        "polymer",
+        "rubber"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT",
+        "MOUNT_SUPPORT"
+      ],
+      "name": "Low Light Stand",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "height_adjustment"
+      ],
+      "category": "LIGHT_SUPPORT",
+      "components": [
+        "base",
+        "risers",
+        "pivot",
+        "boom_arm",
+        "counterweight_mount"
+      ],
+      "dimensions": {
+        "boom_length_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 2000
+        },
+        "height_range_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            1200,
+            3500
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/boom_stand.md",
+      "id": "boom_stand",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "steel",
+        "aluminum",
+        "polymer",
+        "rubber"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT",
+        "MOUNT_SUPPORT"
+      ],
+      "name": "Studio Boom Stand",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "height_adjustment"
+      ],
+      "category": "LIGHT_SUPPORT",
+      "components": [
+        "rolling_base",
+        "casters",
+        "risers",
+        "collars",
+        "spigot"
+      ],
+      "dimensions": {
+        "footprint_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 1000
+        },
+        "height_range_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            1100,
+            3200
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/roller_stand.md",
+      "id": "roller_stand",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "steel",
+        "aluminum",
+        "polymer",
+        "rubber"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT",
+        "MOUNT_SUPPORT"
+      ],
+      "name": "Roller Studio Stand",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "LIGHT_ACCESSORY",
+      "components": [
+        "pin",
+        "shoulder",
+        "threaded_base"
+      ],
+      "dimensions": {
+        "diameter_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 16
+        },
+        "length_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 100
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/baby_pin_16mm.md",
+      "id": "baby_pin_16mm",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "zinc_plated_steel"
+      ],
+      "mounts": [
+        "MOUNT_ACCESSORY"
+      ],
+      "name": "16 mm Baby Pin",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "LIGHT_ACCESSORY",
+      "components": [
+        "receiver",
+        "tilt_joint",
+        "umbrella_clamp",
+        "locking_knobs"
+      ],
+      "dimensions": {
+        "receiver_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 16
+        },
+        "umbrella_shaft_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 8
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/umbrella_holder.md",
+      "id": "umbrella_holder",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "aluminum",
+        "steel",
+        "black_polymer"
+      ],
+      "mounts": [
+        "MOUNT_ACCESSORY"
+      ],
+      "name": "Umbrella Holder",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "LIGHT_ACCESSORY",
+      "components": [
+        "weight_body",
+        "clamp",
+        "locking_knob"
+      ],
+      "dimensions": {
+        "envelope_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            180,
+            100,
+            100
+          ]
+        },
+        "mass_kg": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 4
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/counterweight_4kg.md",
+      "id": "counterweight_4kg",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "painted_steel",
+        "rubber",
+        "polymer"
+      ],
+      "mounts": [
+        "MOUNT_ACCESSORY"
+      ],
+      "name": "Boom Counterweight 4 kg",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "LIGHT_ACCESSORY",
+      "components": [
+        "two_soft_pouches",
+        "webbing_handle",
+        "seams",
+        "label_patch"
+      ],
+      "dimensions": {
+        "envelope_mm": {
+          "confidence": "PROJECT_VERIFIED",
+          "value": [
+            360,
+            250,
+            70
+          ]
+        },
+        "nominal_mass_kg": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 10
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/sandbag_10kg.md",
+      "id": "sandbag_10kg",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "ballistic_nylon",
+        "webbing",
+        "thread",
+        "granular_fill"
+      ],
+      "mounts": [
+        "MOUNT_ACCESSORY"
+      ],
+      "name": "Studio Sandbag 10 kg",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "LIGHT_ACCESSORY",
+      "components": [
+        "cable",
+        "plug_a",
+        "plug_b",
+        "strain_relief"
+      ],
+      "dimensions": {
+        "cable_diameter_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 8
+        },
+        "length_m": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 5
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/power_cable_5m.md",
+      "id": "power_cable_5m",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "rubber_jacket",
+        "copper",
+        "polymer"
+      ],
+      "mounts": [
+        "MOUNT_ACCESSORY"
+      ],
+      "name": "Studio Power Cable 5 m",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "LIGHT_ACCESSORY",
+      "components": [
+        "cable",
+        "connector_a",
+        "connector_b",
+        "strain_relief"
+      ],
+      "dimensions": {
+        "cable_diameter_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 4
+        },
+        "length_m": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 5
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/sync_cable_5m.md",
+      "id": "sync_cable_5m",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "rubber_jacket",
+        "copper",
+        "polymer"
+      ],
+      "mounts": [
+        "MOUNT_ACCESSORY"
+      ],
+      "name": "Flash Sync Cable 5 m",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "LIGHT_ACCESSORY",
+      "components": [
+        "frame",
+        "black_fabric",
+        "mount_ear"
+      ],
+      "dimensions": {
+        "frame_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            600,
+            900
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/black_flag_60x90.md",
+      "id": "black_flag_60x90",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "steel_rod",
+        "black_textile"
+      ],
+      "mounts": [
+        "MOUNT_ACCESSORY"
+      ],
+      "name": "Black Flag 60x90 cm",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "LIGHT_ACCESSORY",
+      "components": [
+        "panel",
+        "edge_tape",
+        "mount_points"
+      ],
+      "dimensions": {
+        "panel_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            1000,
+            1500,
+            20
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/white_reflector_100x150.md",
+      "id": "white_reflector_100x150",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "foam_board",
+        "matte_white_surface",
+        "fabric_tape"
+      ],
+      "mounts": [
+        "MOUNT_ACCESSORY"
+      ],
+      "name": "White Reflector Card 100x150 cm",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "LIGHT_ACCESSORY",
+      "components": [
+        "frame",
+        "diffusion_textile",
+        "tension_points",
+        "mount_ear"
+      ],
+      "dimensions": {
+        "frame_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            1200,
+            1200
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/diffusion_frame_120.md",
+      "id": "diffusion_frame_120",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "aluminum_tube",
+        "diffusion_textile"
+      ],
+      "mounts": [
+        "MOUNT_ACCESSORY"
+      ],
+      "name": "Diffusion Frame 120x120 cm",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "LIGHT_ACCESSORY",
+      "components": [
+        "frame",
+        "insert_slot",
+        "mount_ear"
+      ],
+      "dimensions": {
+        "frame_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            600,
+            600
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/gobo_frame_60.md",
+      "id": "gobo_frame_60",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "painted_steel",
+        "black_polymer"
+      ],
+      "mounts": [
+        "MOUNT_ACCESSORY"
+      ],
+      "name": "Gobo Frame 60x60 cm",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "locking_rotation"
+      ],
+      "category": "LIGHT_ACCESSORY",
+      "components": [
+        "speedring_body",
+        "rod_sockets",
+        "locking_collar",
+        "head_interface"
+      ],
+      "dimensions": {
+        "interface_diameter_mm": {
+          "confidence": "VERIFIED",
+          "value": 100
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/profoto_rfi_speedring.md",
+      "id": "profoto_rfi_speedring",
+      "identity_class": "REFERENCE_STANDARD",
+      "materials": [
+        "cast_aluminum",
+        "anodized_aluminum",
+        "black_polymer"
+      ],
+      "mounts": [
+        "MOUNT_MODIFIER",
+        "MOUNT_FIXTURE"
+      ],
+      "name": "Profoto RFi Speedring Reference",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "profoto_rfi_system"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "FURNITURE",
+      "components": [
+        "frame",
+        "seat_cushions",
+        "back_cushions",
+        "arms",
+        "piping",
+        "feet"
+      ],
+      "dimensions": {
+        "design_envelope_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            2200,
+            950,
+            780
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/leather_sofa_3seat.md",
+      "id": "leather_sofa_3seat",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "leather",
+        "foam",
+        "wood_frame",
+        "metal_fasteners"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Leather Sofa, 3-seat",
+      "notes": [
+        "Representative studio design; silhouette and construction may be refined without changing the frozen envelope contract."
+      ],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "HERO",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "FURNITURE",
+      "components": [
+        "frame",
+        "seat_cushion",
+        "back_cushion",
+        "arms",
+        "piping",
+        "feet"
+      ],
+      "dimensions": {
+        "design_envelope_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            900,
+            900,
+            800
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/lounge_armchair_leather.md",
+      "id": "lounge_armchair_leather",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "leather",
+        "foam",
+        "wood_frame",
+        "metal_fasteners"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Lounge Armchair, Leather",
+      "notes": [
+        "Representative studio design; silhouette and construction may be refined without changing the frozen envelope contract."
+      ],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "HERO",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "FURNITURE",
+      "components": [
+        "frame",
+        "seat_cushion",
+        "back_cushion",
+        "arms",
+        "piping",
+        "feet"
+      ],
+      "dimensions": {
+        "design_envelope_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            900,
+            900,
+            800
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/lounge_armchair_fabric.md",
+      "id": "lounge_armchair_fabric",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "woven_fabric",
+        "foam",
+        "wood_frame",
+        "metal_fasteners"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Lounge Armchair, Fabric",
+      "notes": [
+        "Representative studio design; silhouette and construction may be refined without changing the frozen envelope contract."
+      ],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "HERO",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "FURNITURE",
+      "components": [
+        "seat",
+        "back",
+        "front_legs",
+        "rear_legs",
+        "joinery"
+      ],
+      "dimensions": {
+        "design_envelope_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            480,
+            520,
+            820
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/dining_chair_wood.md",
+      "id": "dining_chair_wood",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "hardwood",
+        "clear_finish"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Dining Chair, Wood",
+      "notes": [
+        "Representative studio design; silhouette and construction may be refined without changing the frozen envelope contract."
+      ],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "FURNITURE",
+      "components": [
+        "wood_seat",
+        "wood_back",
+        "metal_frame",
+        "feet"
+      ],
+      "dimensions": {
+        "design_envelope_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            500,
+            540,
+            820
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/chair_wood_metal.md",
+      "id": "chair_wood_metal",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "hardwood",
+        "powder_coated_steel",
+        "rubber"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Chair, Wood + Metal",
+      "notes": [
+        "Representative studio design; silhouette and construction may be refined without changing the frozen envelope contract."
+      ],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "FURNITURE",
+      "components": [
+        "seat",
+        "legs",
+        "foot_ring",
+        "feet"
+      ],
+      "dimensions": {
+        "design_envelope_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            420,
+            420,
+            650
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/bar_stool_low.md",
+      "id": "bar_stool_low",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "wood",
+        "powder_coated_steel",
+        "rubber"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Bar Stool, Low",
+      "notes": [
+        "Representative studio design; silhouette and construction may be refined without changing the frozen envelope contract."
+      ],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "FURNITURE",
+      "components": [
+        "seat",
+        "legs",
+        "foot_ring",
+        "feet"
+      ],
+      "dimensions": {
+        "design_envelope_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            430,
+            430,
+            780
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/bar_stool_high.md",
+      "id": "bar_stool_high",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "wood",
+        "powder_coated_steel",
+        "rubber"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Bar Stool, High",
+      "notes": [
+        "Representative studio design; silhouette and construction may be refined without changing the frozen envelope contract."
+      ],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "FURNITURE",
+      "components": [
+        "top",
+        "apron",
+        "legs",
+        "feet"
+      ],
+      "dimensions": {
+        "design_envelope_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            1600,
+            800,
+            750
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/studio_table_rect.md",
+      "id": "studio_table_rect",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "wood_veneer",
+        "plywood",
+        "powder_coated_steel"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Studio Table, Rectangular",
+      "notes": [
+        "Representative studio design; silhouette and construction may be refined without changing the frozen envelope contract."
+      ],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "FURNITURE",
+      "components": [
+        "round_top",
+        "column_or_legs",
+        "feet"
+      ],
+      "dimensions": {
+        "design_envelope_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            500,
+            500,
+            520
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/side_table_round.md",
+      "id": "side_table_round",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "wood",
+        "powder_coated_steel"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Side Table, Round",
+      "notes": [
+        "Representative studio design; silhouette and construction may be refined without changing the frozen envelope contract."
+      ],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "PROP",
+      "components": [
+        "cube_body",
+        "edge_breaks"
+      ],
+      "dimensions": {
+        "cube_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            300,
+            300,
+            300
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/wood_cube_300.md",
+      "id": "wood_cube_300",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "wood",
+        "clear_or_matte_finish"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Wood Cube 300 mm",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "PROP",
+      "components": [
+        "cube_body",
+        "edge_breaks"
+      ],
+      "dimensions": {
+        "cube_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            400,
+            400,
+            400
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/wood_cube_400.md",
+      "id": "wood_cube_400",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "wood",
+        "clear_or_matte_finish"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Wood Cube 400 mm",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "PROP",
+      "components": [
+        "cube_body",
+        "edge_breaks"
+      ],
+      "dimensions": {
+        "cube_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            500,
+            500,
+            500
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/wood_cube_500.md",
+      "id": "wood_cube_500",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "wood",
+        "clear_or_matte_finish"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Wood Cube 500 mm",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "PROP",
+      "components": [
+        "cube_body",
+        "edge_breaks"
+      ],
+      "dimensions": {
+        "cube_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            600,
+            600,
+            600
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/wood_cube_600.md",
+      "id": "wood_cube_600",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "wood",
+        "clear_or_matte_finish"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Wood Cube 600 mm",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "PROP",
+      "components": [
+        "cube_body",
+        "edge_chips_microdetail"
+      ],
+      "dimensions": {
+        "cube_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            300,
+            300,
+            300
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/plaster_cube_300.md",
+      "id": "plaster_cube_300",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "plaster",
+        "sealed_plaster_optional"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Plaster Cube 300 mm",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "PROP",
+      "components": [
+        "cube_body",
+        "edge_chips_microdetail"
+      ],
+      "dimensions": {
+        "cube_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            400,
+            400,
+            400
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/plaster_cube_400.md",
+      "id": "plaster_cube_400",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "plaster",
+        "sealed_plaster_optional"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Plaster Cube 400 mm",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "PROP",
+      "components": [
+        "cube_body",
+        "edge_chips_microdetail"
+      ],
+      "dimensions": {
+        "cube_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            500,
+            500,
+            500
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/plaster_cube_500.md",
+      "id": "plaster_cube_500",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "plaster",
+        "sealed_plaster_optional"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Plaster Cube 500 mm",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "PROP",
+      "components": [
+        "sphere_body",
+        "contact_flat_microzone"
+      ],
+      "dimensions": {
+        "diameter_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 300
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/plaster_sphere_300.md",
+      "id": "plaster_sphere_300",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "plaster"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Plaster Sphere Ø300 mm",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "PROP",
+      "components": [
+        "sphere_body",
+        "contact_flat_microzone"
+      ],
+      "dimensions": {
+        "diameter_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 400
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/plaster_sphere_400.md",
+      "id": "plaster_sphere_400",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "plaster"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Plaster Sphere Ø400 mm",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "PROP",
+      "components": [
+        "sphere_body",
+        "contact_flat_microzone"
+      ],
+      "dimensions": {
+        "diameter_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 500
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/plaster_sphere_500.md",
+      "id": "plaster_sphere_500",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "plaster"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Plaster Sphere Ø500 mm",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "PROP",
+      "components": [
+        "body",
+        "edge_breaks"
+      ],
+      "dimensions": {
+        "diameter_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 400
+        },
+        "height_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 300
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/plaster_cylinder_low.md",
+      "id": "plaster_cylinder_low",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "plaster"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Plaster Cylinder, Low",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "PROP",
+      "components": [
+        "body",
+        "edge_breaks"
+      ],
+      "dimensions": {
+        "diameter_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 350
+        },
+        "height_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 700
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/plaster_cylinder_tall.md",
+      "id": "plaster_cylinder_tall",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "plaster"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Plaster Cylinder, Tall",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "PROP",
+      "components": [
+        "body",
+        "edge_breaks"
+      ],
+      "dimensions": {
+        "diameter_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 500
+        },
+        "height_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 450
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/plaster_round_pedestal_low.md",
+      "id": "plaster_round_pedestal_low",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "plaster"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Round Pedestal, Low",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "PROP",
+      "components": [
+        "body",
+        "edge_breaks"
+      ],
+      "dimensions": {
+        "diameter_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 450
+        },
+        "height_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": 900
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/plaster_round_pedestal_tall.md",
+      "id": "plaster_round_pedestal_tall",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "plaster"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Round Pedestal, Tall",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "PROP",
+      "components": [
+        "body",
+        "edge_breaks"
+      ],
+      "dimensions": {
+        "design_envelope_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            500,
+            500,
+            450
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/plaster_plinth_low.md",
+      "id": "plaster_plinth_low",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "plaster"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Plaster Rectangular Plinth, Low",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "PROP",
+      "components": [
+        "body",
+        "edge_breaks"
+      ],
+      "dimensions": {
+        "design_envelope_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            400,
+            400,
+            900
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/plaster_plinth_tall.md",
+      "id": "plaster_plinth_tall",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "plaster"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Plaster Rectangular Plinth, Tall",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "static"
+      ],
+      "category": "PROP",
+      "components": [
+        "body",
+        "edge_breaks"
+      ],
+      "dimensions": {
+        "design_envelope_mm": {
+          "confidence": "DESIGN_STANDARD",
+          "value": [
+            450,
+            450,
+            700
+          ]
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/plaster_cone.md",
+      "id": "plaster_cone",
+      "identity_class": "DESIGN_STANDARD",
+      "materials": [
+        "plaster"
+      ],
+      "mounts": [
+        "FLOOR_CONTACT"
+      ],
+      "name": "Plaster Cone",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "awful_design_standard"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "STANDARD",
+      "variants": [
+        "canonical"
+      ]
+    },
+    {
+      "articulation": [
+        "rear_screen: fixed",
+        "dials_rotate"
+      ],
+      "category": "CAMERA",
+      "components": [
+        "magnesium_polycarbonate_body",
+        "ef_mount",
+        "grip",
+        "viewfinder",
+        "hotshoe",
+        "top_lcd",
+        "rear_lcd",
+        "buttons",
+        "dials",
+        "doors",
+        "ports",
+        "strap_lugs"
+      ],
+      "dimensions": {
+        "body_mm": {
+          "confidence": "VERIFIED",
+          "value": [
+            150.7,
+            116.4,
+            75.9
+          ]
+        },
+        "mass_g": {
+          "confidence": "VERIFIED",
+          "value": 890
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/canon_eos_5d_mark_iv.md",
+      "id": "canon_eos_5d_mark_iv",
+      "identity_class": "REFERENCE_STANDARD",
+      "materials": [
+        "matte_black_polymer",
+        "painted_magnesium",
+        "rubber_grip",
+        "optical_glass",
+        "clear_lcd_cover",
+        "printed_decals"
+      ],
+      "mounts": [
+        "EF_MOUNT_PLANE",
+        "SENSOR_PLANE",
+        "HOTSHOE_MOUNT",
+        "TRIPOD_MOUNT",
+        "OPTICAL_AXIS"
+      ],
+      "name": "Canon EOS 5D Mark IV",
+      "notes": [
+        "Representative production body selected for pipeline preparation; historical Sensetique identity remains intentionally unclaimed."
+      ],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "canon_5d4"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "HERO",
+      "variants": [
+        "body_only"
+      ]
+    },
+    {
+      "articulation": [
+        "zoom_rotation_and_extension",
+        "focus_ring_rotation"
+      ],
+      "category": "LENS",
+      "components": [
+        "ef_mount",
+        "rear_barrel",
+        "zoom_ring",
+        "focus_ring",
+        "distance_window",
+        "front_barrel",
+        "filter_thread",
+        "front_element",
+        "switches",
+        "red_ring",
+        "engravings"
+      ],
+      "dimensions": {
+        "diameter_mm": {
+          "confidence": "VERIFIED",
+          "value": 88.5
+        },
+        "filter_thread_mm": {
+          "confidence": "VERIFIED",
+          "value": 82
+        },
+        "mass_g": {
+          "confidence": "VERIFIED",
+          "value": 805
+        },
+        "retracted_length_mm": {
+          "confidence": "VERIFIED",
+          "value": 113
+        }
+      },
+      "dossier_path": "docs/assets/dossiers/canon_ef_24_70_f28l_ii.md",
+      "id": "canon_ef_24_70_f28l_ii",
+      "identity_class": "REFERENCE_STANDARD",
+      "materials": [
+        "matte_black_polymer",
+        "rubber",
+        "painted_metal",
+        "optical_glass",
+        "printed_decals"
+      ],
+      "mounts": [
+        "EF_MOUNT_PLANE",
+        "OPTICAL_AXIS",
+        "FILTER_THREAD_82"
+      ],
+      "name": "Canon EF 24-70mm f/2.8L II USM",
+      "notes": [],
+      "production_ready": true,
+      "runtime": {
+        "collision": "simple_proxy",
+        "lod": [
+          "LOD0",
+          "LOD1",
+          "LOD2"
+        ],
+        "shipping": "GLB"
+      },
+      "source_refs": [
+        "canon_2470_ii"
+      ],
+      "stage": "SPEC_READY",
+      "tier": "HERO",
+      "variants": [
+        "24mm",
+        "35mm",
+        "50mm",
+        "70mm"
+      ]
+    }
+  ],
+  "schema_version": 1
+}

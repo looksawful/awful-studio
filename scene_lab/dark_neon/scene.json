@@ -1,0 +1,26 @@
+{
+  "id": "dark-neon-v1",
+  "blender": "5.2 LTS",
+  "units": "meters",
+  "purpose": "premium tech / fashion / metallic product hero scene",
+  "hero_reserve": {"center": [0.0, 0.0, 1.35], "radius": 1.45, "height": 2.3},
+  "shell": {"width": 12.0, "depth": 13.0, "height": 5.8},
+  "pedestal": {"shape": "rectangular plinth", "dimensions": [3.4, 2.5, 0.55], "material": "black veined marble"},
+  "camera": {"lens_mm": 74.0, "location": [0.0, -9.6, 2.0], "target": [0.0, 0.0, 1.35]},
+  "lighting": {
+    "left": "large magenta soft source with floor spill",
+    "right": "large cyan-blue soft source with floor spill",
+    "rim": "tight cool rear separator",
+    "top": "very soft neutral top control",
+    "world": "near-black navy ambient"
+  },
+  "set_dressing": ["visible studio stands", "two colored diffuser panels", "rear practical strips", "subtle atmospheric depth"],
+  "materials": ["black veined marble", "polished dark floor", "powder-coated black steel", "dark navy wall"],
+  "acceptance": [
+    "magenta and cyan reflections are distinct and controllable",
+    "hero remains readable against near-black background",
+    "plinth edges retain shape without crushing blacks",
+    "floor reflection carries color but does not become a mirror",
+    "scene is independent from the add-on runtime"
+  ]
+}

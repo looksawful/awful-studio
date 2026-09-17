@@ -35,6 +35,11 @@ def dimensions(bbox):
     return tuple(float(maximum[index] - minimum[index]) for index in range(3))
 
 
+def rotation_distance_degrees(first, second):
+    dot = min(1.0, max(-1.0, abs(float(first.dot(second)))))
+    return math.degrees(2.0 * math.acos(dot))
+
+
 def managed_mockup_counts(legacy, ownership, scene):
     objects = [
         obj for obj in scene.objects
@@ -139,6 +144,8 @@ def main():
 
         device_asset_loader = importlib.import_module(MODULE + '.device_asset_loader')
         check('device LOD property registered', hasattr(scene.awful_studio, 'device_lod'))
+        check('device orientation property registered',
+              hasattr(scene.awful_studio, 'device_orientation_preset'))
         scene.awful_studio.device_lod = 'LOW'
         screen_path = args.work / 'device_screen_test.png'
         generated_screen = bpy.data.images.new('AWFUL_RUNTIME_SCREEN_ART', width=2, height=2)
@@ -215,6 +222,65 @@ def main():
                 hinge_after_op = next(obj for obj in hierarchy if obj.name.startswith('CTRL_HINGE'))
                 check('MacBook Set Hinge operator applies selected preset',
                       abs(float(hinge_after_op.get('open_angle_deg', -999.0)) - 60.0) < 1e-6)
+        orientation_cases = {
+            'DEVICE_IPHONE_17': ('PORTRAIT', 'LANDSCAPE_LEFT', 'LANDSCAPE_RIGHT', 'PORTRAIT_INVERTED'),
+            'DEVICE_IPAD_PRO_11': ('PORTRAIT', 'LANDSCAPE_LEFT'),
+            'DEVICE_IPAD_PRO_13': ('PORTRAIT', 'LANDSCAPE_RIGHT'),
+        }
+        for key, presets in orientation_cases.items():
+            spec = device_asset_loader.device_asset_spec(key)
+            scene.awful_studio.product_mockup = key
+            scene.awful_studio.device_orientation_preset = 'PORTRAIT'
+            with ownership.for_scene(scene):
+                product_quality.replace_mockup(legacy, scene, key)
+            device_asset_loader.apply_screen_image(legacy, scene, screen_path)
+            portrait_screen_rotation = None
+            for preset in presets:
+                scene.awful_studio.device_orientation_preset = preset
+                result = bpy.ops.awful.apply_device_orientation()
+                check(f'{key} orientation {preset} operator finishes',
+                      result == {'FINISHED'}, list(result))
+                roots = product_quality.mockup_roots(legacy, scene)
+                check(f'{key} orientation keeps one root', len(roots) == 1, len(roots))
+                root = roots[0]
+                angle = device_asset_loader.orientation_angle_degrees(key, preset)
+                hierarchy = [root] + legacy.descendants(root)
+                visible_screen = next(obj for obj in hierarchy if obj.name.startswith('SCREEN_CONTENT'))
+                visible_rotation = visible_screen.matrix_world.to_quaternion().normalized()
+                if preset == 'PORTRAIT':
+                    portrait_screen_rotation = visible_rotation.copy()
+                else:
+                    check(f'{key} orientation {preset} changes visible screen rotation',
+                          portrait_screen_rotation is not None)
+                    expected_delta = min(abs(angle) % 360.0, 360.0 - (abs(angle) % 360.0))
+                    actual_delta = rotation_distance_degrees(portrait_screen_rotation, visible_rotation)
+                    check(f'{key} orientation {preset} visible rotation delta',
+                          abs(actual_delta - expected_delta) < 0.1,
+                          {'actual_deg': actual_delta, 'expected_deg': expected_delta})
+                check(f'{key} orientation {preset} metadata',
+                      str(root.get('awful_orientation_preset', '')) == preset
+                      and abs(float(root.get('awful_orientation_angle_deg', -999.0)) - angle) < 1e-6)
+                check(f'{key} orientation preserves stage and LOD',
+                      root.get('awful_asset_stage') == spec['stage']
+                      and root.get('awful_asset_lod') == 'LOW')
+                metrics = legacy.get_product_metrics(scene)
+                if preset.startswith('LANDSCAPE'):
+                    check(f'{key} {preset} has landscape envelope',
+                          metrics.width > metrics.height,
+                          {'width': metrics.width, 'height': metrics.height})
+                else:
+                    check(f'{key} {preset} has portrait envelope',
+                          metrics.height > metrics.width,
+                          {'width': metrics.width, 'height': metrics.height})
+                hierarchy = [root] + legacy.descendants(root)
+                screen = next(obj for obj in hierarchy if obj.name.startswith('SCREEN_CONTENT'))
+                material = next((m for m in screen.data.materials if m is not None), None)
+                node = material.node_tree.nodes.get('AWFUL_SCREEN_IMAGE') if material else None
+                check(f'{key} orientation {preset} preserves screen artwork',
+                      root.get('awful_screen_artwork_name') == screen_path.name
+                      and node is not None and node.image is not None
+                      and node.image.packed_file is not None)
+
         scene.awful_studio.product_mockup = 'DEVICE_MACBOOK_PRO_14'
         rebuild = bpy.ops.awful.rebuild_studio()
         check('device rebuild finishes', rebuild == {'FINISHED'}, list(rebuild))
