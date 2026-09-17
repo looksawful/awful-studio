@@ -1,12 +1,12 @@
 # Current device screenshots
 
-Snapshot: 2026-09-15
+Snapshot: 2026-09-16
 
 These are the latest real preview renders currently present in the active device worktrees. No generated replacement imagery is used here.
 
 ## iPhone 17
 
-Source: `asset/iphone-17`, current working preview set `low_v15`.
+Source: current production iPhone 17 asset, preview set `low_v30`.
 
 ![iPhone 17 current contact sheet](./iphone-17/contact-current.jpg)
 
