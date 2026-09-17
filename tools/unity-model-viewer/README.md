@@ -16,7 +16,7 @@ Internal Unity 6.6 editor tool for browsing AWFUL STUDIO procedural mockups, web
 pwsh ./Tools/sync-assets.ps1
 ```
 
-The sync regenerates Unity assets from canonical sources. Generated FBX/PNG files are intentionally ignored by Git.
+The sync regenerates Unity assets from canonical sources. Studio mockups are detached from the scene-only `PRODUCT_CONTENT` fit transform before export, so FBX files preserve the physical dimensions declared in `MOCKUP_SPECS`. Generated FBX/PNG files are intentionally ignored by Git.
 
 ## Viewer
 

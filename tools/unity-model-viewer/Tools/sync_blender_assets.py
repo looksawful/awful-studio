@@ -33,12 +33,15 @@ def select_hierarchy(root):
     bpy.context.view_layer.objects.active = root
 
 
-def export_fbx(path: Path):
+def export_fbx(path: Path, *, bake_space_transform=False):
     path.parent.mkdir(parents=True, exist_ok=True)
     bpy.ops.export_scene.fbx(
         filepath=str(path),
         use_selection=True,
         apply_unit_scale=True,
+        axis_forward="-Z",
+        axis_up="Y",
+        bake_space_transform=bake_space_transform,
         add_leaf_bones=False,
         path_mode="COPY",
         embed_textures=True,
@@ -70,8 +73,22 @@ def export_studio(studio: Path, out_dir: Path):
         )
         if root is None:
             raise RuntimeError(f"AWFUL mockup root missing: {key}")
-        select_hierarchy(root)
-        export_fbx(out_dir / f"{key.lower()}.fbx")
+        parent = root.parent
+        location = root.location.copy()
+        rotation = root.rotation_euler.copy()
+        scale = root.scale.copy()
+        try:
+            root.parent = None
+            root.location = (0.0, 0.0, 0.0)
+            root.rotation_euler = (0.0, 0.0, 0.0)
+            root.scale = (1.0, 1.0, 1.0)
+            select_hierarchy(root)
+            export_fbx(out_dir / f"{key.lower()}.fbx", bake_space_transform=True)
+        finally:
+            root.parent = parent
+            root.location = location
+            root.rotation_euler = rotation
+            root.scale = scale
 
 
 def clear_scene_objects():
