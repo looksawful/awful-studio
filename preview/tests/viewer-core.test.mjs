@@ -4,6 +4,7 @@ import {
   availableLods,
   cameraDirection,
   resolveAssetUrl,
+  previewMaterialPolicy,
 } from '../src/viewer-core.mjs';
 
 test('preview URLs expose repository assets without copying binaries', () => {
@@ -39,8 +40,18 @@ test('LOD options preserve manifest order and fall back to preview model', () =>
   ]);
 });
 test('camera presets are explicit and normalized', () => {
-  assert.deepEqual(cameraDirection('front'), [0, -1, 0]);
+  assert.deepEqual(cameraDirection('front'), [0, 0, 1]);
   assert.deepEqual(cameraDirection('side'), [1, 0, 0]);
-  assert.deepEqual(cameraDirection('top'), [0, 0, 1]);
+  assert.deepEqual(cameraDirection('top'), [0, 1, 0]);
   assert.throws(() => cameraDirection('diagonal'), /Unknown camera preset/);
+});
+
+test('binary Apple decal uses crisp preview alpha policy', () => {
+  assert.deepEqual(previewMaterialPolicy('MAT_APPLE_LOGO_DECAL'), {
+    alphaTest: 0.5, transparent: false, depthWrite: true, frontSide: true,
+  });
+  assert.deepEqual(previewMaterialPolicy('MAT_SCREEN_CONTENT', { hasTexture: true }), { emissiveIntensity: 2, envMapIntensity: 0, minRoughness: 0.12, maxClearcoat: 0 });
+  assert.deepEqual(previewMaterialPolicy('MAT_SCREEN_CONTENT'), { emissiveIntensity: 0, envMapIntensity: 0, minRoughness: 0.45, maxClearcoat: 0 });
+  assert.deepEqual(previewMaterialPolicy('MAT_DISPLAY_GLASS'), { transmission: 0, transparent: true, opacity: 0.07, depthWrite: false, envMapIntensity: 0.04, minRoughness: 0.3, maxClearcoat: 0.03 });
+  assert.deepEqual(previewMaterialPolicy('MAT_ANODIZED_ALUMINUM'), {});
 });
