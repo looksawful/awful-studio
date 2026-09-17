@@ -15,8 +15,11 @@ RUNTIME = DEVICE / 'runtime/v1'
 LOADER_PATH = ROOT / 'extension/awful_studio/device_asset_loader.py'
 SOURCE_FILES = [
     'extension/awful_studio/assets/devices/macbook_pro_14_m5_low_v1_release.blend',
+    'assets/device_mockups/macbook_pro_14/generate_low.py',
     'assets/device_mockups/macbook_pro_14/export_runtime_v1.py',
     'assets/device_mockups/macbook_pro_14/optimize_runtime_v1.py',
+    'assets/device_mockups/macbook_pro_14/reference/apple_logo_alpha.png',
+    'assets/device_mockups/macbook_pro_14/reference/macos26_official_screen.png',
 ]
 sys.path.insert(0, str(ROOT / 'tools'))
 from device_delivery_contract import source_fingerprint, sha256_file
