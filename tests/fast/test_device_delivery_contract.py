@@ -2,6 +2,7 @@ import importlib.util
 import json
 from pathlib import Path
 import sys
+import subprocess
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -35,6 +36,19 @@ class DeviceDeliveryContractTests(unittest.TestCase):
         self.assertEqual(manifest['stage'], 'LOW_DRAFT')
         self.assertEqual(manifest['delivery_profile']['simplification'], 'none')
         self.assertEqual(contract.verify_manifest(ROOT, manifest), [])
+
+    def test_v30_provenance_text_files_are_pinned_to_lf(self):
+        paths = [
+            'assets/device_mockups/iphone_17/generate_low_v30.py',
+            'assets/device_mockups/iphone_17/evidence/low_v30_validation.json',
+            'assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30.asset.json',
+        ]
+        for relative in paths:
+            result = subprocess.check_output(
+                ['git', 'check-attr', 'eol', '--', relative],
+                cwd=ROOT, text=True,
+            ).strip()
+            self.assertTrue(result.endswith(': eol: lf'), result)
 
     def test_plugin_loader_matches_delivery_revision_and_stage(self):
         self.assertTrue(MANIFEST.is_file(), f'missing canonical v30 manifest: {MANIFEST}')
