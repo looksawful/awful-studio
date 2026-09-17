@@ -1,0 +1,14 @@
+Library/
+Temp/
+Obj/
+Logs/
+UserSettings/
+MemoryCaptures/
+Build/
+Builds/
+*.csproj
+*.sln
+.vs/
+.vscode/
+Assets/AwfulViewer/Generated/*
+!Assets/AwfulViewer/Generated/.gitkeep
