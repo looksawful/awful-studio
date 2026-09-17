@@ -99,7 +99,7 @@ screen_tex.image.colorspace_settings.name = "sRGB"
 screen_bsdf = screen_mat.node_tree.nodes.get("Principled BSDF")
 screen_mat.node_tree.links.new(screen_tex.outputs["Color"], screen_bsdf.inputs["Base Color"])
 screen_mat.node_tree.links.new(screen_tex.outputs["Color"], screen_bsdf.inputs["Emission Color"])
-screen_bsdf.inputs["Emission Strength"].default_value = 4.0
+screen_bsdf.inputs["Emission Strength"].default_value = 1.25
 optic_glass = fc.make_material("MAT_OPTICAL_GLASS", (0.0010, 0.0014, 0.0024), 0.0, 0.030)
 flash_mat = fc.make_material("MAT_FLASH", (0.86, 0.80, 0.62), 0.0, 0.14)
 screw_mat = fc.make_material("MAT_FASTENER", (0.10, 0.11, 0.13), 0.92, 0.24)
@@ -332,7 +332,7 @@ for side, x_mm in (("L", -7.15), ("R", 7.15)):
     screw = fc.cylinder(f"BOTTOM_SCREW_{side}", 0.66*MM, 0.24*MM, screw_mat, detail_c, vertices=48)
     fc.place_on_rounded_edge(screw, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.15*MM, local_normal=(0,0,1))
 
-bev = fc.add_bevel(body, 0.00034, segments=6)
+bev = fc.add_bevel(body, 0.00022, segments=4)
 bev.harden_normals = True
 for poly in body.data.polygons[2:]:
     poly.use_smooth = True
@@ -357,6 +357,8 @@ root["stage"] = "LOW_DRAFT"
 root["dimensions_mm"] = "71.5 x 149.6 x 7.95"
 root["screen_object"] = "SCREEN_CONTENT"
 root["screen_texture"] = "reference/ios26_home_screen_1206x2622.png"
+root["screen_texture_source"] = "Apple Support iPhone User Guide, iOS 26 official Home Screen"
+root["screen_texture_source_url"] = "https://help.apple.com/assets/69F8EBBDF3B89A4F6E0C704C/69F8EBC43862495245036393/en_US/b86263df3b70efb72926baf8a54550bd.png"
 root["screen_texture_px"] = "1206 x 2622"
 root["surface_aware_controls"] = True
 root["surface_aware_bottom"] = True

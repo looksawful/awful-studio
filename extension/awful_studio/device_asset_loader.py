@@ -14,7 +14,7 @@ DEVICE_ASSET_SPECS = {
         'stage': 'LOW_DRAFT',
         'dimensions_m': (0.07145, 0.00795, 0.14961),
         'default_lod': 'LOW',
-        'lods': {'LOW': {'variant': 'low_v30', 'blend_path': 'assets/devices/iphone_17_low_v30.blend', 'entry_collection': 'AWFUL_DEVICE_IPHONE_17', 'source_revision': '0c98aa035a770725dc98ad4c320161128d05cd041adaf54c66acbd45170c8969'}},
+        'lods': {'LOW': {'variant': 'low_v30', 'blend_path': 'assets/devices/iphone_17_low_v30.blend', 'entry_collection': 'AWFUL_DEVICE_IPHONE_17', 'source_revision': '4779cf8a01a0bb9623656fa580d9979b6876d515410c30922644434477b5ea13'}},
         'root_name': 'CTRL_IPHONE_17',
         'orientation_axis': 'Y',
         'screen_object': 'SCREEN_CONTENT',
