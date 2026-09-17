@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "asset_id": "AS_RIG_STUDIO_V01",
+  "blender_target": "5.2.1",
+  "unit_scale": "meters",
+  "support": {
+    "asset_id": "AS_SUPPORT_CSTAND_01",
+    "identity_class": "REPRESENTATIVE_STANDARD",
+    "reference_family": "Avenger-style C-Stand",
+    "baby_pin_mm": 16,
+    "geometry_reference": "Avenger A2025F",
+    "reference_source": "Manfrotto / Avenger official product specification",
+    "rig_mount_height_mm": 1750,
+    "reference_min_height_mm": 1100,
+    "reference_max_height_mm": 2530,
+    "reference_closed_length_mm": 1100,
+    "reference_max_footprint_mm": 950,
+    "reference_tube_diameters_mm": [
+      35,
+      30,
+      25
+    ],
+    "reference_leg_diameter_mm": 25,
+    "reference_weight_kg": 5.0,
+    "reference_payload_kg": 10.0
+  },
+  "d1_500_air": {
+    "asset_id": "AS_FIX_PROFOTO_D1_500",
+    "manufacturer": "Profoto",
+    "model": "D1 500 Air",
+    "product_number_eur": "901024-EUR",
+    "envelope_mm": [
+      300,
+      130,
+      170
+    ],
+    "weight_kg": 2.44,
+    "identity_class": "VERIFIED_MODEL",
+    "reference": "Profoto D1 User Guide / official discontinued product page",
+    "verified_features": [
+      "frosted_glass_plate",
+      "flash_tube",
+      "modeling_lamp",
+      "sync_connector",
+      "ac_connector",
+      "fuse_holder",
+      "umbrella_tube",
+      "zoom_scale",
+      "stand_adapter",
+      "ergonomic_handle",
+      "side_vent_slots",
+      "rear_control_panel"
+    ]
+  },
+  "magnum_100624": {
+    "asset_id": "AS_MOD_PROFOTO_MAGNUM",
+    "manufacturer": "Profoto",
+    "model": "Magnum Reflector 100624",
+    "diameter_mm": 345,
+    "depth_mm": 265,
+    "identity_class": "VERIFIED_MODEL",
+    "weight_kg": 0.8,
+    "reference": "Profoto Magnum Reflector product sheet / official product page",
+    "material_zones": {
+      "outer_shell": "matte_black",
+      "inner_reflector": "high_reflectance_silver",
+      "collar": "matte_black",
+      "front_rim": "silver_metal",
+      "label_zone": "black_with_white_marking"
+    }
+  },
+  "sandbag": {
+    "asset_id": "AS_ACC_SANDBAG_01",
+    "identity_class": "REPRESENTATIVE_STANDARD",
+    "nominal_size_mm": [
+      360,
+      250,
+      70
+    ]
+  },
+  "semantic_mounts": [
+    "FLOOR_CONTACT",
+    "MOUNT_SUPPORT",
+    "MOUNT_FIXTURE",
+    "MOUNT_MODIFIER",
+    "EMITTER_ORIGIN",
+    "LIGHT_TARGET"
+  ],
+  "preview": {
+    "resolution": [
+      1024,
+      1024
+    ],
+    "transparent": true,
+    "views": [
+      "front",
+      "three_quarter",
+      "side",
+      "rear",
+      "fixture_detail",
+      "fixture_rear_detail",
+      "magnum_profile_detail",
+      "base_detail"
+    ]
+  },
+  "tolerances_mm": {
+    "verified_envelope": 1.0,
+    "representative_support": 10.0
+  }
+}
