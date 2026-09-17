@@ -86,7 +86,7 @@ def build_one(blender: Path, size: str, loader):
         root_name, 'SCREEN_CONTENT', 'SCREEN_GLASS', 'FRONT_CAMERA_GLASS',
         'APPLE_LOGO_DECAL', 'CAMERA_HOUSING', 'REAR_CAMERA_GLASS', 'LIDAR',
         'ANCHOR_CENTER', 'ANCHOR_BOTTOM_CENTER', 'ANCHOR_SCREEN_CENTER',
-        'ANCHOR_REAR_CAMERA',
+        'ANCHOR_REAR_CAMERA', 'SCREEN_GLOW_ANCHOR',
     }
     missing = sorted(required - names)
     if missing:

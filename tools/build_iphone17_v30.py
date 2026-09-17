@@ -70,7 +70,7 @@ def main():
         raise RuntimeError('invalid GLB JSON chunk')
     doc = json.loads(raw[20:20 + json_len].decode('utf-8').rstrip(' \t\r\n\0'))
     names = {node.get('name') for node in doc.get('nodes', [])}
-    required = {'CTRL_IPHONE_17','DYNAMIC_ISLAND','FRONT_SENSOR_PILL','FRONT_CAMERA_GLASS','APPLE_LOGO_DECAL','SCREEN_CONTENT'}
+    required = {'CTRL_IPHONE_17','DYNAMIC_ISLAND','FRONT_SENSOR_PILL','FRONT_CAMERA_GLASS','APPLE_LOGO_DECAL','SCREEN_CONTENT','SCREEN_GLOW_ANCHOR'}
     missing = sorted(required - names)
     if missing:
         raise RuntimeError(f'GLB lost required nodes: {missing}')

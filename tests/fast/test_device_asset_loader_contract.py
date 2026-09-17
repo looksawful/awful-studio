@@ -106,6 +106,15 @@ class DeviceAssetLoaderContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             loader.orientation_preset_keys('DEVICE_MACBOOK_PRO_14')
 
+    def test_screen_states_are_explicit_for_all_devices(self):
+        loader = load_module()
+        self.assertEqual(loader.screen_state_keys(), ('OFF', 'ON'))
+        for key in EXPECTED_KEYS:
+            spec = loader.device_asset_spec(key)
+            self.assertEqual(spec['screen_states'], ('OFF', 'ON'))
+            self.assertEqual(loader.screen_state_spec('OFF')['emission_strength'], 0.0)
+            self.assertGreater(loader.screen_state_spec('ON')['emission_strength'], 0.0)
+
     def test_lod_contract_is_manifest_driven(self):
         loader = load_module()
         for key in EXPECTED_KEYS:

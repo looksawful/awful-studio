@@ -30,6 +30,10 @@ test('viewer uses Three GLTF runtime and orbit controls', () => {
   assert.match(source, /material\.clearcoat = Math\.min/);
   assert.match(source, /environmentIntensity = 1\.0/);
   assert.match(source, /autoRotate = false/);
+  assert.match(source, /data-control="screen-state"/);
+  assert.match(source, /data-control="animation-clip"/);
+  assert.match(source, /#applyScreenState/);
+  assert.match(source, /new THREE\.RectAreaLight/);
 });
 
 test('storybook exposes catalog and three model groups', () => {

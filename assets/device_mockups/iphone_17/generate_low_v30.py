@@ -1,4 +1,5 @@
 import json
+import math
 import os
 import sys
 import bmesh
@@ -96,10 +97,11 @@ screen_texture_path = os.path.join(HERE, "reference", "ios26_home_screen_1206x26
 screen_tex = screen_mat.node_tree.nodes.new("ShaderNodeTexImage")
 screen_tex.image = bpy.data.images.load(screen_texture_path, check_existing=True)
 screen_tex.image.colorspace_settings.name = "sRGB"
+screen_tex.image.pack()
 screen_bsdf = screen_mat.node_tree.nodes.get("Principled BSDF")
 screen_mat.node_tree.links.new(screen_tex.outputs["Color"], screen_bsdf.inputs["Base Color"])
 screen_mat.node_tree.links.new(screen_tex.outputs["Color"], screen_bsdf.inputs["Emission Color"])
-screen_bsdf.inputs["Emission Strength"].default_value = 1.25
+screen_bsdf.inputs["Emission Strength"].default_value = 0.85
 optic_glass = fc.make_material("MAT_OPTICAL_GLASS", (0.0010, 0.0014, 0.0024), 0.0, 0.030)
 flash_mat = fc.make_material("MAT_FLASH", (0.86, 0.80, 0.62), 0.0, 0.14)
 screw_mat = fc.make_material("MAT_FASTENER", (0.10, 0.11, 0.13), 0.92, 0.24)
@@ -163,6 +165,13 @@ uv = screen_content.data.uv_layers.new(name="UVMap")
 for loop in screen_content.data.loops:
     co = screen_content.data.vertices[loop.vertex_index].co
     uv.data[loop.index].uv = ((co.x / SCREEN_W) + 0.5, (co.z / SCREEN_H) + 0.5)
+glow_anchor = fc.empty("SCREEN_GLOW_ANCHOR", ctrl_c, location=(0, front_surface - 1.0*MM, 0))
+glow_data = bpy.data.lights.new("SCREEN_GLOW_LIGHT", "AREA")
+glow_data.shape = "RECTANGLE"; glow_data.size = SCREEN_W; glow_data.size_y = SCREEN_H; glow_data.energy = 8.0
+glow = bpy.data.objects.new("SCREEN_GLOW_LIGHT", glow_data); ctrl_c.objects.link(glow)
+glow.location = (0, front_surface - 1.2*MM, 0); glow.rotation_euler.x = math.radians(-90.0)
+glow["screen_state"] = "screen_on"; glow["screen_on_energy"] = 8.0; glow["screen_off_energy"] = 0.0
+screen_content["screen_state"] = "screen_on"; screen_content["screen_on_emission"] = 0.85; screen_content["screen_off_emission"] = 0.0
 
 def hard_surface_glass(obj):
     bevel = obj.modifiers.get("EDGE_BEVEL")
@@ -348,6 +357,8 @@ housing_wn = housing.modifiers.new("WEIGHTED_NORMAL", "WEIGHTED_NORMAL")
 housing_wn.keep_sharp = True
 housing_wn.weight = 50
 root = fc.empty("CTRL_IPHONE_17", ctrl_c)
+glow_anchor.parent = root
+glow.parent = root
 for collection in (body_c, detail_c, screen_c):
     for obj in collection.objects:
         obj.parent = root
@@ -360,6 +371,11 @@ root["screen_texture"] = "reference/ios26_home_screen_1206x2622.png"
 root["screen_texture_source"] = "Apple Support iPhone User Guide, iOS 26 official Home Screen"
 root["screen_texture_source_url"] = "https://help.apple.com/assets/69F8EBBDF3B89A4F6E0C704C/69F8EBC43862495245036393/en_US/b86263df3b70efb72926baf8a54550bd.png"
 root["screen_texture_px"] = "1206 x 2622"
+root["screen_state_default"] = "screen_on"
+root["screen_on_emission_strength"] = 0.85
+root["screen_off_emission_strength"] = 0.0
+root["screen_glow_energy"] = 8.0
+root["screen_glow_type"] = "rect_area"
 root["surface_aware_controls"] = True
 root["surface_aware_bottom"] = True
 root["real_display_pocket"] = True

@@ -16,10 +16,28 @@
         }
       ],
       "collision": null,
-      "sourceRevision": "0c98aa035a770725dc98ad4c320161128d05cd041adaf54c66acbd45170c8969",
-      "sourceCommit": "1c4f80ecf803e3891a9fb04047783f58b046ccc8",
+      "sourceRevision": "3681aaaeb2fbcef16d28bed6dde0d85ed37a72781fccce9c571146cf49267cc4",
+      "sourceCommit": "7860da08975b3f790af5da326dc9c1c0fff49b8b",
       "triangleCount": 33976,
-      "materialCount": 16
+      "materialCount": 16,
+      "animations": [],
+      "screenStates": {
+        "screen_off": {
+          "emission_strength": 0,
+          "glow_intensity": 0
+        },
+        "screen_on": {
+          "emission_strength": 0.85,
+          "glow_intensity": 1
+        }
+      },
+      "screenGlow": {
+        "anchor": "SCREEN_GLOW_ANCHOR",
+        "type": "rect_area",
+        "width_mm": 66.57,
+        "height_mm": 144.79,
+        "source_energy_w": 8
+      }
     },
     {
       "id": "ipad-pro-11-m5-v6",
@@ -35,10 +53,28 @@
         }
       ],
       "collision": null,
-      "sourceRevision": "09d90dd24e472c7f037f8006ded4bce995980229919292d07c29121d77bc9caa",
+      "sourceRevision": "b82f62c99f8d961df916295c19c1149dd322251b778b43508b2ea81be0fd8e30",
       "sourceCommit": "05ce2a03027df1ba4d2a8679cda9d291f8c4d17a",
       "triangleCount": 20696,
-      "materialCount": 11
+      "materialCount": 11,
+      "animations": [],
+      "screenStates": {
+        "screen_off": {
+          "emission_strength": 0,
+          "glow_intensity": 0
+        },
+        "screen_on": {
+          "emission_strength": 0.85,
+          "glow_intensity": 1
+        }
+      },
+      "screenGlow": {
+        "anchor": "SCREEN_GLOW_ANCHOR",
+        "type": "rect_area",
+        "width_mm": 160.13,
+        "height_mm": 232.32,
+        "source_energy_w": 8
+      }
     },
     {
       "id": "ipad-pro-13-m5-v6",
@@ -54,10 +90,28 @@
         }
       ],
       "collision": null,
-      "sourceRevision": "a3119c3c538fe4eb8985a8c0de4edac54e5e2cd7687244bcb89149fabd1e1e4d",
+      "sourceRevision": "bbff319850350186735d029332ebbbafbb6267c702fa6ea1656091d95225e163",
       "sourceCommit": "05ce2a03027df1ba4d2a8679cda9d291f8c4d17a",
       "triangleCount": 20704,
-      "materialCount": 11
+      "materialCount": 11,
+      "animations": [],
+      "screenStates": {
+        "screen_off": {
+          "emission_strength": 0,
+          "glow_intensity": 0
+        },
+        "screen_on": {
+          "emission_strength": 0.85,
+          "glow_intensity": 1
+        }
+      },
+      "screenGlow": {
+        "anchor": "SCREEN_GLOW_ANCHOR",
+        "type": "rect_area",
+        "width_mm": 199.14,
+        "height_mm": 265.19,
+        "source_energy_w": 8
+      }
     },
     {
       "id": "macbook-pro-14-m5-v1",
@@ -73,10 +127,29 @@
         }
       ],
       "collision": null,
-      "sourceRevision": "cb60c00cdded4bd73c5a2ba4fd14f66ad97af8cd1abcc221fce2a5b91357929a",
-      "sourceCommit": "f91b4d0594d15943012f4596b7751f16d5798fa4",
+      "sourceRevision": "733c4c0d6d1e789b22f58d07380bbd88c5541e87266b124c46a68883c92e13f1",
+      "sourceCommit": "574e3e751ef1212f14f7075f632ad54252887a51",
       "triangleCount": 16722,
-      "materialCount": 9
+      "materialCount": 9,
+      "animations": [
+        "lid_open",
+        "lid_close"
+      ],
+      "screenStates": {
+        "screen_off": {
+          "emission_strength": 0,
+          "glow_energy": 0
+        },
+        "screen_on": {
+          "emission_strength": 0.65,
+          "glow_energy": 8
+        }
+      },
+      "screenGlow": {
+        "light": "SCREEN_GLOW_LIGHT",
+        "type": "AREA",
+        "energy": 8
+      }
     },
     {
       "id": "studio-support-cstand-01",

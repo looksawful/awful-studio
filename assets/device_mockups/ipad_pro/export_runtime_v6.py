@@ -9,8 +9,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 RUNTIME = os.path.join(HERE, 'runtime', 'v6')
 os.makedirs(RUNTIME, exist_ok=True)
 SPECS = {
-    '11': {'asset_id': 'ipad_pro_11_m5', 'root': 'CTRL_IPAD_PRO_11', 'w': 177.5, 'h': 249.7, 'd': 5.3},
-    '13': {'asset_id': 'ipad_pro_13_m5', 'root': 'CTRL_IPAD_PRO_13', 'w': 215.5, 'h': 281.6, 'd': 5.1},
+    '11': {'asset_id': 'ipad_pro_11_m5', 'root': 'CTRL_IPAD_PRO_11', 'w': 177.5, 'h': 249.7, 'd': 5.3, 'sw': 160.13, 'sh': 232.32},
+    '13': {'asset_id': 'ipad_pro_13_m5', 'root': 'CTRL_IPAD_PRO_13', 'w': 215.5, 'h': 281.6, 'd': 5.1, 'sw': 199.14, 'sh': 265.19},
 }
 
 
@@ -80,6 +80,7 @@ anchor('ANCHOR_CENTER', (0.0, 0.0, 0.0))
 anchor('ANCHOR_BOTTOM_CENTER', (0.0, 0.0, -spec['h'] / 2000.0))
 anchor('ANCHOR_SCREEN_CENTER', (0.0, -spec['d'] / 2000.0, 0.0))
 anchor('ANCHOR_REAR_CAMERA', camera_location)
+anchor('SCREEN_GLOW_ANCHOR', (0.0, -spec['d'] / 2000.0 - 0.001, 0.0))
 
 root['runtime_format'] = 'glTF 2.0 / GLB'
 root['runtime_units'] = 'meters'
@@ -144,7 +145,13 @@ manifest = {
     'up_axis': '+Y', 'forward_axis': '+Z',
     'root': spec['root'],
     'screen_object': 'SCREEN_CONTENT',
-    'anchors': ['ANCHOR_CENTER', 'ANCHOR_BOTTOM_CENTER', 'ANCHOR_SCREEN_CENTER', 'ANCHOR_REAR_CAMERA'],
+    'anchors': ['ANCHOR_CENTER', 'ANCHOR_BOTTOM_CENTER', 'ANCHOR_SCREEN_CENTER', 'ANCHOR_REAR_CAMERA', 'SCREEN_GLOW_ANCHOR'],
+    'dimensional_drawing_url': f"https://developer.apple.com/download/files/accessories/dimensional-drawings/ipad-pro-{SIZE}-inch-m5.pdf",
+    'screen_states': {
+        'screen_off': {'emission_strength': 0.0, 'glow_intensity': 0.0},
+        'screen_on': {'emission_strength': 0.85, 'glow_intensity': 1.0},
+    },
+    'screen_glow': {'anchor': 'SCREEN_GLOW_ANCHOR', 'type': 'rect_area', 'width_mm': spec['sw'], 'height_mm': spec['sh'], 'source_energy_w': 8.0},
     'lods': [{'name': 'LOD0', 'file': prefix + '_web.glb'}],
     'materials': materials,
     'exported_objects': exported,

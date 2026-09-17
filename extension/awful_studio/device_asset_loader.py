@@ -14,11 +14,12 @@ DEVICE_ASSET_SPECS = {
         'stage': 'LOW_DRAFT',
         'dimensions_m': (0.07145, 0.00795, 0.14961),
         'default_lod': 'LOW',
-        'lods': {'LOW': {'variant': 'low_v30', 'blend_path': 'assets/devices/iphone_17_low_v30.blend', 'entry_collection': 'AWFUL_DEVICE_IPHONE_17', 'source_revision': '4779cf8a01a0bb9623656fa580d9979b6876d515410c30922644434477b5ea13'}},
+        'lods': {'LOW': {'variant': 'low_v30', 'blend_path': 'assets/devices/iphone_17_low_v30.blend', 'entry_collection': 'AWFUL_DEVICE_IPHONE_17', 'source_revision': '3681aaaeb2fbcef16d28bed6dde0d85ed37a72781fccce9c571146cf49267cc4'}},
         'root_name': 'CTRL_IPHONE_17',
         'orientation_axis': 'Y',
         'screen_object': 'SCREEN_CONTENT',
         'screen_material': 'MAT_SCREEN_CONTENT',
+        'screen_states': ('OFF', 'ON'),
     },
     'DEVICE_IPAD_PRO_11': {
         'label': 'iPad Pro 11 M5',
@@ -26,11 +27,12 @@ DEVICE_ASSET_SPECS = {
         'stage': 'LOW_DRAFT',
         'dimensions_m': (0.1775, 0.0053, 0.2497),
         'default_lod': 'LOW',
-        'lods': {'LOW': {'variant': 'low_v6', 'blend_path': 'assets/devices/ipad_pro_11_m5_low_v6.blend', 'entry_collection': 'AWFUL_DEVICE_IPAD_PRO_11', 'source_revision': 'a719672382a63a1d753f11c5d3cdc179d9007442bfeb30de2841e3d4e5099d1d'}},
+        'lods': {'LOW': {'variant': 'low_v6', 'blend_path': 'assets/devices/ipad_pro_11_m5_low_v6.blend', 'entry_collection': 'AWFUL_DEVICE_IPAD_PRO_11', 'source_revision': 'b82f62c99f8d961df916295c19c1149dd322251b778b43508b2ea81be0fd8e30'}},
         'root_name': 'CTRL_IPAD_PRO_11',
         'orientation_axis': 'Y',
         'screen_object': 'SCREEN_CONTENT',
         'screen_material': 'MAT_SCREEN_CONTENT',
+        'screen_states': ('OFF', 'ON'),
     },
     'DEVICE_IPAD_PRO_13': {
         'label': 'iPad Pro 13 M5',
@@ -38,11 +40,12 @@ DEVICE_ASSET_SPECS = {
         'stage': 'LOW_DRAFT',
         'dimensions_m': (0.2155, 0.0051, 0.2816),
         'default_lod': 'LOW',
-        'lods': {'LOW': {'variant': 'low_v6', 'blend_path': 'assets/devices/ipad_pro_13_m5_low_v6.blend', 'entry_collection': 'AWFUL_DEVICE_IPAD_PRO_13', 'source_revision': '443e7ff80fea1c3ed07756b739e77215683f54038b26abe45b88f88d041e8924'}},
+        'lods': {'LOW': {'variant': 'low_v6', 'blend_path': 'assets/devices/ipad_pro_13_m5_low_v6.blend', 'entry_collection': 'AWFUL_DEVICE_IPAD_PRO_13', 'source_revision': 'bbff319850350186735d029332ebbbafbb6267c702fa6ea1656091d95225e163'}},
         'root_name': 'CTRL_IPAD_PRO_13',
         'orientation_axis': 'Y',
         'screen_object': 'SCREEN_CONTENT',
         'screen_material': 'MAT_SCREEN_CONTENT',
+        'screen_states': ('OFF', 'ON'),
     },
     'DEVICE_MACBOOK_PRO_14': {
         'label': 'MacBook Pro 14 M5',
@@ -54,6 +57,7 @@ DEVICE_ASSET_SPECS = {
         'root_name': 'CTRL_MACBOOK_PRO_14',
         'screen_object': 'SCREEN_CONTENT',
         'screen_material': 'MAT_SCREEN_CONTENT',
+        'screen_states': ('OFF', 'ON'),
         'controls': ('CTRL_HINGE',),
     },
 }
@@ -71,6 +75,11 @@ ORIENTATION_PRESETS_DEGREES = {
     'LANDSCAPE_LEFT': 90.0,
     'LANDSCAPE_RIGHT': -90.0,
     'PORTRAIT_INVERTED': 180.0,
+}
+
+SCREEN_STATE_SPECS = {
+    'OFF': {'emission_strength': 0.0, 'glow_intensity': 0.0},
+    'ON': {'emission_strength': 0.85, 'glow_intensity': 1.0},
 }
 
 
@@ -114,6 +123,16 @@ def orientation_angle_degrees(key: str, preset: str) -> float:
         return float(ORIENTATION_PRESETS_DEGREES[preset])
     except KeyError as exc:
         raise ValueError(f'Unknown AWFUL orientation preset: {preset}') from exc
+
+
+def screen_state_keys() -> tuple[str, ...]:
+    return tuple(SCREEN_STATE_SPECS)
+
+def screen_state_spec(state: str) -> dict:
+    try:
+        return deepcopy(SCREEN_STATE_SPECS[state])
+    except KeyError as exc:
+        raise ValueError(f'Unknown AWFUL screen state: {state}') from exc
 
 
 def lod_keys(key: str) -> tuple[str, ...]:
@@ -204,6 +223,31 @@ def apply_screen_image(legacy, scene, filepath):
         strength.default_value = 1.0
     root['awful_screen_artwork_name'] = path.name
     screen['awful_screen_artwork_name'] = path.name
+    return screen
+
+
+def apply_screen_state(legacy, scene, state: str):
+    root = _active_device_root(legacy, scene)
+    key = str(root['awful_mockup_key'])
+    spec = device_asset_spec(key)
+    if state not in spec.get('screen_states', ()):
+        raise ValueError(f'Unsupported AWFUL screen state {state}: {key}')
+    state_spec = screen_state_spec(state)
+    screen = _screen_object(legacy, root, spec)
+    material = next((m for m in screen.data.materials if m is not None), None)
+    if material is None:
+        raise RuntimeError(f'{screen.name} has no screen material')
+    material.use_nodes = True
+    shader = _principled(material)
+    strength = shader.inputs.get('Emission Strength')
+    if strength is not None:
+        strength.default_value = float(state_spec['emission_strength'])
+    glow = next((obj for obj in [root] + legacy.descendants(root) if obj.name == 'SCREEN_GLOW_LIGHT' or obj.name.startswith('SCREEN_GLOW_LIGHT.')), None)
+    if glow is not None and getattr(glow, 'data', None) is not None and hasattr(glow.data, 'energy'):
+        base_energy = float(glow.get('screen_on_energy', root.get('screen_glow_energy', 8.0)))
+        glow.data.energy = base_energy * float(state_spec['glow_intensity'])
+    root['awful_screen_state'] = state
+    screen['awful_screen_state'] = state
     return screen
 
 
