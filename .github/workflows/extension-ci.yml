@@ -94,9 +94,35 @@ jobs:
             .blender/distribution.json
           if-no-files-found: error
 
+
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: preview/package-lock.json
+      - name: Install preview dependencies
+        working-directory: preview
+        run: npm ci
+      - name: Test preview contracts
+        working-directory: preview
+        run: npm test
+      - name: Build Storybook
+        working-directory: preview
+        run: npm run storybook:build
+      - name: Install browser for model smoke
+        working-directory: preview
+        run: npx playwright install --with-deps chromium
+      - name: Smoke canonical model viewer
+        working-directory: preview
+        run: npm run smoke
+
   merge-gate:
     if: always()
-    needs: [fast, candidate, runtime-windows]
+    needs: [fast, candidate, runtime-windows, preview]
     runs-on: ubuntu-latest
     steps:
       - name: Require successful Extension QA
@@ -105,7 +131,9 @@ jobs:
           FAST: ${{ needs.fast.result }}
           CANDIDATE: ${{ needs.candidate.result }}
           WINDOWS: ${{ needs.runtime-windows.result }}
+          PREVIEW: ${{ needs.preview.result }}
         run: |
           test "$FAST" = success
           test "$CANDIDATE" = success
           test "$WINDOWS" = success
+          test "$PREVIEW" = success

@@ -1,0 +1,25 @@
+{
+  "name": "awful-studio-preview",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "catalog": "node tools/generate-catalog.mjs",
+    "catalog:check": "node tools/generate-catalog.mjs --check",
+    "test": "node --test tests/*.test.mjs",
+    "storybook": "npm run catalog && storybook dev -p 6006 --config-dir .storybook",
+    "storybook:build": "npm run catalog:check && storybook build --config-dir .storybook --output-dir storybook-static",
+    "smoke": "node tools/smoke-storybook.mjs",
+    "verify": "npm test && npm run catalog:check && npm run storybook:build"
+  },
+  "dependencies": {
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "@storybook/html-vite": "10.6.0",
+    "playwright": "^1.61.1",
+    "storybook": "10.6.0"
+  },
+  "engines": {
+    "node": "24.x"
+  }
+}

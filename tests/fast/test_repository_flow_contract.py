@@ -14,7 +14,7 @@ class RepositoryFlowContractTests(unittest.TestCase):
         text = CI.read_text(encoding='utf-8')
         self.assertIn('  merge-gate:', text)
         merge_gate = text.split('  merge-gate:', 1)[1]
-        self.assertIn('needs: [fast, candidate, runtime-windows]', merge_gate)
+        self.assertIn('needs: [fast, candidate, runtime-windows, preview]', merge_gate)
         self.assertIn('if: always()', text)
 
     def test_release_is_tag_driven(self):
