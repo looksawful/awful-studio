@@ -1,0 +1,464 @@
+{
+  "schemaVersion": 1,
+  "generatedFrom": "canonical repository manifests",
+  "assets": [
+    {
+      "id": "iphone-17-v30",
+      "label": "iPhone 17",
+      "group": "Devices",
+      "version": "v30",
+      "sourceBlend": "assets/device_mockups/iphone_17/generated/iphone_17_low_v30.blend",
+      "previewGlb": "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb",
+      "lods": [
+        {
+          "name": "LOD0",
+          "path": "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb"
+        }
+      ],
+      "collision": null,
+      "sourceRevision": "ab189d168aa0fcf349a63cc89d7c37b6891390a3f7200a665bfc5b0a2128b2bc",
+      "sourceCommit": "a28b8e67c8a9f8a7f4517224ad76217df16e66fb",
+      "triangleCount": 33976,
+      "materialCount": 16
+    },
+    {
+      "id": "ipad-pro-11-m5-v6",
+      "label": "iPad Pro 11 M5",
+      "group": "Devices",
+      "version": "v6",
+      "sourceBlend": "generated/ipad_pro_11_m5_low_v6.blend",
+      "previewGlb": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_web.glb",
+      "lods": [
+        {
+          "name": "LOD0",
+          "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_web.glb"
+        }
+      ],
+      "collision": null,
+      "sourceRevision": "09d90dd24e472c7f037f8006ded4bce995980229919292d07c29121d77bc9caa",
+      "sourceCommit": "05ce2a03027df1ba4d2a8679cda9d291f8c4d17a",
+      "triangleCount": 20696,
+      "materialCount": 11
+    },
+    {
+      "id": "ipad-pro-13-m5-v6",
+      "label": "iPad Pro 13 M5",
+      "group": "Devices",
+      "version": "v6",
+      "sourceBlend": "generated/ipad_pro_13_m5_low_v6.blend",
+      "previewGlb": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_web.glb",
+      "lods": [
+        {
+          "name": "LOD0",
+          "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_web.glb"
+        }
+      ],
+      "collision": null,
+      "sourceRevision": "a3119c3c538fe4eb8985a8c0de4edac54e5e2cd7687244bcb89149fabd1e1e4d",
+      "sourceCommit": "05ce2a03027df1ba4d2a8679cda9d291f8c4d17a",
+      "triangleCount": 20704,
+      "materialCount": 11
+    },
+    {
+      "id": "macbook-pro-14-m5-v1",
+      "label": "MacBook Pro 14 M5",
+      "group": "Devices",
+      "version": "v1",
+      "sourceBlend": "extension/awful_studio/assets/devices/macbook_pro_14_m5_low_v1_release.blend",
+      "previewGlb": "assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web.glb",
+      "lods": [
+        {
+          "name": "LOD0",
+          "path": "assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web.glb"
+        }
+      ],
+      "collision": null,
+      "sourceRevision": "cb60c00cdded4bd73c5a2ba4fd14f66ad97af8cd1abcc221fce2a5b91357929a",
+      "sourceCommit": "f91b4d0594d15943012f4596b7751f16d5798fa4",
+      "triangleCount": 16722,
+      "materialCount": 9
+    },
+    {
+      "id": "studio-support-cstand-01",
+      "label": "C-Stand",
+      "group": "Studio Equipment",
+      "version": "v01",
+      "sourceBlend": "assets/studio_equipment/studio_rig_v01/generated/studio_rig_v01.blend",
+      "previewGlb": "assets/studio_equipment/studio_rig_v01/runtime/glb/studio_support_cstand_01.glb",
+      "lods": [
+        {
+          "name": "LOD0",
+          "path": "assets/studio_equipment/studio_rig_v01/runtime/glb/studio_support_cstand_01.glb"
+        },
+        {
+          "name": "LOD1",
+          "path": "assets/studio_equipment/studio_rig_v01/runtime/lod/studio_support_cstand_01_lod1.glb"
+        },
+        {
+          "name": "LOD2",
+          "path": "assets/studio_equipment/studio_rig_v01/runtime/lod/studio_support_cstand_01_lod2.glb"
+        }
+      ],
+      "collision": "assets/studio_equipment/studio_rig_v01/runtime/collision/studio_support_cstand_01_collision.glb",
+      "sourceRevision": null,
+      "sourceCommit": null,
+      "interaction": {
+        "kind": "adjustable_support",
+        "state_owner": "simulation",
+        "controls": [
+          "height",
+          "leg_spread"
+        ],
+        "anchors": [
+          "FLOOR_CONTACT",
+          "MOUNT_SUPPORT"
+        ]
+      }
+    },
+    {
+      "id": "profoto-d1-500-air",
+      "label": "Profoto D1 500 Air",
+      "group": "Studio Equipment",
+      "version": "v01",
+      "sourceBlend": "assets/studio_equipment/studio_rig_v01/generated/studio_rig_v01.blend",
+      "previewGlb": "assets/studio_equipment/studio_rig_v01/runtime/glb/profoto_d1_500_air.glb",
+      "lods": [
+        {
+          "name": "LOD0",
+          "path": "assets/studio_equipment/studio_rig_v01/runtime/glb/profoto_d1_500_air.glb"
+        },
+        {
+          "name": "LOD1",
+          "path": "assets/studio_equipment/studio_rig_v01/runtime/lod/profoto_d1_500_air_lod1.glb"
+        },
+        {
+          "name": "LOD2",
+          "path": "assets/studio_equipment/studio_rig_v01/runtime/lod/profoto_d1_500_air_lod2.glb"
+        }
+      ],
+      "collision": "assets/studio_equipment/studio_rig_v01/runtime/collision/profoto_d1_500_air_collision.glb",
+      "sourceRevision": null,
+      "sourceCommit": null,
+      "interaction": {
+        "kind": "studio_fixture",
+        "state_owner": "simulation",
+        "controls": [
+          "tilt",
+          "pan"
+        ],
+        "anchors": [
+          "MOUNT_FIXTURE",
+          "MOUNT_MODIFIER",
+          "EMITTER_ORIGIN",
+          "LIGHT_TARGET"
+        ]
+      }
+    },
+    {
+      "id": "profoto-magnum-100624",
+      "label": "Profoto Magnum 100624",
+      "group": "Studio Equipment",
+      "version": "v01",
+      "sourceBlend": "assets/studio_equipment/studio_rig_v01/generated/studio_rig_v01.blend",
+      "previewGlb": "assets/studio_equipment/studio_rig_v01/runtime/glb/profoto_magnum_100624.glb",
+      "lods": [
+        {
+          "name": "LOD0",
+          "path": "assets/studio_equipment/studio_rig_v01/runtime/glb/profoto_magnum_100624.glb"
+        },
+        {
+          "name": "LOD1",
+          "path": "assets/studio_equipment/studio_rig_v01/runtime/lod/profoto_magnum_100624_lod1.glb"
+        },
+        {
+          "name": "LOD2",
+          "path": "assets/studio_equipment/studio_rig_v01/runtime/lod/profoto_magnum_100624_lod2.glb"
+        }
+      ],
+      "collision": "assets/studio_equipment/studio_rig_v01/runtime/collision/profoto_magnum_100624_collision.glb",
+      "sourceRevision": null,
+      "sourceCommit": null,
+      "interaction": {
+        "kind": "swappable_modifier",
+        "state_owner": "simulation",
+        "controls": [
+          "rotation"
+        ],
+        "anchors": [
+          "MOUNT_MODIFIER"
+        ]
+      }
+    },
+    {
+      "id": "studio-sandbag-01",
+      "label": "Studio Sandbag",
+      "group": "Studio Equipment",
+      "version": "v01",
+      "sourceBlend": "assets/studio_equipment/studio_rig_v01/generated/studio_rig_v01.blend",
+      "previewGlb": "assets/studio_equipment/studio_rig_v01/runtime/glb/studio_sandbag_01.glb",
+      "lods": [
+        {
+          "name": "LOD0",
+          "path": "assets/studio_equipment/studio_rig_v01/runtime/glb/studio_sandbag_01.glb"
+        },
+        {
+          "name": "LOD1",
+          "path": "assets/studio_equipment/studio_rig_v01/runtime/lod/studio_sandbag_01_lod1.glb"
+        },
+        {
+          "name": "LOD2",
+          "path": "assets/studio_equipment/studio_rig_v01/runtime/lod/studio_sandbag_01_lod2.glb"
+        }
+      ],
+      "collision": "assets/studio_equipment/studio_rig_v01/runtime/collision/studio_sandbag_01_collision.glb",
+      "sourceRevision": null,
+      "sourceCommit": null,
+      "interaction": {
+        "kind": "movable_weight",
+        "state_owner": "simulation",
+        "controls": [
+          "pickup",
+          "place"
+        ],
+        "anchors": [
+          "FLOOR_CONTACT"
+        ]
+      }
+    },
+    {
+      "id": "white-studio-v2",
+      "label": "White Studio",
+      "group": "Scenes",
+      "version": "v2",
+      "sourceBlend": "scene_lab/white_studio/generated/white_studio_v2.blend",
+      "previewGlb": "preview/generated/scenes/white-studio-v2.glb",
+      "lods": [],
+      "collision": null,
+      "sourceRevision": null,
+      "sourceCommit": null,
+      "sceneMetadata": {
+        "id": "white-studio-v1",
+        "blender": "5.2 LTS",
+        "units": "meters",
+        "purpose": "high-end commercial packshot / cosmetics / fragrance",
+        "hero_reserve": {
+          "center": [
+            0,
+            0,
+            1.35
+          ],
+          "radius": 1.35,
+          "height": 2.2
+        },
+        "shell": {
+          "width": 12,
+          "depth": 14,
+          "height": 6.5,
+          "cyclorama_radius": 2.6
+        },
+        "pedestal": {
+          "shape": "cylinder",
+          "radius": 1.75,
+          "height": 0.55,
+          "material": "warm white micro-concrete"
+        },
+        "camera": {
+          "lens_mm": 72,
+          "location": [
+            0,
+            -10.5,
+            2.45
+          ],
+          "target": [
+            0,
+            0.15,
+            1.35
+          ]
+        },
+        "lighting": {
+          "key": "large soft source camera-left, feathered across hero",
+          "fill": "large weaker source camera-right",
+          "top": "broad overhead separator",
+          "negative_fill": "black flags close to both sides outside hero reserve"
+        },
+        "set_dressing": [
+          "two visible studio stands",
+          "large softbox shells",
+          "one restrained potted plant"
+        ],
+        "materials": [
+          "white painted cyclorama",
+          "micro-concrete pedestal",
+          "black powder-coated stands"
+        ],
+        "acceptance": [
+          "hero reserve completely unobstructed",
+          "pedestal top reads cleanly without clipping",
+          "softbox reflections can shape glass and glossy products",
+          "background gradient remains smooth from floor through cove",
+          "no dependency on extension/awful_studio runtime"
+        ]
+      }
+    },
+    {
+      "id": "dark-neon-v2",
+      "label": "Dark Neon",
+      "group": "Scenes",
+      "version": "v2",
+      "sourceBlend": "scene_lab/dark_neon/generated/dark_neon_v2.blend",
+      "previewGlb": "preview/generated/scenes/dark-neon-v2.glb",
+      "lods": [],
+      "collision": null,
+      "sourceRevision": null,
+      "sourceCommit": null,
+      "sceneMetadata": {
+        "id": "dark-neon-v1",
+        "blender": "5.2 LTS",
+        "units": "meters",
+        "purpose": "premium tech / fashion / metallic product hero scene",
+        "hero_reserve": {
+          "center": [
+            0,
+            0,
+            1.35
+          ],
+          "radius": 1.45,
+          "height": 2.3
+        },
+        "shell": {
+          "width": 12,
+          "depth": 13,
+          "height": 5.8
+        },
+        "pedestal": {
+          "shape": "rectangular plinth",
+          "dimensions": [
+            3.4,
+            2.5,
+            0.55
+          ],
+          "material": "black veined marble"
+        },
+        "camera": {
+          "lens_mm": 74,
+          "location": [
+            0,
+            -9.6,
+            2
+          ],
+          "target": [
+            0,
+            0,
+            1.35
+          ]
+        },
+        "lighting": {
+          "left": "large magenta soft source with floor spill",
+          "right": "large cyan-blue soft source with floor spill",
+          "rim": "tight cool rear separator",
+          "top": "very soft neutral top control",
+          "world": "near-black navy ambient"
+        },
+        "set_dressing": [
+          "visible studio stands",
+          "two colored diffuser panels",
+          "rear practical strips",
+          "subtle atmospheric depth"
+        ],
+        "materials": [
+          "black veined marble",
+          "polished dark floor",
+          "powder-coated black steel",
+          "dark navy wall"
+        ],
+        "acceptance": [
+          "magenta and cyan reflections are distinct and controllable",
+          "hero remains readable against near-black background",
+          "plinth edges retain shape without crushing blacks",
+          "floor reflection carries color but does not become a mirror",
+          "scene is independent from the add-on runtime"
+        ]
+      }
+    },
+    {
+      "id": "loft-daylight-v2",
+      "label": "Loft Daylight",
+      "group": "Scenes",
+      "version": "v2",
+      "sourceBlend": "scene_lab/loft_daylight/generated/loft_daylight_v2.blend",
+      "previewGlb": "preview/generated/scenes/loft-daylight-v2.glb",
+      "lods": [],
+      "collision": null,
+      "sourceRevision": null,
+      "sourceCommit": null,
+      "sceneMetadata": {
+        "id": "loft-daylight-v1",
+        "blender": "5.2 LTS",
+        "units": "meters",
+        "purpose": "editorial daylight product scene / beverage / lifestyle tech",
+        "hero_reserve": {
+          "center": [
+            0,
+            -0.2,
+            1.25
+          ],
+          "radius": 1.4,
+          "height": 2.1
+        },
+        "shell": {
+          "width": 12,
+          "depth": 12,
+          "height": 5.6
+        },
+        "pedestal": {
+          "shape": "cylinder",
+          "radius": 1.65,
+          "height": 0.48,
+          "material": "polished warm concrete"
+        },
+        "camera": {
+          "lens_mm": 68,
+          "location": [
+            0,
+            -9.3,
+            1.85
+          ],
+          "target": [
+            0,
+            0,
+            1.25
+          ]
+        },
+        "lighting": {
+          "primary": "large daylight window camera-left",
+          "sun": "low warm directional sunlight through frame",
+          "fill": "soft bounce from camera-right",
+          "practicals": "restrained chrome dome lamp on right shelf"
+        },
+        "set_dressing": [
+          "industrial window",
+          "black leather sofa",
+          "wood/steel shelving",
+          "chrome lamp",
+          "three plant groups",
+          "distant city blocks"
+        ],
+        "materials": [
+          "polished concrete floor",
+          "raw concrete walls",
+          "black leather",
+          "dark steel",
+          "warm wood",
+          "chrome"
+        ],
+        "acceptance": [
+          "window light produces long readable shadows",
+          "floor reflections remain controlled rather than mirror-like",
+          "hero reserve stays visually quiet",
+          "props build depth without competing with the product position",
+          "scene is self-contained and independent from the add-on"
+        ]
+      }
+    }
+  ]
+}

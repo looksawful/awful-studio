@@ -2,7 +2,7 @@ name: Publish stable release
 
 on:
   push:
-    branches: [main]
+    tags: ['v*']
   workflow_dispatch:
 
 permissions:
@@ -15,8 +15,29 @@ concurrency:
 jobs:
   fast:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.identity.outputs.version }}
+      package: ${{ steps.identity.outputs.package }}
+      release_tag: ${{ steps.identity.outputs.release_tag }}
+      artifact: ${{ steps.identity.outputs.artifact }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - id: identity
+        name: Resolve release identity
+        shell: bash
+        run: |
+          VERSION=$(python -c "import pathlib,tomllib; p=pathlib.Path('extension/awful_studio/blender_manifest.toml'); print(tomllib.loads(p.read_text(encoding='utf-8'))['version'])")
+          RELEASE_TAG="v$VERSION"
+          if [ "$GITHUB_EVENT_NAME" = push ] && [ "$GITHUB_REF_NAME" != "$RELEASE_TAG" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match manifest version $RELEASE_TAG"
+            exit 1
+          fi
+          PACKAGE="awful_studio-$VERSION.zip"
+          ARTIFACT="stable-release-$VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "package=$PACKAGE" >> "$GITHUB_OUTPUT"
+          echo "release_tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+          echo "artifact=$ARTIFACT" >> "$GITHUB_OUTPUT"
       - run: python3 -m unittest discover -s tests/fast -v
       - run: git diff --check
 
@@ -36,19 +57,19 @@ jobs:
         run: python tools/verify_extension.py --blender "$BLENDER"
       - name: Verify native Extension Repository path
         shell: bash
-        run: python tools/verify_repository.py --blender "$BLENDER" --package dist/awful_studio-1.0.0.zip --output dist
+        run: python tools/verify_repository.py --blender "$BLENDER" --package "dist/${{ needs.fast.outputs.package }}" --output dist
       - name: Record SHA-256
         shell: bash
         run: |
           cd dist
-          sha256sum awful_studio-1.0.0.zip > awful_studio-1.0.0.zip.sha256
+          sha256sum "${{ needs.fast.outputs.package }}" > "${{ needs.fast.outputs.package }}.sha256"
       - name: Upload exact release candidate
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: stable-release-1.0.0
+          name: ${{ needs.fast.outputs.artifact }}
           path: |
-            dist/awful_studio-1.0.0.zip
-            dist/awful_studio-1.0.0.zip.sha256
+            dist/${{ needs.fast.outputs.package }}
+            dist/${{ needs.fast.outputs.package }}.sha256
           if-no-files-found: error
 
   runtime-windows:
@@ -60,7 +81,7 @@ jobs:
       - name: Download exact Ubuntu-built release ZIP
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
-          name: stable-release-1.0.0
+          name: ${{ needs.fast.outputs.artifact }}
           path: dist
       - name: Install exact official Blender
         shell: bash
@@ -69,34 +90,37 @@ jobs:
           echo "BLENDER=$(tail -n 1 blender-path.txt)" >> "$GITHUB_ENV"
       - name: Verify exact stable ZIP on Windows
         shell: bash
-        run: python tools/verify_extension.py --blender "$BLENDER" --package dist/awful_studio-1.0.0.zip
+        run: python tools/verify_extension.py --blender "$BLENDER" --package "dist/${{ needs.fast.outputs.package }}"
       - name: Verify native Extension Repository path on Windows
         shell: bash
-        run: python tools/verify_repository.py --blender "$BLENDER" --package dist/awful_studio-1.0.0.zip --output dist
+        run: python tools/verify_repository.py --blender "$BLENDER" --package "dist/${{ needs.fast.outputs.package }}" --output dist
 
   publish:
-    needs: [candidate, runtime-windows]
+    needs: [fast, candidate, runtime-windows]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - name: Download exact qualified release files
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
-          name: stable-release-1.0.0
+          name: ${{ needs.fast.outputs.artifact }}
           path: dist
-      - name: Publish GitHub Release v1.0.0
+      - name: Publish immutable GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          if gh release view v1.0.0 >/dev/null 2>&1; then
-            echo "v1.0.0 already exists; refusing to replace an immutable stable release."
+          TAG="${{ needs.fast.outputs.release_tag }}"
+          VERSION="${{ needs.fast.outputs.version }}"
+          PACKAGE="${{ needs.fast.outputs.package }}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "$TAG already exists; refusing to replace an immutable stable release."
             exit 0
           fi
-          gh release create v1.0.0 \
-            dist/awful_studio-1.0.0.zip \
-            dist/awful_studio-1.0.0.zip.sha256 \
+          gh release create "$TAG" \
+            "dist/$PACKAGE" \
+            "dist/$PACKAGE.sha256" \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
-            --title "AWFUL STUDIO 1.0.0" \
-            --notes-file docs/releases/1.0.0.md
+            --title "AWFUL STUDIO $VERSION" \
+            --notes-file "docs/releases/$VERSION.md"

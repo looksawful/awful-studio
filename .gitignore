@@ -8,3 +8,5 @@ evidence/
 *.blend1
 *.blend[0-9]*
 *.zip
+preview/node_modules/
+preview/storybook-static/

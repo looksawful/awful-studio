@@ -12,7 +12,8 @@ class ReleaseCandidateIdentityTests(unittest.TestCase):
         self.assertIn("'--package', type=Path", source)
         self.assertIn('package_override', source)
         self.assertIn("'validate', str(package)", source)
-        self.assertIn("EXPECTED_PACKAGE = 'awful_studio-1.0.0.zip'", source)
+        self.assertIn("blender_manifest.toml", source)
+        self.assertIn("EXPECTED_PACKAGE = f\"awful_studio-{MANIFEST_DATA['version']}.zip\"", source)
 
     def test_ci_builds_one_candidate_then_tests_that_same_artifact_on_both_os(self):
         source = WORKFLOW.read_text(encoding='utf-8')
@@ -20,7 +21,7 @@ class ReleaseCandidateIdentityTests(unittest.TestCase):
         self.assertIn('name: extension-candidate', source)
         self.assertIn('actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093', source)
         self.assertIn('needs: [fast, candidate]', source)
-        self.assertIn('--package dist/awful_studio-1.0.0.zip', source)
+        self.assertIn('--package \"dist/$PACKAGE\"', source)
         self.assertNotIn('name: extension-${{ matrix.os }}', source)
 
 

@@ -12,9 +12,12 @@ from pathlib import Path
 import statistics
 import subprocess
 import tempfile
+import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED_PACKAGE = 'awful_studio-1.0.0.zip'
+MANIFEST = ROOT / 'extension' / 'awful_studio' / 'blender_manifest.toml'
+MANIFEST_DATA = tomllib.loads(MANIFEST.read_text(encoding='utf-8'))
+EXPECTED_PACKAGE = f"awful_studio-{MANIFEST_DATA['version']}.zip"
 
 
 def _timing_summary(operations):
