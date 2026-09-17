@@ -29,10 +29,17 @@ export function cameraDirection(preset) {
   return direction;
 }
 
-export function previewMaterialPolicy(name) {
+export function previewMaterialPolicy(name, { hasTexture = false } = {}) {
   if (name === 'MAT_APPLE_LOGO_DECAL') {
     return { alphaTest: 0.5, transparent: false, depthWrite: true, frontSide: true };
   }
-  if (name === 'MAT_SCREEN_CONTENT') return { emissiveIntensity: 2 };
+  if (name === 'MAT_SCREEN_CONTENT') {
+    return hasTexture
+      ? { emissiveIntensity: 2, envMapIntensity: 0, minRoughness: 0.12, maxClearcoat: 0 }
+      : { emissiveIntensity: 0, envMapIntensity: 0, minRoughness: 0.45, maxClearcoat: 0 };
+  }
+  if (name === 'MAT_DISPLAY_GLASS') {
+    return { transmission: 0, transparent: true, opacity: 0.07, depthWrite: false, envMapIntensity: 0.04, minRoughness: 0.3, maxClearcoat: 0.03 };
+  }
   return {};
 }

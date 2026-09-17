@@ -176,12 +176,18 @@ class AwfulModelViewer extends HTMLElement {
       if (!object.isMesh) return;
       const materials = Array.isArray(object.material) ? object.material : [object.material];
       for (const material of materials) {
-        const policy = previewMaterialPolicy(material.name);
+        const policy = previewMaterialPolicy(material.name, { hasTexture: Boolean(material.map || material.emissiveMap) });
         if (policy.alphaTest != null) material.alphaTest = policy.alphaTest;
         if (policy.transparent != null) material.transparent = policy.transparent;
+        if (policy.opacity != null) material.opacity = policy.opacity;
         if (policy.depthWrite != null) material.depthWrite = policy.depthWrite;
         if (policy.frontSide) material.side = THREE.FrontSide;
         if (policy.emissiveIntensity != null) material.emissiveIntensity = policy.emissiveIntensity;
+        if (policy.envMapIntensity != null) material.envMapIntensity = policy.envMapIntensity;
+        if (policy.transmission != null && 'transmission' in material) material.transmission = policy.transmission;
+        if (policy.minRoughness != null && 'roughness' in material) material.roughness = Math.max(material.roughness, policy.minRoughness);
+        if (policy.maxClearcoat != null && 'clearcoat' in material) material.clearcoat = Math.min(material.clearcoat, policy.maxClearcoat);
+        material.needsUpdate = true;
         for (const texture of [material.map, material.emissiveMap, material.normalMap, material.roughnessMap, material.metalnessMap]) {
           if (!texture) continue;
           texture.anisotropy = maxAnisotropy;

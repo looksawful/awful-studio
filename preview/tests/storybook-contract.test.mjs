@@ -24,6 +24,10 @@ test('viewer uses Three GLTF runtime and orbit controls', () => {
   assert.match(source, /_viewLight\.position\.copy\(this\._camera\.position\)/);
   assert.match(source, /getMaxAnisotropy/);
   assert.match(source, /previewMaterialPolicy/);
+  assert.match(source, /hasTexture: Boolean\(material\.map \|\| material\.emissiveMap\)/);
+  assert.match(source, /material\.transmission = policy\.transmission/);
+  assert.match(source, /material\.roughness = Math\.max/);
+  assert.match(source, /material\.clearcoat = Math\.min/);
   assert.match(source, /environmentIntensity = 1\.0/);
   assert.match(source, /autoRotate = false/);
 });
