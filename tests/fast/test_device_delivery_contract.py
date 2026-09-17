@@ -50,6 +50,17 @@ class DeviceDeliveryContractTests(unittest.TestCase):
             ).strip()
             self.assertTrue(result.endswith(': eol: lf'), result)
 
+    def test_v30_tracked_delivery_text_is_lf_only(self):
+        paths = [
+            ROOT / 'assets/device_mockups/iphone_17/generate_low_v30.py',
+            ROOT / 'assets/device_mockups/iphone_17/export_runtime_v30.py',
+            ROOT / 'assets/device_mockups/iphone_17/evidence/low_v30_validation.json',
+            ROOT / 'assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30.asset.json',
+            ROOT / 'tools/build_iphone17_v30.py',
+        ]
+        for path in paths:
+            self.assertNotIn(b'\r\n', path.read_bytes(), str(path))
+
     def test_plugin_loader_matches_delivery_revision_and_stage(self):
         self.assertTrue(MANIFEST.is_file(), f'missing canonical v30 manifest: {MANIFEST}')
         self.assertIsNotNone(contract, 'device delivery contract helper is missing')

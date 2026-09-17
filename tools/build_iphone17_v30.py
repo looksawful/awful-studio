@@ -2,6 +2,7 @@
 from __future__ import annotations
 import argparse
 import json
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -21,6 +22,21 @@ from device_delivery_contract import source_fingerprint, sha256_file
 
 def run(*args):
     subprocess.run([str(x) for x in args], cwd=ROOT, check=True)
+
+def update_iphone_loader_revision(path: Path, revision: str) -> None:
+    text = path.read_text(encoding='utf-8')
+    start = text.index("    'DEVICE_IPHONE_17': {")
+    end = text.index("    'DEVICE_IPAD_PRO_11': {", start)
+    block = text[start:end]
+    updated, count = re.subn(
+        r"('source_revision': ')[0-9a-f]{64}(')",
+        rf"\g<1>{revision}\2",
+        block,
+        count=1,
+    )
+    if count != 1:
+        raise RuntimeError('unable to update iPhone 17 loader source revision')
+    path.write_text(text[:start] + updated + text[end:], encoding='utf-8', newline='\n')
 
 def main():
     parser = argparse.ArgumentParser()
@@ -43,6 +59,7 @@ def main():
     run(blender, '--factory-startup', '--background', generated, '--python', ROOT / 'tools/package_device_asset.py', '--',
         '--output', bundle, '--entry', 'AWFUL_DEVICE_IPHONE_17', '--root', 'CTRL_IPHONE_17',
         '--key', 'IPHONE_17', '--stage', 'LOW_DRAFT', '--variant', 'low_v30', '--revision', revision)
+    update_iphone_loader_revision(ROOT / 'extension/awful_studio/device_asset_loader.py', revision)
     manifest_path = RUNTIME / 'iphone_17_v30.asset.json'
     manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
     manifest['source_files'] = source_hashes
@@ -77,7 +94,7 @@ def main():
     }
     manifest['artifacts'] = {name: {'path': str(path.relative_to(ROOT)).replace('\\','/'),
         'sha256': sha256_file(path)} for name, path in artifact_paths.items()}
-    manifest_path.write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
+    manifest_path.write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8', newline='\n')
     print(json.dumps({'source_revision': revision, 'source_commit': source_commit,
                       'manifest': str(manifest_path), 'bundle': str(bundle)}, indent=2))
 

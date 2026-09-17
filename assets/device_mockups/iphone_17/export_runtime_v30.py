@@ -151,7 +151,7 @@ manifest = {
     "generator_version": "web_delivery_camera_logo_normals_v30",
     "delivery_profile": {"simplification": "none", "compression": "compat+meshopt", "node_preservation": "required"},
 }
-with open(os.path.join(RUNTIME, "iphone_17_v30.asset.json"), "w", encoding="utf-8") as f:
+with open(os.path.join(RUNTIME, "iphone_17_v30.asset.json"), "w", encoding="utf-8", newline="\n") as f:
     json.dump(manifest, f, indent=2)
 print("AWFUL_IPHONE17_V30_RUNTIME_EXPORT", json.dumps({
     "glb": glb,
