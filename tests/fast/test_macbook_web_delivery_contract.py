@@ -56,9 +56,10 @@ class MacBookWebDeliveryContractTests(unittest.TestCase):
         self.assertGreater(manifest['screen_states']['screen_on']['emission_strength'], 0.0)
         self.assertLessEqual(manifest['screen_states']['screen_on']['emission_strength'], 1.0)
         self.assertEqual(manifest['screen_states']['screen_off']['emission_strength'], 0.0)
-        self.assertEqual(manifest['screen_glow']['light'], 'SCREEN_GLOW_LIGHT')
-        self.assertGreater(manifest['screen_glow']['energy'], 0.0)
-        self.assertLessEqual(manifest['screen_glow']['energy'], 10.0)
+        self.assertEqual(manifest['screen_glow']['anchor'], 'SCREEN_GLOW_ANCHOR')
+        self.assertEqual(manifest['screen_glow']['type'], 'rect_area')
+        self.assertGreater(manifest['screen_glow']['source_energy_w'], 0.0)
+        self.assertLessEqual(manifest['screen_glow']['source_energy_w'], 10.0)
 
     def test_v1_glbs_preserve_hinge_and_web_critical_nodes(self):
         manifest = contract.load_manifest(MANIFEST)
@@ -69,6 +70,7 @@ class MacBookWebDeliveryContractTests(unittest.TestCase):
             'SCREEN_CONTENT', 'SCREEN_GLASS', 'FACETIME_CAMERA', 'TRACKPAD',
             'TOUCH_ID', 'MAGSAFE', 'HDMI', 'SDXC', 'APPLE_LOGO_RELEASE',
             'ANCHOR_CENTER', 'ANCHOR_BOTTOM_CENTER', 'ANCHOR_SCREEN_CENTER',
+            'SCREEN_GLOW_ANCHOR',
         }
         self.assertTrue(required <= glb_node_names(compat))
         self.assertTrue(required <= glb_node_names(meshopt))

@@ -51,9 +51,8 @@ for loop in screen_content.data.loops:
     uv.data[loop.index].uv=((co.x/SW)+0.5,(co.z/SH)+0.5)
 screen_glass=fc.rounded_prism('SCREEN_GLASS',W-.45*MM,H-.45*MM,GLASS_T,(s['br']-.2)*MM,glass,screen_c,axis='Y',location=(0,FRONT_Y,0),edge_bevel=.00007,outline_segments=48)
 glow_anchor=fc.empty('SCREEN_GLOW_ANCHOR',ctrl_c,location=(0,FRONT_SURFACE-1.0*MM,0))
-glow_data=bpy.data.lights.new('SCREEN_GLOW_LIGHT','AREA'); glow_data.shape='RECTANGLE'; glow_data.size=SW; glow_data.size_y=SH; glow_data.energy=8.0
-glow=bpy.data.objects.new('SCREEN_GLOW_LIGHT',glow_data); ctrl_c.objects.link(glow); glow.location=(0,FRONT_SURFACE-1.2*MM,0); glow.rotation_euler.x=math.radians(-90.0)
-glow['screen_state']='screen_on'; screen_content['screen_state']='screen_on'
+glow_anchor['screen_on_energy']=8.0; glow_anchor['glow_type']='rect_area'; glow_anchor['glow_width_m']=SW; glow_anchor['glow_height_m']=SH
+screen_content['screen_state']='screen_on'
 # Landscape-edge front camera: right long edge in portrait coordinates.
 fc.cylinder('FRONT_CAMERA_GLASS',1.05*MM,.022*MM,front_optic,detail_c,(W*.5-4.5*MM,FRONT_SURFACE+.012*MM,0),axis='Y',vertices=96)
 fc.cylinder('FRONT_CAMERA_INNER',.55*MM,.016*MM,black,detail_c,(W*.5-4.5*MM,FRONT_SURFACE+.006*MM,0),axis='Y',vertices=64)
@@ -113,7 +112,7 @@ for idx,x_mm in enumerate((-5.27,0,5.27),1):
 rail=fc.rounded_cube('PENCIL_MAGNETIC_RAIL',(.04*MM,.72*MM,82*MM),.04*MM,metal_dark,detail_c)
 fc.place_on_rounded_edge(rail,W,H,s['br']*MM,'RIGHT',6*MM,outward=-.012*MM,local_normal=(1,0,0))
 root=fc.empty(f'CTRL_IPAD_PRO_{SIZE}',ctrl_c)
-glow_anchor.parent=root; glow.parent=root
+glow_anchor.parent=root
 for c in (body_c,detail_c,screen_c):
     for o in c.objects: o.parent=root
 root['asset_id']=f'ipad_pro_{SIZE}_m5'; root['asset_version']='low_v6_0.3'; root['stage']='LOW_DRAFT'; root['size_variant']=SIZE

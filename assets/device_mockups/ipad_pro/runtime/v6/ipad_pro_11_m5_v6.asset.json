@@ -162,9 +162,9 @@
     }
   },
   "camera_fit": "runtime_bounds",
-  "source_revision": "b82f62c99f8d961df916295c19c1149dd322251b778b43508b2ea81be0fd8e30",
-  "source_commit": "05ce2a03027df1ba4d2a8679cda9d291f8c4d17a",
-  "plugin_source_revision": "b82f62c99f8d961df916295c19c1149dd322251b778b43508b2ea81be0fd8e30",
+  "source_revision": "8c945793614e5b932579f1ae47e03c28780e7217aeafc553f9f31050cc84eb86",
+  "source_commit": "2c659b2754654827c23d62dfc269d2719754a223",
+  "plugin_source_revision": "8c945793614e5b932579f1ae47e03c28780e7217aeafc553f9f31050cc84eb86",
   "generator_version": "ipad_v6_packaged_blend_web_delivery",
   "delivery_profile": {
     "simplification": "none",
@@ -179,12 +179,12 @@
     "command": "meshopt --level high"
   },
   "source_files": {
+    "assets/device_mockups/common/foundation_common.py": "1d68c3fff908b7ae149f74c31a19064eb6d2384234d33bd71071fea70d651d12",
     "assets/device_mockups/ipad_pro/export_runtime_v6.py": "80a2e8197b87cbf9207713ecbbdc61d86809d356797621ba82da4e2767f01c06",
-    "assets/device_mockups/ipad_pro/generate_low_v6.py": "e2443edb2e9954ed46e14d0c5c5f089a1348237584ebc56bbfc34d4b4198946d",
+    "assets/device_mockups/ipad_pro/generate_low_v6.py": "d47bc00c9a07898871edb43e27c2b25c2203221f393c3ef80a3154015489f5ee",
     "assets/device_mockups/ipad_pro/optimize_runtime_v6.py": "a2c1755323c6e301d341dfa91c7377228dbbf00d76cbc5a4f1473d81754b2058",
     "assets/device_mockups/ipad_pro/reference/apple_logo_alpha.png": "50209309a1cf3bcb874118b27fe9c9779aaafabaf79bb304cf0aa3a2898c9833",
-    "assets/device_mockups/ipad_pro/reference/ipados26_official_screen_11.png": "7bd9230afaa84e2838c6c4be2e3a46170d4044de8af54f6c8dd4d6c85b490571",
-    "extension/awful_studio/assets/devices/ipad_pro_11_m5_low_v6.blend": "13f4e1948934130bb1e504228cad6cbdad88599c7bce17b6fbf5903f329739db"
+    "assets/device_mockups/ipad_pro/reference/ipados26_official_screen_11.png": "7bd9230afaa84e2838c6c4be2e3a46170d4044de8af54f6c8dd4d6c85b490571"
   },
   "glb_qa": {
     "triangle_count": 20696,
@@ -214,15 +214,15 @@
   "artifacts": {
     "delivery_blend": {
       "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_delivery.blend",
-      "sha256": "14aa862b3d2bfe4ef93601a1ea1ecf8fb777a1df554cecc23e08849650ae9f55"
+      "sha256": "704702584c3006e108c57f70c0fce5337669f674349e2fb3aa834a1d3ef21fd6"
     },
     "compat_glb": {
       "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_web.glb",
-      "sha256": "cbe5d76fd3c5bfaf9ea47f7a70ba4416298072f3a6e8370fa7e8ab28244f2e25"
+      "sha256": "6dedbc72e92d3ea01abd7f2140c41bc8992f933c7312af0a447f0d9d9adb5043"
     },
     "meshopt_glb": {
       "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_web_meshopt.glb",
-      "sha256": "ca1e8f0b9933f339818452b2ae0ee582e91705b8d98151f8df8334d66d35a4f2"
+      "sha256": "fbe515a75525d3293df75ae1cb7624ba805a886278ba20c87da93057e4a074bd"
     }
   }
 }

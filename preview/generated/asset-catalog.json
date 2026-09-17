@@ -16,8 +16,8 @@
         }
       ],
       "collision": null,
-      "sourceRevision": "3681aaaeb2fbcef16d28bed6dde0d85ed37a72781fccce9c571146cf49267cc4",
-      "sourceCommit": "7860da08975b3f790af5da326dc9c1c0fff49b8b",
+      "sourceRevision": "079c469f6114466baac4784507f0b208970fb1fecc862b1fc5db05f68d31b092",
+      "sourceCommit": "2c659b2754654827c23d62dfc269d2719754a223",
       "triangleCount": 33976,
       "materialCount": 16,
       "animations": [],
@@ -53,8 +53,8 @@
         }
       ],
       "collision": null,
-      "sourceRevision": "b82f62c99f8d961df916295c19c1149dd322251b778b43508b2ea81be0fd8e30",
-      "sourceCommit": "05ce2a03027df1ba4d2a8679cda9d291f8c4d17a",
+      "sourceRevision": "8c945793614e5b932579f1ae47e03c28780e7217aeafc553f9f31050cc84eb86",
+      "sourceCommit": "2c659b2754654827c23d62dfc269d2719754a223",
       "triangleCount": 20696,
       "materialCount": 11,
       "animations": [],
@@ -90,8 +90,8 @@
         }
       ],
       "collision": null,
-      "sourceRevision": "bbff319850350186735d029332ebbbafbb6267c702fa6ea1656091d95225e163",
-      "sourceCommit": "05ce2a03027df1ba4d2a8679cda9d291f8c4d17a",
+      "sourceRevision": "fab88ffb8004423c55851571de446dde3369bef97e8f7908373dcf7b994779dc",
+      "sourceCommit": "2c659b2754654827c23d62dfc269d2719754a223",
       "triangleCount": 20704,
       "materialCount": 11,
       "animations": [],
@@ -127,8 +127,8 @@
         }
       ],
       "collision": null,
-      "sourceRevision": "733c4c0d6d1e789b22f58d07380bbd88c5541e87266b124c46a68883c92e13f1",
-      "sourceCommit": "574e3e751ef1212f14f7075f632ad54252887a51",
+      "sourceRevision": "aa57065a4fa9abf3744e2db69cca9be8ae713f04b59f384c13b7518352088261",
+      "sourceCommit": "83d43fa96514372929d48d8798b4dd5526f04c2e",
       "triangleCount": 16722,
       "materialCount": 9,
       "animations": [
@@ -146,9 +146,11 @@
         }
       },
       "screenGlow": {
-        "light": "SCREEN_GLOW_LIGHT",
-        "type": "AREA",
-        "energy": 8
+        "anchor": "SCREEN_GLOW_ANCHOR",
+        "type": "rect_area",
+        "width_mm": 301.66,
+        "height_mm": 195.92,
+        "source_energy_w": 8
       }
     },
     {

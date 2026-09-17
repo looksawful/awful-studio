@@ -166,11 +166,10 @@ for loop in screen_content.data.loops:
     co = screen_content.data.vertices[loop.vertex_index].co
     uv.data[loop.index].uv = ((co.x / SCREEN_W) + 0.5, (co.z / SCREEN_H) + 0.5)
 glow_anchor = fc.empty("SCREEN_GLOW_ANCHOR", ctrl_c, location=(0, front_surface - 1.0*MM, 0))
-glow_data = bpy.data.lights.new("SCREEN_GLOW_LIGHT", "AREA")
-glow_data.shape = "RECTANGLE"; glow_data.size = SCREEN_W; glow_data.size_y = SCREEN_H; glow_data.energy = 8.0
-glow = bpy.data.objects.new("SCREEN_GLOW_LIGHT", glow_data); ctrl_c.objects.link(glow)
-glow.location = (0, front_surface - 1.2*MM, 0); glow.rotation_euler.x = math.radians(-90.0)
-glow["screen_state"] = "screen_on"; glow["screen_on_energy"] = 8.0; glow["screen_off_energy"] = 0.0
+glow_anchor["screen_on_energy"] = 8.0
+glow_anchor["glow_type"] = "rect_area"
+glow_anchor["glow_width_m"] = SCREEN_W
+glow_anchor["glow_height_m"] = SCREEN_H
 screen_content["screen_state"] = "screen_on"; screen_content["screen_on_emission"] = 0.85; screen_content["screen_off_emission"] = 0.0
 
 def hard_surface_glass(obj):
@@ -358,7 +357,6 @@ housing_wn.keep_sharp = True
 housing_wn.weight = 50
 root = fc.empty("CTRL_IPHONE_17", ctrl_c)
 glow_anchor.parent = root
-glow.parent = root
 for collection in (body_c, detail_c, screen_c):
     for obj in collection.objects:
         obj.parent = root

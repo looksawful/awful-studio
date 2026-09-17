@@ -95,10 +95,9 @@ for loop in screen.data.loops:
  v=screen.data.vertices[loop.vertex_index].co; uv.data[loop.index].uv=((v.x/SCREEN_W)+.5,(v.z/SCREEN_H)+.5)
 screen['screen_state']='screen_on'; screen['screen_on_emission']=0.65; screen['screen_off_emission']=0.0
 screen_glass=fc.rounded_prism('SCREEN_GLASS',307.6*MM,204.6*MM,.36*MM,6.8*MM,glass,screen_c,axis='Y',edge_bevel=.00008); screen_glass.parent=hinge; screen_glass.location=(0,-.34*MM,LID_H*.5+2.6*MM)
-glow_data=bpy.data.lights.new('SCREEN_GLOW_LIGHT','AREA'); glow_data.shape='RECTANGLE'; glow_data.energy=8.0; glow_data.color=(0.82,0.90,1.0); glow_data.size=SCREEN_W; glow_data.size_y=SCREEN_H
-glow=bpy.data.objects.new('SCREEN_GLOW_LIGHT',glow_data); screen_c.objects.link(glow); glow.parent=hinge; glow.location=(0,-1.2*MM,LID_H*.5+2.0*MM); glow.rotation_euler.x=math.radians(-90)
-glow['screen_state']='screen_on'; glow['screen_on_energy']=8.0; glow['screen_off_energy']=0.0
-root['screen_states']='screen_off,screen_on'; root['screen_glow_light']='SCREEN_GLOW_LIGHT'
+glow_anchor=fc.empty('SCREEN_GLOW_ANCHOR',ctrl_c,location=(0,-1.2*MM,LID_H*.5+2.0*MM)); glow_anchor.parent=hinge
+glow_anchor['screen_on_energy']=8.0; glow_anchor['glow_type']='rect_area'; glow_anchor['glow_width_m']=SCREEN_W; glow_anchor['glow_height_m']=SCREEN_H
+root['screen_states']='screen_off,screen_on'; root['screen_glow_anchor']='SCREEN_GLOW_ANCHOR'; root['screen_glow_energy']=8.0
 notch=fc.rounded_prism('CAMERA_NOTCH',36*MM,10.5*MM,.20*MM,4.3*MM,bezelmat,detail_c,axis='Y'); notch.parent=hinge; notch.location=(0,-.55*MM,LID_H-5.8*MM)
 cam=fc.cylinder('FACETIME_CAMERA',1.35*MM,.20*MM,dark,detail_c,axis='Y',vertices=48); cam.parent=hinge; cam.location=(0,-.72*MM,LID_H-5.8*MM)
 
@@ -175,7 +174,7 @@ def non_manifold_edges(obj):
 base_dims=local_dims_mm(base); lid_dims=local_dims_mm(lid)
 base_expected={'x':312.6,'y':221.2,'z':8.3}; lid_expected={'x':312.0,'y':4.7,'z':212.0}
 base_delta={k:base_dims[k]-base_expected[k] for k in base_expected}; lid_delta={k:lid_dims[k]-lid_expected[k] for k in lid_expected}
-mandatory=['SCREEN_GLOW_LIGHT','BASE_UNIBODY','LID_UNIBODY','SCREEN_CONTENT','SCREEN_GLASS','CAMERA_NOTCH','FACETIME_CAMERA','TRACKPAD','TOUCH_ID','MAGSAFE','TB_LEFT_1','TB_LEFT_2','HEADPHONE','HDMI','SDXC','TB_RIGHT','APPLE_LOGO_RELEASE','FOOT_01','SPEAKER_L_00_00','SPEAKER_R_14_04']
+mandatory=['SCREEN_GLOW_ANCHOR','BASE_UNIBODY','LID_UNIBODY','SCREEN_CONTENT','SCREEN_GLASS','CAMERA_NOTCH','FACETIME_CAMERA','TRACKPAD','TOUCH_ID','MAGSAFE','TB_LEFT_1','TB_LEFT_2','HEADPHONE','HDMI','SDXC','TB_RIGHT','APPLE_LOGO_RELEASE','FOOT_01','SPEAKER_L_00_00','SPEAKER_R_14_04']
 missing=[name for name in mandatory if bpy.data.objects.get(name) is None]
 base_nm=non_manifold_edges(base); lid_nm=non_manifold_edges(lid)
 passed=(not missing and base_nm==0 and lid_nm==0 and all(abs(v)<=.01 for v in base_delta.values()) and all(abs(v)<=.01 for v in lid_delta.values()) and abs(hinge['open_angle_deg']-OPEN_ANGLE)<1e-6)
