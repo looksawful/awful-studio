@@ -1,0 +1,26 @@
+﻿{
+    "blender":  "D:\\Blender Foundation\\Blender 5.2\\blender.exe",
+    "passed":  true,
+    "assets":  [
+                   {
+                       "asset_id":  "iphone_17",
+                       "passed":  true,
+                       "evidence":  "assets/device_mockups/iphone_17/evidence/foundation_validation.json"
+                   },
+                   {
+                       "asset_id":  "ipad_pro_11_m5",
+                       "passed":  true,
+                       "evidence":  "assets/device_mockups/ipad_pro/evidence/ipad_pro_11_m5_validation.json"
+                   },
+                   {
+                       "asset_id":  "ipad_pro_13_m5",
+                       "passed":  true,
+                       "evidence":  "assets/device_mockups/ipad_pro/evidence/ipad_pro_13_m5_validation.json"
+                   },
+                   {
+                       "asset_id":  "macbook_pro_14_m5",
+                       "passed":  true,
+                       "evidence":  "assets/device_mockups/macbook_pro_14/evidence/foundation_validation.json"
+                   }
+               ]
+}

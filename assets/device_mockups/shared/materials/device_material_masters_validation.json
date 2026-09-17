@@ -1,0 +1,17 @@
+{
+  "blender_version": "5.2.1 LTS",
+  "canonical_materials": [
+    "ALUMINUM",
+    "DECAL",
+    "GAP",
+    "GLASS_BACK",
+    "GLASS_DISPLAY",
+    "OPTICAL_GLASS",
+    "POLYMER_BLACK",
+    "RUBBER",
+    "SCREEN"
+  ],
+  "contract_version": "0.1.0",
+  "material_count": 9,
+  "passed": true
+}
