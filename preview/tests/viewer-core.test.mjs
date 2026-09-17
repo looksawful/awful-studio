@@ -50,5 +50,6 @@ test('binary Apple decal uses crisp preview alpha policy', () => {
   assert.deepEqual(previewMaterialPolicy('MAT_APPLE_LOGO_DECAL'), {
     alphaTest: 0.5, transparent: false, depthWrite: true, frontSide: true,
   });
+  assert.deepEqual(previewMaterialPolicy('MAT_SCREEN_CONTENT'), { emissiveIntensity: 2 });
   assert.deepEqual(previewMaterialPolicy('MAT_ANODIZED_ALUMINUM'), {});
 });

@@ -77,16 +77,19 @@ class AwfulModelViewer extends HTMLElement {
     this._renderer.setSize(width, height, false);
     this._renderer.outputColorSpace = THREE.SRGBColorSpace;
     this._renderer.toneMapping = THREE.NeutralToneMapping;
-    this._renderer.toneMappingExposure = 1.0;
+    this._renderer.toneMappingExposure = 0.7;
     this._renderer.localClippingEnabled = true;
     stage.append(this._renderer.domElement);
 
     const pmrem = new THREE.PMREMGenerator(this._renderer);
     this._environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
     this._scene.environment = this._environment;
-    this._scene.environmentIntensity = 0.85;
+    this._scene.environmentIntensity = 1.0;
     pmrem.dispose();
 
+    this._viewLight = new THREE.DirectionalLight(0xffffff, 0.65);
+    this._scene.add(this._viewLight);
+    this._scene.add(this._viewLight.target);
 
     this._axes = new THREE.AxesHelper(1);
     this._axes.visible = false;
@@ -178,6 +181,7 @@ class AwfulModelViewer extends HTMLElement {
         if (policy.transparent != null) material.transparent = policy.transparent;
         if (policy.depthWrite != null) material.depthWrite = policy.depthWrite;
         if (policy.frontSide) material.side = THREE.FrontSide;
+        if (policy.emissiveIntensity != null) material.emissiveIntensity = policy.emissiveIntensity;
         for (const texture of [material.map, material.emissiveMap, material.normalMap, material.roughnessMap, material.metalnessMap]) {
           if (!texture) continue;
           texture.anisotropy = maxAnisotropy;
@@ -312,6 +316,11 @@ class AwfulModelViewer extends HTMLElement {
     const delta = this._clock.getDelta();
     this._mixer?.update(delta);
     this._controls?.update();
+    if (this._viewLight && this._camera && this._controls) {
+      this._viewLight.position.copy(this._camera.position);
+      this._viewLight.target.position.copy(this._controls.target);
+      this._viewLight.target.updateMatrixWorld();
+    }
     this._renderer?.render(this._scene, this._camera);
     this._raf = requestAnimationFrame(() => this.#animate());
   }

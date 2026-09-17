@@ -33,5 +33,6 @@ export function previewMaterialPolicy(name) {
   if (name === 'MAT_APPLE_LOGO_DECAL') {
     return { alphaTest: 0.5, transparent: false, depthWrite: true, frontSide: true };
   }
+  if (name === 'MAT_SCREEN_CONTENT') return { emissiveIntensity: 2 };
   return {};
 }

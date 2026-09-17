@@ -18,11 +18,13 @@ test('viewer uses Three GLTF runtime and orbit controls', () => {
   assert.match(source, /requestFullscreen/);
   assert.match(source, /availableLods/);
   assert.match(source, /NeutralToneMapping/);
+  assert.match(source, /toneMappingExposure = 0\.7/);
   assert.doesNotMatch(source, /HemisphereLight/);
-  assert.doesNotMatch(source, /DirectionalLight/);
+  assert.match(source, /new THREE\.DirectionalLight\(0xffffff, 0\.65\)/);
+  assert.match(source, /_viewLight\.position\.copy\(this\._camera\.position\)/);
   assert.match(source, /getMaxAnisotropy/);
   assert.match(source, /previewMaterialPolicy/);
-  assert.match(source, /environmentIntensity = 0\.85/);
+  assert.match(source, /environmentIntensity = 1\.0/);
   assert.match(source, /autoRotate = false/);
 });
 

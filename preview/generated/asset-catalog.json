@@ -16,8 +16,8 @@
         }
       ],
       "collision": null,
-      "sourceRevision": "ab189d168aa0fcf349a63cc89d7c37b6891390a3f7200a665bfc5b0a2128b2bc",
-      "sourceCommit": "a28b8e67c8a9f8a7f4517224ad76217df16e66fb",
+      "sourceRevision": "0c98aa035a770725dc98ad4c320161128d05cd041adaf54c66acbd45170c8969",
+      "sourceCommit": "1c4f80ecf803e3891a9fb04047783f58b046ccc8",
       "triangleCount": 33976,
       "materialCount": 16
     },
