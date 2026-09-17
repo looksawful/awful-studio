@@ -20,11 +20,18 @@ export function availableLods(asset) {
 
 export function cameraDirection(preset) {
   const directions = {
-    front: [0, -1, 0],
+    front: [0, 0, 1],
     side: [1, 0, 0],
-    top: [0, 0, 1],
+    top: [0, 1, 0],
   };
   const direction = directions[preset];
   if (!direction) throw new Error(`Unknown camera preset: ${preset}`);
   return direction;
+}
+
+export function previewMaterialPolicy(name) {
+  if (name === 'MAT_APPLE_LOGO_DECAL') {
+    return { alphaTest: 0.5, transparent: false, depthWrite: true, frontSide: true };
+  }
+  return {};
 }

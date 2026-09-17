@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
-import { availableLods, cameraDirection, resolveAssetUrl } from './viewer-core.mjs';
+import { availableLods, cameraDirection, previewMaterialPolicy, resolveAssetUrl } from './viewer-core.mjs';
 
 const tagName = 'awful-model-viewer';
 
@@ -45,7 +45,7 @@ class AwfulModelViewer extends HTMLElement {
           <label>projection <select data-control="projection"><option value="perspective">perspective</option><option value="orthographic">orthographic</option></select></label>
           <button data-camera="front">front</button><button data-camera="side">side</button><button data-camera="top">top</button>
           <button data-action="fit">fit</button>
-          <label><input data-control="autorotate" type="checkbox" checked> rotate</label>
+          <label><input data-control="autorotate" type="checkbox"> rotate</label>
           <label><input data-control="animation" type="checkbox"> animation</label>
           <label><input data-control="clip" type="checkbox"> clip</label>
           <input data-control="clip-position" type="range" min="-1" max="1" step="0.01" value="0">
@@ -76,22 +76,17 @@ class AwfulModelViewer extends HTMLElement {
     this._renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     this._renderer.setSize(width, height, false);
     this._renderer.outputColorSpace = THREE.SRGBColorSpace;
-    this._renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this._renderer.toneMapping = THREE.NeutralToneMapping;
+    this._renderer.toneMappingExposure = 1.0;
     this._renderer.localClippingEnabled = true;
     stage.append(this._renderer.domElement);
 
     const pmrem = new THREE.PMREMGenerator(this._renderer);
     this._environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
     this._scene.environment = this._environment;
+    this._scene.environmentIntensity = 0.85;
     pmrem.dispose();
 
-    this._scene.add(new THREE.HemisphereLight(0xffffff, 0x222233, 1.6));
-    const key = new THREE.DirectionalLight(0xffffff, 3.2);
-    key.position.set(4, -5, 7);
-    this._scene.add(key);
-    const rim = new THREE.DirectionalLight(0xaaccff, 1.2);
-    rim.position.set(-4, 3, 5);
-    this._scene.add(rim);
 
     this._axes = new THREE.AxesHelper(1);
     this._axes.visible = false;
@@ -100,7 +95,7 @@ class AwfulModelViewer extends HTMLElement {
 
     this._controls = new OrbitControls(this._camera, this._renderer.domElement);
     this._controls.enableDamping = true;
-    this._controls.autoRotate = true;
+    this._controls.autoRotate = false;
     this._controls.autoRotateSpeed = 1.2;
 
     this._resizeObserver = new ResizeObserver(() => this.#resize());
@@ -173,8 +168,22 @@ class AwfulModelViewer extends HTMLElement {
     this._model = gltf.scene;
     this._scene.add(this._model);
     this.dataset.modelLoaded = this._asset.id;
+    const maxAnisotropy = this._renderer.capabilities.getMaxAnisotropy();
     this._model.traverse((object) => {
       if (!object.isMesh) return;
+      const materials = Array.isArray(object.material) ? object.material : [object.material];
+      for (const material of materials) {
+        const policy = previewMaterialPolicy(material.name);
+        if (policy.alphaTest != null) material.alphaTest = policy.alphaTest;
+        if (policy.transparent != null) material.transparent = policy.transparent;
+        if (policy.depthWrite != null) material.depthWrite = policy.depthWrite;
+        if (policy.frontSide) material.side = THREE.FrontSide;
+        for (const texture of [material.map, material.emissiveMap, material.normalMap, material.roughnessMap, material.metalnessMap]) {
+          if (!texture) continue;
+          texture.anisotropy = maxAnisotropy;
+          texture.needsUpdate = true;
+        }
+      }
       object.userData.previewOriginalMaterial = object.material;
       object.castShadow = false;
       object.receiveShadow = false;
@@ -203,7 +212,7 @@ class AwfulModelViewer extends HTMLElement {
     if (!bounds) return;
     const { center, max } = bounds;
     const distance = max / (2 * Math.tan(THREE.MathUtils.degToRad(this._perspective.fov / 2))) * 1.45;
-    const direction = new THREE.Vector3(0, -1, 0);
+    const direction = new THREE.Vector3(...cameraDirection('front'));
     this._perspective.position.copy(center).add(direction.multiplyScalar(distance));
     this._perspective.near = Math.max(distance / 1000, 0.001);
     this._perspective.far = distance * 100;
@@ -215,7 +224,7 @@ class AwfulModelViewer extends HTMLElement {
     this._ortho.right = half * aspect;
     this._ortho.top = half;
     this._ortho.bottom = -half;
-    this._ortho.position.copy(center).add(new THREE.Vector3(0, -1, 0).multiplyScalar(max * 3));
+    this._ortho.position.copy(center).add(new THREE.Vector3(...cameraDirection('front')).multiplyScalar(max * 3));
     this._ortho.near = 0.001;
     this._ortho.far = max * 100;
     this._ortho.updateProjectionMatrix();

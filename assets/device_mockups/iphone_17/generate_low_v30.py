@@ -99,7 +99,6 @@ screen_tex.image.colorspace_settings.name = "sRGB"
 screen_bsdf = screen_mat.node_tree.nodes.get("Principled BSDF")
 screen_mat.node_tree.links.new(screen_tex.outputs["Color"], screen_bsdf.inputs["Base Color"])
 screen_mat.node_tree.links.new(screen_tex.outputs["Color"], screen_bsdf.inputs["Emission Color"])
-screen_mat.node_tree.links.new(screen_tex.outputs["Alpha"], screen_bsdf.inputs["Alpha"])
 screen_bsdf.inputs["Emission Strength"].default_value = 4.0
 optic_glass = fc.make_material("MAT_OPTICAL_GLASS", (0.0010, 0.0014, 0.0024), 0.0, 0.030)
 flash_mat = fc.make_material("MAT_FLASH", (0.86, 0.80, 0.62), 0.0, 0.14)
@@ -241,6 +240,7 @@ bsdf.inputs["Roughness"].default_value = 0.16
 bsdf.inputs["Coat Weight"].default_value = 0.12
 bsdf.inputs["Coat Roughness"].default_value = 0.045
 bsdf.inputs["Metallic"].default_value = 0.86
+logo_mat.use_backface_culling = True
 links.new(tex.outputs["Alpha"], bsdf.inputs["Alpha"])
 links.new(bsdf.outputs["BSDF"], out.inputs["Surface"])
 try:
@@ -250,7 +250,7 @@ except Exception:
 lw, lh = 15.75*MM, 19.34*MM
 verts = [(-lw/2,0,-lh/2),(lw/2,0,-lh/2),(lw/2,0,lh/2),(-lw/2,0,lh/2)]
 mesh = bpy.data.meshes.new("APPLE_LOGO_MESH")
-mesh.from_pydata(verts, [], [(0,1,2,3)])
+mesh.from_pydata(verts, [], [(0,3,2,1)])
 mesh.update()
 logo = bpy.data.objects.new("APPLE_LOGO_DECAL", mesh)
 detail_c.objects.link(logo)
