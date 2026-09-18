@@ -32,6 +32,44 @@ def counts():
              'worlds', 'actions', 'node_groups', 'images')}
 
 
+def lighting_state(legacy):
+    result = {}
+    for role in tuple(legacy.LIGHT_BANK_ROLES):
+        light = legacy.REG.object(role)
+        if light is None:
+            result[role] = None
+            continue
+        data = light.data
+        result[role] = {
+            'active': bool(light.get('awful_preset_active', False)),
+            'hide_render': bool(light.hide_render),
+            'hide_viewport': bool(light.hide_viewport),
+            'energy': round(float(getattr(data, 'energy', 0.0)), 6),
+            'color': tuple(round(float(v), 6) for v in getattr(data, 'color', ())),
+            'use_temperature': bool(getattr(data, 'use_temperature', False)),
+            'temperature': round(float(getattr(data, 'temperature', 0.0)), 3),
+        }
+    for role in tuple(legacy.SHAPER_ROLES):
+        shaper = legacy.REG.object(role)
+        if shaper is not None:
+            result[role] = {
+                'active': bool(shaper.get('awful_preset_active', False)),
+                'hide_render': bool(shaper.hide_render),
+                'hide_viewport': bool(shaper.hide_viewport),
+                'location': tuple(round(float(v), 6) for v in shaper.location),
+                'dimensions': tuple(round(float(v), 6) for v in shaper.dimensions),
+            }
+    for index in range(1, 8):
+        slat = legacy.REG.object(f'GOBO_SLAT_{index:02d}')
+        if slat is not None:
+            result[f'GOBO_SLAT_{index:02d}'] = {
+                'hide_render': bool(slat.hide_render),
+                'hide_viewport': bool(slat.hide_viewport),
+                'location': tuple(round(float(v), 6) for v in slat.location),
+            }
+    return result
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--work', type=Path, required=True)
@@ -117,6 +155,38 @@ def main():
 
         check('initial datablock inventory remained bounded', before == inventory_counts,
               {'before': before, 'inventory': inventory_counts})
+
+        workflow = importlib.import_module(MODULE + '.lighting_workflow')
+        workflow.apply_look(legacy, scene, 'ACCENT')
+        accent_first = lighting_state(legacy)
+        workflow.apply_look(legacy, scene, 'PRODUCT')
+        product_state = lighting_state(legacy)
+        workflow.apply_look(legacy, scene, 'ACCENT')
+        accent_second = lighting_state(legacy)
+        check(
+            'Accent -> Product -> Accent returns identical lighting state',
+            accent_first == accent_second,
+            {'first': accent_first, 'second': accent_second},
+        )
+        check(
+            'production look updates canonical preset',
+            scene.awful_studio.studio_light_preset == 'DUAL_COLOR_STRIP',
+            scene.awful_studio.studio_light_preset,
+        )
+        workflow.apply_look(legacy, scene, 'PRODUCT')
+        for role in ('LIGHT_Accent_L', 'LIGHT_Accent_R', 'LIGHT_Strip_L', 'LIGHT_Strip_R'):
+            state = lighting_state(legacy)[role]
+            if role.startswith('LIGHT_Accent'):
+                check(
+                    f'Product resets {role}',
+                    not state['active'] and state['hide_render'] and state['hide_viewport'],
+                    state,
+                )
+        check(
+            'production lighting shortcuts stay datablock-bounded',
+            counts() == inventory_counts,
+            {'expected': inventory_counts, 'actual': counts()},
+        )
         REPORT['status'] = 'passed'
     except Exception:
         REPORT['traceback'] = traceback.format_exc()

@@ -3,7 +3,7 @@
 import time
 import bpy
 from bpy.props import BoolProperty, StringProperty, IntProperty, PointerProperty, EnumProperty
-from . import ownership, migrations, asset_cache, asset_workflow, post_pipeline, photography, camera_policy, studio_geometry, natural_light, runtime_performance, playback_policy, product_placement, product_quality, device_asset_loader, external_asset_library, workflow_ui
+from . import ownership, migrations, asset_cache, asset_workflow, post_pipeline, photography, camera_policy, studio_geometry, natural_light, runtime_performance, playback_policy, product_placement, product_quality, device_asset_loader, external_asset_library, workflow_ui, lighting_workflow
 from .core import legacy
 
 # Policy installation mutates only in-memory preset metadata/callables. It must run
@@ -19,6 +19,7 @@ playback_policy.install(legacy)
 product_placement.install(legacy)
 product_quality.install(legacy)
 workflow_ui.install(legacy)
+lighting_workflow.install(legacy)
 
 VERSION = (1, 0, 0)
 _registered = []
