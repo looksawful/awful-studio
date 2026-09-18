@@ -43,6 +43,12 @@ def mark(block, role='', scene=None):
     return block
 
 
+def real_users(block):
+    """Count real datablock users, excluding Blender's synthetic fake user."""
+    fake = 1 if getattr(block, 'use_fake_user', False) else 0
+    return max(0, int(getattr(block, 'users', 0)) - fake)
+
+
 def detach(block):
     """Transfer a retained managed datablock back to user ownership."""
     for key in (MANAGED, KEY, ROLE, VERSION_KEY):
@@ -99,7 +105,7 @@ def detach_retained(scene):
     """User-referenced generated data survives cleanup without stale AWFUL ownership."""
     for name in GROUPS[2:]:
         for block in list(getattr(bpy.data, name)):
-            if owned(block, scene) and block.users > 0:
+            if owned(block, scene) and real_users(block) > 0:
                 detach(block)
 
 
@@ -136,7 +142,9 @@ def remove(scene):
         for name in GROUPS[2:]:
             group = getattr(bpy.data, name)
             for block in list(group):
-                if owned(block, scene) and block.users == 0:
+                if owned(block, scene) and real_users(block) == 0:
+                    if getattr(block, 'use_fake_user', False):
+                        block.use_fake_user = False
                     group.remove(block)
                     count += 1
         if not count:

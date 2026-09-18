@@ -45,6 +45,14 @@ class OwnershipSafetySourceTests(unittest.TestCase):
         source = OWNERSHIP.read_text(encoding='utf-8')
         self.assertIn('detach_retained', source)
 
+    def test_fake_user_is_not_treated_as_real_external_ownership(self):
+        source = OWNERSHIP.read_text(encoding='utf-8')
+        self.assertIn('def real_users(block):', source)
+        self.assertIn("getattr(block, 'use_fake_user', False)", source)
+        self.assertIn('real_users(block) > 0', source)
+        self.assertIn('real_users(block) == 0', source)
+        self.assertIn('block.use_fake_user = False', source)
+
 
 if __name__ == '__main__':
     unittest.main()
