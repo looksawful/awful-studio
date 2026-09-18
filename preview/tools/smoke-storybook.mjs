@@ -44,7 +44,7 @@ const launchOptions = { headless: true };
 if (systemChrome && existsSync(systemChrome)) launchOptions.executablePath = systemChrome;
 const browser = await chromium.launch(launchOptions);
 
-async function checkStory(id, assetId) {
+async function checkStory(id, assetId, expectedClips = []) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   const errors = [];
   const failedResponses = [];
@@ -55,7 +55,8 @@ async function checkStory(id, assetId) {
   page.on('response', (response) => {
     if (response.status() >= 400) failedResponses.push(`${response.status()} ${response.url()}`);
   });
-  const url = `http://127.0.0.1:${port}/iframe.html?id=${id}&viewMode=story`;
+  const args = id === 'models-devices--viewer' ? `&args=assetId:${assetId}` : '';
+  const url = `http://127.0.0.1:${port}/iframe.html?id=${id}&viewMode=story${args}`;
   await page.goto(url, { waitUntil: 'networkidle' });
   const viewer = page.locator(`awful-model-viewer[data-model-loaded="${assetId}"]`);
   await viewer.waitFor({ state: 'attached', timeout: 20000 });
@@ -64,6 +65,25 @@ async function checkStory(id, assetId) {
   const size = await canvas.evaluate((element) => [element.width, element.height]);
   if (size[0] <= 0 || size[1] <= 0) {
     throw new Error(`${assetId}: canvas has invalid size ${size}`);
+  }
+  if (id === 'models-devices--viewer') {
+    const screen = page.locator('awful-model-viewer select[data-control="screen-state"]');
+    if (await screen.isEnabled()) {
+      const options = await screen.locator('option').evaluateAll((items) => items.map((item) => item.value));
+      if (!options.includes('screen_off') || !options.includes('screen_on')) {
+        throw new Error(`${assetId}: screen state controls missing`);
+      }
+      await screen.selectOption('screen_off');
+      await screen.selectOption('screen_on');
+    }
+    if (expectedClips.length) {
+      const clips = page.locator('awful-model-viewer select[data-control="animation-clip"]');
+      const options = await clips.locator('option').evaluateAll((items) => items.map((item) => item.value));
+      for (const clip of expectedClips) if (!options.includes(clip)) throw new Error(`${assetId}: missing animation ${clip}`);
+      await clips.selectOption(expectedClips[0]);
+      await page.locator('awful-model-viewer input[data-control="animation"]').check();
+      await page.waitForTimeout(150);
+    }
   }
   const relevant404 = failedResponses.filter((entry) => !entry.includes('/favicon'));
   if (errors.length || relevant404.length) {
@@ -74,8 +94,11 @@ async function checkStory(id, assetId) {
 
 try {
   await checkStory('models-devices--viewer', 'iphone-17-v30');
+  await checkStory('models-devices--viewer', 'ipad-pro-11-m5-v6');
+  await checkStory('models-devices--viewer', 'ipad-pro-13-m5-v6');
+  await checkStory('models-devices--viewer', 'macbook-pro-14-m5-v1', ['lid_open', 'lid_close']);
   await checkStory('models-studio-equipment--viewer', 'studio-support-cstand-01');
-  console.log('Storybook model smoke passed: iPhone 17 v30 + Studio C-Stand');
+  console.log('Storybook model smoke passed: all devices + Studio C-Stand');
 } finally {
   await browser.close();
   await new Promise((resolve) => server.close(resolve));

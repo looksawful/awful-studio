@@ -46,6 +46,9 @@ function deviceEntry(manifestPath) {
     sourceCommit: data.source_commit ?? null,
     triangleCount: data.glb_qa?.triangle_count ?? null,
     materialCount: data.glb_qa?.material_count ?? null,
+    animations: data.animations ?? [],
+    screenStates: data.screen_states ?? null,
+    screenGlow: data.screen_glow ?? null,
   };
 }
 const studioLabels = {

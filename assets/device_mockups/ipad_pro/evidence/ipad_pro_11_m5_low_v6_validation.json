@@ -19,7 +19,7 @@
   },
   "body_non_manifold_edges": 0,
   "mandatory_missing": [],
-  "object_count": 62,
+  "object_count": 63,
   "material_count": 13,
   "passed": true,
   "boolean_cut_count": 28,

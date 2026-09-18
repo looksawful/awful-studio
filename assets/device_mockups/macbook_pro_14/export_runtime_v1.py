@@ -99,6 +99,8 @@ bpy.ops.export_scene.gltf(
     export_format='GLB',
     use_selection=True,
     export_extras=True,
+    export_animations=True,
+    export_animation_mode='ACTIONS',
 )
 bpy.ops.file.pack_all()
 delivery = os.path.join(RUNTIME, prefix + '_delivery.blend')
@@ -130,8 +132,14 @@ manifest = {
     'up_axis': '+Y', 'forward_axis': '+Z',
     'root': 'CTRL_MACBOOK_PRO_14',
     'hinge_control': 'CTRL_HINGE',
+    'animations': ['lid_open', 'lid_close'],
+    'screen_states': {
+        'screen_off': {'emission_strength': 0.0, 'glow_energy': 0.0},
+        'screen_on': {'emission_strength': 0.65, 'glow_energy': 8.0},
+    },
+    'screen_glow': {'anchor': 'SCREEN_GLOW_ANCHOR', 'type': 'rect_area', 'width_mm': 301.66, 'height_mm': 195.92, 'source_energy_w': 8.0},
     'screen_object': 'SCREEN_CONTENT',
-    'anchors': ['ANCHOR_CENTER', 'ANCHOR_BOTTOM_CENTER', 'ANCHOR_SCREEN_CENTER'],
+    'anchors': ['ANCHOR_CENTER', 'ANCHOR_BOTTOM_CENTER', 'ANCHOR_SCREEN_CENTER', 'SCREEN_GLOW_ANCHOR'],
     'lods': [{'name': 'LOD0', 'file': 'macbook_pro_14_m5_v1_web.glb'}],
     'materials': materials,
     'exported_objects': exported,

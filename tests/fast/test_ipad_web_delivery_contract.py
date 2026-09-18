@@ -27,12 +27,16 @@ def load_loader():
     return module
 
 
-def glb_node_names(path: Path) -> set[str]:
+def glb_doc(path: Path) -> dict:
     raw = path.read_bytes()
     json_len, json_type = struct.unpack_from('<II', raw, 12)
     if json_type != 0x4E4F534A:
         raise AssertionError(f'invalid GLB JSON chunk: {path}')
-    doc = json.loads(raw[20:20 + json_len].decode('utf-8').rstrip(' \t\r\n\0'))
+    return json.loads(raw[20:20 + json_len].decode('utf-8').rstrip(' \t\r\n\0'))
+
+
+def glb_node_names(path: Path) -> set[str]:
+    doc = glb_doc(path)
     return {node.get('name') for node in doc.get('nodes', []) if node.get('name')}
 
 
@@ -50,6 +54,16 @@ class IPadWebDeliveryContractTests(unittest.TestCase):
             lod = loader.device_asset_spec(key)['lods']['LOW']
             self.assertEqual(manifest['plugin_source_revision'], lod['source_revision'])
             self.assertEqual(manifest['root'], root_name)
+            self.assertEqual(set(manifest['screen_states']), {'screen_off', 'screen_on'})
+            self.assertEqual(manifest['screen_states']['screen_off']['emission_strength'], 0.0)
+            self.assertGreater(manifest['screen_states']['screen_on']['emission_strength'], 0.0)
+            self.assertEqual(manifest['screen_glow']['anchor'], 'SCREEN_GLOW_ANCHOR')
+            self.assertEqual(manifest['screen_glow']['type'], 'rect_area')
+            self.assertLessEqual(manifest['screen_states']['screen_on']['emission_strength'], 1.0)
+            self.assertIn(
+                'developer.apple.com/download/files/accessories/dimensional-drawings/',
+                manifest['dimensional_drawing_url'],
+            )
 
     def test_v6_glbs_preserve_web_critical_nodes(self):
         for size, (asset_id, _key, root_name) in CASES.items():
@@ -60,12 +74,16 @@ class IPadWebDeliveryContractTests(unittest.TestCase):
                 root_name, 'SCREEN_CONTENT', 'SCREEN_GLASS', 'FRONT_CAMERA_GLASS',
                 'APPLE_LOGO_DECAL', 'CAMERA_HOUSING', 'REAR_CAMERA_GLASS', 'LIDAR',
                 'ANCHOR_CENTER', 'ANCHOR_BOTTOM_CENTER', 'ANCHOR_SCREEN_CENTER',
-                'ANCHOR_REAR_CAMERA',
+                'ANCHOR_REAR_CAMERA', 'SCREEN_GLOW_ANCHOR',
             }
             self.assertTrue(required <= glb_node_names(compat))
             self.assertTrue(required <= glb_node_names(meshopt))
             self.assertEqual(manifest['default_web_variant'], 'compat')
             self.assertEqual(manifest['preferred_web_variant'], 'meshopt')
+            doc = glb_doc(compat)
+            screen_material = next(m for m in doc['materials'] if m.get('name') == 'MAT_SCREEN_CONTENT')
+            self.assertIn('baseColorTexture', screen_material['pbrMetallicRoughness'])
+            self.assertIn('emissiveTexture', screen_material)
 
 
 if __name__ == '__main__':

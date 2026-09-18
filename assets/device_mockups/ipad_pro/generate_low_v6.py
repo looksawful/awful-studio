@@ -1,4 +1,4 @@
-import json, os, sys, bmesh, bpy
+import json, math, os, sys, bmesh, bpy
 HERE=os.path.dirname(os.path.abspath(__file__))
 COMMON=os.path.normpath(os.path.join(HERE,'..','common'))
 if COMMON not in sys.path: sys.path.insert(0,COMMON)
@@ -28,19 +28,31 @@ metal_dark=fc.make_material('MAT_IPAD_EDGE',(0.010,0.012,0.017),1.0,0.22)
 black=fc.make_material('MAT_OPTICS_BLACK',(0.0005,0.0007,0.0010),0.0,0.08)
 gap=fc.make_material('MAT_ASSEMBLY_GAP',(0.0003,0.0004,0.0006),0.0,0.34)
 bezel=fc.make_material('MAT_DISPLAY_BEZEL',(0.0005,0.0007,0.0010),0.0,0.12)
-glass=fc.make_material('MAT_DISPLAY_GLASS',(0.0012,0.0016,0.0023),0.0,0.045)
-gbsdf=glass.node_tree.nodes.get('Principled BSDF'); gbsdf.inputs['IOR'].default_value=1.46; gbsdf.inputs['Coat Weight'].default_value=.22; gbsdf.inputs['Coat Roughness'].default_value=.024
+glass=fc.make_material('MAT_DISPLAY_GLASS',(0.008,0.010,0.014),0.0,0.12)
+gbsdf=glass.node_tree.nodes.get('Principled BSDF'); gbsdf.inputs['Coat Weight'].default_value=.14; gbsdf.inputs['Coat Roughness'].default_value=.10; gbsdf.inputs['Alpha'].default_value=.10
+try: glass.surface_render_method='DITHERED'
+except Exception: pass
 optic=fc.make_material('MAT_OPTICAL_GLASS',(0.0008,0.0012,0.0020),0.0,0.025)
 obsdf=optic.node_tree.nodes.get('Principled BSDF'); obsdf.inputs['Coat Weight'].default_value=.55; obsdf.inputs['Coat Roughness'].default_value=.010
 front_optic=fc.make_material('MAT_FRONT_OPTIC',(0.0040,0.0060,0.0100),0.0,0.028)
 fobsdf=front_optic.node_tree.nodes.get('Principled BSDF'); fobsdf.inputs['Coat Weight'].default_value=.62; fobsdf.inputs['Coat Roughness'].default_value=.012
-screen_mat=fc.make_material('MAT_SCREEN_CONTENT',(0.0018,0.0026,0.0040),0.0,0.075)
+screen_mat=fc.make_material('MAT_SCREEN_CONTENT',(0.0018,0.0026,0.0040),0.0,0.18)
+screen_path=os.path.join(HERE,'reference',f'ipados26_official_screen_{SIZE}.png')
+screen_tex=screen_mat.node_tree.nodes.new('ShaderNodeTexImage'); screen_tex.image=bpy.data.images.load(screen_path,check_existing=True); screen_tex.image.colorspace_settings.name='sRGB'; screen_tex.image.pack()
+screen_bsdf=screen_mat.node_tree.nodes.get('Principled BSDF'); screen_mat.node_tree.links.new(screen_tex.outputs['Color'],screen_bsdf.inputs['Base Color']); screen_mat.node_tree.links.new(screen_tex.outputs['Color'],screen_bsdf.inputs['Emission Color']); screen_bsdf.inputs['Emission Strength'].default_value=.85
 flash=fc.make_material('MAT_FLASH',(0.90,0.84,0.68),0.0,0.16)
 body=fc.rounded_prism('BODY_ALUMINUM',W,H,CORE_D,s['br']*MM,metal,body_c,axis='Y',location=(0,CORE_Y,0),outline_segments=48)
 fc.rounded_prism('DISPLAY_GLASS_SEAT',W-.30*MM,H-.30*MM,.05*MM,(s['br']-.15)*MM,gap,screen_c,axis='Y',location=(0,FRONT_Y+.025*MM,0),outline_segments=48)
 fc.rounded_prism('DISPLAY_BEZEL',SW+1.3*MM,SH+1.3*MM,.08*MM,(s['sr']+.50)*MM,bezel,screen_c,axis='Y',location=(0,FRONT_Y-.04*MM,0),outline_segments=48)
-fc.rounded_prism('SCREEN_CONTENT',SW,SH,.06*MM,s['sr']*MM,screen_mat,screen_c,axis='Y',location=(0,FRONT_Y-.09*MM,0),outline_segments=48)
+screen_content=fc.rounded_prism('SCREEN_CONTENT',SW,SH,.06*MM,s['sr']*MM,screen_mat,screen_c,axis='Y',location=(0,FRONT_Y-.09*MM,0),outline_segments=48)
+uv=screen_content.data.uv_layers.new(name='UVMap')
+for loop in screen_content.data.loops:
+    co=screen_content.data.vertices[loop.vertex_index].co
+    uv.data[loop.index].uv=((co.x/SW)+0.5,(co.z/SH)+0.5)
 screen_glass=fc.rounded_prism('SCREEN_GLASS',W-.45*MM,H-.45*MM,GLASS_T,(s['br']-.2)*MM,glass,screen_c,axis='Y',location=(0,FRONT_Y,0),edge_bevel=.00007,outline_segments=48)
+glow_anchor=fc.empty('SCREEN_GLOW_ANCHOR',ctrl_c,location=(0,FRONT_SURFACE-1.0*MM,0))
+glow_anchor['screen_on_energy']=8.0; glow_anchor['glow_type']='rect_area'; glow_anchor['glow_width_m']=SW; glow_anchor['glow_height_m']=SH
+screen_content['screen_state']='screen_on'
 # Landscape-edge front camera: right long edge in portrait coordinates.
 fc.cylinder('FRONT_CAMERA_GLASS',1.05*MM,.022*MM,front_optic,detail_c,(W*.5-4.5*MM,FRONT_SURFACE+.012*MM,0),axis='Y',vertices=96)
 fc.cylinder('FRONT_CAMERA_INNER',.55*MM,.016*MM,black,detail_c,(W*.5-4.5*MM,FRONT_SURFACE+.006*MM,0),axis='Y',vertices=64)
@@ -60,7 +72,7 @@ logo_path=os.path.join(HERE,'reference','apple_logo_alpha.png')
 logo_mat=bpy.data.materials.new('MAT_APPLE_LOGO_DECAL'); logo_mat.use_nodes=True
 nodes=logo_mat.node_tree.nodes; links=logo_mat.node_tree.links
 for node in list(nodes): nodes.remove(node)
-outn=nodes.new('ShaderNodeOutputMaterial'); lbsdf=nodes.new('ShaderNodeBsdfPrincipled'); tex=nodes.new('ShaderNodeTexImage'); tex.image=bpy.data.images.load(logo_path,check_existing=True)
+outn=nodes.new('ShaderNodeOutputMaterial'); lbsdf=nodes.new('ShaderNodeBsdfPrincipled'); tex=nodes.new('ShaderNodeTexImage'); tex.image=bpy.data.images.load(logo_path,check_existing=True); tex.image.pack()
 lbsdf.inputs['Base Color'].default_value=(.006,.007,.009,1); lbsdf.inputs['Metallic'].default_value=.58; lbsdf.inputs['Roughness'].default_value=.20
 links.new(tex.outputs['Alpha'],lbsdf.inputs['Alpha']); links.new(lbsdf.outputs['BSDF'],outn.inputs['Surface'])
 try: logo_mat.surface_render_method='DITHERED'
@@ -90,16 +102,24 @@ def edge_button(name,edge_name,coord,dims,cut_dims,normal):
 edge_button('TOP_BUTTON','TOP',-W*.5+24*MM,(14*MM,.72*MM,.12*MM),(14.8*MM,1.3*MM,1.0*MM),(0,0,1))
 edge_button('VOL_UP','RIGHT',H*.5-28*MM,(.12*MM,.72*MM,10*MM),(1.0*MM,1.3*MM,10.8*MM),(1,0,0))
 edge_button('VOL_DOWN','RIGHT',H*.5-44*MM,(.12*MM,.72*MM,10*MM),(1.0*MM,1.3*MM,10.8*MM),(1,0,0))
-fc.add_bevel(body,.00028,segments=6)
+bev=fc.add_bevel(body,.00018,segments=4)
+for edge in body.data.edges: edge.use_edge_sharp=True
+bev.harden_normals=True
+for poly in body.data.polygons: poly.use_smooth=True
+body_wn=body.modifiers.new('WEIGHTED_NORMAL','WEIGHTED_NORMAL'); body_wn.keep_sharp=True; body_wn.weight=50
 for idx,x_mm in enumerate((-5.27,0,5.27),1):
     fc.cylinder(f'SMART_CONNECTOR_{idx}',1.35*MM,.22*MM,metal_dark,detail_c,(x_mm*MM,D*.5+.08*MM,-H*.5+12*MM),axis='Y',vertices=32)
 rail=fc.rounded_cube('PENCIL_MAGNETIC_RAIL',(.04*MM,.72*MM,82*MM),.04*MM,metal_dark,detail_c)
 fc.place_on_rounded_edge(rail,W,H,s['br']*MM,'RIGHT',6*MM,outward=-.012*MM,local_normal=(1,0,0))
 root=fc.empty(f'CTRL_IPAD_PRO_{SIZE}',ctrl_c)
+glow_anchor.parent=root
 for c in (body_c,detail_c,screen_c):
     for o in c.objects: o.parent=root
 root['asset_id']=f'ipad_pro_{SIZE}_m5'; root['asset_version']='low_v6_0.3'; root['stage']='LOW_DRAFT'; root['size_variant']=SIZE
 root['dimensions_mm']=f"{s['w']} x {s['h']} x {s['d']}"; root['screen_object']='SCREEN_CONTENT'; root['runtime_contract']='awful-device-v1'
+root['screen_texture']=f'reference/ipados26_official_screen_{SIZE}.png'; root['screen_texture_source']='Apple Support iPad User Guide, iPadOS 26 official lock screen artwork'; root['screen_texture_source_url']='https://help.apple.com/assets/698A8EFC4AF0A5C4CF042598/698A8F004AF0A5C4CF04259E/en_US/3fc0f24ff5065da6a985df207b96d8f2.png'
+root['screen_state_default']='screen_on'; root['screen_on_emission_strength']=.85; root['screen_off_emission_strength']=0.0; root['screen_glow_energy']=8.0; root['screen_glow_type']='rect_area'
+root['dimensional_drawing_url']=f'https://developer.apple.com/download/files/accessories/dimensional-drawings/ipad-pro-{SIZE}-inch-m5.pdf'
 scene=bpy.context.scene; scene.render.resolution_x=1600; scene.render.resolution_y=1600; scene.render.resolution_percentage=100; scene.view_settings.exposure=-1.05
 scene.world.use_nodes=True; bg=scene.world.node_tree.nodes.get('Background'); bg.inputs['Color'].default_value=(.001,.001,.001,1); bg.inputs['Strength'].default_value=.025
 studio=fc.make_collection('_STUDIO_RIG')

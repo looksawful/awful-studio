@@ -24,12 +24,16 @@ def load_loader():
     return module
 
 
-def glb_node_names(path: Path) -> set[str]:
+def glb_doc(path: Path) -> dict:
     raw = path.read_bytes()
     json_len, json_type = struct.unpack_from('<II', raw, 12)
     if json_type != 0x4E4F534A:
         raise AssertionError(f'invalid GLB JSON chunk: {path}')
-    doc = json.loads(raw[20:20 + json_len].decode('utf-8').rstrip(' \t\r\n\0'))
+    return json.loads(raw[20:20 + json_len].decode('utf-8').rstrip(' \t\r\n\0'))
+
+
+def glb_node_names(path: Path) -> set[str]:
+    doc = glb_doc(path)
     return {node.get('name') for node in doc.get('nodes', []) if node.get('name')}
 
 
@@ -46,6 +50,16 @@ class MacBookWebDeliveryContractTests(unittest.TestCase):
         self.assertEqual(manifest['plugin_source_revision'], lod['source_revision'])
         self.assertEqual(manifest['root'], 'CTRL_MACBOOK_PRO_14')
         self.assertEqual(manifest['hinge_control'], 'CTRL_HINGE')
+        source_paths = set(manifest['source_files'])
+        self.assertIn('assets/device_mockups/macbook_pro_14/reference/macos26_official_screen.png', source_paths)
+        self.assertEqual(set(manifest['screen_states']), {'screen_off', 'screen_on'})
+        self.assertGreater(manifest['screen_states']['screen_on']['emission_strength'], 0.0)
+        self.assertLessEqual(manifest['screen_states']['screen_on']['emission_strength'], 1.0)
+        self.assertEqual(manifest['screen_states']['screen_off']['emission_strength'], 0.0)
+        self.assertEqual(manifest['screen_glow']['anchor'], 'SCREEN_GLOW_ANCHOR')
+        self.assertEqual(manifest['screen_glow']['type'], 'rect_area')
+        self.assertGreater(manifest['screen_glow']['source_energy_w'], 0.0)
+        self.assertLessEqual(manifest['screen_glow']['source_energy_w'], 10.0)
 
     def test_v1_glbs_preserve_hinge_and_web_critical_nodes(self):
         manifest = contract.load_manifest(MANIFEST)
@@ -56,11 +70,18 @@ class MacBookWebDeliveryContractTests(unittest.TestCase):
             'SCREEN_CONTENT', 'SCREEN_GLASS', 'FACETIME_CAMERA', 'TRACKPAD',
             'TOUCH_ID', 'MAGSAFE', 'HDMI', 'SDXC', 'APPLE_LOGO_RELEASE',
             'ANCHOR_CENTER', 'ANCHOR_BOTTOM_CENTER', 'ANCHOR_SCREEN_CENTER',
+            'SCREEN_GLOW_ANCHOR',
         }
         self.assertTrue(required <= glb_node_names(compat))
         self.assertTrue(required <= glb_node_names(meshopt))
         self.assertEqual(manifest['default_web_variant'], 'compat')
         self.assertEqual(manifest['preferred_web_variant'], 'meshopt')
+        doc = glb_doc(compat)
+        screen_material = next(m for m in doc['materials'] if m.get('name') == 'MAT_SCREEN_CONTENT')
+        self.assertIn('baseColorTexture', screen_material['pbrMetallicRoughness'])
+        self.assertIn('emissiveTexture', screen_material)
+        animation_names = {a.get('name') for a in doc.get('animations', [])}
+        self.assertTrue({'lid_open', 'lid_close'} <= animation_names)
 
 
 if __name__ == '__main__':

@@ -72,6 +72,7 @@ def anchor(name, location):
 anchor("ANCHOR_CENTER", (0.0, 0.0, 0.0))
 anchor("ANCHOR_BOTTOM_CENTER", (0.0, 0.0, -0.0748))
 anchor("ANCHOR_SCREEN_CENTER", (0.0, -0.003975, 0.0))
+anchor("SCREEN_GLOW_ANCHOR", (0.0, -0.004975, 0.0))
 camera_housing = bpy.data.objects.get("CAMERA_HOUSING")
 anchor("ANCHOR_REAR_CAMERA", (camera_housing.location.x, 0.003975, camera_housing.location.z))
 root["runtime_format"] = "glTF 2.0 / GLB"
@@ -134,7 +135,12 @@ manifest = {
     "forward_axis": "+Z",
     "root": "CTRL_IPHONE_17",
     "screen_object": "SCREEN_CONTENT",
-    "anchors": ["ANCHOR_CENTER", "ANCHOR_BOTTOM_CENTER", "ANCHOR_SCREEN_CENTER", "ANCHOR_REAR_CAMERA"],
+    "anchors": ["ANCHOR_CENTER", "ANCHOR_BOTTOM_CENTER", "ANCHOR_SCREEN_CENTER", "ANCHOR_REAR_CAMERA", "SCREEN_GLOW_ANCHOR"],
+    "screen_states": {
+        "screen_off": {"emission_strength": 0.0, "glow_intensity": 0.0},
+        "screen_on": {"emission_strength": 0.85, "glow_intensity": 1.0},
+    },
+    "screen_glow": {"anchor": "SCREEN_GLOW_ANCHOR", "type": "rect_area", "width_mm": 66.57, "height_mm": 144.79, "source_energy_w": 8.0},
     "lods": [{"name": "LOD0", "file": "iphone_17_v30_web.glb"}],
     "materials": materials,
     "exported_objects": exported,

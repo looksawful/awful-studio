@@ -31,8 +31,27 @@
     "ANCHOR_CENTER",
     "ANCHOR_BOTTOM_CENTER",
     "ANCHOR_SCREEN_CENTER",
-    "ANCHOR_REAR_CAMERA"
+    "ANCHOR_REAR_CAMERA",
+    "SCREEN_GLOW_ANCHOR"
   ],
+  "dimensional_drawing_url": "https://developer.apple.com/download/files/accessories/dimensional-drawings/ipad-pro-13-inch-m5.pdf",
+  "screen_states": {
+    "screen_off": {
+      "emission_strength": 0.0,
+      "glow_intensity": 0.0
+    },
+    "screen_on": {
+      "emission_strength": 0.85,
+      "glow_intensity": 1.0
+    }
+  },
+  "screen_glow": {
+    "anchor": "SCREEN_GLOW_ANCHOR",
+    "type": "rect_area",
+    "width_mm": 199.14,
+    "height_mm": 265.19,
+    "source_energy_w": 8.0
+  },
   "lods": [
     {
       "name": "LOD0",
@@ -89,6 +108,7 @@
     "REAR_MIC",
     "SCREEN_CONTENT",
     "SCREEN_GLASS",
+    "SCREEN_GLOW_ANCHOR",
     "SMART_CONNECTOR_1",
     "SMART_CONNECTOR_2",
     "SMART_CONNECTOR_3",
@@ -142,9 +162,9 @@
     }
   },
   "camera_fit": "runtime_bounds",
-  "source_revision": "a3119c3c538fe4eb8985a8c0de4edac54e5e2cd7687244bcb89149fabd1e1e4d",
-  "source_commit": "05ce2a03027df1ba4d2a8679cda9d291f8c4d17a",
-  "plugin_source_revision": "a9ef8324a767fe72bfb5df34f85f5d5906a0822b08809374f9a901083ad9f462",
+  "source_revision": "fab88ffb8004423c55851571de446dde3369bef97e8f7908373dcf7b994779dc",
+  "source_commit": "2c659b2754654827c23d62dfc269d2719754a223",
+  "plugin_source_revision": "fab88ffb8004423c55851571de446dde3369bef97e8f7908373dcf7b994779dc",
   "generator_version": "ipad_v6_packaged_blend_web_delivery",
   "delivery_profile": {
     "simplification": "none",
@@ -159,10 +179,12 @@
     "command": "meshopt --level high"
   },
   "source_files": {
-    "assets/device_mockups/ipad_pro/export_runtime_v6.py": "061d6198795b7a2d120bdcc276946c0b9c6bfa4f5ee5959147e1d875d4509a09",
-    "assets/device_mockups/ipad_pro/optimize_runtime_v6.py": "153535fe4835764088ad4a540e5f8b119915022594eda52ff4ac17790a44cdc7",
+    "assets/device_mockups/common/foundation_common.py": "1d68c3fff908b7ae149f74c31a19064eb6d2384234d33bd71071fea70d651d12",
+    "assets/device_mockups/ipad_pro/export_runtime_v6.py": "80a2e8197b87cbf9207713ecbbdc61d86809d356797621ba82da4e2767f01c06",
+    "assets/device_mockups/ipad_pro/generate_low_v6.py": "d47bc00c9a07898871edb43e27c2b25c2203221f393c3ef80a3154015489f5ee",
+    "assets/device_mockups/ipad_pro/optimize_runtime_v6.py": "a2c1755323c6e301d341dfa91c7377228dbbf00d76cbc5a4f1473d81754b2058",
     "assets/device_mockups/ipad_pro/reference/apple_logo_alpha.png": "50209309a1cf3bcb874118b27fe9c9779aaafabaf79bb304cf0aa3a2898c9833",
-    "extension/awful_studio/assets/devices/ipad_pro_13_m5_low_v6.blend": "5b096b4ca0dfa3d177358bfb73ce0823df3a2c962f527960f7a963e6683de63f"
+    "assets/device_mockups/ipad_pro/reference/ipados26_official_screen_13.png": "8a260fe6c432132c2987179228d80a1022def52ce3d7dad74a6588abd36f122b"
   },
   "glb_qa": {
     "triangle_count": 20704,
@@ -178,9 +200,10 @@
       "LIDAR",
       "REAR_CAMERA_GLASS",
       "SCREEN_CONTENT",
-      "SCREEN_GLASS"
+      "SCREEN_GLASS",
+      "SCREEN_GLOW_ANCHOR"
     ],
-    "node_count": 55,
+    "node_count": 56,
     "material_count": 11,
     "runtime_bounds_mm": [
       215.578,
@@ -191,15 +214,15 @@
   "artifacts": {
     "delivery_blend": {
       "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_delivery.blend",
-      "sha256": "6e98ddba90c04cde0d9d5e1c827cd7c1c4115d4b70182308f030d13aac0aa750"
+      "sha256": "f14b996d6f72bda584065bf48c27454a30c376fcabb130407aead4ada004fdd8"
     },
     "compat_glb": {
       "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_web.glb",
-      "sha256": "00b69c731d02a5f3781ddb63235e3e8b28ede2b8e11b0b5f3e73f2b9320f08a4"
+      "sha256": "493018d1c634d57a2ade0d1398fecf29eb2ed1e380e76601b40dd4795ec7e0a0"
     },
     "meshopt_glb": {
       "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_web_meshopt.glb",
-      "sha256": "3cf19846f3fa4c5f7e2f562b300f7ecb7e9d072c305d66177e688e5e425321c7"
+      "sha256": "69c832370becaba4cab488f14fd1ccef341d7cf45621c6538937218841f9ed30"
     }
   }
 }

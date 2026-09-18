@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import re
 from pathlib import Path
 import struct
 import subprocess
@@ -32,6 +33,17 @@ def load_loader():
     return module
 
 
+
+def update_loader_revision(path: Path, key: str, revision: str) -> None:
+    text = path.read_text(encoding='utf-8')
+    start = text.index(f"    '{key}': {{")
+    end = text.find("    'DEVICE_", start + 8)
+    if end < 0: end = len(text)
+    block = text[start:end]
+    block, count = re.subn(r"('source_revision': ')[0-9a-f]{64}(')", rf"\g<1>{revision}\2", block, count=1)
+    if count != 1: raise RuntimeError(f'unable to update loader revision: {key}')
+    path.write_text(text[:start] + block + text[end:], encoding='utf-8', newline='\n')
+
 def read_glb_json(path: Path):
     raw = path.read_bytes()
     if raw[:4] != b'glTF':
@@ -44,9 +56,11 @@ def read_glb_json(path: Path):
 
 def source_files_for(size: str, asset_id: str) -> list[str]:
     return [
-        f'extension/awful_studio/assets/devices/{asset_id}_low_v6.blend',
+        'assets/device_mockups/common/foundation_common.py',
+        'assets/device_mockups/ipad_pro/generate_low_v6.py',
         'assets/device_mockups/ipad_pro/export_runtime_v6.py',
         'assets/device_mockups/ipad_pro/optimize_runtime_v6.py',
+        f'assets/device_mockups/ipad_pro/reference/ipados26_official_screen_{size}.png',
         'assets/device_mockups/ipad_pro/reference/apple_logo_alpha.png',
     ]
 
@@ -56,11 +70,16 @@ def build_one(blender: Path, size: str, loader):
     source_files = source_files_for(size, asset_id)
     revision, source_hashes = source_fingerprint(ROOT, source_files)
     source_commit = subprocess.check_output(
-        ['git', 'log', '-1', '--format=%H', '--', 'assets/device_mockups/ipad_pro/export_runtime_v6.py'],
+        ['git', 'log', '-1', '--format=%H', '--', 'assets/device_mockups/ipad_pro/generate_low_v6.py'],
         cwd=ROOT, text=True,
     ).strip()
-    plugin_revision = loader.device_asset_spec(loader_key)['lods']['LOW']['source_revision']
+    generated = DEVICE / f'generated/{asset_id}_low_v6.blend'
     source_blend = ROOT / f'extension/awful_studio/assets/devices/{asset_id}_low_v6.blend'
+    run(blender, '--factory-startup', '--background', generated, '--python', ROOT / 'tools/package_device_asset.py', '--',
+        '--output', source_blend, '--entry', f'AWFUL_DEVICE_IPAD_PRO_{size}', '--root', root_name,
+        '--key', f'IPAD_PRO_{size}', '--stage', 'LOW_DRAFT', '--variant', 'low_v6', '--revision', revision)
+    update_loader_revision(LOADER_PATH, loader_key, revision)
+    plugin_revision = revision
     run(
         blender, source_blend, '--background', '--python', DEVICE / 'export_runtime_v6.py', '--',
         '--size', size,
@@ -84,7 +103,7 @@ def build_one(blender: Path, size: str, loader):
         root_name, 'SCREEN_CONTENT', 'SCREEN_GLASS', 'FRONT_CAMERA_GLASS',
         'APPLE_LOGO_DECAL', 'CAMERA_HOUSING', 'REAR_CAMERA_GLASS', 'LIDAR',
         'ANCHOR_CENTER', 'ANCHOR_BOTTOM_CENTER', 'ANCHOR_SCREEN_CENTER',
-        'ANCHOR_REAR_CAMERA',
+        'ANCHOR_REAR_CAMERA', 'SCREEN_GLOW_ANCHOR',
     }
     missing = sorted(required - names)
     if missing:

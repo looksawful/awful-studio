@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import re
 from pathlib import Path
 import struct
 import subprocess
@@ -14,9 +15,12 @@ DEVICE = ROOT / 'assets/device_mockups/macbook_pro_14'
 RUNTIME = DEVICE / 'runtime/v1'
 LOADER_PATH = ROOT / 'extension/awful_studio/device_asset_loader.py'
 SOURCE_FILES = [
-    'extension/awful_studio/assets/devices/macbook_pro_14_m5_low_v1_release.blend',
+    'assets/device_mockups/common/foundation_common.py',
+    'assets/device_mockups/macbook_pro_14/generate_low.py',
     'assets/device_mockups/macbook_pro_14/export_runtime_v1.py',
     'assets/device_mockups/macbook_pro_14/optimize_runtime_v1.py',
+    'assets/device_mockups/macbook_pro_14/reference/apple_logo_alpha.png',
+    'assets/device_mockups/macbook_pro_14/reference/macos26_official_screen.png',
 ]
 sys.path.insert(0, str(ROOT / 'tools'))
 from device_delivery_contract import source_fingerprint, sha256_file
@@ -33,6 +37,17 @@ def load_loader():
     return module
 
 
+
+def update_loader_revision(path: Path, key: str, revision: str) -> None:
+    text = path.read_text(encoding='utf-8')
+    start = text.index(f"    '{key}': {{")
+    end = text.find("    'DEVICE_", start + 8)
+    if end < 0: end = len(text)
+    block = text[start:end]
+    block, count = re.subn(r"('source_revision': ')[0-9a-f]{64}(')", rf"\g<1>{revision}\2", block, count=1)
+    if count != 1: raise RuntimeError(f'unable to update loader revision: {key}')
+    path.write_text(text[:start] + block + text[end:], encoding='utf-8', newline='\n')
+
 def read_glb_json(path: Path):
     raw = path.read_bytes()
     if raw[:4] != b'glTF':
@@ -47,14 +62,18 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--blender', type=Path, required=True)
     args = parser.parse_args()
-    loader = load_loader()
-    plugin_revision = loader.device_asset_spec('DEVICE_MACBOOK_PRO_14')['lods']['LOW']['source_revision']
     revision, source_hashes = source_fingerprint(ROOT, SOURCE_FILES)
     source_commit = subprocess.check_output(
-        ['git', 'log', '-1', '--format=%H', '--', SOURCE_FILES[1]],
+        ['git', 'log', '-1', '--format=%H', '--', 'assets/device_mockups/macbook_pro_14/generate_low.py'],
         cwd=ROOT, text=True,
     ).strip()
-    source_blend = ROOT / SOURCE_FILES[0]
+    generated = DEVICE / 'generated/macbook_pro_14_m5_low_v1_release.blend'
+    source_blend = ROOT / 'extension/awful_studio/assets/devices/macbook_pro_14_m5_low_v1_release.blend'
+    run(args.blender.resolve(), '--factory-startup', '--background', generated, '--python', ROOT / 'tools/package_device_asset.py', '--',
+        '--output', source_blend, '--entry', 'AWFUL_DEVICE_MACBOOK_PRO_14', '--root', 'CTRL_MACBOOK_PRO_14',
+        '--key', 'MACBOOK_PRO_14', '--stage', 'RELEASE_CANDIDATE', '--variant', 'low_v1_release', '--revision', revision)
+    update_loader_revision(LOADER_PATH, 'DEVICE_MACBOOK_PRO_14', revision)
+    plugin_revision = revision
     run(
         args.blender.resolve(), source_blend, '--background',
         '--python', DEVICE / 'export_runtime_v1.py', '--',
@@ -77,6 +96,7 @@ def main():
         'SCREEN_CONTENT', 'SCREEN_GLASS', 'FACETIME_CAMERA', 'TRACKPAD',
         'TOUCH_ID', 'MAGSAFE', 'HDMI', 'SDXC', 'APPLE_LOGO_RELEASE',
         'ANCHOR_CENTER', 'ANCHOR_BOTTOM_CENTER', 'ANCHOR_SCREEN_CENTER',
+        'SCREEN_GLOW_ANCHOR',
     }
     missing = sorted(required - names)
     if missing:

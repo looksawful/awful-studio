@@ -36,6 +36,10 @@ class DeviceDeliveryContractTests(unittest.TestCase):
         self.assertEqual(manifest['stage'], 'LOW_DRAFT')
         self.assertEqual(manifest['delivery_profile']['simplification'], 'none')
         self.assertEqual(contract.verify_manifest(ROOT, manifest), [])
+        self.assertEqual(set(manifest['screen_states']), {'screen_off', 'screen_on'})
+        self.assertEqual(manifest['screen_states']['screen_off']['emission_strength'], 0.0)
+        self.assertGreater(manifest['screen_states']['screen_on']['emission_strength'], 0.0)
+        self.assertEqual(manifest['screen_glow']['anchor'], 'SCREEN_GLOW_ANCHOR')
 
     def test_v30_provenance_text_files_are_pinned_to_lf(self):
         paths = [
