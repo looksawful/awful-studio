@@ -1,6 +1,6 @@
 ﻿# AWFUL STUDIO Production Pass Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Turn the existing AWFUL STUDIO 1.x Blender Extension into a polished task-oriented product workflow while preserving the stable ownership/lifecycle architecture.
 
@@ -38,7 +38,7 @@
 - Produces: `install(legacy) -> None`
 - Later tasks reuse the same snapshot keys; no second persistent scene-state model is introduced.
 
-- [ ] **Step 1: Write the failing fast contract**
+- [x] **Step 1: Write the failing fast contract**
 
 ```python
 def test_workflow_module_is_scene_clean_and_declares_order():
@@ -51,13 +51,13 @@ def test_workflow_module_is_scene_clean_and_declares_order():
     assert 'import bpy' not in source
 ```
 
-- [ ] **Step 2: Run the targeted test and observe RED**
+- [x] **Step 2: Run the targeted test and observe RED**
 
 Run: `python -m unittest tests.fast.test_workflow_ui_contract -v`
 
 Expected: FAIL because `workflow_ui.py` does not exist.
 
-- [ ] **Step 3: Implement the minimal workflow adapter**
+- [x] **Step 3: Implement the minimal workflow adapter**
 
 ```python
 PANEL_ORDER = (
@@ -89,11 +89,11 @@ def status_lines(snapshot):
 
 `install(legacy)` patches the existing main panel draw function, adds Output and Diagnostics child panels through the established `legacy.CLASSES += (...,)` pattern, and never touches a scene during import/register.
 
-- [ ] **Step 4: Wire install before class registration**
+- [x] **Step 4: Wire install before class registration**
 
 Add `workflow_ui` to the Extension imports and call `workflow_ui.install(legacy)` after the existing policy installers and before `CLASSES = ...`.
 
-- [ ] **Step 5: Run targeted + fast tests**
+- [x] **Step 5: Run targeted + fast tests**
 
 Run:
 ```powershell
@@ -103,7 +103,7 @@ python -m unittest discover -s tests/fast -q
 
 Expected: targeted PASS; full fast suite PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add extension/awful_studio/workflow_ui.py extension/awful_studio/__init__.py tests/fast/test_workflow_ui_contract.py
@@ -124,7 +124,7 @@ git commit -m "feat(ui): add production workflow shell"
 - Produces: `collect(legacy, scene, runtime_performance) -> tuple[Diagnostic, ...]`
 - `workflow_ui` renders these results and exposes an explicit Validate/Doctor operator.
 
-- [ ] **Step 1: Write RED tests for severity and grouping**
+- [x] **Step 1: Write RED tests for severity and grouping**
 
 ```python
 def test_summary_counts_levels():
@@ -138,13 +138,13 @@ def test_summary_counts_levels():
 
 Also require source to remain importable without Blender by avoiding module-level `import bpy`.
 
-- [ ] **Step 2: Run targeted RED**
+- [x] **Step 2: Run targeted RED**
 
 Run: `python -m unittest tests.fast.test_studio_diagnostics_contract -v`
 
 Expected: FAIL because the module is missing.
 
-- [ ] **Step 3: Implement diagnostics**
+- [x] **Step 3: Implement diagnostics**
 
 ```python
 from dataclasses import dataclass
@@ -165,15 +165,15 @@ def summarize(items):
 
 `collect()` checks existing owned studio objects, current product source/stage/LOD, active light preset, camera availability/framing metadata, environment/HDRI availability, preview mode, post-pipeline marker and lightweight runtime-performance diagnostics. Optional remote HDRIs yield WARNING, not ERROR.
 
-- [ ] **Step 4: Add explicit diagnostics operator/UI**
+- [x] **Step 4: Add explicit diagnostics operator/UI**
 
 The operator runs `legacy.validate_static_configuration(scene)` and `legacy.validate_built_scene(scene)`, stores a concise success/failure in `scene.awful_state.last_operation/last_error`, and never performs repair automatically.
 
-- [ ] **Step 5: Extend packaged runtime contract**
+- [x] **Step 5: Extend packaged runtime contract**
 
 Add runtime checks that diagnostics returns no ERROR for a freshly built default studio and that calling diagnostics does not change datablock counts or trigger network attempts.
 
-- [ ] **Step 6: Run tests**
+- [x] **Step 6: Run tests**
 
 Run:
 ```powershell
@@ -183,7 +183,7 @@ python -m unittest discover -s tests/fast -q
 
 Later packaged runtime uses the existing `p0_suite.py` entrypoint.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add extension/awful_studio/studio_diagnostics.py extension/awful_studio/workflow_ui.py tests/fast/test_studio_diagnostics_contract.py tests/runtime/p0_suite.py
@@ -205,7 +205,7 @@ git commit -m "feat(diagnostics): add actionable studio health report"
 - Uses existing `device_asset_spec`, `lod_keys`, `orientation_preset_keys`, `hinge_preset_keys`.
 - UI never infers capability from display labels or object names.
 
-- [ ] **Step 1: Write failing capability tests**
+- [x] **Step 1: Write failing capability tests**
 
 ```python
 def test_device_capabilities_are_explicit():
@@ -216,13 +216,13 @@ def test_device_capabilities_are_explicit():
     assert 'orientation' not in loader.device_capabilities('DEVICE_MACBOOK_PRO_14')
 ```
 
-- [ ] **Step 2: Observe RED**
+- [x] **Step 2: Observe RED**
 
 Run: `python -m unittest tests.fast.test_device_asset_loader_contract tests.fast.test_product_quality_contract -v`
 
 Expected: FAIL because `device_capabilities` is undefined.
 
-- [ ] **Step 3: Add the explicit capability helper**
+- [x] **Step 3: Add the explicit capability helper**
 
 ```python
 def device_capabilities(key):
@@ -237,15 +237,15 @@ def device_capabilities(key):
 
 Use the catalog's existing `orientation_axis`, `controls`, `screen_object` and `lods` fields; do not add redundant booleans to every asset.
 
-- [ ] **Step 4: Make Product UI capability-driven**
+- [x] **Step 4: Make Product UI capability-driven**
 
 Replace key-specific UI checks with `device_capabilities(selected)`. Show Stage and LOD as distinct labels/controls. Unsupported controls are not drawn.
 
-- [ ] **Step 5: Extend real Blender product runtime**
+- [x] **Step 5: Extend real Blender product runtime**
 
 For each bundled device, assert the UI-facing capability set agrees with actual runtime behavior, then re-run existing screen/orientation/hinge/save-reopen checks.
 
-- [ ] **Step 6: Run targeted + fast tests**
+- [x] **Step 6: Run targeted + fast tests**
 
 Run:
 ```powershell
@@ -253,7 +253,7 @@ python -m unittest tests.fast.test_device_asset_loader_contract tests.fast.test_
 python -m unittest discover -s tests/fast -q
 ```
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add extension/awful_studio/device_asset_loader.py extension/awful_studio/product_quality.py extension/awful_studio/workflow_ui.py tests/fast/test_device_asset_loader_contract.py tests/fast/test_product_quality_contract.py tests/runtime/product_quality_contract.py
@@ -274,7 +274,7 @@ git commit -m "feat(product): polish capability-driven device workflow"
 - Produces runtime adapter: `legacy.apply_camera_view(scene, key) -> None`
 - Still view state remains separate from existing `camera_motion`.
 
-- [ ] **Step 1: Write RED tests for still views**
+- [x] **Step 1: Write RED tests for still views**
 
 ```python
 def test_still_view_inventory_is_photographic():
@@ -288,11 +288,11 @@ def test_still_view_inventory_is_photographic():
     assert policy.camera_view_spec('DETAIL_120')['lens'] == 120.0
 ```
 
-- [ ] **Step 2: Observe RED**
+- [x] **Step 2: Observe RED**
 
 Run: `python -m unittest tests.fast.test_camera_framing_contract -v`
 
-- [ ] **Step 3: Implement pure view specs + runtime adapter**
+- [x] **Step 3: Implement pure view specs + runtime adapter**
 
 ```python
 CAMERA_VIEW_PRESETS = {
@@ -308,15 +308,15 @@ CAMERA_VIEW_PRESETS = {
 
 The runtime adapter clears camera-rig animation, sets motion to `STATIC`, calls existing `apply_camera_base_pose` with lens/margin, then sets owned yaw/pitch controls from the view spec. Reapplying the same view produces identical transforms.
 
-- [ ] **Step 4: Add `camera_view` EnumProperty and UI**
+- [x] **Step 4: Add `camera_view` EnumProperty and UI**
 
 Add it through `camera_policy.install(legacy)`; the Camera panel shows Still View first, Motion second. No duplicate lens slider is added.
 
-- [ ] **Step 5: Extend Blender runtime**
+- [x] **Step 5: Extend Blender runtime**
 
 Apply HERO в†’ WIDE в†’ HERO and assert HERO transform/lens are identical before/after; verify product bounds still fit and unmanaged objects are untouched.
 
-- [ ] **Step 6: Run tests and commit**
+- [x] **Step 6: Run tests and commit**
 
 Run fast camera + full suite, then:
 ```bash
@@ -338,7 +338,7 @@ git commit -m "feat(camera): add deterministic product still views"
 - Produces: `apply_look(legacy, scene, look: str) -> str`.
 - Does not add a second persistent lighting preset property.
 
-- [ ] **Step 1: Write RED mapping tests**
+- [x] **Step 1: Write RED mapping tests**
 
 ```python
 def test_production_looks_route_to_existing_presets():
@@ -355,11 +355,11 @@ def test_production_looks_route_to_existing_presets():
     }
 ```
 
-- [ ] **Step 2: Observe RED**
+- [x] **Step 2: Observe RED**
 
 Run: `python -m unittest tests.fast.test_lighting_workflow_contract -v`
 
-- [ ] **Step 3: Implement thin routing**
+- [x] **Step 3: Implement thin routing**
 
 ```python
 def apply_look(legacy, scene, look):
@@ -371,15 +371,15 @@ def apply_look(legacy, scene, look):
     return preset_id
 ```
 
-- [ ] **Step 4: Add quick-look buttons above advanced family/preset controls**
+- [x] **Step 4: Add quick-look buttons above advanced family/preset controls**
 
 The existing `studio_light_family` and `studio_light_preset` remain authoritative and continue to show the exact selected preset.
 
-- [ ] **Step 5: Extend runtime idempotence test**
+- [x] **Step 5: Extend runtime idempotence test**
 
 Apply ACCENT в†’ PRODUCT в†’ ACCENT and compare active light roles, energy/color/temperature and shaper state for the two ACCENT applications. Apply PRODUCT afterward and assert colored FX lights are inactive rather than leaking from the previous look.
 
-- [ ] **Step 6: Run fast tests and commit**
+- [x] **Step 6: Run fast tests and commit**
 
 ```bash
 git add extension/awful_studio/lighting_workflow.py extension/awful_studio/__init__.py extension/awful_studio/workflow_ui.py tests/fast/test_lighting_workflow_contract.py tests/runtime/p0_lighting_contract.py
@@ -398,23 +398,23 @@ git commit -m "feat(lighting): add production look shortcuts"
 - Produces/uses an environment status snapshot containing mode, selected world preset, background visibility, glass visibility and optional-asset availability.
 - Existing `world_preset`, `natural_light_enabled`, `show_environment_background` and window-glass state remain authoritative.
 
-- [ ] **Step 1: Add RED tests for explicit environment status**
+- [x] **Step 1: Add RED tests for explicit environment status**
 
 Require Physical Sky to report no remote-asset requirement, HDRI modes to distinguish cached/available/missing optional assets, and ordinary status collection to make zero network attempts.
 
-- [ ] **Step 2: Observe RED**
+- [x] **Step 2: Observe RED**
 
 Run: `python -m unittest tests.fast.test_natural_light_contract -v`
 
-- [ ] **Step 3: Implement status helper/UI only where needed**
+- [x] **Step 3: Implement status helper/UI only where needed**
 
 The Environment panel shows the existing mode/preset selector, Studio/World relationship, BG and Glass toggles, plus a concise `Ready / Optional asset missing` line and explicit Download/Retry button. Merely opening/drawing the panel never downloads anything.
 
-- [ ] **Step 4: Extend real Blender runtime**
+- [x] **Step 4: Extend real Blender runtime**
 
 Exercise Physical Sky, cached HDRI and missing-HDRI states; assert Build/preset switching/status inspection stay network-clean and that artificial lights remain independently controllable.
 
-- [ ] **Step 5: Run tests and commit**
+- [x] **Step 5: Run tests and commit**
 
 ```bash
 git add extension/awful_studio/workflow_ui.py extension/awful_studio/natural_light.py tests/fast/test_natural_light_contract.py tests/runtime/p0_natural_light_contract.py
@@ -434,15 +434,15 @@ git commit -m "feat(environment): clarify offline studio world workflow"
 - Produces: `output_snapshot(scene) -> dict[str, object]` for UI/diagnostics only.
 - Uses native `scene.render.film_transparent` rather than duplicating transparency state.
 
-- [ ] **Step 1: Write RED output contract**
+- [x] **Step 1: Write RED output contract**
 
 Require `output_snapshot` to report render engine, preview mode, transparent-background state and whether the managed post pipeline exists, while source contains no assignment to Cycles compute backend/device.
 
-- [ ] **Step 2: Observe RED**
+- [x] **Step 2: Observe RED**
 
 Run: `python -m unittest tests.fast.test_runtime_performance_contract -v`
 
-- [ ] **Step 3: Implement output snapshot and panel**
+- [x] **Step 3: Implement output snapshot and panel**
 
 Output panel contains:
 - Fast Preview / Quality Preview via existing `preview_mode`;
@@ -451,7 +451,7 @@ Output panel contains:
 - explicit Build Post Pipeline action;
 - no fake Final preset that overwrites unrelated render settings.
 
-- [ ] **Step 4: Runtime safety assertions**
+- [x] **Step 4: Runtime safety assertions**
 
 Switch FAST в†” QUALITY and assert:
 - `scene.cycles.device` is unchanged;
@@ -460,7 +460,7 @@ Switch FAST в†” QUALITY and assert:
 - transparent toggle changes only `scene.render.film_transparent`;
 - post pipeline remains opt-in and idempotent.
 
-- [ ] **Step 5: Run tests and commit**
+- [x] **Step 5: Run tests and commit**
 
 ```bash
 git add extension/awful_studio/workflow_ui.py extension/awful_studio/runtime_performance.py tests/fast/test_runtime_performance_contract.py tests/runtime/p0_performance_contract.py tests/runtime/p0_post_pipeline_contract.py
@@ -479,19 +479,19 @@ git commit -m "feat(output): add safe production output workflow"
 - Explicit command builds a review scene from the Extension source, never during import/register.
 - Outputs stay under a local/generated review directory and are not treated as runtime dependencies.
 
-- [ ] **Step 1: Write a contract for the review tool**
+- [x] **Step 1: Write a contract for the review tool**
 
 Require source to call explicit Build, select representative product/device, apply named lighting/camera states, save a `.blend` review scene and optionally render bounded-size previews only when explicitly invoked.
 
-- [ ] **Step 2: Implement the explicit review script**
+- [x] **Step 2: Implement the explicit review script**
 
 The script accepts output directory and preset/product arguments, uses existing AWFUL operators/policies, and records a JSON manifest with Blender version, Extension version, chosen product, lighting, camera, environment and output files.
 
-- [ ] **Step 3: Run fast suite and explicit Blender review generation**
+- [x] **Step 3: Run fast suite and explicit Blender review generation**
 
 Run the review script with installed Blender 5.2.1 and inspect the generated Full Studio scene plus representative Product/Accent/Gobo/Window previews.
 
-- [ ] **Step 4: Run canonical health gates**
+- [x] **Step 4: Run canonical health gates**
 
 ```powershell
 python tools/awful.py status
@@ -502,15 +502,15 @@ python -m unittest discover -s tests/fast -q
 
 Then build/validate the Extension and run the existing exact-ZIP Blender 5.2.1 runtime verification path with local Blender explicitly allowed.
 
-- [ ] **Step 5: Lifecycle verification**
+- [x] **Step 5: Lifecycle verification**
 
 Using the exact candidate ZIP in an isolated profile: install в†’ enable в†’ Build в†’ save/reopen в†’ Rebuild в†’ Remove в†’ disable в†’ re-enable в†’ restart/reopen. Confirm no unmanaged-data, network, ownership or device-selection regression.
 
-- [ ] **Step 6: Review branch without merging**
+- [x] **Step 6: Review branch without merging**
 
 Run `git diff --check`, inspect all commits/diffs, leave `agent/production-pass` unmerged and report exact test/runtime evidence to the owner for approval.
 
-- [ ] **Step 7: Commit final review tooling/docs**
+- [x] **Step 7: Commit final review tooling/docs**
 
 ```bash
 git add tools/production_pass_review.py docs/PRODUCTION_PASS_REVIEW.md tests/fast/test_preview_delivery_contract.py
