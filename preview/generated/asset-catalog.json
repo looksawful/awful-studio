@@ -16,10 +16,10 @@
         }
       ],
       "collision": null,
-      "sourceRevision": "079c469f6114466baac4784507f0b208970fb1fecc862b1fc5db05f68d31b092",
-      "sourceCommit": "2c659b2754654827c23d62dfc269d2719754a223",
-      "triangleCount": 33976,
-      "materialCount": 16,
+      "sourceRevision": "1a2da674579d14eb853dc211126f0494958122930cebb38ffde1afa9f1f31930",
+      "sourceCommit": "adab006c0d2200bf4321c4655195518cb9dbeb6a",
+      "triangleCount": 32412,
+      "materialCount": 15,
       "animations": [],
       "screenStates": {
         "screen_off": {

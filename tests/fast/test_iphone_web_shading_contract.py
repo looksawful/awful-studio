@@ -38,6 +38,12 @@ class IPhoneWebShadingContractTests(unittest.TestCase):
         material = next(item for item in doc['materials'] if item.get('name') == 'MAT_SCREEN_CONTENT')
         self.assertNotEqual(material.get('alphaMode', 'OPAQUE'), 'BLEND')
 
+    def test_web_delivery_has_one_screen_surface(self):
+        doc, _ = read_glb(GLB)
+        names = [node.get("name") for node in doc.get("nodes", [])]
+        self.assertEqual(names.count("SCREEN_CONTENT"), 1)
+        self.assertNotIn("SCREEN_GLASS", names, "web preview must not stack a second cover-glass mesh over the active screen")
+
     def test_apple_logo_normals_face_outward(self):
         doc, blob = read_glb(GLB)
         mesh = next(mesh for mesh in doc['meshes'] if mesh.get('name') == 'APPLE_LOGO_DECAL')

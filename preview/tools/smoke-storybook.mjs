@@ -55,8 +55,7 @@ async function checkStory(id, assetId, expectedClips = []) {
   page.on('response', (response) => {
     if (response.status() >= 400) failedResponses.push(`${response.status()} ${response.url()}`);
   });
-  const args = id === 'models-devices--viewer' ? `&args=assetId:${assetId}` : '';
-  const url = `http://127.0.0.1:${port}/iframe.html?id=${id}&viewMode=story${args}`;
+  const url = `http://127.0.0.1:${port}/iframe.html?id=${id}&viewMode=story`;
   await page.goto(url, { waitUntil: 'networkidle' });
   const viewer = page.locator(`awful-model-viewer[data-model-loaded="${assetId}"]`);
   await viewer.waitFor({ state: 'attached', timeout: 20000 });
@@ -66,7 +65,7 @@ async function checkStory(id, assetId, expectedClips = []) {
   if (size[0] <= 0 || size[1] <= 0) {
     throw new Error(`${assetId}: canvas has invalid size ${size}`);
   }
-  if (id === 'models-devices--viewer') {
+  if (assetId.startsWith('iphone-') || assetId.startsWith('ipad-') || assetId.startsWith('macbook-')) {
     const screen = page.locator('awful-model-viewer select[data-control="screen-state"]');
     if (await screen.isEnabled()) {
       const options = await screen.locator('option').evaluateAll((items) => items.map((item) => item.value));
@@ -93,12 +92,18 @@ async function checkStory(id, assetId, expectedClips = []) {
 }
 
 try {
-  await checkStory('models-devices--viewer', 'iphone-17-v30');
-  await checkStory('models-devices--viewer', 'ipad-pro-11-m5-v6');
-  await checkStory('models-devices--viewer', 'ipad-pro-13-m5-v6');
-  await checkStory('models-devices--viewer', 'macbook-pro-14-m5-v1', ['lid_open', 'lid_close']);
-  await checkStory('models-studio-equipment--viewer', 'studio-support-cstand-01');
-  console.log('Storybook model smoke passed: all devices + Studio C-Stand');
+  await checkStory('models-devices--i-phone-17', 'iphone-17-v30');
+  await checkStory('models-devices--i-pad-pro-11', 'ipad-pro-11-m5-v6');
+  await checkStory('models-devices--i-pad-pro-13', 'ipad-pro-13-m5-v6');
+  await checkStory('models-devices--mac-book-pro-14', 'macbook-pro-14-m5-v1', ['lid_open', 'lid_close']);
+  await checkStory('models-studio-equipment--c-stand', 'studio-support-cstand-01');
+  await checkStory('models-studio-equipment--profoto-d-1', 'profoto-d1-500-air');
+  await checkStory('models-studio-equipment--profoto-magnum', 'profoto-magnum-100624');
+  await checkStory('models-studio-equipment--studio-sandbag', 'studio-sandbag-01');
+  await checkStory('models-scenes--white-studio', 'white-studio-v2');
+  await checkStory('models-scenes--dark-neon', 'dark-neon-v2');
+  await checkStory('models-scenes--loft-daylight', 'loft-daylight-v2');
+  console.log('Storybook model smoke passed: all 11 canonical assets');
 } finally {
   await browser.close();
   await new Promise((resolve) => server.close(resolve));
