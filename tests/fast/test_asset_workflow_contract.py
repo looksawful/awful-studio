@@ -101,6 +101,16 @@ class AssetWorkflowContractTests(unittest.TestCase):
         )
         self.assertEqual(sky[0], 'Source: Physical Sky - Offline Ready')
         self.assertEqual(sky[1], 'Lighting: World only')
+    def test_environment_adapter_uses_scene_ownership_context(self):
+        source = (
+            ROOT / 'extension' / 'awful_studio' / 'asset_workflow.py'
+        ).read_text(encoding='utf-8')
+        adapter = source.split(
+            'def apply_environment_preset(scene, preset_id, reset_defaults=True):',
+            1,
+        )[1].split('def ensure_assets', 1)[0]
+        self.assertIn('with legacy.ownership.for_scene(scene):', adapter)
+
     def test_unknown_environment_intent_is_rejected(self):
         import asset_workflow
 

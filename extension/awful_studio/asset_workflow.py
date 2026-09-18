@@ -168,7 +168,8 @@ def install(legacy, cache):
         """Apply an effective source but keep the user's selected environment intent."""
         selected = str(preset_id)
         effective = resolve_environment_preset(scene, selected)
-        result = original_apply_environment(scene, effective, reset_defaults)
+        with legacy.ownership.for_scene(scene):
+            result = original_apply_environment(scene, effective, reset_defaults)
         if effective != selected:
             scene.awful_studio.world_preset = selected
         return result

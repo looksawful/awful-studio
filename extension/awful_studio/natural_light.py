@@ -362,13 +362,26 @@ def install(legacy):
 
     def apply_lighting_preset(scene, preset_id, apply_camera_defaults=False,
                               apply_environment_defaults=True):
-        result = original_apply_lighting(
-            scene, preset_id, apply_camera_defaults, apply_environment_defaults)
+        environment_adapter = legacy.apply_environment_preset
+
+        def defer_environment(*_args, **_kwargs):
+            return None
+
         if apply_environment_defaults:
-            preset = legacy.LIGHTING_PRESETS[preset_id]
-            regime = lighting_regime(preset.family)
-            scene.awful_studio.natural_light_enabled = bool(regime['world_default'])
-            apply_environment_preset(
+            legacy.apply_environment_preset = defer_environment
+        try:
+            result = original_apply_lighting(
+                scene, preset_id, apply_camera_defaults, apply_environment_defaults)
+            if apply_environment_defaults:
+                preset = legacy.LIGHTING_PRESETS[preset_id]
+                regime = lighting_regime(preset.family)
+                scene.awful_studio.natural_light_enabled = bool(regime['world_default'])
+        finally:
+            if apply_environment_defaults:
+                legacy.apply_environment_preset = environment_adapter
+
+        if apply_environment_defaults:
+            environment_adapter(
                 scene, scene.awful_studio.world_preset, reset_defaults=True)
         return result
 

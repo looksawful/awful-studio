@@ -908,6 +908,7 @@ def make_diffusion_material():
 
 def make_diagnostic_material():
     mat = get_or_create_managed_material("MAT_AWFUL_Diagnostic", "MAT_DIAGNOSTIC")
+    mat.use_fake_user = True
     nodes, links = mat.node_tree.nodes, mat.node_tree.links
     out = nodes.new("ShaderNodeOutputMaterial")
     bsdf = nodes.new("ShaderNodeBsdfPrincipled")
@@ -1427,7 +1428,7 @@ def setup_world_nodes():
         env = nodes.new("ShaderNodeTexEnvironment"); env.name = f"AWFUL_ENV_{pid}"; env.location = (-560, y - idx*220)
         # Lazy-load HDRIs. Keeping all five 2K float environments decoded in memory
         # is wasteful for an interactive studio where only one preset is active.
-        env.image = None
+        env.image = None; env.mute = True
         links.new(mapping.outputs["Vector"], env.inputs["Vector"])
         bg = nodes.new("ShaderNodeBackground"); bg.name = f"AWFUL_BG_{pid}"; bg.location = (-180, y - idx*220); bg.inputs["Strength"].default_value = data["strength"]
         links.new(env.outputs["Color"], bg.inputs["Color"])
@@ -1465,6 +1466,7 @@ def release_inactive_hdri_images(active_preset=None):
             continue
         image = env.image
         env.image = None
+        env.mute = True
         try:
             if is_managed(image) and image.users == 0:
                 expected = os.path.normcase(os.path.abspath(hdri_asset_path(data["asset"])))
@@ -1493,6 +1495,8 @@ def apply_environment_preset(scene, preset_id, reset_defaults=True):
         # Decode the environment only when it can actually contribute to the scene.
         if settings.natural_light_enabled and env and env.image is None:
             env.image = load_image(hdri_asset_path(HDRI_PRESETS[preset_id]["asset"]), False)
+        if settings.natural_light_enabled and env:
+            env.mute = env.image is None
         if settings.natural_light_enabled and env and env.image is None:
             active = nodes.get("AWFUL_BG_NISHITA_DAY") or black
         release_inactive_hdri_images(preset_id if settings.natural_light_enabled else None)
@@ -1528,12 +1532,14 @@ def refresh_world_images():
     if env:
         old = env.image
         env.image = None
+        env.mute = True
         if old is not None:
             try:
                 old.reload()
             except Exception:
                 pass
         env.image = load_image(hdri_asset_path(HDRI_PRESETS[preset]["asset"]), False)
+        env.mute = env.image is None
 
 
 def create_window_portal(light_col):

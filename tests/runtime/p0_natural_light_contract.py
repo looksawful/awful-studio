@@ -169,6 +169,30 @@ def main():
         legacy.apply_lighting_preset(scene, 'WINDOW_BALANCED', False, True)
         check('Natural defaults World ON', settings.natural_light_enabled)
 
+        # Lighting presets must honor the later asset-workflow adapter.
+        original_read_valid = ext.asset_cache.read_valid
+        original_migrate = ext.asset_cache.migrate_legacy_asset
+        ext.asset_cache.read_valid = lambda _path: False
+        ext.asset_cache.migrate_legacy_asset = lambda _record: False
+        try:
+            legacy.apply_lighting_preset(scene, 'WINDOW_BALANCED', False, True)
+        finally:
+            ext.asset_cache.read_valid = original_read_valid
+            ext.asset_cache.migrate_legacy_asset = original_migrate
+        bpy.context.view_layer.update()
+        fallback_active = linked_node(mix.inputs[1])
+        check(
+            'Window look preserves selected missing HDRI intent',
+            settings.world_preset == 'KLOPPENHEIM',
+            settings.world_preset,
+        )
+        check(
+            'Window look routes missing HDRI through Physical Sky fallback',
+            fallback_active is not None
+            and fallback_active.name == 'AWFUL_BG_NISHITA_DAY',
+            fallback_active.name if fallback_active else None,
+        )
+
         # Preserve ready-HDRI semantics separately from the #43 missing-asset fallback.
         settings.natural_light_enabled = True
         settings.reflective_room_enabled = True

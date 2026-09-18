@@ -101,6 +101,45 @@ class NaturalLightPolicyContractTests(unittest.TestCase):
         )
         self.assertLess(darker_camera, camera)
 
+    def test_lazy_hdri_nodes_are_muted_until_an_image_is_loaded(self):
+        legacy_source = (
+            ROOT / 'extension' / 'awful_studio' / 'core' / 'legacy.py'
+        ).read_text(encoding='utf-8')
+        self.assertIn('env.image = None; env.mute = True', legacy_source)
+        self.assertIn('env.mute = env.image is None', legacy_source)
+        release = legacy_source.split('def release_inactive_hdri_images', 1)[1]
+        release = release.split('def apply_environment_preset', 1)[0]
+        self.assertIn('env.mute = True', release)
+        refresh = legacy_source.split('def refresh_world_images', 1)[1]
+        refresh = refresh.split('\ndef ', 1)[0]
+        self.assertIn('env.mute = env.image is None', refresh)
+    def test_lighting_wrapper_batches_environment_side_effects(self):
+        source = (EXT / 'natural_light.py').read_text(encoding='utf-8')
+        wrapper = source.split('def apply_lighting_preset(scene, preset_id,', 1)[1]
+        wrapper = wrapper.split('def draw_environment', 1)[0]
+        self.assertIn('environment_adapter = legacy.apply_environment_preset', wrapper)
+        self.assertIn('legacy.apply_environment_preset = defer_environment', wrapper)
+        self.assertIn('legacy.apply_environment_preset = environment_adapter', wrapper)
+        self.assertIn('environment_adapter(', wrapper)
+    def test_lighting_wrapper_delegates_environment_to_latest_adapter(self):
+        source = (EXT / 'natural_light.py').read_text(encoding='utf-8')
+        wrapper = source.split('def apply_lighting_preset(scene, preset_id,', 1)[1]
+        wrapper = wrapper.split('def draw_environment', 1)[0]
+        self.assertIn(
+            'environment_adapter = legacy.apply_environment_preset',
+            wrapper,
+            'lighting wrapper must capture the latest environment adapter',
+        )
+        self.assertIn(
+            'environment_adapter(',
+            wrapper,
+            'lighting wrapper must invoke the captured outer adapter',
+        )
+        self.assertNotIn(
+            '            apply_environment_preset(\n',
+            wrapper,
+            'lighting wrapper must not bypass later environment adapters',
+        )
     def test_strength_controls_are_bounded_and_unknown_family_is_rejected(self):
         import natural_light
 
