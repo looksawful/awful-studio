@@ -14,6 +14,7 @@ RUNTIME = DEVICE / 'runtime/v30'
 SOURCE_FILES = [
     'assets/device_mockups/common/foundation_common.py',
     'assets/device_mockups/iphone_17/generate_low_v30.py',
+    'assets/device_mockups/iphone_17/export_runtime_v30.py',
     'assets/device_mockups/iphone_17/reference/apple_logo_glb_mask.png',
     'assets/device_mockups/iphone_17/reference/ios26_home_screen_1206x2622.png',
 ]
