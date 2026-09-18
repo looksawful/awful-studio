@@ -157,7 +157,26 @@ def main():
         scene.awful_studio.auto_fit = True
         for key in device_asset_loader.device_asset_keys():
             spec = device_asset_loader.device_asset_spec(key)
+            capabilities = device_asset_loader.device_capabilities(key)
+            check(f'{key} capability LOD', 'lod' in capabilities, sorted(capabilities))
+            check(f'{key} capability screen', 'screen' in capabilities, sorted(capabilities))
+            check(
+                f'{key} orientation capability',
+                ('orientation' in capabilities) == (spec.get('orientation_axis') == 'Y'),
+                sorted(capabilities),
+            )
+            check(
+                f'{key} hinge capability',
+                ('hinge' in capabilities) == ('CTRL_HINGE' in spec.get('controls', ())),
+                sorted(capabilities),
+            )
             scene.awful_studio.product_mockup = key
+            hinge_poll = ext.AWFUL_OT_ApplyDeviceHinge.poll(bpy.context)
+            check(
+                f'{key} hinge operator capability poll',
+                bool(hinge_poll) == ('hinge' in capabilities),
+                hinge_poll,
+            )
             with ownership.for_scene(scene):
                 root = product_quality.replace_mockup(legacy, scene, key)
             check(f'{key} root is scene-owned', ownership.owned(root, scene))

@@ -95,6 +95,19 @@ def device_asset_spec(key: str) -> dict:
 
 
 
+def device_capabilities(key: str) -> frozenset[str]:
+    spec = device_asset_spec(key)
+    capabilities = set()
+    if spec.get('lods'):
+        capabilities.add('lod')
+    if spec.get('screen_object') and spec.get('screen_material'):
+        capabilities.add('screen')
+    if spec.get('orientation_axis') == 'Y':
+        capabilities.add('orientation')
+    if 'CTRL_HINGE' in spec.get('controls', ()):
+        capabilities.add('hinge')
+    return frozenset(capabilities)
+
 def hinge_preset_keys(key: str) -> tuple[str, ...]:
     spec = device_asset_spec(key)
     if 'CTRL_HINGE' not in spec.get('controls', ()):

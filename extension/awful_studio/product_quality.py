@@ -518,16 +518,19 @@ def install(legacy):
         selected = settings.product_mockup
         if device_asset_loader.is_device_asset_key(selected):
             spec = device_asset_loader.device_asset_spec(selected)
+            capabilities = device_asset_loader.device_capabilities(selected)
             box.label(text=f"Stage: {spec['stage'].replace('_', ' ').title()}")
-            box.prop(settings, 'device_lod', text='LOD')
-            if spec.get('orientation_axis') == 'Y':
+            if 'lod' in capabilities:
+                box.prop(settings, 'device_lod', text='LOD')
+            if 'orientation' in capabilities:
                 box.prop(settings, 'device_orientation_preset', text='Orientation')
                 box.operator('awful.apply_device_orientation', text='Set Orientation')
-            box.prop(settings, 'device_screen_path', text='Screen')
-            screen_row = box.row()
-            screen_row.enabled = bool(settings.device_screen_path)
-            screen_row.operator('awful.apply_device_screen', text='Apply Screen')
-            if selected == 'DEVICE_MACBOOK_PRO_14':
+            if 'screen' in capabilities:
+                box.prop(settings, 'device_screen_path', text='Screen')
+                screen_row = box.row()
+                screen_row.enabled = bool(settings.device_screen_path)
+                screen_row.operator('awful.apply_device_screen', text='Apply Screen')
+            if 'hinge' in capabilities:
                 box.prop(settings, 'device_hinge_preset', text='Hinge')
                 box.operator('awful.apply_device_hinge', text='Set Hinge')
 

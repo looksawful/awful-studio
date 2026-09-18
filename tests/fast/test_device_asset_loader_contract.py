@@ -147,6 +147,24 @@ class DeviceAssetLoaderContractTests(unittest.TestCase):
         self.assertIn("awful.apply_device_orientation", init_source)
 
 
+    def test_device_capabilities_are_explicit(self):
+        loader = load_module()
+        for key in ('DEVICE_IPHONE_17', 'DEVICE_IPAD_PRO_11', 'DEVICE_IPAD_PRO_13'):
+            caps = loader.device_capabilities(key)
+            self.assertTrue({'screen', 'orientation', 'lod'}.issubset(caps))
+            self.assertNotIn('hinge', caps)
+        mac_caps = loader.device_capabilities('DEVICE_MACBOOK_PRO_14')
+        self.assertTrue({'screen', 'hinge', 'lod'}.issubset(mac_caps))
+        self.assertNotIn('orientation', mac_caps)
+    def test_product_ui_uses_device_capabilities(self):
+        product_source = PRODUCT_PATH.read_text(encoding='utf-8')
+        init_source = INIT_PATH.read_text(encoding='utf-8')
+        self.assertIn('device_asset_loader.device_capabilities(selected)', product_source)
+        self.assertIn("'orientation' in capabilities", product_source)
+        self.assertIn("'hinge' in capabilities", product_source)
+        self.assertNotIn("if selected == 'DEVICE_MACBOOK_PRO_14':", product_source)
+        self.assertIn('device_asset_loader.device_capabilities(key)', init_source)
+        self.assertNotIn("product_mockup == 'DEVICE_MACBOOK_PRO_14'", init_source)
 class BinaryAssetAttributesTests(unittest.TestCase):
     def test_extension_binary_assets_are_never_text_normalized(self):
         attrs = (ROOT / '.gitattributes').read_text(encoding='utf-8')

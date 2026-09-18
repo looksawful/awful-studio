@@ -321,9 +321,12 @@ class AWFUL_OT_ApplyDeviceHinge(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return (context.scene is not None
-                and legacy.REG.object('CYC') is not None
-                and context.scene.awful_studio.product_mockup == 'DEVICE_MACBOOK_PRO_14')
+        if context.scene is None or legacy.REG.object('CYC') is None:
+            return False
+        key = context.scene.awful_studio.product_mockup
+        if not device_asset_loader.is_device_asset_key(key):
+            return False
+        return 'hinge' in device_asset_loader.device_capabilities(key)
 
     def execute(self, context):
         try:
