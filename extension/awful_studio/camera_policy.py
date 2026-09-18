@@ -11,6 +11,23 @@ import math
 MIN_CAMERA_DISTANCE = 2.2
 _MAX_SEARCH_DISTANCE = 1_000_000.0
 
+CAMERA_VIEW_PRESETS = {
+    'HERO_85': {'label': 'Hero - 85 mm', 'lens': 85.0, 'margin': 1.24, 'yaw_deg': 0.0, 'pitch_deg': 4.0},
+    'THREE_QUARTER_LEFT_85': {'label': '3/4 Left - 85 mm', 'lens': 85.0, 'margin': 1.28, 'yaw_deg': -28.0, 'pitch_deg': 5.0},
+    'THREE_QUARTER_RIGHT_85': {'label': '3/4 Right - 85 mm', 'lens': 85.0, 'margin': 1.28, 'yaw_deg': 28.0, 'pitch_deg': 5.0},
+    'SIDE_85': {'label': 'Side - 85 mm', 'lens': 85.0, 'margin': 1.30, 'yaw_deg': 90.0, 'pitch_deg': 2.0},
+    'WIDE_50': {'label': 'Wide - 50 mm', 'lens': 50.0, 'margin': 1.38, 'yaw_deg': 0.0, 'pitch_deg': 3.0},
+    'DETAIL_120': {'label': 'Detail - 120 mm', 'lens': 120.0, 'margin': 1.10, 'yaw_deg': -18.0, 'pitch_deg': 4.0},
+    'TOP_THREE_QUARTER_85': {'label': 'Top 3/4 - 85 mm', 'lens': 85.0, 'margin': 1.32, 'yaw_deg': -28.0, 'pitch_deg': 24.0},
+}
+
+
+def camera_view_spec(key: str) -> dict:
+    try:
+        return dict(CAMERA_VIEW_PRESETS[key])
+    except KeyError as exc:
+        raise ValueError(f'Unknown AWFUL camera view: {key}') from exc
+
 
 def frame_tangents(frame):
     """Return conservative horizontal/vertical half-frustum tangents.
@@ -122,9 +139,11 @@ def required_distance_for_bounds(width, depth, height, tan_half_x, tan_half_y,
 
 
 def install(legacy):
-    """Replace only the retained base-pose calculation, once, before use."""
+    """Install bounds framing and deterministic still-view workflow once."""
     if getattr(legacy, '_awful_camera_policy_installed', False):
         return
+
+    updating_view = False
 
     def compute_camera_base_pose(scene, camera, metrics, lens=85.0, margin=1.32):
         camera.data.lens = float(lens)
@@ -141,5 +160,62 @@ def install(legacy):
         scene['awful_camera_margin'] = float(margin)
         return distance, height_offset
 
+    def apply_camera_view(scene, key):
+        nonlocal updating_view
+        spec = camera_view_spec(key)
+        yaw = legacy.REG.require_object('CAMERA_YAW')
+        pitch = legacy.REG.require_object('CAMERA_PITCH')
+        dolly = legacy.REG.require_object('CAMERA_DOLLY')
+        follower = legacy.REG.require_object('CAMERA_PATH_FOLLOW')
+        camera = legacy.REG.require_object('CAMERA')
+        for obj in (yaw, pitch, dolly, follower):
+            legacy.clear_animation(obj)
+        legacy.clear_animation(camera.data)
+        legacy.set_camera_source(False)
+        scene.awful_studio.camera_motion = 'STATIC'
+        legacy.apply_camera_base_pose(
+            scene,
+            float(spec['lens']),
+            float(spec['margin']),
+        )
+        yaw.rotation_euler[2] = math.radians(float(spec['yaw_deg']))
+        pitch.rotation_euler[0] = math.radians(float(spec['pitch_deg']))
+        legacy.bpy.context.view_layer.update()
+        if getattr(scene.awful_studio, 'camera_view', None) != key:
+            updating_view = True
+            try:
+                scene.awful_studio.camera_view = key
+            finally:
+                updating_view = False
+
+    def on_camera_view(self, context):
+        if updating_view:
+            return
+        scene = getattr(context, 'scene', None)
+        if scene is None or legacy.REG.object('CYC') is None:
+            return
+        apply_camera_view(scene, self.camera_view)
+
+    annotations = legacy.AWFUL_StudioSettings.__annotations__
+    annotations['camera_view'] = legacy.EnumProperty(
+        name='Still View',
+        items=[
+            (key, spec['label'], '')
+            for key, spec in CAMERA_VIEW_PRESETS.items()
+        ],
+        default='HERO_85',
+        update=on_camera_view,
+    )
+
+    original_draw = legacy.AWFUL_PT_Camera.draw
+
+    def draw_camera(self, context):
+        box = self.layout.box()
+        box.label(text='Still View')
+        box.prop(context.scene.awful_studio, 'camera_view', text='')
+        original_draw(self, context)
+
+    legacy.AWFUL_PT_Camera.draw = draw_camera
     legacy.compute_camera_base_pose = compute_camera_base_pose
+    legacy.apply_camera_view = apply_camera_view
     legacy._awful_camera_policy_installed = True

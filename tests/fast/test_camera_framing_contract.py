@@ -51,3 +51,44 @@ class CameraFramingContractTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class CameraStillViewContractTests(unittest.TestCase):
+    def test_still_view_inventory_is_photographic(self):
+        import camera_policy
+
+        self.assertEqual(set(camera_policy.CAMERA_VIEW_PRESETS), {
+            'HERO_85',
+            'THREE_QUARTER_LEFT_85',
+            'THREE_QUARTER_RIGHT_85',
+            'SIDE_85',
+            'WIDE_50',
+            'DETAIL_120',
+            'TOP_THREE_QUARTER_85',
+        })
+        self.assertEqual(
+            camera_policy.camera_view_spec('WIDE_50')['lens'],
+            50.0,
+        )
+        self.assertEqual(
+            camera_policy.camera_view_spec('HERO_85')['lens'],
+            85.0,
+        )
+        self.assertEqual(
+            camera_policy.camera_view_spec('DETAIL_120')['lens'],
+            120.0,
+        )
+
+    def test_still_view_specs_are_defensive_copies(self):
+        import camera_policy
+
+        first = camera_policy.camera_view_spec('HERO_85')
+        first['lens'] = 1.0
+        second = camera_policy.camera_view_spec('HERO_85')
+        self.assertEqual(second['lens'], 85.0)
+
+    def test_unknown_still_view_is_rejected(self):
+        import camera_policy
+
+        with self.assertRaises(ValueError):
+            camera_policy.camera_view_spec('DRONE_FROM_SPACE')

@@ -124,6 +124,112 @@ def main():
         check('camera framing repeat is datablock-bounded', before_counts == after_counts,
               {'before': before_counts, 'after': after_counts})
 
+        # Still views are deterministic and separate from motion policy.
+        yaw = legacy.REG.require_object('CAMERA_YAW')
+        pitch = legacy.REG.require_object('CAMERA_PITCH')
+        before_view_counts = {
+            name: len(getattr(bpy.data, name))
+            for name in ('objects', 'collections', 'cameras', 'actions')
+        }
+
+        def still_state():
+            return {
+                'lens': float(camera.data.lens),
+                'yaw': float(yaw.rotation_euler[2]),
+                'pitch': float(pitch.rotation_euler[0]),
+                'dolly': tuple(float(v) for v in dolly.location),
+            }
+
+        legacy.apply_camera_view(scene, 'HERO_85')
+        hero_first = still_state()
+        legacy.apply_camera_view(scene, 'WIDE_50')
+        wide = still_state()
+        legacy.apply_camera_view(scene, 'HERO_85')
+        hero_second = still_state()
+        after_view_counts = {
+            name: len(getattr(bpy.data, name))
+            for name in before_view_counts
+        }
+        check(
+            'Hero -> Wide -> Hero returns to identical camera state',
+            hero_first == hero_second,
+            {'first': hero_first, 'wide': wide, 'second': hero_second},
+        )
+        check(
+            'still view selection records HERO_85',
+            scene.awful_studio.camera_view == 'HERO_85',
+            scene.awful_studio.camera_view,
+        )
+        check(
+            'still view forces camera motion to STATIC',
+            scene.awful_studio.camera_motion == 'STATIC',
+            scene.awful_studio.camera_motion,
+        )
+        check(
+            'still views do not grow datablocks',
+            before_view_counts == after_view_counts,
+            {'before': before_view_counts, 'after': after_view_counts},
+        )
+        check(
+            'Wide preset uses 50mm and Hero uses 85mm',
+            abs(float(wide['lens']) - 50.0) < 1e-6
+            and abs(float(hero_second['lens']) - 85.0) < 1e-6,
+            {'wide': wide['lens'], 'hero': hero_second['lens']},
+        )
+
+        # Still views are deterministic and separate from motion policy.
+        yaw = legacy.REG.require_object('CAMERA_YAW')
+        pitch = legacy.REG.require_object('CAMERA_PITCH')
+        before_view_counts = {
+            name: len(getattr(bpy.data, name))
+            for name in ('objects', 'collections', 'cameras', 'actions')
+        }
+
+        def still_state():
+            return {
+                'lens': float(camera.data.lens),
+                'yaw': float(yaw.rotation_euler[2]),
+                'pitch': float(pitch.rotation_euler[0]),
+                'dolly': tuple(float(v) for v in dolly.location),
+            }
+
+        legacy.apply_camera_view(scene, 'HERO_85')
+        hero_first = still_state()
+        legacy.apply_camera_view(scene, 'WIDE_50')
+        wide = still_state()
+        legacy.apply_camera_view(scene, 'HERO_85')
+        hero_second = still_state()
+        after_view_counts = {
+            name: len(getattr(bpy.data, name))
+            for name in before_view_counts
+        }
+        check(
+            'Hero -> Wide -> Hero returns to identical camera state',
+            hero_first == hero_second,
+            {'first': hero_first, 'wide': wide, 'second': hero_second},
+        )
+        check(
+            'still view selection records HERO_85',
+            scene.awful_studio.camera_view == 'HERO_85',
+            scene.awful_studio.camera_view,
+        )
+        check(
+            'still view forces camera motion to STATIC',
+            scene.awful_studio.camera_motion == 'STATIC',
+            scene.awful_studio.camera_motion,
+        )
+        check(
+            'still views do not grow datablocks',
+            before_view_counts == after_view_counts,
+            {'before': before_view_counts, 'after': after_view_counts},
+        )
+        check(
+            'Wide preset uses 50mm and Hero uses 85mm',
+            abs(float(wide['lens']) - 50.0) < 1e-6
+            and abs(float(hero_second['lens']) - 85.0) < 1e-6,
+            {'wide': wide['lens'], 'hero': hero_second['lens']},
+        )
+
         REPORT['status'] = 'passed'
     except Exception:
         REPORT['traceback'] = traceback.format_exc()
