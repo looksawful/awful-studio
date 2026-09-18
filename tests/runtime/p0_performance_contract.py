@@ -97,6 +97,34 @@ def main():
         check('preview modes preserve final render and device settings', after == before,
               {'before': before, 'after': after})
 
+        output = policy.output_snapshot(scene)
+        check('output snapshot reports native engine',
+              output['engine'] == str(scene.render.engine), output)
+        check('output snapshot reports native device',
+              output['device'] == str(scene.cycles.device), output)
+        check('output snapshot reports final samples without changing them',
+              output['final_samples'] == int(scene.cycles.samples), output)
+        check('output snapshot reports native resolution',
+              output['resolution'] == (
+                  int(scene.render.resolution_x),
+                  int(scene.render.resolution_y),
+                  int(scene.render.resolution_percentage),
+              ), output)
+
+        transparent_before = bool(scene.render.film_transparent)
+        final_before_transparency = final_state(scene)
+        scene.render.film_transparent = not transparent_before
+        transparent_output = policy.output_snapshot(scene)
+        final_after_transparency = final_state(scene)
+        check('native transparent toggle is reflected in Output',
+              transparent_output['transparent'] == (not transparent_before),
+              transparent_output)
+        check('transparent toggle preserves final device/render settings',
+              final_after_transparency == final_before_transparency,
+              {'before': final_before_transparency,
+               'after': final_after_transparency})
+        scene.render.film_transparent = transparent_before
+
         REPORT['diagnostics'] = diagnostics
         REPORT['status'] = 'passed'
     except Exception:

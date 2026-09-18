@@ -115,6 +115,45 @@ class RuntimePerformancePolicyTests(unittest.TestCase):
         )
         self.assertEqual(final_after, final_before)
 
+    def test_output_snapshot_reports_native_final_state_without_mutation(self):
+        policy = load_performance_policy()
+        scene = types.SimpleNamespace(
+            awful_studio=types.SimpleNamespace(preview_mode='QUALITY'),
+            cycles=types.SimpleNamespace(
+                device='GPU',
+                samples=512,
+                preview_samples=16,
+                preview_adaptive_threshold=0.05,
+                use_preview_denoising=True,
+                use_light_tree=True,
+            ),
+            render=types.SimpleNamespace(
+                engine='CYCLES',
+                preview_pixel_size='1',
+                resolution_x=2400,
+                resolution_y=3000,
+                resolution_percentage=50,
+                film_transparent=True,
+            ),
+            get=lambda key, default=None: {
+                'awful_post_pipeline_enabled': True,
+            }.get(key, default),
+        )
+
+        snapshot = policy.output_snapshot(scene)
+        self.assertEqual(snapshot['preview_mode'], 'QUALITY')
+        self.assertEqual(snapshot['engine'], 'CYCLES')
+        self.assertEqual(snapshot['device'], 'GPU')
+        self.assertEqual(snapshot['final_samples'], 512)
+        self.assertEqual(snapshot['resolution'], (2400, 3000, 50))
+        self.assertTrue(snapshot['transparent'])
+        self.assertTrue(snapshot['post_pipeline'])
+    def test_output_panel_separates_preview_final_and_post(self):
+        source = (EXT / 'workflow_ui.py').read_text(encoding='utf-8')
+        self.assertIn("box.label(text='Viewport Preview')", source)
+        self.assertIn("box.label(text='Final Output')", source)
+        self.assertIn("box.label(text='Post')", source)
+        self.assertIn('runtime_performance.output_snapshot', source)
     def test_performance_policy_installs_before_registration(self):
         source = (EXT / '__init__.py').read_text(encoding='utf-8')
         self.assertIn('runtime_performance.install(legacy)', source)

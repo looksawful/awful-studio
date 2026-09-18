@@ -88,17 +88,49 @@ def _install_output_panel(legacy):
         bl_order = 60
 
         def draw(self, context):
+            from . import runtime_performance
+
             scene = context.scene
             settings = scene.awful_studio
             layout = self.layout
+            snapshot = runtime_performance.output_snapshot(scene)
+
+            box = layout.box()
+            box.label(text='Viewport Preview')
             if hasattr(settings, 'preview_mode'):
-                layout.prop(settings, 'preview_mode', text='Viewport')
-            layout.prop(
+                box.prop(settings, 'preview_mode', text='Mode')
+            box.label(
+                text=f"Samples: {snapshot['preview_samples']}",
+                icon='HIDE_OFF',
+            )
+
+            box = layout.box()
+            box.label(text='Final Output')
+            x, y, percentage = snapshot['resolution']
+            box.label(text=f"{snapshot['engine']} / {snapshot['device']}")
+            box.label(
+                text=(
+                    f"{x} x {y} @ {percentage}%"
+                    f" / {snapshot['final_samples']} samples"
+                )
+            )
+            box.prop(
                 scene.render,
                 'film_transparent',
                 text='Transparent Background',
             )
-            layout.operator(
+
+            box = layout.box()
+            box.label(text='Post')
+            box.label(
+                text=(
+                    'Pipeline: Built'
+                    if snapshot['post_pipeline']
+                    else 'Pipeline: Optional'
+                ),
+                icon='CHECKMARK' if snapshot['post_pipeline'] else 'INFO',
+            )
+            box.operator(
                 'awful.build_post_pipeline_v4',
                 icon='NODETREE',
             )

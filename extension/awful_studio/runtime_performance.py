@@ -47,6 +47,29 @@ def apply_preview_profile(scene, mode):
     return profile
 
 
+def output_snapshot(scene) -> dict[str, object]:
+    settings = getattr(scene, 'awful_studio', None)
+    getter = getattr(scene, 'get', None)
+    if callable(getter):
+        post_pipeline = bool(getter('awful_post_pipeline_enabled', False))
+    else:
+        post_pipeline = False
+    return {
+        'preview_mode': str(getattr(settings, 'preview_mode', 'FAST')),
+        'engine': str(getattr(scene.render, 'engine', 'UNKNOWN')),
+        'device': str(getattr(scene.cycles, 'device', 'UNKNOWN')),
+        'preview_samples': int(getattr(scene.cycles, 'preview_samples', 0) or 0),
+        'final_samples': int(getattr(scene.cycles, 'samples', 0) or 0),
+        'resolution': (
+            int(getattr(scene.render, 'resolution_x', 0) or 0),
+            int(getattr(scene.render, 'resolution_y', 0) or 0),
+            int(getattr(scene.render, 'resolution_percentage', 100) or 100),
+        ),
+        'transparent': bool(getattr(scene.render, 'film_transparent', False)),
+        'post_pipeline': post_pipeline,
+    }
+
+
 def _image_bytes(image):
     try:
         width, height = map(int, image.size)
