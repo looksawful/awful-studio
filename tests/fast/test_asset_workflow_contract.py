@@ -74,6 +74,33 @@ class AssetWorkflowContractTests(unittest.TestCase):
         self.assertIn("_set_preferences_section('SYSTEM')", source)
         self.assertLess(source.index("userpref_show('INVOKE_DEFAULT')"), source.rindex("_set_preferences_section('SYSTEM')"))
 
+    def test_environment_overview_is_compact_and_explicit(self):
+        import asset_workflow
+
+        lines = asset_workflow.environment_overview(
+            selected_preset='FISH_HOEK',
+            status_code='READY',
+            studio_enabled=True,
+            world_enabled=True,
+            background_visible=False,
+            glass_visible=True,
+        )
+        self.assertEqual(lines, (
+            'Source: HDRI - Ready',
+            'Lighting: Hybrid - Studio + World',
+            'Camera: Background Off - Glass On',
+        ))
+
+        sky = asset_workflow.environment_overview(
+            selected_preset='NISHITA_DAY',
+            status_code='PHYSICAL_SKY',
+            studio_enabled=False,
+            world_enabled=True,
+            background_visible=True,
+            glass_visible=False,
+        )
+        self.assertEqual(sky[0], 'Source: Physical Sky - Offline Ready')
+        self.assertEqual(sky[1], 'Lighting: World only')
     def test_unknown_environment_intent_is_rejected(self):
         import asset_workflow
 

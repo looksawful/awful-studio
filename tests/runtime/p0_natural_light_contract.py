@@ -4,6 +4,7 @@ import importlib
 import json
 from pathlib import Path
 import platform
+import socket
 import sys
 import traceback
 
@@ -17,6 +18,7 @@ REPORT = {
     'blender': bpy.app.version_string,
     'platform': platform.platform(),
     'python': sys.version,
+    'network_attempts': 0,
 }
 
 
@@ -214,6 +216,58 @@ def main():
         eager_volumes = [obj.name for obj in scene.objects
                          if ext.ownership.owned(obj, scene) and obj.type == 'VOLUME']
         check('no eager managed volumes', not eager_volumes, eager_volumes)
+
+        workflow = importlib.import_module(MODULE + '.asset_workflow')
+        settings.world_preset = 'NISHITA_DAY'
+        sky_status = workflow.runtime_status(legacy, ext.asset_cache, scene)
+        sky_lines = workflow.environment_overview(
+            selected_preset=settings.world_preset,
+            status_code=sky_status['code'],
+            studio_enabled=bool(settings.studio_lights_enabled),
+            world_enabled=bool(settings.natural_light_enabled),
+            background_visible=bool(settings.show_environment_background),
+            glass_visible=bool(settings.window_glass_enabled),
+        )
+        check(
+            'Physical Sky overview is offline-ready',
+            sky_lines[0] == 'Source: Physical Sky - Offline Ready',
+            sky_lines,
+        )
+
+        original_create_connection = socket.create_connection
+        original_socket_connect = socket.socket.connect
+
+        def blocked_network(*args, **kwargs):
+            REPORT['network_attempts'] += 1
+            raise RuntimeError('network blocked by natural-light contract')
+
+        socket.create_connection = blocked_network
+        socket.socket.connect = blocked_network
+        try:
+            settings.world_preset = 'FISH_HOEK'
+            hdri_status = workflow.runtime_status(legacy, ext.asset_cache, scene)
+        finally:
+            socket.create_connection = original_create_connection
+            socket.socket.connect = original_socket_connect
+
+        hdri_lines = workflow.environment_overview(
+            selected_preset=settings.world_preset,
+            status_code=hdri_status['code'],
+            studio_enabled=bool(settings.studio_lights_enabled),
+            world_enabled=bool(settings.natural_light_enabled),
+            background_visible=bool(settings.show_environment_background),
+            glass_visible=bool(settings.window_glass_enabled),
+        )
+        check(
+            'Environment status inspection makes zero network attempts',
+            REPORT['network_attempts'] == 0,
+            REPORT['network_attempts'],
+        )
+        check(
+            'HDRI overview remains explicit',
+            hdri_lines[0].startswith('Source: HDRI - '),
+            hdri_lines,
+        )
         REPORT['status'] = 'passed'
     except Exception:
         REPORT['traceback'] = traceback.format_exc()

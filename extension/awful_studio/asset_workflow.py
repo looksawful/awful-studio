@@ -86,6 +86,45 @@ def _asset_ready(legacy, cache, preset_id: str) -> bool:
     return bool(cache.read_valid(Path(legacy.hdri_asset_path(asset_key))) or cache.migrate_legacy_asset(record))
 
 
+def environment_overview(
+    *,
+    selected_preset: str,
+    status_code: str,
+    studio_enabled: bool,
+    world_enabled: bool,
+    background_visible: bool,
+    glass_visible: bool,
+) -> tuple[str, str, str]:
+    selected = str(selected_preset)
+    code = str(status_code)
+
+    if selected in PHYSICAL_SKY_PRESETS:
+        source = 'Source: Physical Sky - Offline Ready'
+    elif code == 'READY':
+        source = 'Source: HDRI - Ready'
+    elif code == 'BLENDER_ONLINE_ACCESS_OFF':
+        source = 'Source: HDRI - Blender Online Access Off'
+    elif code == 'AWFUL_CONSENT_REQUIRED':
+        source = 'Source: HDRI - Network Consent Required'
+    else:
+        source = 'Source: HDRI - Missing, Physical Sky fallback'
+
+    if studio_enabled and world_enabled:
+        lighting = 'Lighting: Hybrid - Studio + World'
+    elif studio_enabled:
+        lighting = 'Lighting: Studio only'
+    elif world_enabled:
+        lighting = 'Lighting: World only'
+    else:
+        lighting = 'Lighting: Off'
+
+    camera = (
+        f"Camera: Background {'On' if background_visible else 'Off'}"
+        f" - Glass {'On' if glass_visible else 'Off'}"
+    )
+    return source, lighting, camera
+
+
 def runtime_status(legacy, cache, scene) -> dict[str, object]:
     """Return compact Environment-panel status without causing network activity."""
     selected = str(scene.awful_studio.world_preset)
@@ -207,7 +246,16 @@ def install(legacy, cache):
         selected = str(scene.awful_studio.world_preset)
         status = runtime_status(legacy, cache, scene)
         box = self.layout.box()
-        box.label(text=str(status['label']), icon=str(status['icon']))
+        box.label(text='Environment Status')
+        for index, line in enumerate(environment_overview(
+                selected_preset=selected,
+                status_code=str(status['code']),
+                studio_enabled=bool(scene.awful_studio.studio_lights_enabled),
+                world_enabled=bool(scene.awful_studio.natural_light_enabled),
+                background_visible=bool(scene.awful_studio.show_environment_background),
+                glass_visible=bool(scene.awful_studio.window_glass_enabled))):
+            icon = str(status['icon']) if index == 0 else 'NONE'
+            box.label(text=line, icon=icon)
         if selected in HDRI_PRESETS:
             prefs = cache.preferences()
             if prefs is not None:
