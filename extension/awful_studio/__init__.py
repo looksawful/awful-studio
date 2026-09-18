@@ -3,7 +3,7 @@
 import time
 import bpy
 from bpy.props import BoolProperty, StringProperty, IntProperty, PointerProperty, EnumProperty
-from . import ownership, migrations, asset_cache, asset_workflow, post_pipeline, photography, camera_policy, studio_geometry, natural_light, runtime_performance, playback_policy, product_placement, product_quality, device_asset_loader, external_asset_library
+from . import ownership, migrations, asset_cache, asset_workflow, post_pipeline, photography, camera_policy, studio_geometry, natural_light, runtime_performance, playback_policy, product_placement, product_quality, device_asset_loader, external_asset_library, workflow_ui
 from .core import legacy
 
 # Policy installation mutates only in-memory preset metadata/callables. It must run
@@ -18,6 +18,7 @@ runtime_performance.install(legacy)
 playback_policy.install(legacy)
 product_placement.install(legacy)
 product_quality.install(legacy)
+workflow_ui.install(legacy)
 
 VERSION = (1, 0, 0)
 _registered = []
@@ -31,7 +32,7 @@ class AWFUL_AddonPreferences(bpy.types.AddonPreferences):
     diagnostics: BoolProperty(name='Diagnostics', default=False)
 
     def draw(self, context):
-        self.layout.label(text='AWFUL STUDIO 1.0.0 Р Р†Р вЂљРІР‚Сњ Blender 5.2 LTS')
+        self.layout.label(text='AWFUL STUDIO 1.0.0 Р В Р вЂ Р В РІР‚С™Р Р†Р вЂљРЎСљ Blender 5.2 LTS')
         self.layout.prop(self, 'asset_cache_path')
         self.layout.prop(self, 'external_asset_library_path')
         self.layout.operator('awful.register_external_asset_library')
