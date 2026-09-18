@@ -358,6 +358,7 @@ def build_cstand(mats, sem):
         add_cube(f"CSTAND_LEG_HINGE_{idx}", (0.060, 0.038, 0.025), hinge, mats["black_metal"], col, 0.006, root)
         rod_between(f"CSTAND_LEG_{idx}", start + radial * 0.035, end, 0.0125, mats["chrome"], col, root)
         add_cylinder(f"CSTAND_FOOT_{idx}", 0.017, 0.058, (end.x, end.y, 0.029), mats["rubber"], col, axis="Z", parent=root)
+        add_cylinder(f"CSTAND_LEG_KNEE_{idx}", 0.0185, 0.030, tuple(hinge), mats["black_metal"], col, axis="Z", parent=root, bevel=0.0012)
     # Three telescoping risers with decreasing diameters.
     add_cylinder("CSTAND_RISER_01", 0.0175, 0.700, (0, 0, 0.445), mats["chrome"], col, parent=root)
     add_cylinder("CSTAND_RISER_02", 0.0150, 0.590, (0, 0, 1.070), mats["chrome"], col, parent=root)
@@ -372,6 +373,8 @@ def build_cstand(mats, sem):
     add_cylinder("CSTAND_TOP_GRIP_BODY", 0.034, 0.034, (0, 0, 1.695), mats["black_metal"], col, parent=root)
     add_cylinder("CSTAND_TOP_GRIP_FACE_L", 0.029, 0.010, (-0.021, 0, 1.695), mats["aluminum"], col, axis="X", parent=root)
     add_cylinder("CSTAND_TOP_GRIP_FACE_R", 0.029, 0.010, (0.021, 0, 1.695), mats["aluminum"], col, axis="X", parent=root)
+    add_torus("CSTAND_TOP_ROSETTE_L", 0.0215, 0.0022, (-0.026, 0, 1.695), (0, math.radians(90), 0), mats["black_metal"], col, root)
+    add_torus("CSTAND_TOP_ROSETTE_R", 0.0215, 0.0022, (0.026, 0, 1.695), (0, math.radians(90), 0), mats["black_metal"], col, root)
     rod_between("CSTAND_TOP_HANDLE_STEM", (0.032, 0, 1.695), (0.085, 0, 1.695), 0.0050, mats["black_metal"], col, root, vertices=32)
     add_cylinder("CSTAND_TOP_HANDLE", 0.014, 0.024, (0.097, 0, 1.695), mats["black_plastic"], col, axis="X", parent=root)
     rod_between("CSTAND_TOP_TBAR", (0.097, -0.024, 1.695), (0.097, 0.024, 1.695), 0.0045, mats["black_metal"], col, root, vertices=24)
@@ -441,6 +444,8 @@ def build_d1(mats, sem, support_mount):
     for idx, x in enumerate((-0.010, 0.000, 0.010), start=1):
         add_cube(f"D1_DISPLAY_SEG_{idx}", (0.005, 0.0008, 0.011),
                  (x, -0.14985, z + 0.035), mats["indicator"], col, 0.00025, root)
+    add_torus("D1_REAR_CONTROL_RIM", 0.048, 0.0018, (0, -0.1492, z), (math.radians(90), 0, 0), mats["aluminum"], col, root)
+    add_cube("D1_BRAND_BADGE", (0.034, 0.0012, 0.009), (0, -0.1498, z + 0.061), mats["label"], col, 0.0012, root)
     add_cylinder("D1_SETTING_KNOB", 0.0155, 0.0020, (0, -0.1490, z - 0.002),
                  mats["black_plastic"], col, axis="Y", parent=root, bevel=0.0005)
 
@@ -570,6 +575,8 @@ def build_magnum(mats, sem, mount_modifier):
         (0, front - 0.0038, z), (math.radians(90), 0, 0),
         mats["silver"], col, root
     )
+    for idx, yy in enumerate((overall_start + 0.008, overall_start + 0.020, overall_start + 0.032), start=1):
+        add_torus(f"MAGNUM_COLLAR_RIB_{idx:02d}", 0.0605, 0.0014, (0, yy, z), (math.radians(90), 0, 0), mats["black_metal"], col, root)
     root["awful_mount_start_y_m"] = overall_start
     root["awful_front_y_m"] = front
     return root, outer
@@ -614,6 +621,9 @@ def build_sandbag(mats):
                      (0.004, 0.210, 0.003), (sx, 0.0, 0.083),
                      mats["fabric"], col, 0.0012, root)
 
+    add_cube("SANDBAG_CENTER_PINCH", (0.026, 0.230, 0.016), (0.250, 0.0, 0.076), mats["fabric"], col, 0.007, root)
+    add_cube("SANDBAG_GUSSET_1", (0.010, 0.205, 0.030), (0.164, 0.0, 0.058), mats["fabric"], col, 0.004, root)
+    add_cube("SANDBAG_GUSSET_2", (0.010, 0.205, 0.030), (0.336, 0.0, 0.058), mats["fabric"], col, 0.004, root)
     add_cube("SANDBAG_CENTER_STRAP", (0.058, 0.252, 0.020),
              (0.250, 0.0, 0.088), mats["webbing"], col, 0.008, root)
     add_cube("SANDBAG_LABEL_PATCH", (0.044, 0.070, 0.004),

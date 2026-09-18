@@ -1,9 +1,19 @@
 import json
 import pathlib
+import struct
 import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 RUNTIME = ROOT / "assets" / "studio_equipment" / "studio_rig_v01" / "runtime"
+
+
+def glb_node_names(path):
+    raw = path.read_bytes()
+    json_len, json_type = struct.unpack_from("<II", raw, 12)
+    if raw[:4] != b"glTF" or json_type != 0x4E4F534A:
+        raise AssertionError(f"invalid GLB: {path}")
+    doc = json.loads(raw[20:20 + json_len].decode("utf-8").rstrip(" \\t\\r\\n\\0"))
+    return {node.get("name") for node in doc.get("nodes", []) if node.get("name")}
 
 
 class StudioRigWebRuntimeContractTests(unittest.TestCase):
@@ -58,6 +68,18 @@ class StudioRigWebRuntimeContractTests(unittest.TestCase):
         manifest = json.loads((RUNTIME / "asset_manifest.json").read_text(encoding="utf-8"))
         for entry in manifest["assets"].values():
             self.assertTrue((RUNTIME / entry["glb"]).is_file(), entry["glb"])
+
+    def test_lod0_preserves_hero_detail_nodes_for_threejs(self):
+        manifest = json.loads((RUNTIME / "asset_manifest.json").read_text(encoding="utf-8"))
+        required = {
+            "studio_support_cstand_01": {"CSTAND_LEG_KNEE_1", "CSTAND_LEG_KNEE_2", "CSTAND_LEG_KNEE_3", "CSTAND_TOP_ROSETTE_L", "CSTAND_TOP_ROSETTE_R"},
+            "profoto_d1_500_air": {"D1_REAR_CONTROL_RIM", "D1_BRAND_BADGE"},
+            "profoto_magnum_100624": {"MAGNUM_COLLAR_RIB_01", "MAGNUM_COLLAR_RIB_02", "MAGNUM_COLLAR_RIB_03"},
+            "studio_sandbag_01": {"SANDBAG_CENTER_PINCH", "SANDBAG_GUSSET_1", "SANDBAG_GUSSET_2"},
+        }
+        for key, names in required.items():
+            lod0 = RUNTIME / manifest["assets"][key]["lod_glb"]["LOD0"]
+            self.assertTrue(names <= glb_node_names(lod0), (key, sorted(names - glb_node_names(lod0))))
 
     def test_headless_exporter_never_waits_for_overwrite_confirmation(self):
         exporter = (RUNTIME / "export_glb.py").read_text(encoding="utf-8")
