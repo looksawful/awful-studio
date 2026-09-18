@@ -30,6 +30,17 @@ export function cameraDirection(preset) {
 }
 
 export function previewMaterialPolicy(name, { hasTexture = false } = {}) {
+  const surfacePolicies = {
+    MAT_ANODIZED_ALUMINUM: { frontSide: true, envMapIntensity: 0.55, minRoughness: 0.28 },
+    MAT_IPAD_ALUMINUM: { frontSide: true, envMapIntensity: 0.55, minRoughness: 0.3 },
+    MAT_IPAD_EDGE: { frontSide: true, envMapIntensity: 0.5, minRoughness: 0.28 },
+    MAT_SPACE_BLACK_ALUMINUM: { frontSide: true, envMapIntensity: 0.5, minRoughness: 0.28 },
+    MAT_EDGE_ALUMINUM: { frontSide: true, envMapIntensity: 0.5, minRoughness: 0.28 },
+    MAT_BACK_GLASS: { frontSide: true, envMapIntensity: 0.32, minRoughness: 0.38 },
+    MAT_CAMERA_HOUSING: { frontSide: true, envMapIntensity: 0.45, minRoughness: 0.3 },
+    MAT_TRACKPAD: { frontSide: true, envMapIntensity: 0.35, minRoughness: 0.3 },
+  };
+  if (surfacePolicies[name]) return surfacePolicies[name];
   if (name === 'MAT_APPLE_LOGO_DECAL') {
     return { alphaTest: 0.5, transparent: false, depthWrite: true, frontSide: true };
   }
@@ -41,5 +52,5 @@ export function previewMaterialPolicy(name, { hasTexture = false } = {}) {
   if (name === 'MAT_DISPLAY_GLASS') {
     return { transmission: 0, transparent: true, opacity: 0.07, depthWrite: false, envMapIntensity: 0.04, minRoughness: 0.3, maxClearcoat: 0.03 };
   }
-  return {};
+  return { frontSide: true };
 }

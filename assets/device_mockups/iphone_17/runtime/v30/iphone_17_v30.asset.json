@@ -216,7 +216,7 @@
   "artifacts": {
     "generated_blend": {
       "path": "assets/device_mockups/iphone_17/generated/iphone_17_low_v30.blend",
-      "sha256": "a3bcc4cd36d24405f1e38041627d8a03af593ab6d2ad1e61bde6a3e549c534f6"
+      "sha256": "75460553a9e4b37c9b59fc092f59ffed268f060446e5598ba851e87e4b015cd3"
     },
     "validation": {
       "path": "assets/device_mockups/iphone_17/evidence/low_v30_validation.json",
