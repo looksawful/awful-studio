@@ -562,7 +562,8 @@ class StudioRegistry:
         used = {m for o in scene.objects if ownership.owned(o, scene)
                 for m in getattr(o.data, "materials", ()) if m}
         return next((m for m in bpy.data.materials if ownership.owned(m, scene)
-                     and m.get(ROLE_KEY) == role and (m.users == 0 or m in used)), None)
+                     and m.get(ROLE_KEY) == role
+                     and (m.users == 0 or m.use_fake_user or m in used)), None)
 
     def require_object(self, role):
         result = self.object(role)

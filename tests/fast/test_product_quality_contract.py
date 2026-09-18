@@ -123,6 +123,17 @@ class ProductQualityContractTests(unittest.TestCase):
         self.assertIn("scene.awful_studio.product_mockup = 'NONE'", legacy_source)
         self.assertIn('Use selected unmanaged object hierarchy as the editable product', legacy_source)
 
+    def test_required_diagnostic_material_survives_zero_user_save(self):
+        legacy_source = (
+            ROOT / 'extension' / 'awful_studio' / 'core' / 'legacy.py'
+        ).read_text(encoding='utf-8')
+        block = legacy_source.split('def make_diagnostic_material():', 1)[1]
+        block = block.split('def build_all_materials', 1)[0]
+        self.assertIn('mat.use_fake_user = True', block)
+
+        registry_block = legacy_source.split('    def material(self, role):', 1)[1]
+        registry_block = registry_block.split('    def require_object', 1)[0]
+        self.assertIn('m.use_fake_user', registry_block)
     def test_product_quality_installs_before_registration_and_exposes_one_action(self):
         init_source = INIT_PATH.read_text(encoding='utf-8')
         policy_source = MODULE_PATH.read_text(encoding='utf-8')

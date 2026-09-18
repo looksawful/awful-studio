@@ -457,6 +457,12 @@ def main():
                            if obj.type == 'MESH']
         check('mockup geometry measurable after save/reopen',
               legacy.world_bbox(reopened_meshes) is not None)
+        check(
+            'diagnostic material survives product save/reopen',
+            legacy.REG.material('MAT_DIAGNOSTIC') is not None,
+        )
+        legacy.validate_built_scene(scene)
+        check('built studio validates after product save/reopen', True)
         scene.awful_studio.product_mockup = 'DEVICE_MACBOOK_PRO_14'
         scene.awful_studio.auto_fit = True
         with ownership.for_scene(scene):
