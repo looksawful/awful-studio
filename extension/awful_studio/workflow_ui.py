@@ -55,7 +55,8 @@ def _draw_main(legacy, panel, context):
     snapshot = workflow_snapshot(legacy, scene)
     status = layout.box()
     for index, line in enumerate(status_lines(snapshot)):
-        status.label(text=line, icon='CHECKMARK' if index == 0 and snapshot['built'] else 'NONE')
+        icon = 'CHECKMARK' if index == 0 and snapshot['built'] else 'NONE'
+        status.label(text=line, icon=icon)
 
     if not snapshot['built']:
         layout.operator('awful.build_studio', icon='ADD')
@@ -63,8 +64,16 @@ def _draw_main(legacy, panel, context):
         return
 
     row = layout.row(align=True)
-    row.operator('awful.use_selected_product_v4', text='Use Selected', icon='OBJECT_DATA')
-    row.operator('awful.validate_v4', text='Validate', icon='CHECKMARK')
+    row.operator(
+        'awful.use_selected_product_v4',
+        text='Use Selected',
+        icon='OBJECT_DATA',
+    )
+    row.operator(
+        'awful.run_diagnostics',
+        text='Validate',
+        icon='CHECKMARK',
+    )
     layout.prop(scene.awful_studio, 'auto_fit', toggle=True)
 
 
@@ -84,14 +93,71 @@ def _install_output_panel(legacy):
             layout = self.layout
             if hasattr(settings, 'preview_mode'):
                 layout.prop(settings, 'preview_mode', text='Viewport')
-            layout.prop(scene.render, 'film_transparent', text='Transparent Background')
-            layout.operator('awful.build_post_pipeline_v4', icon='NODETREE')
+            layout.prop(
+                scene.render,
+                'film_transparent',
+                text='Transparent Background',
+            )
+            layout.operator(
+                'awful.build_post_pipeline_v4',
+                icon='NODETREE',
+            )
 
     legacy.AWFUL_PT_Output = AWFUL_PT_Output
     legacy.CLASSES = tuple(legacy.CLASSES) + (AWFUL_PT_Output,)
 
 
+def run_diagnostics(legacy, scene):
+    from . import runtime_performance, studio_diagnostics
+
+    state = scene.awful_state
+    try:
+        legacy.validate_static_configuration(scene)
+        legacy.validate_built_scene(scene)
+        items = studio_diagnostics.collect(
+            legacy,
+            scene,
+            runtime_performance,
+        )
+    except Exception as exc:
+        state.last_error = str(exc)
+        state.last_operation = 'validate: failed'
+        raise
+
+    counts = studio_diagnostics.summarize(items)
+    errors = [item for item in items if item.level == 'ERROR']
+    state.last_error = errors[0].message if errors else ''
+    state.last_operation = (
+        f"validate: ok={counts['OK']} "
+        f"warning={counts['WARNING']} "
+        f"error={counts['ERROR']}"
+    )
+    return items
+
+
 def _install_diagnostics_panel(legacy):
+    class AWFUL_OT_RunDiagnostics(legacy.bpy.types.Operator):
+        bl_idname = 'awful.run_diagnostics'
+        bl_label = 'Validate Studio'
+        bl_description = 'Run read-only AWFUL Studio diagnostics'
+
+        def execute(self, context):
+            try:
+                items = run_diagnostics(legacy, context.scene)
+            except Exception as exc:
+                self.report({'ERROR'}, str(exc))
+                return {'CANCELLED'}
+
+            warnings = [item for item in items if item.level == 'WARNING']
+            if warnings:
+                self.report(
+                    {'WARNING'},
+                    f'Validation OK with {len(warnings)} warning(s)',
+                )
+            else:
+                self.report({'INFO'}, 'AWFUL Studio validation OK')
+            return {'FINISHED'}
+
     class AWFUL_PT_Diagnostics(legacy.bpy.types.Panel):
         bl_label = 'Diagnostics'
         bl_idname = 'AWFUL_PT_DIAGNOSTICS'
@@ -105,17 +171,30 @@ def _install_diagnostics_panel(legacy):
             scene = context.scene
             layout = self.layout
             error = getattr(scene.awful_state, 'last_error', '')
+            operation = getattr(scene.awful_state, 'last_operation', '')
             if error:
-                layout.label(text='Last operation needs attention', icon='ERROR')
+                layout.label(
+                    text='Last operation needs attention',
+                    icon='ERROR',
+                )
                 layout.label(text=str(error)[:120])
             else:
-                layout.label(text='No recorded AWFUL error', icon='CHECKMARK')
-            layout.operator('awful.validate_v4', icon='CHECKMARK')
+                layout.label(
+                    text='No recorded AWFUL error',
+                    icon='CHECKMARK',
+                )
+            if operation:
+                layout.label(text=str(operation)[:120])
+            layout.operator('awful.run_diagnostics', icon='CHECKMARK')
             layout.operator('awful.rebuild_studio', icon='RECOVER_LAST')
             layout.operator('awful.reset_system')
 
+    legacy.AWFUL_OT_RunDiagnostics = AWFUL_OT_RunDiagnostics
     legacy.AWFUL_PT_Diagnostics = AWFUL_PT_Diagnostics
-    legacy.CLASSES = tuple(legacy.CLASSES) + (AWFUL_PT_Diagnostics,)
+    legacy.CLASSES = tuple(legacy.CLASSES) + (
+        AWFUL_OT_RunDiagnostics,
+        AWFUL_PT_Diagnostics,
+    )
 
 
 def _order_existing_panels(legacy):
@@ -137,7 +216,10 @@ def install(legacy):
     if getattr(legacy, '_awful_workflow_ui_installed', False):
         return
     legacy.AWFUL_PT_Main.draw = lambda self, context: _draw_main(
-        legacy, self, context)
+        legacy,
+        self,
+        context,
+    )
     _order_existing_panels(legacy)
     _install_output_panel(legacy)
     _install_diagnostics_panel(legacy)

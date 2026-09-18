@@ -17,6 +17,7 @@ CONTRACTS = (
     ('natural_light', 'p0_natural_light_contract.py'),
     ('asset_workflow', 'p0_asset_workflow_contract.py'),
     ('performance', 'p0_performance_contract.py'),
+    ('diagnostics', 'p0_diagnostics_contract.py'),
     ('post_pipeline', 'p0_post_pipeline_contract.py'),
     ('playback', 'p0_playback_contract.py'),
     ('product_quality', 'product_quality_contract.py'),
@@ -46,13 +47,20 @@ def main():
     try:
         for name, filename in CONTRACTS:
             seconds = run_contract(root / filename, args.work)
-            contract_report = json.loads((args.work / f'{name}.json').read_text(encoding='utf-8'))
+            contract_report = json.loads(
+                (args.work / f'{name}.json').read_text(encoding='utf-8'))
             if contract_report.get('status') != 'passed':
                 raise RuntimeError(f'{name} report did not pass')
-            report['contracts'].append({'name': name, 'wall_seconds': seconds})
+            report['contracts'].append({
+                'name': name,
+                'wall_seconds': seconds,
+            })
         report['status'] = 'passed'
     finally:
-        (args.work / 'p0_suite.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
+        (args.work / 'p0_suite.json').write_text(
+            json.dumps(report, indent=2),
+            encoding='utf-8',
+        )
 
     if report['status'] != 'passed':
         raise RuntimeError('AWFUL structural runtime suite failed')
