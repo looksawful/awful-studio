@@ -1,5 +1,11 @@
 # AWFUL STUDIO Agent Guide
 
+## Global reporting rule
+
+- EN: When reporting information to the user, be extremely concise. Sacrifice grammar if needed for brevity.
+- RU: При сообщении информации пользователю будь предельно краткой. Ради краткости можно жертвовать грамматикой.
+
+
 This file is the default entry point for GPT Chat, GPT Work, Codex-like agents, and human contributors.
 
 ## Start here
