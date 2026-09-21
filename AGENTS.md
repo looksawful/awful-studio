@@ -7,6 +7,14 @@
 
 
 This file is the default entry point for GPT Chat, GPT Work, Codex-like agents, and human contributors.
+## Cross-repository coordination
+
+- Before starting a new independent production stream or reprioritizing existing work, consult the owner's private cross-repository program control when it is accessible.
+- Do not copy private queue, status, approval, or internal coordination data into this public repository.
+- Global priority does not preempt already-started or claimed Studio work; take it to a safe boundary unless genuinely blocked or a critical production/safety risk requires intervention.
+- This repository's lifecycle, ownership, Blender-runtime, TDD, and release rules remain authoritative and may be stricter.
+- If private program control is unavailable, do not invent a global priority. Continue current claimed work or the owner's explicit Studio task.
+
 
 ## Start here
 
