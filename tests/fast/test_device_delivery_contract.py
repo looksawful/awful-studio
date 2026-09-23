@@ -17,6 +17,12 @@ except ImportError:
     contract = None
 
 MANIFEST = ROOT / 'assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30.asset.json'
+CANONICAL_MANIFESTS = (
+    MANIFEST,
+    ROOT / 'assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6.asset.json',
+    ROOT / 'assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6.asset.json',
+    ROOT / 'assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1.asset.json',
+)
 LOADER = ROOT / 'extension/awful_studio/device_asset_loader.py'
 
 
@@ -28,6 +34,14 @@ def load_loader():
 
 
 class DeviceDeliveryContractTests(unittest.TestCase):
+    def test_all_canonical_device_manifests_are_current_and_self_verifying(self):
+        self.assertIsNotNone(contract, 'device delivery contract helper is missing')
+        for manifest_path in CANONICAL_MANIFESTS:
+            with self.subTest(manifest=manifest_path):
+                self.assertTrue(manifest_path.is_file(), f'missing canonical manifest: {manifest_path}')
+                manifest = contract.load_manifest(manifest_path)
+                self.assertEqual(contract.verify_manifest(ROOT, manifest), [])
+
     def test_v30_manifest_is_current_and_self_verifying(self):
         self.assertTrue(MANIFEST.is_file(), f'missing canonical v30 manifest: {MANIFEST}')
         self.assertIsNotNone(contract, 'device delivery contract helper is missing')
