@@ -1,6 +1,7 @@
 import importlib.util
 import json
 from pathlib import Path
+from tempfile import TemporaryDirectory
 import sys
 import subprocess
 import unittest
@@ -76,6 +77,22 @@ class DeviceDeliveryContractTests(unittest.TestCase):
         self.assertEqual(lod['variant'], 'low_v30')
         self.assertEqual(lod['source_revision'], manifest['source_revision'])
         self.assertEqual(Path(lod['blend_path']).name, 'iphone_17_low_v30.blend')
+
+    def test_manifest_without_artifacts_is_rejected(self):
+        self.assertIsNotNone(contract, 'device delivery contract helper is missing')
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / 'generator.py'
+            source.write_text('print("device")\n', encoding='utf-8')
+            revision, source_hashes = contract.source_fingerprint(root, ['generator.py'])
+            manifest = {
+                'source_files': source_hashes,
+                'source_revision': revision,
+            }
+            self.assertEqual(
+                contract.verify_manifest(root, manifest),
+                ['artifacts missing or empty'],
+            )
 
     def test_wrong_stage_or_revision_is_rejected(self):
         self.assertIsNotNone(contract, 'device delivery contract helper is missing')
