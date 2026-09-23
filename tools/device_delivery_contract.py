@@ -55,7 +55,10 @@ def verify_manifest(root: Path, manifest: dict) -> list[str]:
     fingerprint, _ = source_fingerprint(root, source_files.keys())
     if manifest.get('source_revision') != fingerprint:
         errors.append('source_revision mismatch')
-    artifacts = manifest.get('artifacts', {})
+    artifacts = manifest.get('artifacts')
+    if not isinstance(artifacts, dict) or not artifacts:
+        errors.append('artifacts missing or empty')
+        return errors
     for name, item in sorted(artifacts.items()):
         if not isinstance(item, dict) or 'path' not in item or 'sha256' not in item:
             errors.append(f'invalid artifact entry: {name}')
