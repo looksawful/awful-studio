@@ -96,12 +96,17 @@ for edge_name in ('BOTTOM','TOP'):
             cavity=fc.cylinder(f'{edge_name}_{"L" if side<0 else "R"}_SPEAKER_{idx:02d}',.46*MM,.34*MM,black,detail_c,axis='Z',vertices=32)
             fc.place_on_rounded_edge(cavity,W,H,s['br']*MM,edge_name,x,outward=-.16*MM,local_normal=(0,0,1)); boolean_cuts.append(f'SPK_{edge_name}_{side}_{idx}')
 # Physical button recesses and shallow controls.
+CONTROL_PROFILE=2.26*MM
+CONTROL_RECESS_CLEARANCE=.20*MM
+VOLUME_LENGTH=10.06*MM
+VOLUME_UP_FROM_TOP=19.33*MM
+VOLUME_DOWN_FROM_TOP=31.39*MM
 def edge_button(name,edge_name,coord,dims,cut_dims,normal):
     cut=fc.rounded_cube(name+'_CUTTER',cut_dims,.25*MM,None,detail_c); fc.place_on_rounded_edge(cut,W,H,s['br']*MM,edge_name,coord,outward=-.28*MM,local_normal=normal); fc.boolean_difference(body,cut,name='CUT_'+name); boolean_cuts.append(name)
     btn=fc.rounded_cube(name,dims,.12*MM,metal_dark,detail_c); fc.place_on_rounded_edge(btn,W,H,s['br']*MM,edge_name,coord,outward=.018*MM,local_normal=normal); return btn
-edge_button('TOP_BUTTON','TOP',-W*.5+24*MM,(14*MM,.72*MM,.12*MM),(14.8*MM,1.3*MM,1.0*MM),(0,0,1))
-edge_button('VOL_UP','RIGHT',H*.5-28*MM,(.12*MM,.72*MM,10*MM),(1.0*MM,1.3*MM,10.8*MM),(1,0,0))
-edge_button('VOL_DOWN','RIGHT',H*.5-44*MM,(.12*MM,.72*MM,10*MM),(1.0*MM,1.3*MM,10.8*MM),(1,0,0))
+edge_button('TOP_BUTTON','TOP',-W*.5+24*MM,(14*MM,CONTROL_PROFILE,.12*MM),(14.8*MM,CONTROL_PROFILE+CONTROL_RECESS_CLEARANCE,1.0*MM),(0,0,1))
+edge_button('VOL_UP','RIGHT',H*.5-VOLUME_UP_FROM_TOP,(.12*MM,CONTROL_PROFILE,VOLUME_LENGTH),(1.0*MM,CONTROL_PROFILE+CONTROL_RECESS_CLEARANCE,10.8*MM),(1,0,0))
+edge_button('VOL_DOWN','RIGHT',H*.5-VOLUME_DOWN_FROM_TOP,(.12*MM,CONTROL_PROFILE,VOLUME_LENGTH),(1.0*MM,CONTROL_PROFILE+CONTROL_RECESS_CLEARANCE,10.8*MM),(1,0,0))
 bev=fc.add_bevel(body,.00018,segments=4)
 for edge in body.data.edges: edge.use_edge_sharp=True
 bev.harden_normals=True
