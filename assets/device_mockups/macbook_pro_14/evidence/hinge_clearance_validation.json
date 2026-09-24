@@ -1,0 +1,66 @@
+{
+  "source": "/home/runner/work/awful-studio/awful-studio/assets/device_mockups/macbook_pro_14/generated/macbook_pro_14_m5_low_v1_release.blend",
+  "states": [
+    {
+      "angle_deg": 0,
+      "pass": true,
+      "intersection_mm3": {
+        "barrel_l_base": 0.0,
+        "barrel_r_base": 0.0,
+        "cover_l_base": 0.0,
+        "cover_r_base": 0.0,
+        "cover_l_barrel": 0.0,
+        "cover_r_barrel": 0.0
+      }
+    },
+    {
+      "angle_deg": 30,
+      "pass": true,
+      "intersection_mm3": {
+        "barrel_l_base": 0.0,
+        "barrel_r_base": 0.0,
+        "cover_l_base": 0.0,
+        "cover_r_base": 0.0,
+        "cover_l_barrel": 0.0,
+        "cover_r_barrel": 0.0
+      }
+    },
+    {
+      "angle_deg": 60,
+      "pass": true,
+      "intersection_mm3": {
+        "barrel_l_base": 0.0,
+        "barrel_r_base": 0.0,
+        "cover_l_base": 0.0,
+        "cover_r_base": 0.0,
+        "cover_l_barrel": 0.0,
+        "cover_r_barrel": 0.0
+      }
+    },
+    {
+      "angle_deg": 90,
+      "pass": true,
+      "intersection_mm3": {
+        "barrel_l_base": 0.0,
+        "barrel_r_base": 0.0,
+        "cover_l_base": 0.0,
+        "cover_r_base": 0.0,
+        "cover_l_barrel": 0.0,
+        "cover_r_barrel": 0.0
+      }
+    },
+    {
+      "angle_deg": 102,
+      "pass": true,
+      "intersection_mm3": {
+        "barrel_l_base": 0.0,
+        "barrel_r_base": 0.0,
+        "cover_l_base": 0.0,
+        "cover_r_base": 0.0,
+        "cover_l_barrel": 0.0,
+        "cover_r_barrel": 0.0
+      }
+    }
+  ],
+  "passed": true
+}
