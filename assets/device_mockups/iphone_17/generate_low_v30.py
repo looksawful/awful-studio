@@ -190,7 +190,9 @@ sbsdf = screen_mat.node_tree.nodes.get("Principled BSDF")
 sbsdf.inputs["Coat Weight"].default_value = 0.16
 sbsdf.inputs["Coat Roughness"].default_value = 0.035
 
-# Front camera / TrueDepth assembly from Apple dimensional drawing.\n# Detail Q gives the 20.75 x 5.12 mm keepout centerline at 7.79 mm from the top datum.\nisland_z = H*0.5 - 7.79*MM
+# Front camera / TrueDepth assembly from Apple dimensional drawing.
+# Detail Q gives the 20.75 x 5.12 mm keepout centerline at 7.79 mm from the top datum.
+island_z = H*0.5 - 7.79*MM
 island_y = front_surface - 0.012*MM
 detail_y = front_surface - 0.024*MM
 island = fc.rounded_prism("DYNAMIC_ISLAND", 20.75*MM, 5.12*MM, 0.012*MM, 2.55*MM, island_mat, detail_c, axis="Y", location=(0, island_y, island_z), outline_segments=96)
@@ -376,7 +378,10 @@ root["screen_glow_type"] = "rect_area"
 root["surface_aware_controls"] = True
 root["surface_aware_bottom"] = True
 root["real_display_pocket"] = True
-root["front_camera_present"] = True\nroot["front_camera_keepout_mm"] = "20.75 x 5.12"\nroot["front_camera_center_from_top_mm"] = 7.79\nroot["apple_logo_decal"] = True
+root["front_camera_present"] = True
+root["front_camera_keepout_mm"] = "20.75 x 5.12"
+root["front_camera_center_from_top_mm"] = 7.79
+root["apple_logo_decal"] = True
 root["rear_camera_outer_diameter_mm"] = 16.0
 root["rear_camera_optical_diameter_mm"] = 13.62
 root["publish_preview_material"] = "black_anodized"
@@ -459,7 +464,9 @@ for control_name in ("ACTION_BUTTON", "VOL_UP", "VOL_DOWN", "SIDE_BUTTON"):
 button_protrusion_mm = min(button_protrusions_mm)
 cc = bpy.data.objects["CAMERA_CONTROL"]
 cc_outer_x = max(abs((cc.matrix_world @ fc.Vector(corner)).x) for corner in cc.bound_box)
-camera_control_protrusion_mm = (cc_outer_x - rail_outer_x) / MM\nfront_camera_center_from_top_mm = (H * 0.5 - island.location.z) / MM\npassed = (
+camera_control_protrusion_mm = (cc_outer_x - rail_outer_x) / MM
+front_camera_center_from_top_mm = (H * 0.5 - island.location.z) / MM
+passed = (
     non_manifold == 0
     and not missing
     and not forbidden
@@ -467,7 +474,9 @@ camera_control_protrusion_mm = (cc_outer_x - rail_outer_x) / MM\nfront_camera_ce
     and all(abs(v) <= 0.01 for v in delta_mm.values())
     and camera_backing_protrusion_mm >= 0.25
     and button_protrusion_mm >= 0.45
-    and 0.0 <= camera_control_protrusion_mm <= 0.20\n    and abs(front_camera_center_from_top_mm - 7.79) <= 0.01\n)
+    and 0.0 <= camera_control_protrusion_mm <= 0.20
+    and abs(front_camera_center_from_top_mm - 7.79) <= 0.01
+)
 evidence = {
     "asset_id": "iphone_17",
     "stage": "LOW_DRAFT",
@@ -490,7 +499,10 @@ evidence = {
     "camera_backing_protrusion_mm": round(camera_backing_protrusion_mm, 4),
     "camera_backing_visible": not housing_seat.hide_render,
     "button_min_protrusion_mm": round(button_protrusion_mm, 4),
-    "camera_control_protrusion_mm": max(0.0, round(camera_control_protrusion_mm, 4)),\n    "front_camera_keepout_mm": [20.75, 5.12],\n    "front_camera_center_from_top_mm": round(front_camera_center_from_top_mm, 4),\n    "passed": passed,
+    "camera_control_protrusion_mm": max(0.0, round(camera_control_protrusion_mm, 4)),
+    "front_camera_keepout_mm": [20.75, 5.12],
+    "front_camera_center_from_top_mm": round(front_camera_center_from_top_mm, 4),
+    "passed": passed,
 }
 os.makedirs(os.path.dirname(EVIDENCE), exist_ok=True)
 with open(EVIDENCE, "w", encoding="utf-8", newline="\n") as handle:
