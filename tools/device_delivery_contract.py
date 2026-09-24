@@ -118,3 +118,55 @@ def verify_glb_provenance(path: Path, manifest: dict) -> list[str]:
         if extras.get(key) != value:
             errors.append(f'GLB provenance mismatch: {key}')
     return errors
+
+
+def _glb_triangle_count(document: dict) -> int:
+    accessors = document.get('accessors', [])
+    triangles = 0
+    for mesh in document.get('meshes', []):
+        for primitive in mesh.get('primitives', []):
+            if primitive.get('mode', 4) != 4:
+                continue
+            accessor_index = primitive.get('indices')
+            if accessor_index is None:
+                accessor_index = primitive.get('attributes', {}).get('POSITION')
+            if accessor_index is None or accessor_index >= len(accessors):
+                raise ValueError('GLB triangle primitive is missing a valid accessor')
+            triangles += int(accessors[accessor_index].get('count', 0)) // 3
+    return triangles
+
+
+def verify_glb_round_trip(path: Path, manifest: dict) -> list[str]:
+    try:
+        document = load_glb_document(path)
+        triangle_count = _glb_triangle_count(document)
+    except (OSError, ValueError, json.JSONDecodeError) as error:
+        return [str(error)]
+
+    qa = manifest.get('glb_qa')
+    if not isinstance(qa, dict) or not qa:
+        return ['glb_qa missing or empty']
+
+    errors: list[str] = []
+    node_names = {node.get('name') for node in document.get('nodes', []) if node.get('name')}
+    required_nodes = set(qa.get('required_nodes', []))
+    missing_nodes = sorted(required_nodes - node_names)
+    if missing_nodes:
+        errors.append(f'GLB required nodes missing: {", ".join(missing_nodes)}')
+
+    expected_materials = set(manifest.get('materials', []))
+    actual_materials = {
+        material.get('name')
+        for material in document.get('materials', [])
+        if material.get('name')
+    }
+    if actual_materials != expected_materials:
+        errors.append('GLB material IDs mismatch')
+
+    if len(document.get('nodes', [])) != qa.get('node_count'):
+        errors.append('GLB node count mismatch')
+    if len(document.get('materials', [])) != qa.get('material_count'):
+        errors.append('GLB material count mismatch')
+    if triangle_count != qa.get('triangle_count'):
+        errors.append('GLB triangle count mismatch')
+    return errors
