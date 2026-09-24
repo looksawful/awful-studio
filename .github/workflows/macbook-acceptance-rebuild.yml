@@ -1,0 +1,70 @@
+name: MacBook acceptance rebuild
+
+on:
+  pull_request:
+    paths:
+      - 'assets/device_mockups/macbook_pro_14/**'
+      - 'extension/awful_studio/assets/devices/macbook_pro_14_m5_low_v1_release.blend'
+      - 'extension/awful_studio/device_asset_loader.py'
+      - 'tools/build_macbook_v1_web.py'
+      - '.github/workflows/macbook-acceptance-rebuild.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Install exact official Blender
+        shell: bash
+        run: |
+          python tools/setup_blender.py --destination .blender > blender-path.txt
+          echo "BLENDER=$(tail -n 1 blender-path.txt)" >> "$GITHUB_ENV"
+
+      - name: Rebuild canonical MacBook source
+        shell: bash
+        run: |
+          "$BLENDER" --factory-startup --background --python-exit-code 1             --python assets/device_mockups/macbook_pro_14/generate_low.py
+
+      - name: Validate full hinge sweep
+        shell: bash
+        run: |
+          "$BLENDER"             assets/device_mockups/macbook_pro_14/generated/macbook_pro_14_m5_low_v1_release.blend             --factory-startup --background --python-exit-code 1             --python assets/device_mockups/macbook_pro_14/validate_hinge_clearance.py             -- --out assets/device_mockups/macbook_pro_14/evidence/hinge_clearance_validation.json
+
+      - name: Render deterministic hinge acceptance pack
+        shell: bash
+        run: |
+          "$BLENDER"             assets/device_mockups/macbook_pro_14/generated/macbook_pro_14_m5_low_v1_release.blend             --factory-startup --background --python-exit-code 1             --python assets/device_mockups/macbook_pro_14/render_hinge_acceptance.py             -- --out assets/device_mockups/macbook_pro_14/previews/acceptance_v1
+
+      - name: Build GLB, Meshopt and manifest
+        shell: bash
+        run: python tools/build_macbook_v1_web.py --blender "$BLENDER"
+
+      - name: Verify MacBook delivery contract
+        shell: bash
+        run: python tests/fast/test_macbook_web_delivery_contract.py -v
+
+      - name: Show generated diff
+        shell: bash
+        run: |
+          git diff --check
+          git status --short
+          git diff --stat
+
+      - name: Upload canonical rebuild
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: macbook-acceptance-rebuild
+          if-no-files-found: error
+          path: |
+            assets/device_mockups/macbook_pro_14/evidence/low_v1_release_validation.json
+            assets/device_mockups/macbook_pro_14/evidence/hinge_clearance_validation.json
+            assets/device_mockups/macbook_pro_14/generated/macbook_pro_14_m5_low_v1_release.blend
+            assets/device_mockups/macbook_pro_14/previews/acceptance_v1/*.png
+            assets/device_mockups/macbook_pro_14/runtime/v1/*
+            extension/awful_studio/assets/devices/macbook_pro_14_m5_low_v1_release.blend
+            extension/awful_studio/device_asset_loader.py
