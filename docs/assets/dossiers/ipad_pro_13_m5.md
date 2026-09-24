@@ -5,7 +5,7 @@
     - Asset ID: `ipad_pro_13_m5`
     - Category: `DEVICE_MOCKUP`
     - Identity class: `PROJECT_VERIFIED`
-    - Current stage: `RELEASE_CANDIDATE`
+    - Current stage: `LOW_DRAFT`
     - Quality tier: `HERO`
     - Variants: `Space Black`, `Silver`
     - `production_ready=true` means this dossier is complete enough to enter the next modeling gate; it does not mean the 3D asset is released.
