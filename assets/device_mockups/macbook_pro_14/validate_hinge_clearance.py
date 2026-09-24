@@ -18,6 +18,9 @@ OUT = os.path.abspath(
         os.path.join(os.path.dirname(bpy.data.filepath), "hinge_clearance.json"),
     )
 )
+REPO_ROOT = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "..", "..")
+)
 ANGLES = (0, 30, 60, 90, 102)
 MAX_INTERSECTION_MM3 = 0.01
 PAIRS = (
@@ -62,7 +65,8 @@ def intersection_volume_mm3(a_name, b_name, suffix):
     return round(volume, 6)
 
 
-result = {"source": bpy.data.filepath, "states": []}
+source_path = os.path.relpath(bpy.data.filepath, REPO_ROOT).replace(os.sep, "/")
+result = {"source": source_path, "states": []}
 failed = False
 for angle in ANGLES:
     if hinge.animation_data:
