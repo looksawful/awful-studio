@@ -270,6 +270,33 @@ def _transform_point(matrix, point):
     )
 
 
+def _normalize_accessor_component(value: float, component_type: int) -> float:
+    if component_type == 5120:
+        return max(float(value) / 127.0, -1.0)
+    if component_type == 5121:
+        return float(value) / 255.0
+    if component_type == 5122:
+        return max(float(value) / 32767.0, -1.0)
+    if component_type == 5123:
+        return float(value) / 65535.0
+    return float(value)
+
+
+def _accessor_bounds(accessor: dict):
+    minimum = accessor.get('min')
+    maximum = accessor.get('max')
+    if not isinstance(minimum, list) or not isinstance(maximum, list) or len(minimum) < 3 or len(maximum) < 3:
+        raise ValueError('GLB POSITION accessor is missing min/max bounds')
+    if accessor.get('normalized'):
+        component_type = accessor.get('componentType')
+        minimum = [_normalize_accessor_component(value, component_type) for value in minimum]
+        maximum = [_normalize_accessor_component(value, component_type) for value in maximum]
+    else:
+        minimum = [float(value) for value in minimum]
+        maximum = [float(value) for value in maximum]
+    return minimum, maximum
+
+
 def _node_mesh_bounds(document: dict, world_matrices, node_index: int):
     nodes = document.get('nodes', [])
     meshes = document.get('meshes', [])
@@ -287,10 +314,7 @@ def _node_mesh_bounds(document: dict, world_matrices, node_index: int):
         if accessor_index is None or accessor_index < 0 or accessor_index >= len(accessors):
             raise ValueError('GLB mesh primitive is missing a valid POSITION accessor')
         accessor = accessors[accessor_index]
-        minimum = accessor.get('min')
-        maximum = accessor.get('max')
-        if not isinstance(minimum, list) or not isinstance(maximum, list) or len(minimum) < 3 or len(maximum) < 3:
-            raise ValueError('GLB POSITION accessor is missing min/max bounds')
+        minimum, maximum = _accessor_bounds(accessor)
         for x in (minimum[0], maximum[0]):
             for y in (minimum[1], maximum[1]):
                 for z in (minimum[2], maximum[2]):
