@@ -25,6 +25,12 @@ jobs:
           python tools/setup_blender.py --destination .blender > blender-path.txt
           echo "BLENDER=$(tail -n 1 blender-path.txt)" >> "$GITHUB_ENV"
 
+      - name: Install headless render libraries
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libegl1 libgl1
+
       - name: Rebuild canonical MacBook source
         shell: bash
         run: |
