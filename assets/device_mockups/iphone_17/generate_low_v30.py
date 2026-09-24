@@ -190,18 +190,20 @@ sbsdf = screen_mat.node_tree.nodes.get("Principled BSDF")
 sbsdf.inputs["Coat Weight"].default_value = 0.16
 sbsdf.inputs["Coat Roughness"].default_value = 0.035
 
-# Front camera / TrueDepth assembly from Apple dimensional drawing.
-island_z = H*0.5 - 10.35*MM
+# The visible Dynamic Island follows the official screen raster. Apple's Detail Q dimensions
+# describe the independent front camera / sensor keepout, not the visible silhouette.
+island_visual_z = H*0.5 - 6.14*MM
+front_hardware_z = H*0.5 - 7.79*MM
 island_y = front_surface - 0.012*MM
 detail_y = front_surface - 0.024*MM
-island = fc.rounded_prism("DYNAMIC_ISLAND", 20.75*MM, 5.12*MM, 0.012*MM, 2.55*MM, island_mat, detail_c, axis="Y", location=(0, island_y, island_z), outline_segments=96)
-fc.rounded_prism("FRONT_SENSOR_PILL", 7.10*MM, 2.30*MM, 0.016*MM, 1.15*MM, sensor_pill_mat, detail_c, axis="Y", location=(-4.15*MM, detail_y, island_z), outline_segments=64)
+island = fc.rounded_prism("DYNAMIC_ISLAND", 21.47*MM, 6.46*MM, 0.012*MM, 3.23*MM, island_mat, detail_c, axis="Y", location=(0, island_y, island_visual_z), outline_segments=96)
+fc.rounded_prism("FRONT_SENSOR_PILL", 7.10*MM, 2.30*MM, 0.016*MM, 1.15*MM, sensor_pill_mat, detail_c, axis="Y", location=(-4.15*MM, detail_y, front_hardware_z), outline_segments=64)
 cam_x = 5.05*MM
-fc.cylinder("FRONT_CAMERA_RING", 1.15*MM, 0.014*MM, metal_dark, detail_c, (cam_x, detail_y, island_z), axis="Y", vertices=128)
-fc.cylinder("FRONT_CAMERA_GLASS", 0.84*MM, 0.012*MM, front_optic, detail_c, (cam_x, detail_y - 0.004*MM, island_z), axis="Y", vertices=128)
-fc.cylinder("FRONT_CAMERA_INNER", 0.52*MM, 0.010*MM, black, detail_c, (cam_x, detail_y - 0.010*MM, island_z), axis="Y", vertices=96)
-fc.cylinder("FRONT_CAMERA_IRIS", 0.28*MM, 0.008*MM, front_optic, detail_c, (cam_x, detail_y - 0.016*MM, island_z), axis="Y", vertices=80)
-fc.cylinder("FRONT_CAMERA_PUPIL", 0.12*MM, 0.006*MM, black, detail_c, (cam_x, detail_y - 0.021*MM, island_z), axis="Y", vertices=64)
+fc.cylinder("FRONT_CAMERA_RING", 1.15*MM, 0.014*MM, metal_dark, detail_c, (cam_x, detail_y, front_hardware_z), axis="Y", vertices=128)
+fc.cylinder("FRONT_CAMERA_GLASS", 0.84*MM, 0.012*MM, front_optic, detail_c, (cam_x, detail_y - 0.004*MM, front_hardware_z), axis="Y", vertices=128)
+fc.cylinder("FRONT_CAMERA_INNER", 0.52*MM, 0.010*MM, black, detail_c, (cam_x, detail_y - 0.010*MM, front_hardware_z), axis="Y", vertices=96)
+fc.cylinder("FRONT_CAMERA_IRIS", 0.28*MM, 0.008*MM, front_optic, detail_c, (cam_x, detail_y - 0.016*MM, front_hardware_z), axis="Y", vertices=80)
+fc.cylinder("FRONT_CAMERA_PUPIL", 0.12*MM, 0.006*MM, black, detail_c, (cam_x, detail_y - 0.021*MM, front_hardware_z), axis="Y", vertices=64)
 receiver = fc.rounded_cube("FRONT_RECEIVER_MIC", (14.02*MM, 0.020*MM, 0.30*MM), 0.14*MM, black, detail_c, location=(0, front_surface - 0.012*MM, H*0.5 - 0.62*MM))
 
 housing_x = CAM_CENTER_X
@@ -378,6 +380,8 @@ root["surface_aware_controls"] = True
 root["surface_aware_bottom"] = True
 root["real_display_pocket"] = True
 root["front_camera_present"] = True
+root["front_camera_keepout_mm"] = "20.75 x 5.12"
+root["front_camera_center_from_top_mm"] = 7.79
 root["apple_logo_decal"] = True
 root["rear_camera_outer_diameter_mm"] = 16.0
 root["rear_camera_optical_diameter_mm"] = 13.62
@@ -412,10 +416,10 @@ cam_back = persp("CAM_BACK", (0, 0.42, 0), (0,0,0), 92)
 cam_three = persp("CAM_THREE_QUARTER", (0.20, -0.30, 0.15), (0,0,0.010), 82)
 cam_left = persp("CAM_LEFT_SIDE", (-0.22, -0.07, 0.020), (-W*0.48,0,0.020), 92)
 cam_right = persp("CAM_RIGHT_SIDE", (0.22, -0.07, -0.004), (W*0.48,0,-0.004), 92)
-cam_bottom = persp("CAM_BOTTOM_MACRO", (0.0, -0.16, -0.125), (0,0,-H*0.485), 105)
+cam_bottom = persp("CAM_BOTTOM_MACRO", (0.0, -0.075, -0.135), (0,0,-H*0.490), 96)
 cam_screen = persp("CAM_SCREEN_EDGE_MACRO", (0.095, -0.13, 0.096), (W*0.39,front_surface,H*0.40), 110)
 cam_camera = persp("CAM_CAMERA_MACRO", (0.070, 0.18, 0.100), (0.020,0.004,0.052), 115)
-cam_front_sensor = persp("CAM_FRONT_SENSOR_MACRO", (0.0, -0.125, 0.082), (0, front_surface, island_z), 120)
+cam_front_sensor = persp("CAM_FRONT_SENSOR_MACRO", (0.0, -0.125, 0.082), (0, front_surface, front_hardware_z), 120)
 cam_back_three = persp("CAM_BACK_THREE_QUARTER", (0.18, 0.30, 0.13), (0.010,0.002,0.020), 84)
 
 bpy.context.view_layer.update()
@@ -462,6 +466,7 @@ button_protrusion_mm = min(button_protrusions_mm)
 cc = bpy.data.objects["CAMERA_CONTROL"]
 cc_outer_x = max(abs((cc.matrix_world @ fc.Vector(corner)).x) for corner in cc.bound_box)
 camera_control_protrusion_mm = (cc_outer_x - rail_outer_x) / MM
+front_camera_center_from_top_mm = (H * 0.5 - front_hardware_z) / MM
 passed = (
     non_manifold == 0
     and not missing
@@ -471,6 +476,7 @@ passed = (
     and camera_backing_protrusion_mm >= 0.25
     and button_protrusion_mm >= 0.45
     and 0.0 <= camera_control_protrusion_mm <= 0.20
+    and abs(front_camera_center_from_top_mm - 7.79) <= 0.01
 )
 evidence = {
     "asset_id": "iphone_17",
@@ -495,6 +501,8 @@ evidence = {
     "camera_backing_visible": not housing_seat.hide_render,
     "button_min_protrusion_mm": round(button_protrusion_mm, 4),
     "camera_control_protrusion_mm": max(0.0, round(camera_control_protrusion_mm, 4)),
+    "front_camera_keepout_mm": [20.75, 5.12],
+    "front_camera_center_from_top_mm": round(front_camera_center_from_top_mm, 4),
     "passed": passed,
 }
 os.makedirs(os.path.dirname(EVIDENCE), exist_ok=True)

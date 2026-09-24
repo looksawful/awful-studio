@@ -14,6 +14,9 @@
     {"element":"rear_camera.optical_diameter","source_class":"engineering","reference":13.62,"model":13.62,"delta":0.0,"confidence":"official","status":"match"},
     {"element":"flash.diameter","source_class":"engineering","reference":6.28,"model":6.28,"delta":0.0,"confidence":"official","status":"match"},
     {"element":"rear_mic.diameter","source_class":"engineering","reference":1.0,"model":1.0,"delta":0.0,"confidence":"official","status":"match"},
+    {"element":"front_camera_keepout.width","source_class":"engineering","reference":20.75,"model":20.75,"delta":0.0,"confidence":"official","status":"match"},
+    {"element":"front_camera_keepout.height","source_class":"engineering","reference":5.12,"model":5.12,"delta":0.0,"confidence":"official","status":"match"},
+    {"element":"front_camera_keepout.center_from_top","source_class":"engineering","reference":7.79,"model":7.79,"delta":0.0,"confidence":"official","status":"match"},
     {"element":"camera_plateau.profile","source_class":"engineering+visual","reference":null,"model":"generic_rounded_prism","delta":null,"confidence":"requires_trace","status":"repair"},
     {"element":"camera_control.protrusion","source_class":"visual/internal","reference":null,"model":null,"delta":null,"confidence":"not_official","status":"validate_nonnegative"}
   ]
