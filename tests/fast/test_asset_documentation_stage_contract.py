@@ -1,3 +1,5 @@
+"""Keep generated device documentation stages aligned with committed validation evidence."""
+
 import json
 import unittest
 from pathlib import Path
