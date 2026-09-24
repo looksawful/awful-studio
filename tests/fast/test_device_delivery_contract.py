@@ -1,3 +1,4 @@
+from copy import deepcopy
 import importlib.util
 import json
 from pathlib import Path
@@ -67,6 +68,38 @@ class DeviceDeliveryContractTests(unittest.TestCase):
                         contract.verify_glb_round_trip(glb, manifest),
                         [],
                     )
+
+    def test_round_trip_rejects_wrong_runtime_bounds(self):
+        manifest = contract.load_manifest(MANIFEST)
+        broken = deepcopy(manifest)
+        broken['glb_qa']['runtime_bounds_mm'] = [0.0, 0.0, 0.0]
+        glb = MANIFEST.parent / manifest['web_variants']['compat']['file']
+        self.assertEqual(
+            contract.verify_glb_round_trip(glb, broken),
+            ['GLB runtime bounds mismatch'],
+        )
+
+    def test_v30_glb_qa_records_camera_backing_protrusion(self):
+        validation = json.loads(
+            (ROOT / 'assets/device_mockups/iphone_17/evidence/low_v30_validation.json').read_text(
+                encoding='utf-8'
+            )
+        )
+        manifest = contract.load_manifest(MANIFEST)
+        self.assertEqual(
+            manifest['glb_qa']['camera_backing_protrusion_mm'],
+            validation['camera_backing_protrusion_mm'],
+        )
+
+    def test_round_trip_rejects_wrong_camera_backing_protrusion(self):
+        manifest = contract.load_manifest(MANIFEST)
+        broken = deepcopy(manifest)
+        broken['glb_qa']['camera_backing_protrusion_mm'] = 99.0
+        glb = MANIFEST.parent / manifest['web_variants']['compat']['file']
+        self.assertEqual(
+            contract.verify_glb_round_trip(glb, broken),
+            ['GLB camera backing protrusion mismatch'],
+        )
 
     def test_v30_manifest_is_current_and_self_verifying(self):
         self.assertTrue(MANIFEST.is_file(), f'missing canonical v30 manifest: {MANIFEST}')
