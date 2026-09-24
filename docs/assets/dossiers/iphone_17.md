@@ -5,7 +5,7 @@
     - Asset ID: `iphone_17`
     - Category: `DEVICE_MOCKUP`
     - Identity class: `PROJECT_VERIFIED`
-    - Current stage: `LOW_V15`
+    - Current stage: `LOW_DRAFT`
     - Quality tier: `HERO`
     - Variants: `Space Black`, `Silver`
     - `production_ready=true` means this dossier is complete enough to enter the next modeling gate; it does not mean the 3D asset is released.
