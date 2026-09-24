@@ -42,6 +42,19 @@ class DeviceDeliveryContractTests(unittest.TestCase):
                 manifest = contract.load_manifest(manifest_path)
                 self.assertEqual(contract.verify_manifest(ROOT, manifest), [])
 
+    def test_all_canonical_web_glbs_preserve_manifest_provenance(self):
+        self.assertIsNotNone(contract, 'device delivery contract helper is missing')
+        for manifest_path in CANONICAL_MANIFESTS:
+            manifest = contract.load_manifest(manifest_path)
+            runtime = manifest_path.parent
+            for variant in ('compat', 'meshopt'):
+                with self.subTest(manifest=manifest_path, variant=variant):
+                    glb = runtime / manifest['web_variants'][variant]['file']
+                    self.assertEqual(
+                        contract.verify_glb_provenance(glb, manifest),
+                        [],
+                    )
+
     def test_v30_manifest_is_current_and_self_verifying(self):
         self.assertTrue(MANIFEST.is_file(), f'missing canonical v30 manifest: {MANIFEST}')
         self.assertIsNotNone(contract, 'device delivery contract helper is missing')
