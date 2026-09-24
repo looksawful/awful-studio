@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
-import { availableLods, cameraDirection, previewMaterialPolicy, resolveAssetUrl } from './viewer-core.mjs';
+import { availableLods, cameraDirection, previewMaterialPolicy, resolveAssetUrl, validateModelProvenance } from './viewer-core.mjs';
 
 const tagName = 'awful-model-viewer';
 
@@ -193,6 +193,13 @@ class AwfulModelViewer extends HTMLElement {
     const basePath = new URL('.', document.baseURI).pathname;
     const gltf = await loader.loadAsync(resolveAssetUrl(repoPath, basePath));
     if (this._disposed) return;
+    if (this._asset.group === 'Devices') {
+      const root = gltf.scene.getObjectByName(this._asset.root);
+      const provenanceErrors = validateModelProvenance(this._asset, root);
+      if (provenanceErrors.length) {
+        throw new Error(`Rejected stale/wrong-stage asset ${this._asset.id}: ${provenanceErrors.join('; ')}`);
+      }
+    }
     this._model = gltf.scene;
     this._scene.add(this._model);
     this.dataset.modelLoaded = this._asset.id;

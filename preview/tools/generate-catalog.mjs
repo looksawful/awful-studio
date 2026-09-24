@@ -38,6 +38,8 @@ function deviceEntry(manifestPath) {
     label: labelFromDevice(data.asset_id),
     group: 'Devices',
     version: data.version,
+    stage: data.stage,
+    root: data.root,
     sourceBlend: data.artifacts?.generated_blend?.path ?? data.source_blend,
     previewGlb: posix(compat),
     lods: (data.lods ?? []).map((lod) => ({ name: lod.name, path: posix(path.posix.join(manifestDir, lod.file)) })),
