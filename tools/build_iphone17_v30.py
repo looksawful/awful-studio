@@ -83,9 +83,11 @@ def main():
             accessor = primitive.get('indices')
             count = doc['accessors'][accessor]['count'] if accessor is not None else doc['accessors'][primitive['attributes']['POSITION']]['count']
             triangles += count // 3
+    validation = json.loads(evidence.read_text(encoding='utf-8'))
     manifest['glb_qa'] = {'triangle_count': triangles, 'required_nodes': sorted(required),
         'node_count': len(doc.get('nodes', [])), 'material_count': len(doc.get('materials', [])),
-        'runtime_bounds_mm': manifest['runtime_bounds_mm']}
+        'runtime_bounds_mm': manifest['runtime_bounds_mm'],
+        'camera_backing_protrusion_mm': validation['camera_backing_protrusion_mm']}
     artifact_paths = {
         'generated_blend': generated, 'validation': evidence,
         'delivery_blend': RUNTIME / 'iphone_17_v30_delivery.blend',

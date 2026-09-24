@@ -18,6 +18,20 @@ export function availableLods(asset) {
   return [{ name: 'Default', path: asset.previewGlb }];
 }
 
+export function validateModelProvenance(asset, root) {
+  if (!root?.userData) return ['GLB provenance root missing'];
+  const expected = {
+    delivery_version: asset.version,
+    delivery_stage: asset.stage,
+    delivery_source_revision: asset.sourceRevision,
+    delivery_source_commit: asset.sourceCommit,
+  };
+  return Object.entries(expected)
+    .filter(([, value]) => value != null)
+    .filter(([key, value]) => root.userData[key] !== value)
+    .map(([key]) => `GLB provenance mismatch: ${key}`);
+}
+
 export function cameraDirection(preset) {
   const directions = {
     front: [0, 0, 1],
