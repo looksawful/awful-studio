@@ -10,7 +10,7 @@ on:
       - '.github/workflows/macbook-acceptance-rebuild.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   rebuild:
@@ -18,6 +18,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Install exact official Blender
         shell: bash
@@ -55,6 +57,28 @@ jobs:
           git diff --check
           git status --short
           git diff --stat
+
+      - name: Commit canonical rebuild to PR branch
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            assets/device_mockups/macbook_pro_14/evidence/low_v1_release_validation.json \
+            assets/device_mockups/macbook_pro_14/evidence/hinge_clearance_validation.json \
+            assets/device_mockups/macbook_pro_14/generated/macbook_pro_14_m5_low_v1_release.blend \
+            assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1.asset.json \
+            assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_delivery.blend \
+            assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web.glb \
+            assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web_meshopt.glb \
+            extension/awful_studio/assets/devices/macbook_pro_14_m5_low_v1_release.blend \
+            extension/awful_studio/device_asset_loader.py
+          if git diff --cached --quiet; then
+            echo "Canonical artifacts already current"
+          else
+            git commit -m "Rebuild MacBook hinge acceptance artifacts"
+            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          fi
 
       - name: Upload canonical rebuild
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
