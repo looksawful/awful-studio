@@ -41,11 +41,6 @@ jobs:
         run: |
           "$BLENDER"             assets/device_mockups/macbook_pro_14/generated/macbook_pro_14_m5_low_v1_release.blend             --factory-startup --background --python-exit-code 1             --python assets/device_mockups/macbook_pro_14/validate_hinge_clearance.py             -- --out assets/device_mockups/macbook_pro_14/evidence/hinge_clearance_validation.json
 
-      - name: Render deterministic hinge acceptance pack
-        shell: bash
-        run: |
-          "$BLENDER"             assets/device_mockups/macbook_pro_14/generated/macbook_pro_14_m5_low_v1_release.blend             --factory-startup --background --python-exit-code 1             --python assets/device_mockups/macbook_pro_14/render_hinge_acceptance.py             -- --out assets/device_mockups/macbook_pro_14/previews/acceptance_v1
-
       - name: Build GLB, Meshopt and manifest
         shell: bash
         run: python tools/build_macbook_v1_web.py --blender "$BLENDER"
@@ -70,7 +65,6 @@ jobs:
             assets/device_mockups/macbook_pro_14/evidence/low_v1_release_validation.json
             assets/device_mockups/macbook_pro_14/evidence/hinge_clearance_validation.json
             assets/device_mockups/macbook_pro_14/generated/macbook_pro_14_m5_low_v1_release.blend
-            assets/device_mockups/macbook_pro_14/previews/acceptance_v1/*.png
             assets/device_mockups/macbook_pro_14/runtime/v1/*
             extension/awful_studio/assets/devices/macbook_pro_14_m5_low_v1_release.blend
             extension/awful_studio/device_asset_loader.py
