@@ -130,7 +130,7 @@ def _glb_triangle_count(document: dict) -> int:
             accessor_index = primitive.get('indices')
             if accessor_index is None:
                 accessor_index = primitive.get('attributes', {}).get('POSITION')
-            if accessor_index is None or accessor_index >= len(accessors):
+            if accessor_index is None or accessor_index < 0 or accessor_index >= len(accessors):
                 raise ValueError('GLB triangle primitive is missing a valid accessor')
             triangles += int(accessors[accessor_index].get('count', 0)) // 3
     return triangles

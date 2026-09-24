@@ -79,6 +79,14 @@ class DeviceDeliveryContractTests(unittest.TestCase):
             ['GLB runtime bounds mismatch'],
         )
 
+    def test_triangle_count_rejects_negative_accessor_index(self):
+        document = {
+            'accessors': [{'count': 3}],
+            'meshes': [{'primitives': [{'mode': 4, 'indices': -1}]}],
+        }
+        with self.assertRaisesRegex(ValueError, 'valid accessor'):
+            contract._glb_triangle_count(document)
+
     def test_v30_glb_qa_records_camera_backing_protrusion(self):
         validation = json.loads(
             (ROOT / 'assets/device_mockups/iphone_17/evidence/low_v30_validation.json').read_text(
