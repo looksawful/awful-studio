@@ -39,6 +39,7 @@ class AssetDocumentationStageContractTests(unittest.TestCase):
             with self.subTest(asset=asset_id):
                 evidence_path = latest_validation(directory, pattern)
                 evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+                self.assertIs(evidence.get("passed"), True, f"{evidence_path.name} must be passing evidence")
                 self.assertEqual(
                     assets[asset_id]["stage"],
                     evidence["stage"],
@@ -53,10 +54,19 @@ class AssetDocumentationStageContractTests(unittest.TestCase):
             with self.subTest(asset=asset_id):
                 dossier = ROOT / assets[asset_id]["dossier_path"]
                 text = dossier.read_text(encoding="utf-8")
-                self.assertIn(
-                    f"- Current stage: `{assets[asset_id]['stage']}`",
-                    text,
-                )
+                self.assertIn(f"- Current stage: `{assets[asset_id]['stage']}`", text)
+                self.assertIn(f"- Next gate: `{assets[asset_id]['stage']}`", text)
+
+    def test_asset_index_stage_matches_registry(self):
+        registry = json.loads(REGISTRY.read_text(encoding="utf-8"))
+        assets = {asset["id"]: asset for asset in registry["assets"]}
+        index = (ROOT / "docs" / "assets" / "README.md").read_text(encoding="utf-8")
+
+        for asset_id in DEVICE_EVIDENCE:
+            asset = assets[asset_id]
+            with self.subTest(asset=asset_id):
+                row = f"| [{asset['name']}](dossiers/{asset_id}.md) | `{asset['category']}` | `{asset['identity_class']}` | `{asset['stage']}` | `{asset['tier']}` |"
+                self.assertIn(row, index)
 
 
 if __name__ == "__main__":
