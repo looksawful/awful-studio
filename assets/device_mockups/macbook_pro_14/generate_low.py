@@ -17,9 +17,19 @@ OUT=os.path.abspath(arg('--out',os.path.join(HERE,'generated','macbook_pro_14_m5
 EVIDENCE=os.path.abspath(arg('--evidence',os.path.join(HERE,'evidence','low_v1_release_validation.json')))
 PREVIEWS=os.path.abspath(arg('--previews',os.path.join(HERE,'previews','current')))
 
-def cyl_x(name,radius,depth,material,collection,location):
+def subtract_cylinder_x(target,radius,depth,location):
+ bpy.ops.mesh.primitive_cylinder_add(vertices=64,radius=radius,depth=depth,location=location,rotation=(0,math.radians(90),0))
+ cutter=bpy.context.object
+ bpy.ops.object.select_all(action='DESELECT'); target.select_set(True); bpy.context.view_layer.objects.active=target
+ mod=target.modifiers.new('HINGE_CLEARANCE','BOOLEAN'); mod.operation='DIFFERENCE'; mod.solver='EXACT'; mod.object=cutter
+ bpy.ops.object.modifier_apply(modifier=mod.name)
+ bpy.data.objects.remove(cutter,do_unlink=True)
+
+def cyl_x(name,radius,depth,material,collection,location,inner_radius=0.0):
  bpy.ops.mesh.primitive_cylinder_add(vertices=64,radius=radius,depth=depth,location=location,rotation=(0,math.radians(90),0))
  o=bpy.context.object; o.name=name; o.data.materials.append(material); fc.move_to(o,collection)
+ if inner_radius:
+  subtract_cylinder_x(o,inner_radius,depth+.001,location)
  b=o.modifiers.new('EDGE_BEVEL','BEVEL'); b.width=.00018; b.segments=3
  return o
 fc.clear_scene(); fc.setup_scene()
@@ -43,7 +53,7 @@ screenmat=fc.make_screen_material('MAT_SCREEN_CONTENT',(0.002,0.003,0.006),0.65)
 root=fc.empty('CTRL_MACBOOK_PRO_14',ctrl_c)
 root['asset_id']='macbook_pro_14_m5'; root['stage']='LOW_DRAFT'; root['asset_version']='low_draft_0.2'
 root['closed_dimensions_mm']='312.6 x 221.2 x 15.5'
-base=fc.rounded_prism('BASE_UNIBODY',W,D,BASE_H,8.4*MM,metal,base_c,axis='Z',location=(0,0,BASE_H*.5),edge_bevel=.00055)
+base=fc.rounded_prism('BASE_UNIBODY',W,D,BASE_H,8.4*MM,metal,base_c,axis='Z',location=(0,0,BASE_H*.5))
 base.parent=root
 for poly in base.data.polygons: poly.use_smooth = poly.index >= 2
 bottom=fc.rounded_prism('BOTTOM_PANEL',W-3.0*MM,D-3.0*MM,.55*MM,7.4*MM,metal2,detail_c,axis='Z',location=(0,0,.30*MM),edge_bevel=.00018); bottom.parent=root
@@ -52,6 +62,10 @@ track_gap=fc.rounded_prism('TRACKPAD_GAP',134*MM,88*MM,.22*MM,4.7*MM,dark,detail
 track=fc.rounded_prism('TRACKPAD',132*MM,86*MM,.24*MM,4.2*MM,trackmat,detail_c,axis='Z',location=(0,-50*MM,BASE_H+.23*MM),edge_bevel=.00012); track.parent=root
 
 hinge_y=D*.5-8.5*MM
+for side in (-1,1):
+    x=side*(W*.5-48*MM)
+    subtract_cylinder_x(base,3.90*MM,60*MM,(x,hinge_y,BASE_H+GAP))
+base_bevel=base.modifiers.new('EDGE_BEVEL','BEVEL'); base_bevel.width=.00055; base_bevel.segments=4; base_bevel.limit_method='ANGLE'
 hinge=fc.empty('CTRL_HINGE',ctrl_c,location=(0,hinge_y,BASE_H+GAP)); hinge.parent=root
 hinge.rotation_euler.x=math.radians(90.0-OPEN_ANGLE)
 hinge['open_angle_deg']=OPEN_ANGLE; hinge['preset']='OPEN_102'
@@ -74,7 +88,7 @@ root['animation_clips']='lid_open,lid_close'
 for side in (-1,1):
     x=side*(W*.5-48*MM)
     barrel=cyl_x(f'HINGE_BARREL_{"L" if side<0 else "R"}',3.3*MM,58*MM,metal2,detail_c,(x,hinge_y,BASE_H+GAP)); barrel.parent=root
-    cover=cyl_x(f'HINGE_COVER_{"L" if side<0 else "R"}',3.65*MM,51*MM,metal,detail_c,(x,0,0)); cover.parent=hinge
+    cover=cyl_x(f'HINGE_COVER_{"L" if side<0 else "R"}',3.65*MM,51*MM,metal,detail_c,(x,0,0),inner_radius=3.42*MM); cover.parent=hinge
 
 lid=fc.rounded_prism('LID_UNIBODY',LID_W,LID_H,LID_T,8.0*MM,metal,lid_c,axis='Y',edge_bevel=.00035); lid.parent=hinge; lid.location=(0,LID_T*.5,LID_H*.5)
 for poly in lid.data.polygons: poly.use_smooth = poly.index >= 2
