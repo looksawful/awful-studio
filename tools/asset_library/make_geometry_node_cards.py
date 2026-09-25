@@ -8,8 +8,8 @@ MANIFEST=Path(sys.argv[3]) if len(sys.argv)>3 else CAT/'geometry_nodes_preview_m
 data=json.loads(SUMMARY.read_text(encoding='utf-8'))['assets']
 colors={'Architecture':'#d9845b','Nature':'#87a96b','Motion & FX':'#8b7bb5','Audio':'#5f9ea0','Procedural':'#c6a15b','Utilities':'#7d8b99','Text':'#b77b9e','Props':'#b38b6d','Environment':'#6b9a8b'}
 try:
- bold=ImageFont.truetype(r'C:\Windows\Fonts\segoeuib.ttf',15); small=ImageFont.truetype(r'C:\Windows\Fonts\segoeui.ttf',9); tiny=ImageFont.truetype(r'C:\Windows\Fonts\segoeui.ttf',8)
-except: bold=small=tiny=ImageFont.load_default()
+ bold=ImageFont.truetype(r'C:\Windows\Fonts\segoeuib.ttf',15); tiny=ImageFont.truetype(r'C:\Windows\Fonts\segoeui.ttf',8)
+except: bold=tiny=ImageFont.load_default()
 manifest={}
 for a in data:
  im=Image.new('RGB',(128,128),'#151719'); d=ImageDraw.Draw(im); accent=colors.get(a['category'],'#888888')

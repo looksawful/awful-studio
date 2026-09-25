@@ -4,7 +4,9 @@ import json, os, shutil, subprocess, sys, tempfile
 ROOT=Path(r"F:\AWFUL_ASSETS")
 CAT=ROOT/"_catalog"
 CODE=Path(__file__).resolve().parent
-BLENDER=Path(r"D:\Blender Foundation\Blender 5.2\blender.exe")
+BLENDER=Path(os.environ.get("AWFUL_BLENDER",shutil.which("blender") or ""))
+if not BLENDER.is_file():
+    raise FileNotFoundError("Set AWFUL_BLENDER to the Blender 5.2 executable")
 BUNDLE=ROOT/"3D"/"AssetBundles"/"AWFUL"/"GeometryNodes"/"blender_official_curated.blend"
 CATALOG=ROOT/"3D"/"blender_assets.cats.txt"
 FINAL_SUMMARY=CAT/"geometry_nodes_curated_summary.json"
@@ -27,6 +29,41 @@ def validate(bundle):
           "bad=[x.name for x in a if not x.preview or tuple(x.preview.image_size)!=(128,128)]; "
           "print('ASSETS',len(a),'BAD_PREVIEWS',bad); sys.exit(0 if len(a)==22 and not bad else 1)")
     run([BLENDER,"--background","--factory-startup","--python-exit-code","1","--python-expr",code])
+
+def replace_set(replacements, backup_dir):
+    done=[]
+    try:
+        for source,target in replacements:
+            backup=backup_dir/str(len(done))
+            existed=target.exists()
+            if existed:
+                if target.is_dir():
+                    shutil.copytree(target,backup)
+                else:
+                    backup.parent.mkdir(parents=True,exist_ok=True)
+                    shutil.copy2(target,backup)
+            target.parent.mkdir(parents=True,exist_ok=True)
+            if target.exists():
+                if target.is_dir():
+                    shutil.rmtree(target)
+                else:
+                    target.unlink()
+            if source.is_dir():
+                shutil.copytree(source,target)
+            else:
+                os.replace(source,target)
+            done.append((target,backup,existed))
+    except Exception:
+        for target,backup,existed in reversed(done):
+            if target.exists():
+                shutil.rmtree(target) if target.is_dir() else target.unlink()
+            if existed:
+                if backup.is_dir():
+                    shutil.copytree(backup,target)
+                else:
+                    target.parent.mkdir(parents=True,exist_ok=True)
+                    shutil.copy2(backup,target)
+        raise
 
 with tempfile.TemporaryDirectory(dir=BUNDLE.parent,prefix=".awful-gn-stage-") as td:
     stage=Path(td)
@@ -58,29 +95,49 @@ with tempfile.TemporaryDirectory(dir=BUNDLE.parent,prefix=".awful-gn-stage-") as
     assert summary["asset_count"]==22 and not summary["errors"],summary
 
     lines=summary.pop("catalog_lines",[])
-    if lines:
-        text=CATALOG.read_text(encoding="utf-8-sig")
-        existing={line.split(":",1)[0].lower() for line in text.splitlines() if ":" in line and not line.lstrip().startswith("#")}
-        additions=[line for line in lines if line.split(":",1)[0].lower() not in existing]
-        if additions:
-            CATALOG.write_text(text.rstrip()+"\n"+"\n".join(additions)+"\n",encoding="utf-8")
+    staged_catalog=stage/"blender_assets.cats.txt"
+    text=CATALOG.read_text(encoding="utf-8-sig")
+    existing={line.split(":",1)[0].lower() for line in text.splitlines() if ":" in line and not line.lstrip().startswith("#")}
+    additions=[line for line in lines if line.split(":",1)[0].lower() not in existing]
+    staged_catalog.write_text(text.rstrip()+("\n"+"\n".join(additions) if additions else "")+"\n",encoding="utf-8")
+    fail("publish_catalog")
 
-    FINAL_PREVIEWS.mkdir(parents=True,exist_ok=True)
-    for card in staged_previews.glob("*.png"):
-        shutil.copy2(card,FINAL_PREVIEWS/card.name)
-    shutil.copy2(staged_manifest,FINAL_MANIFEST)
-    shutil.copy2(staged_source,FINAL_SOURCE)
+    publish_previews=stage/"publish_previews"
+    shutil.copytree(staged_previews,publish_previews)
+    fail("publish_previews")
+
+    publish_manifest=stage/"publish_manifest.json"
+    shutil.copy2(staged_manifest,publish_manifest)
+    fail("publish_manifest")
+
+    publish_source=stage/"publish_SOURCE.txt"
+    shutil.copy2(staged_source,publish_source)
+    fail("publish_source")
 
     summary["bundle"]=str(BUNDLE)
-    summary["catalogs_added"]=len(lines)
+    summary["catalogs_added"]=len(additions)
     summary["size_mb"]=round(staged_bundle.stat().st_size/1024**2,2)
-    temp_summary=FINAL_SUMMARY.with_suffix(".json.tmp")
-    temp_summary.write_text(json.dumps(summary,ensure_ascii=False,indent=2),encoding="utf-8")
-    os.replace(temp_summary,FINAL_SUMMARY)
+    publish_summary=stage/"publish_summary.json"
+    publish_summary.write_text(json.dumps(summary,ensure_ascii=False,indent=2),encoding="utf-8")
+    fail("publish_summary")
 
+    publish_checkpoint=stage/"checkpoint.blend"
     if BUNDLE.exists():
-        CHECKPOINT.parent.mkdir(parents=True,exist_ok=True)
-        shutil.copy2(BUNDLE,CHECKPOINT)
-    os.replace(staged_bundle,BUNDLE)
+        shutil.copy2(BUNDLE,publish_checkpoint)
+    else:
+        shutil.copy2(staged_bundle,publish_checkpoint)
+    fail("publish_checkpoint")
+    fail("publish_bundle")
+
+    replacements=[
+        (staged_catalog,CATALOG),
+        (publish_previews,FINAL_PREVIEWS),
+        (publish_manifest,FINAL_MANIFEST),
+        (publish_source,FINAL_SOURCE),
+        (publish_summary,FINAL_SUMMARY),
+        (publish_checkpoint,CHECKPOINT),
+        (staged_bundle,BUNDLE),
+    ]
+    replace_set(replacements,stage/"rollback")
 
 print("OK: staged publish complete; 22 curated Geometry Nodes assets with 22 previews")

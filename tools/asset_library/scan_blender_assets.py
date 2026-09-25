@@ -1,5 +1,5 @@
 ﻿from pathlib import Path
-import bpy, csv, json, traceback
+import bpy, csv, json
 ROOT=Path(r'F:\AWFUL_ASSETS\3D')
 OUT=Path(r'F:\AWFUL_ASSETS\_catalog')
 fields=['actions','armatures','brushes','collections','curves','grease_pencils','images','materials','meshes','node_groups','objects','worlds']
