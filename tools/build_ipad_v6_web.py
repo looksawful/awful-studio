@@ -100,7 +100,7 @@ def build_one(blender: Path, size: str, loader):
     doc = read_glb_json(compat)
     names = {node.get('name') for node in doc.get('nodes', []) if node.get('name')}
     required = {
-        root_name, 'SCREEN_CONTENT', 'SCREEN_GLASS', 'FRONT_CAMERA_GLASS',
+        root_name, 'SCREEN_CONTENT', 'FRONT_CAMERA_GLASS',
         'APPLE_LOGO_DECAL', 'CAMERA_HOUSING', 'REAR_CAMERA_GLASS', 'LIDAR',
         'ANCHOR_CENTER', 'ANCHOR_BOTTOM_CENTER', 'ANCHOR_SCREEN_CENTER',
         'ANCHOR_REAR_CAMERA', 'SCREEN_GLOW_ANCHOR',
