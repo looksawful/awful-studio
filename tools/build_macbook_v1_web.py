@@ -93,7 +93,7 @@ def main():
     names = {node.get('name') for node in doc.get('nodes', []) if node.get('name')}
     required = {
         'CTRL_MACBOOK_PRO_14', 'CTRL_HINGE', 'BASE_UNIBODY', 'LID_UNIBODY',
-        'SCREEN_CONTENT', 'SCREEN_GLASS', 'FACETIME_CAMERA', 'TRACKPAD',
+        'SCREEN_CONTENT', 'FACETIME_CAMERA', 'TRACKPAD',
         'TOUCH_ID', 'MAGSAFE', 'HDMI', 'SDXC', 'APPLE_LOGO_RELEASE',
         'ANCHOR_CENTER', 'ANCHOR_BOTTOM_CENTER', 'ANCHOR_SCREEN_CENTER',
         'SCREEN_GLOW_ANCHOR',

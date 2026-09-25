@@ -67,13 +67,17 @@ class MacBookWebDeliveryContractTests(unittest.TestCase):
         meshopt = RUNTIME / manifest['web_variants']['meshopt']['file']
         required = {
             'CTRL_MACBOOK_PRO_14', 'CTRL_HINGE', 'BASE_UNIBODY', 'LID_UNIBODY',
-            'SCREEN_CONTENT', 'SCREEN_GLASS', 'FACETIME_CAMERA', 'TRACKPAD',
+            'SCREEN_CONTENT', 'FACETIME_CAMERA', 'TRACKPAD',
             'TOUCH_ID', 'MAGSAFE', 'HDMI', 'SDXC', 'APPLE_LOGO_RELEASE',
             'ANCHOR_CENTER', 'ANCHOR_BOTTOM_CENTER', 'ANCHOR_SCREEN_CENTER',
             'SCREEN_GLOW_ANCHOR',
         }
-        self.assertTrue(required <= glb_node_names(compat))
-        self.assertTrue(required <= glb_node_names(meshopt))
+        compat_nodes = glb_node_names(compat)
+        meshopt_nodes = glb_node_names(meshopt)
+        self.assertTrue(required <= compat_nodes)
+        self.assertTrue(required <= meshopt_nodes)
+        self.assertEqual(sum(name in compat_nodes for name in ('SCREEN_CONTENT', 'SCREEN_GLASS')), 1)
+        self.assertEqual(sum(name in meshopt_nodes for name in ('SCREEN_CONTENT', 'SCREEN_GLASS')), 1)
         self.assertEqual(manifest['default_web_variant'], 'compat')
         self.assertEqual(manifest['preferred_web_variant'], 'meshopt')
         doc = glb_doc(compat)
