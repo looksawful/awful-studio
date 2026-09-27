@@ -11,6 +11,7 @@ import struct
 ROOT = Path(__file__).resolve().parents[1]
 DEVICE = ROOT / 'assets/device_mockups/iphone_17'
 RUNTIME = DEVICE / 'runtime/v30'
+GENERATOR_VERSION = 'web_delivery_camera_logo_normals_v30'
 SOURCE_FILES = [
     'assets/device_mockups/common/foundation_common.py',
     'assets/device_mockups/iphone_17/generate_low_v30.py',
@@ -64,6 +65,7 @@ def main():
     manifest_path = RUNTIME / 'iphone_17_v30.asset.json'
     manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
     manifest['source_files'] = source_hashes
+    manifest['generator_version'] = GENERATOR_VERSION
     glb_path = RUNTIME / 'iphone_17_v30_web.glb'
     raw = glb_path.read_bytes()
     json_len, json_type = struct.unpack_from('<II', raw, 12)
