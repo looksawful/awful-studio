@@ -123,13 +123,16 @@ class DeviceDeliveryContractTests(unittest.TestCase):
         self.assertGreater(manifest['screen_states']['screen_on']['emission_strength'], 0.0)
         self.assertEqual(manifest['screen_glow']['anchor'], 'SCREEN_GLOW_ANCHOR')
 
-    def test_v30_provenance_text_files_are_pinned_to_lf(self):
-        paths = [
-            'assets/device_mockups/iphone_17/generate_low_v30.py',
-            'assets/device_mockups/iphone_17/evidence/low_v30_validation.json',
-            'assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30.asset.json',
-        ]
-        for relative in paths:
+    def test_all_provenance_text_sources_are_pinned_to_lf(self):
+        text_suffixes = {'.py', '.json', '.mjs', '.js', '.ts'}
+        paths = set()
+        for manifest_path in CANONICAL_MANIFESTS:
+            manifest = contract.load_manifest(manifest_path)
+            paths.update(
+                relative for relative in manifest['source_files']
+                if Path(relative).suffix.lower() in text_suffixes
+            )
+        for relative in sorted(paths):
             result = subprocess.check_output(
                 ['git', 'check-attr', 'eol', '--', relative],
                 cwd=ROOT, text=True,

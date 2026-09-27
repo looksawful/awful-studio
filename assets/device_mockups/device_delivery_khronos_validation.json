@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "validator_versions": [
+    "2.0.0-dev.3.10"
+  ],
+  "assets": {
+    "iphone_17": {
+      "compat": {
+        "validator_version": "2.0.0-dev.3.10",
+        "errors": 0,
+        "warnings": 0,
+        "infos": 45,
+        "hints": 0,
+        "pass": true,
+        "file": "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb",
+        "sha256": "e950e82dfad49b1983877059da8f672ce58c037d319d3cd64cca606bb5060470"
+      },
+      "meshopt": {
+        "validator_version": "2.0.0-dev.3.10",
+        "errors": 0,
+        "warnings": 0,
+        "infos": 46,
+        "hints": 0,
+        "pass": true,
+        "file": "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web_meshopt.glb",
+        "sha256": "6d4a882c2e0c8ced2382136886a294f526ebdedc3cc799367c3197da3dd6e7ed"
+      }
+    },
+    "ipad_pro_11_m5": {
+      "compat": {
+        "validator_version": "2.0.0-dev.3.10",
+        "errors": 0,
+        "warnings": 0,
+        "infos": 50,
+        "hints": 0,
+        "pass": true,
+        "file": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_web.glb",
+        "sha256": "6dedbc72e92d3ea01abd7f2140c41bc8992f933c7312af0a447f0d9d9adb5043"
+      },
+      "meshopt": {
+        "validator_version": "2.0.0-dev.3.10",
+        "errors": 0,
+        "warnings": 0,
+        "infos": 51,
+        "hints": 0,
+        "pass": true,
+        "file": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_web_meshopt.glb",
+        "sha256": "fbe515a75525d3293df75ae1cb7624ba805a886278ba20c87da93057e4a074bd"
+      }
+    },
+    "ipad_pro_13_m5": {
+      "compat": {
+        "validator_version": "2.0.0-dev.3.10",
+        "errors": 0,
+        "warnings": 0,
+        "infos": 50,
+        "hints": 0,
+        "pass": true,
+        "file": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_web.glb",
+        "sha256": "493018d1c634d57a2ade0d1398fecf29eb2ed1e380e76601b40dd4795ec7e0a0"
+      },
+      "meshopt": {
+        "validator_version": "2.0.0-dev.3.10",
+        "errors": 0,
+        "warnings": 0,
+        "infos": 51,
+        "hints": 0,
+        "pass": true,
+        "file": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_web_meshopt.glb",
+        "sha256": "69c832370becaba4cab488f14fd1ccef341d7cf45621c6538937218841f9ed30"
+      }
+    },
+    "macbook_pro_14_m5": {
+      "compat": {
+        "validator_version": "2.0.0-dev.3.10",
+        "errors": 0,
+        "warnings": 0,
+        "infos": 275,
+        "hints": 0,
+        "pass": true,
+        "file": "assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web.glb",
+        "sha256": "8304dd3fb1a647d6f12ab06fa2552e8db3d23df9e8a58e97328101ccba6a1c89"
+      },
+      "meshopt": {
+        "validator_version": "2.0.0-dev.3.10",
+        "errors": 0,
+        "warnings": 0,
+        "infos": 276,
+        "hints": 0,
+        "pass": true,
+        "file": "assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web_meshopt.glb",
+        "sha256": "4a70cf5cea5cf2efdc6a07ac9510e7325c5e64c1eb7adc62bbf922763d9e21f6"
+      }
+    }
+  },
+  "pass": true
+}

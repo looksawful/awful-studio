@@ -8,8 +8,9 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+KHRONOS_EVIDENCE = ROOT / 'assets/device_mockups/device_delivery_khronos_validation.json'
 sys.path.insert(0, str(ROOT / 'tools'))
-from device_delivery_contract import load_manifest, verify_glb_provenance, verify_glb_round_trip, verify_manifest
+from device_delivery_contract import load_manifest, sha256_file, verify_glb_provenance, verify_glb_round_trip, verify_manifest
 
 PLAN = (
     {
@@ -39,6 +40,77 @@ def run(*args) -> None:
     subprocess.run([str(value) for value in args], cwd=ROOT, check=True)
 
 
+def summarize_khronos_report(report: dict) -> dict:
+    issues = report.get('issues')
+    if not isinstance(issues, dict):
+        raise RuntimeError('Khronos validation report is missing issues')
+    summary = {
+        'validator_version': report.get('validatorVersion'),
+        'errors': int(issues.get('numErrors', 0)),
+        'warnings': int(issues.get('numWarnings', 0)),
+        'infos': int(issues.get('numInfos', 0)),
+        'hints': int(issues.get('numHints', 0)),
+    }
+    summary['pass'] = summary['errors'] == 0 and summary['warnings'] == 0
+    if not summary['pass']:
+        raise RuntimeError(
+            f"Khronos validation failed: {summary['errors']} errors, {summary['warnings']} warnings"
+        )
+    return summary
+
+
+def run_khronos_validator(validator: Path, glb: Path) -> dict:
+    process = subprocess.run(
+        [
+            str(validator),
+            '--stdout',
+            '--no-write-timestamp',
+            '--no-absolute-path',
+            str(glb),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if not process.stdout.strip():
+        raise RuntimeError(f'Khronos validator produced no JSON report for {glb}')
+    report = json.loads(process.stdout)
+    summary = summarize_khronos_report(report)
+    if process.returncode != 0:
+        raise RuntimeError(f'Khronos validator failed for {glb} with exit code {process.returncode}')
+    summary['file'] = str(glb.relative_to(ROOT)).replace('\\', '/')
+    summary['sha256'] = sha256_file(glb)
+    return summary
+
+
+def validate_all_with_khronos(validator: Path) -> dict:
+    assets: dict[str, dict[str, dict]] = {}
+    versions: set[str] = set()
+    for item in PLAN:
+        manifest_path = ROOT / item['manifest']
+        manifest = load_manifest(manifest_path)
+        runtime = manifest_path.parent
+        variants: dict[str, dict] = {}
+        for variant in ('compat', 'meshopt'):
+            glb = runtime / manifest['web_variants'][variant]['file']
+            summary = run_khronos_validator(validator, glb)
+            versions.add(summary['validator_version'])
+            variants[variant] = summary
+        assets[item['asset_id']] = variants
+    evidence = {
+        'schema_version': 1,
+        'validator_versions': sorted(versions),
+        'assets': assets,
+        'pass': True,
+    }
+    KHRONOS_EVIDENCE.write_text(
+        json.dumps(evidence, indent=2) + '\n',
+        encoding='utf-8',
+        newline='\n',
+    )
+    return evidence
+
+
 def verify_delivery(item: dict) -> dict:
     manifest_path = ROOT / item['manifest']
     manifest = load_manifest(manifest_path)
@@ -62,24 +134,27 @@ def verify_delivery(item: dict) -> dict:
     }
 
 
-def build_all(blender: Path) -> list[dict]:
+def build_all(blender: Path, validator: Path) -> list[dict]:
     run(sys.executable, ROOT / 'tools/build_iphone17_v30.py', '--blender', blender)
     run(sys.executable, ROOT / 'tools/build_ipad_v6_web.py', '--blender', blender, '--size', 'all')
     run(sys.executable, ROOT / 'tools/build_macbook_v1_web.py', '--blender', blender)
-    return [verify_delivery(item) for item in PLAN]
+    deliveries = [verify_delivery(item) for item in PLAN]
+    validate_all_with_khronos(validator)
+    return deliveries
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument('--plan', action='store_true')
     parser.add_argument('--blender', type=Path)
+    parser.add_argument('--validator', type=Path)
     args = parser.parse_args()
     if args.plan:
         print(json.dumps(PLAN, indent=2))
         return 0
-    if args.blender is None:
-        parser.error('--blender is required unless --plan is used')
-    print(json.dumps(build_all(args.blender.resolve()), indent=2))
+    if args.blender is None or args.validator is None:
+        parser.error('--blender and --validator are required unless --plan is used')
+    print(json.dumps(build_all(args.blender.resolve(), args.validator.resolve()), indent=2))
     return 0
 
 
