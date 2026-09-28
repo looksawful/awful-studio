@@ -107,25 +107,33 @@ class IPhoneFrontEvidenceContractTests(unittest.TestCase):
             places=6,
         )
 
-    def test_bottom_macro_camera_has_steep_enough_underside_angle(self):
+    def test_bottom_macro_camera_proves_full_bottom_hardware(self):
         source = GENERATOR.read_text(encoding="utf-8")
         match = re.search(
             r'cam_bottom\s*=\s*persp\("CAM_BOTTOM_MACRO",\s*'
             r'\(0\.0,\s*([-0-9.]+),\s*([-0-9.]+)\),\s*'
-            r'\(0,0,-H\*([0-9.]+)\)',
+            r'\(0,0,-H\*([0-9.]+)\),\s*([0-9.]+)\)',
             source,
         )
         self.assertIsNotNone(match, "bottom macro camera contract must remain explicit")
         camera_y = float(match.group(1))
         camera_z = float(match.group(2))
         target_fraction = float(match.group(3))
+        lens_mm = float(match.group(4))
         target_z = -BODY_H_M * target_fraction
         vertical = abs(camera_z - target_z)
         depth = abs(camera_y)
         self.assertGreaterEqual(
             vertical / depth,
-            0.75,
-            "bottom macro camera is too face-on to prove USB-C, microphones and speakers",
+            1.5,
+            "bottom macro camera is too face-on to prove underside hardware",
+        )
+        target_distance = (vertical ** 2 + depth ** 2) ** 0.5
+        horizontal_span_m = target_distance * 36.0 / lens_mm
+        self.assertGreaterEqual(
+            horizontal_span_m,
+            0.061,
+            "bottom macro crop cannot contain USB-C + 3 mic + 6 speaker apertures + screws",
         )
 
 
