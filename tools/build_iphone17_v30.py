@@ -11,6 +11,7 @@ import struct
 ROOT = Path(__file__).resolve().parents[1]
 DEVICE = ROOT / 'assets/device_mockups/iphone_17'
 RUNTIME = DEVICE / 'runtime/v30'
+GENERATOR_VERSION = 'web_delivery_camera_logo_normals_v30'
 SOURCE_FILES = [
     'assets/device_mockups/common/foundation_common.py',
     'assets/device_mockups/iphone_17/generate_low_v30.py',
@@ -64,6 +65,7 @@ def main():
     manifest_path = RUNTIME / 'iphone_17_v30.asset.json'
     manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
     manifest['source_files'] = source_hashes
+    manifest['generator_version'] = GENERATOR_VERSION
     glb_path = RUNTIME / 'iphone_17_v30_web.glb'
     raw = glb_path.read_bytes()
     json_len, json_type = struct.unpack_from('<II', raw, 12)
@@ -83,9 +85,11 @@ def main():
             accessor = primitive.get('indices')
             count = doc['accessors'][accessor]['count'] if accessor is not None else doc['accessors'][primitive['attributes']['POSITION']]['count']
             triangles += count // 3
+    validation = json.loads(evidence.read_text(encoding='utf-8'))
     manifest['glb_qa'] = {'triangle_count': triangles, 'required_nodes': sorted(required),
         'node_count': len(doc.get('nodes', [])), 'material_count': len(doc.get('materials', [])),
-        'runtime_bounds_mm': manifest['runtime_bounds_mm']}
+        'runtime_bounds_mm': manifest['runtime_bounds_mm'],
+        'camera_backing_protrusion_mm': validation['camera_backing_protrusion_mm']}
     artifact_paths = {
         'generated_blend': generated, 'validation': evidence,
         'delivery_blend': RUNTIME / 'iphone_17_v30_delivery.blend',

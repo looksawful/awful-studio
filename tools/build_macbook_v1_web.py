@@ -13,6 +13,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 DEVICE = ROOT / 'assets/device_mockups/macbook_pro_14'
 RUNTIME = DEVICE / 'runtime/v1'
+GENERATOR_VERSION = 'macbook_v1_packaged_blend_web_delivery'
 LOADER_PATH = ROOT / 'extension/awful_studio/device_asset_loader.py'
 SOURCE_FILES = [
     'assets/device_mockups/common/foundation_common.py',
@@ -68,6 +69,15 @@ def main():
         cwd=ROOT, text=True,
     ).strip()
     generated = DEVICE / 'generated/macbook_pro_14_m5_low_v1_release.blend'
+    evidence = DEVICE / 'evidence/low_v1_release_validation.json'
+    previews = DEVICE / 'previews/current'
+    run(
+        args.blender.resolve(), '--factory-startup', '--background',
+        '--python', DEVICE / 'generate_low.py', '--',
+        '--out', generated,
+        '--evidence', evidence,
+        '--previews', previews,
+    )
     source_blend = ROOT / 'extension/awful_studio/assets/devices/macbook_pro_14_m5_low_v1_release.blend'
     run(args.blender.resolve(), '--factory-startup', '--background', generated, '--python', ROOT / 'tools/package_device_asset.py', '--',
         '--output', source_blend, '--entry', 'AWFUL_DEVICE_MACBOOK_PRO_14', '--root', 'CTRL_MACBOOK_PRO_14',
@@ -86,6 +96,7 @@ def main():
     manifest_path = RUNTIME / 'macbook_pro_14_m5_v1.asset.json'
     manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
     manifest['source_files'] = source_hashes
+    manifest['generator_version'] = GENERATOR_VERSION
     compat = RUNTIME / 'macbook_pro_14_m5_v1_web.glb'
     meshopt = RUNTIME / 'macbook_pro_14_m5_v1_web_meshopt.glb'
     delivery = RUNTIME / 'macbook_pro_14_m5_v1_delivery.blend'
@@ -121,9 +132,12 @@ def main():
         'runtime_bounds_mm': manifest['runtime_bounds_mm'],
     }
     artifacts = {
+        'generated_blend': generated,
+        'validation': evidence,
         'delivery_blend': delivery,
         'compat_glb': compat,
         'meshopt_glb': meshopt,
+        'plugin_bundle': source_blend,
     }
     manifest['artifacts'] = {
         name: {
