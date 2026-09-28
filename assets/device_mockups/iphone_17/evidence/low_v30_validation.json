@@ -60,5 +60,10 @@
   "camera_backing_visible": true,
   "button_min_protrusion_mm": 0.45,
   "camera_control_protrusion_mm": 0.06,
+  "front_camera_keepout_mm": [
+    20.75,
+    5.12
+  ],
+  "front_camera_center_from_top_mm": 7.79,
   "passed": true
 }
