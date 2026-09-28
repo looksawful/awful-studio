@@ -30,4 +30,18 @@ The renderer produces hero, front, side, keyboard, hinge and ports views in `pre
 
 The generator verifies base and lid dimensions, zero non-manifold edges on both chassis meshes, required functional objects, the 102-degree hinge preset and the release metadata before saving.
 
-Fresh reconstruction was compared against the previous hand-polished release file: all 283 object digests match, and all six regenerated preview images match the committed previews pixel-for-pixel (`RMSE 0`).
+Run the full mechanical hinge gate against the generated candidate:
+
+```powershell
+blender generated/macbook_pro_14_m5_low_v1_release.blend --background --python validate_hinge_clearance.py -- --out evidence/hinge_clearance_validation.json
+```
+
+The hinge validator checks solid intersections at CLOSED / 30 / 60 / 90 / 102 for both hinge barrels and covers against the base and against each other. The committed acceptance evidence must report zero intersection volume at all five presets.
+
+Render the deterministic human-review pack with:
+
+```powershell
+blender generated/macbook_pro_14_m5_low_v1_release.blend --background --python render_hinge_acceptance.py -- --out previews/acceptance_v1
+```
+
+The current release candidate intentionally differs from the earlier pre-clearance candidate: local base hinge recesses and hollow hinge covers remove the solid collisions while preserving the verified chassis envelope.

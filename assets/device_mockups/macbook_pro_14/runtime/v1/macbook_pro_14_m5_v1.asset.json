@@ -64,7 +64,6 @@
   "materials": [
     "MAT_APPLE_LOGO_RELEASE",
     "MAT_DISPLAY_BEZEL",
-    "MAT_DISPLAY_GLASS",
     "MAT_EDGE_ALUMINUM",
     "MAT_KEYCAP",
     "MAT_PORT_DARK",
@@ -88,7 +87,6 @@
     "HINGE_COVER_R",
     "LID_UNIBODY",
     "SCREEN_CONTENT",
-    "SCREEN_GLASS",
     "SCREEN_GLOW_ANCHOR",
     "FOOT_01",
     "FOOT_02",
@@ -397,9 +395,9 @@
     }
   },
   "camera_fit": "runtime_bounds",
-  "source_revision": "aa57065a4fa9abf3744e2db69cca9be8ae713f04b59f384c13b7518352088261",
-  "source_commit": "83d43fa96514372929d48d8798b4dd5526f04c2e",
-  "plugin_source_revision": "aa57065a4fa9abf3744e2db69cca9be8ae713f04b59f384c13b7518352088261",
+  "source_revision": "1ba32d2af56bbe861b088c45419c6d42b6a96bb66b7d4d1858d9a5e179a79b47",
+  "source_commit": "9f5d74b9122e11828375b5f77983bbc919552f60",
+  "plugin_source_revision": "1ba32d2af56bbe861b088c45419c6d42b6a96bb66b7d4d1858d9a5e179a79b47",
   "generator_version": "macbook_v1_packaged_blend_web_delivery",
   "delivery_profile": {
     "simplification": "none",
@@ -416,14 +414,14 @@
   },
   "source_files": {
     "assets/device_mockups/common/foundation_common.py": "1d68c3fff908b7ae149f74c31a19064eb6d2384234d33bd71071fea70d651d12",
-    "assets/device_mockups/macbook_pro_14/export_runtime_v1.py": "fab28567dd0cee4031eaefdd8e0598f92ee6f607fa3d7a74b6eb4cdf0b247108",
-    "assets/device_mockups/macbook_pro_14/generate_low.py": "498c5a7bfd90e0de81a8b89f98e7ba137fe000ffc2ade46197e9e85abed00815",
-    "assets/device_mockups/macbook_pro_14/optimize_runtime_v1.py": "0bab7ce899c32a8887df4daa27c4f3521b14bdbeaa2d7e977379d61093d6258a",
+    "assets/device_mockups/macbook_pro_14/export_runtime_v1.py": "47fa68b82924a79be1bde41be75d887ec004cdffe5ed4c9b7101e0b9b82b195a",
+    "assets/device_mockups/macbook_pro_14/generate_low.py": "1051a0719f94a66f304e74b83bcd47d89ecfc406c9c511b453b010024f44c621",
+    "assets/device_mockups/macbook_pro_14/optimize_runtime_v1.py": "f7cda0a120b8a0e6f7d7194357d4d86035898594f0c21742f1d3d9d1577d250a",
     "assets/device_mockups/macbook_pro_14/reference/apple_logo_alpha.png": "50209309a1cf3bcb874118b27fe9c9779aaafabaf79bb304cf0aa3a2898c9833",
     "assets/device_mockups/macbook_pro_14/reference/macos26_official_screen.png": "95a228a03c6c1d83ba6e79703f0df1cbe7d464ddbd1e2be82239cc938ea1b0f8"
   },
   "glb_qa": {
-    "triangle_count": 16722,
+    "triangle_count": 17192,
     "required_nodes": [
       "ANCHOR_BOTTOM_CENTER",
       "ANCHOR_CENTER",
@@ -437,14 +435,13 @@
       "LID_UNIBODY",
       "MAGSAFE",
       "SCREEN_CONTENT",
-      "SCREEN_GLASS",
       "SCREEN_GLOW_ANCHOR",
       "SDXC",
       "TOUCH_ID",
       "TRACKPAD"
     ],
-    "node_count": 287,
-    "material_count": 9,
+    "node_count": 286,
+    "material_count": 8,
     "runtime_bounds_mm": [
       313.52,
       218.822,
@@ -454,15 +451,15 @@
   "artifacts": {
     "delivery_blend": {
       "path": "assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_delivery.blend",
-      "sha256": "b7517982e46c781db090eb89bd6fcd7bbc3ffb17840b4e97e076889db4c804b2"
+      "sha256": "856cd20d13a8188049ed919aed77daa5532ec73d3e8771eaf6e92a3002c5a7ef"
     },
     "compat_glb": {
       "path": "assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web.glb",
-      "sha256": "8304dd3fb1a647d6f12ab06fa2552e8db3d23df9e8a58e97328101ccba6a1c89"
+      "sha256": "7057b25c0c86f29a25ed9b6efd03df561e34127516359d06bf022237ac5952c1"
     },
     "meshopt_glb": {
       "path": "assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web_meshopt.glb",
-      "sha256": "4a70cf5cea5cf2efdc6a07ac9510e7325c5e64c1eb7adc62bbf922763d9e21f6"
+      "sha256": "0696b7429315edb76a44cd327ff48c018717e123669bb4256fd697649acb6c27"
     }
   }
 }
