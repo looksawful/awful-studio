@@ -71,13 +71,17 @@ class IPadWebDeliveryContractTests(unittest.TestCase):
             compat = RUNTIME / manifest['web_variants']['compat']['file']
             meshopt = RUNTIME / manifest['web_variants']['meshopt']['file']
             required = {
-                root_name, 'SCREEN_CONTENT', 'SCREEN_GLASS', 'FRONT_CAMERA_GLASS',
+                root_name, 'SCREEN_CONTENT', 'FRONT_CAMERA_GLASS',
                 'APPLE_LOGO_DECAL', 'CAMERA_HOUSING', 'REAR_CAMERA_GLASS', 'LIDAR',
                 'ANCHOR_CENTER', 'ANCHOR_BOTTOM_CENTER', 'ANCHOR_SCREEN_CENTER',
                 'ANCHOR_REAR_CAMERA', 'SCREEN_GLOW_ANCHOR',
             }
-            self.assertTrue(required <= glb_node_names(compat))
-            self.assertTrue(required <= glb_node_names(meshopt))
+            compat_nodes = glb_node_names(compat)
+            meshopt_nodes = glb_node_names(meshopt)
+            self.assertTrue(required <= compat_nodes)
+            self.assertTrue(required <= meshopt_nodes)
+            self.assertEqual(sum(name in compat_nodes for name in ('SCREEN_CONTENT', 'SCREEN_GLASS')), 1)
+            self.assertEqual(sum(name in meshopt_nodes for name in ('SCREEN_CONTENT', 'SCREEN_GLASS')), 1)
             self.assertEqual(manifest['default_web_variant'], 'compat')
             self.assertEqual(manifest['preferred_web_variant'], 'meshopt')
             doc = glb_doc(compat)
