@@ -7,6 +7,8 @@
       "label": "iPhone 17",
       "group": "Devices",
       "version": "v30",
+      "stage": "LOW_DRAFT",
+      "root": "CTRL_IPHONE_17",
       "sourceBlend": "assets/device_mockups/iphone_17/generated/iphone_17_low_v30.blend",
       "previewGlb": "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb",
       "lods": [
@@ -44,7 +46,9 @@
       "label": "iPad Pro 11 M5",
       "group": "Devices",
       "version": "v6",
-      "sourceBlend": "generated/ipad_pro_11_m5_low_v6.blend",
+      "stage": "LOW_DRAFT",
+      "root": "CTRL_IPAD_PRO_11",
+      "sourceBlend": "assets/device_mockups/ipad_pro/generated/ipad_pro_11_m5_low_v6.blend",
       "previewGlb": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_web.glb",
       "lods": [
         {
@@ -54,7 +58,7 @@
       ],
       "collision": null,
       "sourceRevision": "8c945793614e5b932579f1ae47e03c28780e7217aeafc553f9f31050cc84eb86",
-      "sourceCommit": "2c659b2754654827c23d62dfc269d2719754a223",
+      "sourceCommit": "adab006c0d2200bf4321c4655195518cb9dbeb6a",
       "triangleCount": 20696,
       "materialCount": 11,
       "animations": [],
@@ -81,7 +85,9 @@
       "label": "iPad Pro 13 M5",
       "group": "Devices",
       "version": "v6",
-      "sourceBlend": "generated/ipad_pro_13_m5_low_v6.blend",
+      "stage": "LOW_DRAFT",
+      "root": "CTRL_IPAD_PRO_13",
+      "sourceBlend": "assets/device_mockups/ipad_pro/generated/ipad_pro_13_m5_low_v6.blend",
       "previewGlb": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_web.glb",
       "lods": [
         {
@@ -91,7 +97,7 @@
       ],
       "collision": null,
       "sourceRevision": "fab88ffb8004423c55851571de446dde3369bef97e8f7908373dcf7b994779dc",
-      "sourceCommit": "2c659b2754654827c23d62dfc269d2719754a223",
+      "sourceCommit": "adab006c0d2200bf4321c4655195518cb9dbeb6a",
       "triangleCount": 20704,
       "materialCount": 11,
       "animations": [],
@@ -118,7 +124,9 @@
       "label": "MacBook Pro 14 M5",
       "group": "Devices",
       "version": "v1",
-      "sourceBlend": "extension/awful_studio/assets/devices/macbook_pro_14_m5_low_v1_release.blend",
+      "stage": "RELEASE_CANDIDATE",
+      "root": "CTRL_MACBOOK_PRO_14",
+      "sourceBlend": "assets/device_mockups/macbook_pro_14/generated/macbook_pro_14_m5_low_v1_release.blend",
       "previewGlb": "assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web.glb",
       "lods": [
         {
@@ -128,7 +136,7 @@
       ],
       "collision": null,
       "sourceRevision": "aa57065a4fa9abf3744e2db69cca9be8ae713f04b59f384c13b7518352088261",
-      "sourceCommit": "83d43fa96514372929d48d8798b4dd5526f04c2e",
+      "sourceCommit": "adab006c0d2200bf4321c4655195518cb9dbeb6a",
       "triangleCount": 16722,
       "materialCount": 9,
       "animations": [

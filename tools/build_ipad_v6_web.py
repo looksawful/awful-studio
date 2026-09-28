@@ -13,6 +13,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 DEVICE = ROOT / 'assets/device_mockups/ipad_pro'
 RUNTIME = DEVICE / 'runtime/v6'
+GENERATOR_VERSION = 'ipad_v6_packaged_blend_web_delivery'
 LOADER_PATH = ROOT / 'extension/awful_studio/device_asset_loader.py'
 CASES = {
     '11': ('ipad_pro_11_m5', 'DEVICE_IPAD_PRO_11', 'CTRL_IPAD_PRO_11'),
@@ -74,6 +75,16 @@ def build_one(blender: Path, size: str, loader):
         cwd=ROOT, text=True,
     ).strip()
     generated = DEVICE / f'generated/{asset_id}_low_v6.blend'
+    evidence = DEVICE / f'evidence/{asset_id}_low_v6_validation.json'
+    previews = DEVICE / f'previews/{size}/low_v6'
+    run(
+        blender, '--factory-startup', '--background',
+        '--python', DEVICE / 'generate_low_v6.py', '--',
+        '--size', size,
+        '--out', generated,
+        '--evidence', evidence,
+        '--previews', previews,
+    )
     source_blend = ROOT / f'extension/awful_studio/assets/devices/{asset_id}_low_v6.blend'
     run(blender, '--factory-startup', '--background', generated, '--python', ROOT / 'tools/package_device_asset.py', '--',
         '--output', source_blend, '--entry', f'AWFUL_DEVICE_IPAD_PRO_{size}', '--root', root_name,
@@ -93,6 +104,7 @@ def build_one(blender: Path, size: str, loader):
     manifest_path = RUNTIME / f'{prefix}.asset.json'
     manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
     manifest['source_files'] = source_hashes
+    manifest['generator_version'] = GENERATOR_VERSION
 
     compat = RUNTIME / f'{prefix}_web.glb'
     meshopt = RUNTIME / f'{prefix}_web_meshopt.glb'
@@ -128,9 +140,12 @@ def build_one(blender: Path, size: str, loader):
         'runtime_bounds_mm': manifest['runtime_bounds_mm'],
     }
     artifacts = {
+        'generated_blend': generated,
+        'validation': evidence,
         'delivery_blend': delivery,
         'compat_glb': compat,
         'meshopt_glb': meshopt,
+        'plugin_bundle': source_blend,
     }
     manifest['artifacts'] = {
         name: {

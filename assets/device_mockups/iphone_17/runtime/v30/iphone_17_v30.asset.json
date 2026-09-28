@@ -211,7 +211,8 @@
       72.35,
       149.61,
       9.81
-    ]
+    ],
+    "camera_backing_protrusion_mm": 0.26
   },
   "artifacts": {
     "generated_blend": {

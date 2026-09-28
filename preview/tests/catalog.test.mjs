@@ -31,6 +31,12 @@ test('catalog generator produces only canonical model inventory', () => {
     ['ipad-pro-13-m5-v6', 'v6'],
     ['macbook-pro-14-m5-v1', 'v1'],
   ]);
+  assert.deepEqual(devices.map(({ stage }) => stage), [
+    'LOW_DRAFT',
+    'LOW_DRAFT',
+    'LOW_DRAFT',
+    'RELEASE_CANDIDATE',
+  ]);
 
   const studio = catalog.assets.filter((asset) => asset.group === 'Studio Equipment');
   assert.equal(studio.length, 4);

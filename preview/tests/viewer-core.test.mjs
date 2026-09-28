@@ -5,6 +5,7 @@ import {
   cameraDirection,
   resolveAssetUrl,
   previewMaterialPolicy,
+  validateModelProvenance,
 } from '../src/viewer-core.mjs';
 
 test('preview URLs expose repository assets without copying binaries', () => {
@@ -39,6 +40,25 @@ test('LOD options preserve manifest order and fall back to preview model', () =>
     { name: 'Default', path: 'assets/model.glb' },
   ]);
 });
+test('device model provenance rejects stale stage or source revision', () => {
+  const asset = { version: 'v30', stage: 'LOW_DRAFT', sourceRevision: 'abc', sourceCommit: 'def' };
+  const root = { userData: {
+    delivery_version: 'v30',
+    delivery_stage: 'LOW_DRAFT',
+    delivery_source_revision: 'abc',
+    delivery_source_commit: 'def',
+  } };
+  assert.deepEqual(validateModelProvenance(asset, root), []);
+  assert.deepEqual(
+    validateModelProvenance({ ...asset, stage: 'RELEASE_CANDIDATE' }, root),
+    ['GLB provenance mismatch: delivery_stage'],
+  );
+  assert.deepEqual(
+    validateModelProvenance({ ...asset, sourceRevision: 'stale' }, root),
+    ['GLB provenance mismatch: delivery_source_revision'],
+  );
+});
+
 test('camera presets are explicit and normalized', () => {
   assert.deepEqual(cameraDirection('front'), [0, 0, 1]);
   assert.deepEqual(cameraDirection('side'), [1, 0, 0]);
