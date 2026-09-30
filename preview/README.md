@@ -32,6 +32,14 @@ The generated catalog contains only current canonical assets:
 
 Device and Studio Rig GLBs are served from their canonical repository runtime paths. Scene GLBs under `generated/scenes/` are preview-only exports from the canonical Blender scene candidates.
 
+## iPhone web presentation
+
+The iPhone viewer adds Home, Off, Lock, Website and Resume display states. Website and Resume are live mobile captures of the public portfolio; the browser frame and lock artwork are illustrative. `public/screens/provenance.json` retains capture dimensions and source URLs.
+
+The display raster is 1206 × 2622, with a 402 × 874 logical viewport at 3×. At Apple's specified 460 ppi this corresponds to 66.59 × 144.78 mm, matching the canonical 66.57 × 144.79 mm active area within rounding. UI is mapped without cover cropping or screen-vertex rescaling; the inherited Home plate remains the official reference artwork.
+
+`iphone-presentation.mjs` keeps the mapped/emitting material only on the front face, uses dark opaque display edges, aligns visible front optics to the visible island, calibrates cavity/fastener reflections, and adds a correctly oriented display-sized area emitter. These are explicit Three.js presentation overrides; they do not change the canonical GLB, Blender geometry, provenance, or delivery stage. Physical cavity depth, bevels and any later baked surface maps remain source-model work.
+
 ## Publishing
 
 `main` deploys the static Storybook through GitHub Pages. Working branches only validate the preview through `Extension QA`; they do not create permanent preview branches.

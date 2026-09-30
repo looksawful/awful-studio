@@ -4,6 +4,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { availableLods, cameraDirection, previewMaterialPolicy, resolveAssetUrl, validateModelProvenance } from './viewer-core.mjs';
+import { iphoneScreenStates, prepareIphonePresentation } from './iphone-presentation.mjs';
 
 const tagName = 'awful-model-viewer';
 
@@ -18,6 +19,8 @@ class AwfulModelViewer extends HTMLElement {
     this._mixer = null;
     this._animationClips = [];
     this._screenGlow = null;
+    this._screenTextures = new Map();
+    this._screenRequest = 0;
     this._clock = new THREE.Clock();
   }
 
@@ -129,11 +132,12 @@ class AwfulModelViewer extends HTMLElement {
     lod.addEventListener('change', () => this.#loadModel(lod.value));
 
     const screenState = this.shadowRoot.querySelector('[data-control="screen-state"]');
-    const states = Object.keys(asset.screenStates ?? {});
+    this._screenStates = asset.id === 'iphone-17-v30' ? iphoneScreenStates : (asset.screenStates ?? {});
+    const states = Object.keys(this._screenStates);
     for (const state of states) {
       const option = document.createElement('option');
       option.value = state;
-      option.textContent = state.replace('screen_', '');
+      option.textContent = this._screenStates[state].label ?? state.replace('screen_', '');
       screenState.append(option);
     }
     if (!states.length) {
@@ -181,6 +185,9 @@ class AwfulModelViewer extends HTMLElement {
   }
 
   async #loadModel(repoPath) {
+    this._screenRequest++;
+    this._iphonePresentation?.dispose();
+    this._iphonePresentation = null;
     if (this._model) {
       this._scene.remove(this._model);
       this.#disposeObject(this._model);
@@ -251,7 +258,11 @@ class AwfulModelViewer extends HTMLElement {
       animationClip.disabled = true;
       animationClip.append(new Option('n/a', ''));
     }
-    this.#setupScreenGlow();
+    if (this._asset.id === 'iphone-17-v30') {
+      this._iphonePresentation = prepareIphonePresentation(this._model);
+      this._screenGlow = this._iphonePresentation.glow;
+      this._model.traverse(object => { if (object.isMesh) object.userData.previewOriginalMaterial = object.material; });
+    } else this.#setupScreenGlow();
     const screenState = this.shadowRoot.querySelector('[data-control="screen-state"]');
     if (!screenState.disabled) this.#applyScreenState(screenState.value);
     this.#fitModel();
@@ -288,9 +299,40 @@ class AwfulModelViewer extends HTMLElement {
     screen.add(this._screenGlow);
   }
 
-  #applyScreenState(state) {
+  async #applyScreenState(state) {
     if (!this._model || !state) return;
-    const stateSpec = this._asset.screenStates?.[state] ?? {};
+    const request = ++this._screenRequest;
+    const selection = this.shadowRoot.querySelector('[data-control="screen-state"]');
+    selection.setCustomValidity('');
+    const stateSpec = this._screenStates?.[state] ?? {};
+    const model = this._model;
+    let texture = null;
+    if (stateSpec.texture) {
+      try {
+        const cache = this._screenTextures;
+        if (!cache.has(state)) {
+          const anisotropy = this._renderer.capabilities.getMaxAnisotropy();
+          const pending = new THREE.TextureLoader().loadAsync(new URL(stateSpec.texture, document.baseURI).href)
+            .then(loaded => {
+              loaded.colorSpace = THREE.SRGBColorSpace;
+              loaded.flipY = false;
+              loaded.anisotropy = anisotropy;
+              return loaded;
+            }).catch(error => { if (cache.get(state) === pending) cache.delete(state);throw error; });
+          cache.set(state, pending);
+        }
+        texture = await cache.get(state);
+      } catch (error) {
+        if (this._disposed || request !== this._screenRequest || model !== this._model) return;
+        this.dataset.screenError = 'texture-load-failed';
+        selection.value = this.dataset.screenState ?? 'screen_on';
+        selection.setCustomValidity('Screen image could not load. Please try again.');
+        selection.reportValidity();
+        console.error('Screen texture failed', error);
+        return;
+      }
+      if (this._disposed || request !== this._screenRequest || model !== this._model) return;
+    }
     const on = state !== 'screen_off';
     this._model.traverse((object) => {
       if (!object.isMesh) return;
@@ -299,11 +341,15 @@ class AwfulModelViewer extends HTMLElement {
         if (material.name !== 'MAT_SCREEN_CONTENT') continue;
         const saved = material.userData.previewScreenOn;
         if (!saved) continue;
-        material.map = on ? saved.map : null;
-        material.emissiveMap = on ? saved.emissiveMap : null;
+        material.map = on ? (texture ?? saved.map) : null;
+        material.emissiveMap = on ? (texture ?? saved.emissiveMap) : null;
         if (material.color) on && saved.color ? material.color.copy(saved.color) : material.color.set(0x010101);
         if (material.emissive) on && saved.emissive ? material.emissive.copy(saved.emissive) : material.emissive.set(0x000000);
         material.emissiveIntensity = on ? Number(stateSpec.emission_strength ?? saved.emissiveIntensity ?? 0.8) : 0;
+        if (this._asset.id === 'iphone-17-v30') {
+          material.emissive.set(on ? 0xffffff : 0x000000);
+          material.color.set(on ? 0x000000 : 0x010101);
+        }
         material.needsUpdate = true;
       }
     });
@@ -313,6 +359,8 @@ class AwfulModelViewer extends HTMLElement {
         ? Number(stateSpec.glow_energy ?? base * Number(stateSpec.glow_intensity ?? 1))
         : 0;
     }
+    this.dataset.screenState = state;
+    delete this.dataset.screenError;
   }
 
   #bounds() {
@@ -448,10 +496,15 @@ class AwfulModelViewer extends HTMLElement {
 
   #dispose() {
     this._disposed = true;
+    this._screenRequest++;
     if (this._raf) cancelAnimationFrame(this._raf);
     this._raf = 0;
     this._resizeObserver?.disconnect();
     this._controls?.dispose();
+    this._iphonePresentation?.dispose();
+    this._iphonePresentation = null;
+    this._screenTextures?.forEach(pending => { void pending.then(texture => texture.dispose(), () => {}); });
+    this._screenTextures?.clear();
     if (this._model) this.#disposeObject(this._model);
     this._screenGlow?.removeFromParent();
     this._screenGlow = null;
