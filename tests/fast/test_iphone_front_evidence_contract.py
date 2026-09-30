@@ -44,6 +44,23 @@ def raster_dynamic_island_contract() -> tuple[float, float, float]:
 
 
 class IPhoneFrontEvidenceContractTests(unittest.TestCase):
+    def test_clean_screen_preserves_artwork_and_removes_baked_island(self):
+        from PIL import ImageChops
+        original = Image.open(SCREEN).convert('RGB')
+        clean = Image.open(SCREEN.with_name('ios26_home_screen_clean_1206x2622.png')).convert('RGB')
+        self.assertEqual(clean.size, original.size)
+        delta = ImageChops.difference(original, clean)
+        box = delta.getbbox()
+        self.assertIsNotNone(box)
+        self.assertGreaterEqual(box[0], 350)
+        self.assertLessEqual(box[2], 856)
+        self.assertGreaterEqual(box[1], 0)
+        self.assertLessEqual(box[3], 160)
+        crop = clean.crop((410, 14, 798, 125))
+        pixels = crop.tobytes()
+        black_pixels = sum(max(pixels[i:i+3]) < 16 for i in range(0, len(pixels), 3))
+        self.assertLess(black_pixels, 100, 'screen still contains a black island')
+
     def test_visible_dynamic_island_tracks_official_screen_raster(self):
         source = GENERATOR.read_text(encoding="utf-8")
         z_match = re.search(

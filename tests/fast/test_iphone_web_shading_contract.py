@@ -33,6 +33,45 @@ def accessor_vec3(doc, blob, accessor_index):
 
 
 class IPhoneWebShadingContractTests(unittest.TestCase):
+    def test_closed_shells_have_outward_winding(self):
+        doc, blob = read_glb(GLB)
+        for name in ('BODY_ALUMINUM', 'BACK_GLASS', 'CAMERA_HOUSING', 'CAMERA_HOUSING_SEAT', 'DYNAMIC_ISLAND'):
+            mesh = next(mesh for mesh in doc['meshes'] if mesh.get('name') == name)
+            volume = 0.0
+            for primitive in mesh['primitives']:
+                positions = accessor_vec3(doc, blob, primitive['attributes']['POSITION'])
+                accessor = doc['accessors'][primitive['indices']]
+                view = doc['bufferViews'][accessor['bufferView']]
+                offset = view.get('byteOffset', 0) + accessor.get('byteOffset', 0)
+                fmt = {5121: 'B', 5123: 'H', 5125: 'I'}[accessor['componentType']]
+                indices = struct.unpack_from('<' + fmt * accessor['count'], blob, offset)
+                for i in range(0, len(indices), 3):
+                    a, b, c = (positions[indices[i+j]] for j in range(3))
+                    cross = (b[1]*c[2]-b[2]*c[1], b[2]*c[0]-b[0]*c[2], b[0]*c[1]-b[1]*c[0])
+                    volume += sum(a[k]*cross[k] for k in range(3)) / 6.0
+            self.assertGreater(volume, 0.0, f'{name}: inverted or mixed triangle winding')
+
+    def test_back_glass_vertex_normals_face_outward(self):
+        doc, blob = read_glb(GLB)
+        mesh = next(mesh for mesh in doc['meshes'] if mesh.get('name') == 'BACK_GLASS')
+        for primitive in mesh['primitives']:
+            positions = accessor_vec3(doc, blob, primitive['attributes']['POSITION'])
+            normals = accessor_vec3(doc, blob, primitive['attributes']['NORMAL'])
+            inward = sum(sum(p[k]*n[k] for k in range(3)) < -1e-7 for p, n in zip(positions, normals))
+            self.assertEqual(inward, 0, f'BACK_GLASS has {inward} inward vertex normals')
+
+    def test_flash_has_embedded_image_and_uvs(self):
+        doc, blob = read_glb(GLB)
+        material_index = next(i for i, item in enumerate(doc['materials']) if item.get('name') == 'MAT_FLASH')
+        material = doc['materials'][material_index]
+        texture = material.get('pbrMetallicRoughness', {}).get('baseColorTexture')
+        self.assertIsNotNone(texture, 'flash diffuser is an untextured white disk')
+        image_index = doc['textures'][texture['index']]['source']
+        self.assertIn('bufferView', doc['images'][image_index], 'flash image must be embedded')
+        primitives = [p for mesh in doc['meshes'] for p in mesh['primitives'] if p.get('material') == material_index]
+        self.assertTrue(primitives)
+        self.assertTrue(all('TEXCOORD_0' in p['attributes'] for p in primitives))
+
     def test_screen_content_is_opaque(self):
         doc, _ = read_glb(GLB)
         material = next(item for item in doc['materials'] if item.get('name') == 'MAT_SCREEN_CONTENT')

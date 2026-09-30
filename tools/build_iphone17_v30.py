@@ -18,6 +18,8 @@ SOURCE_FILES = [
     'assets/device_mockups/iphone_17/export_runtime_v30.py',
     'assets/device_mockups/iphone_17/reference/apple_logo_glb_mask.png',
     'assets/device_mockups/iphone_17/reference/ios26_home_screen_1206x2622.png',
+    'assets/device_mockups/iphone_17/reference/ios26_home_screen_clean_1206x2622.png',
+    'assets/device_mockups/iphone_17/reference/flash_diffuser_v30.png',
 ]
 sys.path.insert(0, str(ROOT / 'tools'))
 from device_delivery_contract import source_fingerprint, sha256_file
