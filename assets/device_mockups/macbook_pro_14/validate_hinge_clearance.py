@@ -21,9 +21,10 @@ OUT = os.path.abspath(
 REPO_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..")
 )
-ANGLES = (0, 30, 60, 90, 102)
+ANGLES = tuple(range(103))
 MAX_INTERSECTION_MM3 = 0.01
 PAIRS = (
+    ("lid_base", "LID_UNIBODY", "BASE_UNIBODY"),
     ("barrel_l_base", "HINGE_BARREL_L", "BASE_UNIBODY"),
     ("barrel_r_base", "HINGE_BARREL_R", "BASE_UNIBODY"),
     ("cover_l_base", "HINGE_COVER_L", "BASE_UNIBODY"),
@@ -40,6 +41,10 @@ def baked_copy(name, suffix):
     source = bpy.data.objects[name].evaluated_get(depsgraph)
     mesh = bpy.data.meshes.new_from_object(source, depsgraph=depsgraph)
     mesh.transform(source.matrix_world)
+    # Triangulate evaluated annular caps before Boolean intersection.
+    bm = bmesh.new(); bm.from_mesh(mesh)
+    bmesh.ops.triangulate(bm, faces=list(bm.faces))
+    bm.to_mesh(mesh); bm.free()
     obj = bpy.data.objects.new(f"_HINGE_CHECK_{suffix}", mesh)
     scene.collection.objects.link(obj)
     return obj

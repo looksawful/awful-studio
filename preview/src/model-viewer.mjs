@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
-import { availableLods, cameraDirection, previewMaterialPolicy, resolveAssetUrl } from './viewer-core.mjs';
+import { availableLods, cameraDirection, perspectiveClipPlanes, previewMaterialPolicy, resolveAssetUrl } from './viewer-core.mjs';
 
 const tagName = 'awful-model-viewer';
 
@@ -324,8 +324,9 @@ class AwfulModelViewer extends HTMLElement {
     const distance = max / (2 * Math.tan(THREE.MathUtils.degToRad(this._perspective.fov / 2))) * 1.45;
     const direction = new THREE.Vector3(...cameraDirection('front'));
     this._perspective.position.copy(center).add(direction.multiplyScalar(distance));
-    this._perspective.near = Math.max(distance / 1000, 0.001);
-    this._perspective.far = distance * 100;
+    const { near, far } = perspectiveClipPlanes(distance);
+    this._perspective.near = near;
+    this._perspective.far = far;
     this._perspective.updateProjectionMatrix();
 
     const half = max * 0.72;

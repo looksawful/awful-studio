@@ -17,6 +17,7 @@ LOADER_PATH = ROOT / 'extension/awful_studio/device_asset_loader.py'
 SOURCE_FILES = [
     'assets/device_mockups/common/foundation_common.py',
     'assets/device_mockups/macbook_pro_14/generate_low.py',
+    'assets/device_mockups/macbook_pro_14/deck_details.py',
     'assets/device_mockups/macbook_pro_14/export_runtime_v1.py',
     'assets/device_mockups/macbook_pro_14/optimize_runtime_v1.py',
     'assets/device_mockups/macbook_pro_14/reference/apple_logo_alpha.png',
@@ -75,6 +76,8 @@ def main():
     run(args.blender.resolve(), '--factory-startup', '--background', generated, '--python-exit-code', '1',
         '--python', DEVICE / 'validate_hinge_clearance.py', '--',
         '--out', DEVICE / 'evidence/hinge_clearance_delivery.json')
+    run(args.blender.resolve(), '--factory-startup', '--background', generated, '--python-exit-code', '1',
+        '--python', DEVICE / 'validate_deck_ports.py')
     run(args.blender.resolve(), '--factory-startup', '--background', generated, '--python-exit-code', '1', '--python', ROOT / 'tools/package_device_asset.py', '--',
         '--output', source_blend, '--entry', 'AWFUL_DEVICE_MACBOOK_PRO_14', '--root', 'CTRL_MACBOOK_PRO_14',
         '--key', 'MACBOOK_PRO_14', '--stage', 'RELEASE_CANDIDATE', '--variant', 'low_v1_release', '--revision', revision)

@@ -35,8 +35,8 @@
   "base_non_manifold_edges": 0,
   "lid_non_manifold_edges": 0,
   "mandatory_missing": [],
-  "object_count": 284,
-  "material_count": 9,
+  "object_count": 368,
+  "material_count": 12,
   "hinge_open_angle_deg": 102.0,
   "animation_clips": [
     "lid_open",

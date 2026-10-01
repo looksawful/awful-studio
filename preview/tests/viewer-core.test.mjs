@@ -3,9 +3,19 @@ import { test } from 'node:test';
 import {
   availableLods,
   cameraDirection,
+  perspectiveClipPlanes,
   resolveAssetUrl,
   previewMaterialPolicy,
 } from '../src/viewer-core.mjs';
+
+test('perspective depth separates the display from its bezel at a 40 micron gap', () => {
+  for (const distance of [0.4, 0.8, 1.2]) {
+    const { near, far } = perspectiveClipPlanes(distance);
+    const depth = (z) => Math.floor((far / (far - near) - far * near / ((far - near) * z)) * (2 ** 24 - 1));
+    assert.ok(Math.abs(depth(distance) - depth(distance + 0.00004)) >= 4);
+    assert.ok(near < distance / 2 && far > distance * 2, 'product must remain inside the camera range');
+  }
+});
 
 test('preview URLs expose repository assets without copying binaries', () => {
   assert.equal(

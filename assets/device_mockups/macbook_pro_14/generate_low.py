@@ -2,7 +2,9 @@ import json, math, os, sys, bmesh, bpy
 HERE=os.path.dirname(os.path.abspath(__file__))
 COMMON=os.path.normpath(os.path.join(HERE,'..','common'))
 if COMMON not in sys.path: sys.path.insert(0,COMMON)
+if HERE not in sys.path: sys.path.insert(0,HERE)
 import foundation_common as fc
+import deck_details
 MM=fc.MM
 W,D,CLOSED_H=312.6*MM,221.2*MM,15.5*MM
 LID_T=4.7*MM; BASE_H=8.3*MM; GAP=CLOSED_H-LID_T-BASE_H
@@ -38,12 +40,14 @@ lid_c=fc.make_collection('MACBOOK_PRO_14_LOW_LID')
 detail_c=fc.make_collection('MACBOOK_PRO_14_LOW_DETAILS')
 screen_c=fc.make_collection('MACBOOK_PRO_14_LOW_SCREEN')
 ctrl_c=fc.make_collection('MACBOOK_PRO_14_CONTROLS')
-metal=fc.make_material('MAT_SPACE_BLACK_ALUMINUM',(0.12,0.13,0.15),0.86,0.22)
-metal2=fc.make_material('MAT_EDGE_ALUMINUM',(0.18,0.19,0.21),0.88,0.20)
-keymat=fc.make_material('MAT_KEYCAP',(0.012,0.014,0.018),0.0,0.28)
+metal=fc.make_material('MAT_SPACE_BLACK_ALUMINUM',(0.018,0.020,0.024),0.86,0.30)
+metal2=fc.make_material('MAT_EDGE_ALUMINUM',(0.040,0.043,0.048),0.88,0.26)
+keymat=fc.make_material('MAT_KEYCAP',(0.0020,0.0024,0.0030),0.0,0.46)
+keymat.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value=.12
 dark=fc.make_material('MAT_PORT_DARK',(0.004,0.005,0.007),0.02,0.16)
-trackmat=fc.make_material('MAT_TRACKPAD',(0.11,0.12,0.14),0.68,0.26)
-bezelmat=fc.make_material('MAT_DISPLAY_BEZEL',(0.002,0.003,0.005),0.0,0.12)
+trackmat=fc.make_material('MAT_TRACKPAD',(0.014,0.016,0.020),0.52,0.33)
+bezelmat=fc.make_material('MAT_DISPLAY_BEZEL',(0.002,0.003,0.005),0.0,0.28)
+bezelmat.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value=.12
 glass=fc.make_material('MAT_DISPLAY_GLASS',(0.012,0.015,0.020),0.0,0.14)
 glass.diffuse_color=(0.012,0.015,0.020,0.16)
 gbsdf=glass.node_tree.nodes.get('Principled BSDF'); gbsdf.inputs['Base Color'].default_value=(0.012,0.015,0.020,0.16); gbsdf.inputs['Alpha'].default_value=0.16; gbsdf.inputs['Coat Weight'].default_value=0.10; gbsdf.inputs['Coat Roughness'].default_value=0.12
@@ -57,7 +61,7 @@ base=fc.rounded_prism('BASE_UNIBODY',W,D,BASE_H,8.4*MM,metal,base_c,axis='Z',loc
 base.parent=root
 for poly in base.data.polygons: poly.use_smooth = poly.index >= 2
 bottom=fc.rounded_prism('BOTTOM_PANEL',W-3.0*MM,D-3.0*MM,.55*MM,7.4*MM,metal2,detail_c,axis='Z',location=(0,0,.30*MM),edge_bevel=.00018); bottom.parent=root
-keywell=fc.rounded_prism('KEYBOARD_WELL',275*MM,96*MM,.32*MM,4.5*MM,dark,detail_c,axis='Z',location=(0,31*MM,BASE_H+.08*MM),edge_bevel=.00012); keywell.parent=root
+keywell=fc.rounded_prism('KEYBOARD_WELL',275*MM,102*MM,.32*MM,4.5*MM,dark,detail_c,axis='Z',location=(0,39*MM,BASE_H+.08*MM),edge_bevel=.00012); keywell.parent=root
 track_gap=fc.rounded_prism('TRACKPAD_GAP',134*MM,88*MM,.22*MM,4.7*MM,dark,detail_c,axis='Z',location=(0,-50*MM,BASE_H+.10*MM)); track_gap.parent=root
 track=fc.rounded_prism('TRACKPAD',132*MM,86*MM,.24*MM,4.2*MM,trackmat,detail_c,axis='Z',location=(0,-50*MM,BASE_H+.23*MM),edge_bevel=.00012); track.parent=root
 
@@ -119,43 +123,10 @@ root['screen_states']='screen_off,screen_on'; root['screen_glow_anchor']='SCREEN
 notch=fc.rounded_prism('CAMERA_NOTCH',36*MM,10.5*MM,.20*MM,4.3*MM,bezelmat,detail_c,axis='Y'); notch.parent=hinge; notch.location=(0,-.55*MM,LID_H-5.8*MM)
 cam=fc.cylinder('FACETIME_CAMERA',1.35*MM,.20*MM,dark,detail_c,axis='Y',vertices=48); cam.parent=hinge; cam.location=(0,-.72*MM,LID_H-5.8*MM)
 
-key_z=.82*MM; key_h=13.2*MM; gap_x=2.0*MM; gap_y=2.25*MM
-row_specs=[
- ([14.0]*14,0.0),
- ([18.0]+[14.0]*12+[18.0],0.0),
- ([21.0]+[14.0]*11+[27.0],0.0),
- ([25.0]+[14.0]*10+[37.0],0.0),
- ([31.0]+[14.0]*9+[45.0],0.0),
- ([18.0,18.0,18.0,82.0,18.0,18.0,18.0,18.0],0.0),
-]
-row_y0=-2*MM
-for r,(widths,_) in enumerate(row_specs):
-    y=row_y0+r*(key_h+gap_y)
-    total=sum(widths)*MM+(len(widths)-1)*gap_x
-    x=-total*.5
-    for c,wmm in enumerate(widths):
-        w=wmm*MM
-        key=fc.rounded_cube(f'KEY_{r:02d}_{c:02d}',(w,key_h,key_z),1.65*MM,keymat,detail_c,(x+w*.5,y,BASE_H+key_z*.5+.34*MM)); key.parent=root
-        x+=w+gap_x
-# Touch ID replaces the far-right function-row key visually
-fc.rounded_cube('TOUCH_ID',(15.8*MM,13.2*MM,.92*MM),2.4*MM,keymat,detail_c,(127*MM,row_y0+5*(key_h+gap_y),BASE_H+.80*MM)).parent=root
-for side in (-1,1):
-    sx=side*(W*.5-20.0*MM)
-    for row in range(15):
-        sy=2.0*MM+row*5.2*MM
-        for col in range(5):
-            ox=(col-2)*2.35*MM
-            hole=fc.cylinder(f'SPEAKER_{"L" if side<0 else "R"}_{row:02d}_{col:02d}',.48*MM,.24*MM,dark,detail_c,(sx+ox,sy,BASE_H+.21*MM),axis='Z',vertices=20); hole.parent=root
+deck_details.keyboard(fc,detail_c,root,keymat,BASE_H)
+deck_details.speakers(fc,detail_c,root,base,W,BASE_H,dark)
 
-port_specs=[
- ('MAGSAFE','L',62,14.0,3.4),('TB_LEFT_1','L',27,12.5,2.6),('TB_LEFT_2','L',-1,12.5,2.6),('HEADPHONE','L',-54,7.2,3.7),
- ('HDMI','R',53,17.0,4.4),('SDXC','R',18,19.5,2.4),('TB_RIGHT','R',-22,12.5,2.6),
-]
-for name,side,y_mm,length_mm,height_mm in port_specs:
-    sgn=-1 if side=='L' else 1
-    x=sgn*(W*.5+.10*MM)
-    rim=fc.rounded_cube(f'{name}_RIM',(.38*MM,(length_mm+1.6)*MM,(height_mm+1.0)*MM),min(.8*MM,height_mm*.30*MM),metal2,detail_c,(x,y_mm*MM,BASE_H*.50)); rim.parent=root
-    cav=fc.rounded_cube(name,(.48*MM,length_mm*MM,height_mm*MM),min(.7*MM,height_mm*.26*MM),dark,detail_c,(sgn*(W*.5+.22*MM),y_mm*MM,BASE_H*.50)); cav.parent=root
+deck_details.ports(fc,detail_c,root,base,W,BASE_H,dark)
 
 for i,(x,y) in enumerate(((-W*.5+18*MM,-D*.5+17*MM),(W*.5-18*MM,-D*.5+17*MM),(-W*.5+18*MM,D*.5-20*MM),(W*.5-18*MM,D*.5-20*MM)),1):
     foot=fc.cylinder(f'FOOT_{i:02d}',5.2*MM,.75*MM,keymat,detail_c,(x,y,-.28*MM),axis='Z',vertices=48); foot.parent=root
@@ -183,6 +154,14 @@ logo=bpy.data.objects.new('APPLE_LOGO_RELEASE',mesh); bpy.context.scene.collecti
 uv=mesh.uv_layers.new(name='UVMap')
 for loop,coord in zip(mesh.loops,((0,0),(1,0),(1,1),(0,1))): uv.data[loop.index].uv=coord
 root['stage']='RELEASE_CANDIDATE'; root['release_export_target']='GLB uncompressed'; root['release_polish']='apple_logo + embedded source image'
+
+# X/Z prisms extruded on Y reverse handedness; closed shells face outward.
+for obj in list(bpy.data.objects):
+    if obj.type != 'MESH': continue
+    bm=bmesh.new(); bm.from_mesh(obj.data)
+    if bm.faces and all(edge.is_manifold for edge in bm.edges) and bm.calc_volume(signed=True)<0:
+        bmesh.ops.reverse_faces(bm,faces=list(bm.faces)); bm.to_mesh(obj.data); obj.data.update()
+    bm.free()
 
 def local_dims_mm(obj):
  xs=[v.co.x for v in obj.data.vertices]; ys=[v.co.y for v in obj.data.vertices]; zs=[v.co.z for v in obj.data.vertices]

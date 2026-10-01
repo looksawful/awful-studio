@@ -95,4 +95,16 @@ aim(camera, (0, 0.105, 0.035))
 scene.render.filepath = os.path.join(OUT, "macbook_hinge_macro_030.png")
 bpy.ops.render.render(write_still=True)
 
+set_angle(102)
+for label, location, target, scale in (
+    ('deck', (0, -.035, .48), (0, .035, .01), .38),
+    ('ports_left', (-.28, .008, .055), (-.152, .008, .004), .17),
+    ('ports_right', (.28, .008, .055), (.152, .008, .004), .17),
+):
+    camera.data.ortho_scale = scale
+    camera.location = location
+    aim(camera, target)
+    scene.render.filepath = os.path.join(OUT, f'macbook_{label}.png')
+    bpy.ops.render.render(write_still=True)
+
 print("MACBOOK_HINGE_ACCEPTANCE_RENDERS", OUT)
