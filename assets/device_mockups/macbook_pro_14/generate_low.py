@@ -52,6 +52,8 @@ wellmat.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].defa
 trackmat=fc.make_material('MAT_TRACKPAD',(0.014,0.016,0.020),0.52,0.33)
 bezelmat=fc.make_material('MAT_DISPLAY_BEZEL',(0.002,0.003,0.005),0.0,0.28)
 bezelmat.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value=.025
+hingemat=fc.make_material('MAT_HINGE_SHROUD',(0.003,0.0035,0.004),0.0,0.48)
+hingemat.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value=.08
 glass=fc.make_material('MAT_DISPLAY_GLASS',(0.012,0.015,0.020),0.0,0.14)
 glass.diffuse_color=(0.012,0.015,0.020,0.04)
 gbsdf=glass.node_tree.nodes.get('Principled BSDF'); gbsdf.inputs['Base Color'].default_value=(0.012,0.015,0.020,0.04); gbsdf.inputs['Alpha'].default_value=0.04; gbsdf.inputs['Coat Weight'].default_value=0.025; gbsdf.inputs['Coat Roughness'].default_value=0.12; gbsdf.inputs['Specular IOR Level'].default_value=.12
@@ -104,7 +106,7 @@ root['animation_clips']='lid_open,lid_close'
 for side in (-1,1):
     x=side*(W*.5-48*MM)
     barrel=cyl_x(f'HINGE_BARREL_{"L" if side<0 else "R"}',3.3*MM,58*MM,metal2,detail_c,(x,hinge_y,BASE_H+GAP)); barrel.parent=root
-    cover=cyl_x(f'HINGE_COVER_{"L" if side<0 else "R"}',3.65*MM,51*MM,metal,detail_c,(x,0,0),inner_radius=3.42*MM); cover.parent=hinge
+    cover=cd.hinge_shroud(fc,f'HINGE_COVER_{"L" if side<0 else "R"}',hingemat,detail_c,hinge,x)
 
 lid=cd.profiled_shell(fc,'LID_UNIBODY',LID_W,LID_H,LID_T,8.0*MM,
  [(y*MM,i*MM) for y,i in ((-2.35,.35),(-2.25,.14),(-2.05,.03),(-1.80,0),(1.45,0),(1.80,.08),(2.10,.28),(2.29,.55),(2.35,.82))],
@@ -112,6 +114,7 @@ lid=cd.profiled_shell(fc,'LID_UNIBODY',LID_W,LID_H,LID_T,8.0*MM,
 for poly in lid.data.polygons: poly.use_smooth = poly.index >= 2
 bezel=fc.rounded_prism('DISPLAY_BEZEL',307.2*MM,204.2*MM,.28*MM,6.6*MM,bezelmat,screen_c,axis='Y',edge_bevel=.00010); bezel.parent=hinge; bezel.location=(0,-.12*MM,LID_H*.5+2.6*MM)
 gasket=fc.rounded_prism('DISPLAY_GASKET',309.3*MM,207*MM,.20*MM,7.1*MM,keymat,screen_c,axis='Y',edge_bevel=.00003); gasket.parent=hinge; gasket.location=(0,-.05*MM,LID_H*.5+2.3*MM)
+lower_rail=fc.rounded_prism('DISPLAY_LOWER_RAIL',307.2*MM,3.4*MM,.20*MM,.7*MM,bezelmat,screen_c,axis='Y',edge_bevel=.00003); lower_rail.parent=hinge; lower_rail.location=(0,-.12*MM,1.7*MM)
 screen=fc.rounded_prism('SCREEN_CONTENT',SCREEN_W,SCREEN_H,.12*MM,5.8*MM,screenmat,screen_c,axis='Y'); screen.parent=hinge; screen.location=(0,-.28*MM,LID_H*.5+2.0*MM)
 screen_path=os.path.join(HERE,'reference','looksawful_home_3024x1964.png')
 img=bpy.data.images.load(screen_path,check_existing=True); img.pack()

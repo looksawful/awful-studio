@@ -1,6 +1,38 @@
 """Reference-led construction profiles. Local dimensions are LOW estimates in metres."""
 import bpy
 import bmesh
+import math
+
+
+def hinge_shroud(fc, name, material, collection, hinge, x):
+    """Closed sleeve around the pivot, with a shallow flat on its visible face.
+
+    Local radii/length are estimates. The complete cross section remains inside
+    the existing 3.9 mm chassis relief and outside the 3.3 mm pivot.
+    """
+    mm=fc.MM; count=64; vertices=[]
+    for end in (-30*mm,30*mm):
+        for radius in (3.65*mm,3.42*mm):
+            for index in range(count):
+                angle=2*math.pi*index/count
+                y=radius*math.cos(angle)
+                if radius>3.5*mm: y=max(y,-3.46*mm)
+                vertices.append((end,y,radius*math.sin(angle)))
+    faces=[]
+    for index in range(count):
+        j=(index+1)%count
+        faces.extend(((index,j,2*count+j,2*count+index),
+                      (count+index,3*count+index,3*count+j,count+j),
+                      (index,count+index,count+j,j),
+                      (2*count+index,2*count+j,3*count+j,3*count+index)))
+    mesh=bpy.data.meshes.new(name+'_SLEEVE'); mesh.from_pydata(vertices,[],faces); mesh.update()
+    bm=bmesh.new(); bm.from_mesh(mesh); bmesh.ops.recalc_face_normals(bm,faces=list(bm.faces)); bm.to_mesh(mesh); bm.free()
+    mesh.materials.append(material)
+    for polygon in mesh.polygons: polygon.use_smooth=polygon.index%4<2
+    obj=bpy.data.objects.new(name,mesh); collection.objects.link(obj)
+    obj.parent=hinge; obj.location=(x,0,0)
+    bevel=obj.modifiers.new('SHROUD_EDGE','BEVEL'); bevel.width=.025*mm; bevel.segments=2
+    return obj
 
 
 def profiled_shell(fc, name, width, height, depth, radius, rings, material, collection, axis='Z', location=(0, 0, 0)):

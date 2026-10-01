@@ -14,6 +14,24 @@ for name in ('BASE_UNIBODY', 'LID_UNIBODY'):
     assert bm.calc_volume(signed=True) > 0, f'{name}: inward shell'
     bm.free()
 assert bpy.data.objects.get('DISPLAY_GASKET'), 'Missing display seating gasket'
+hinge_frame=bpy.data.objects['CTRL_HINGE']
+for side in ('L','R'):
+    barrel=bpy.data.objects[f'HINGE_BARREL_{side}']
+    cover=bpy.data.objects[f'HINGE_COVER_{side}'].evaluated_get(bpy.context.evaluated_depsgraph_get())
+    # Probe near both barrel ends: the old short sleeve left seven millimeters
+    # of reflective mechanism exposed, despite passing collision checks.
+    x_center=barrel.location.x
+    barrel_x=[(hinge_frame.matrix_world.inverted()@(barrel.matrix_world@Vector(p))).x for p in barrel.bound_box]
+    half_length=(max(barrel_x)-min(barrel_x))/2
+    for end in (-1,1):
+        origin=hinge_frame.matrix_world@Vector((x_center+end*(half_length-.00025),-.006,0))
+        direction=hinge_frame.matrix_world.to_3x3()@Vector((0,1,0))
+        hit,point,_,_=cover.ray_cast(cover.matrix_world.inverted()@origin,cover.matrix_world.inverted().to_3x3()@direction)
+        assert hit, f'Exposed hinge barrel at {side} end {end}'
+        local=hinge_frame.matrix_world.inverted()@(cover.matrix_world@point)
+        assert -.0038<local.y<-.0033, 'Hinge shroud lost radial clearance or exceeds chassis cut'
+    surface=cover.data.materials[0].node_tree.nodes.get('Principled BSDF')
+    assert surface.inputs['Metallic'].default_value<=.15 and surface.inputs['Roughness'].default_value>=.4, 'External hinge still reads as a reflective metal rod'
 assert len([o for o in bpy.data.objects if o.get('function_icon')]) == 12, 'Mac function row still uses F-number proxy labels'
 well=bpy.data.objects['KEYBOARD_WELL']; track=bpy.data.objects['TRACKPAD']
 assert min((well.matrix_world@Vector(v)).y for v in well.bound_box)-max((track.matrix_world@Vector(v)).y for v in track.bound_box) >= .004, 'Trackpad collides visually with keyboard well'
