@@ -3,6 +3,8 @@ import math
 import bpy
 import bmesh
 from mathutils import Matrix
+from construction_details import profiled_shell
+import function_legends
 
 
 def keyboard(fc, collection, root, material, base_height):
@@ -18,10 +20,13 @@ def keyboard(fc, collection, root, material, base_height):
     ]
 
     def key(name, label, x, y, width, height=13.2):
-        obj = fc.rounded_cube(name, (width * mm, height * mm, .82 * mm), .26 * mm,
-                              material, collection, (x * mm, y * mm, base_height + .75 * mm))
+        obj = profiled_shell(fc, name, width*mm, height*mm, .82*mm, .7*mm,
+                             [(z*mm, inset*mm) for z,inset in ((-.41,.30),(-.26,0),(.26,0),(.39,.16),(.41,.34),(.32,.95))],
+                             material, collection, location=(x*mm,y*mm,base_height+.75*mm))
         obj.parent = root
         obj['key_label'] = label
+        stem = fc.rounded_cube('KEYSEAT_'+name, ((width-2)*mm,(height-1.2)*mm,.86*mm), .12*mm,
+                               material,collection,(x*mm,y*mm,base_height-.05*mm)); stem.parent=root
         if label == 'Touch ID':
             sensor_mat = fc.make_material('MAT_TOUCH_ID_SENSOR', (.003, .004, .005), 0, .22)
             sensor = fc.cylinder('TOUCH_ID_SENSOR', 4.3 * mm, .06 * mm, sensor_mat, collection,
@@ -30,15 +35,19 @@ def keyboard(fc, collection, root, material, base_height):
             return
         if label == 'space':
             return
+        if label.startswith('F') and label[1:].isdigit():
+            function_legends.icon('LEGEND_'+name,int(label[1:]),collection,root,legend_mat,
+                                  (x*mm,y*mm,base_height+1.08*mm))
+            return
         font = bpy.data.curves.new('LEGEND_' + name, 'FONT')
         font.body = label
         font.align_x = 'CENTER'
         font.align_y = 'CENTER'
-        font.size = (1.6 if len(label) > 3 else 2.5) * mm
+        font.size = (1.8 if len(label) > 3 else 3.6) * mm
         legend = bpy.data.objects.new('LEGEND_' + name, font)
         collection.objects.link(legend)
         legend.parent = root
-        legend.location = (x * mm, y * mm, base_height + 1.18 * mm)
+        legend.location = (x * mm, y * mm, base_height + 1.08 * mm)
         font.materials.append(legend_mat)
         bpy.ops.object.select_all(action='DESELECT')
         legend.select_set(True)
@@ -116,18 +125,27 @@ def speakers(fc, collection, root, base, width, base_height, dark):
     mm = fc.MM
     bm = bmesh.new()
     for side in (-1, 1):
-        for row in range(15):
-            for col in range(5):
-                x = side * (width / 2 - 10 * mm) + (col - 2) * 2.35 * mm
-                y = (2 + row * 5.2) * mm
-                bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=24,
-                                      radius1=.48 * mm, radius2=.48 * mm, depth=.8 * mm,
-                                      matrix=Matrix.Translation((x, y, base_height - .22 * mm)))
-                floor = fc.cylinder(f'SPEAKER_{"L" if side < 0 else "R"}_{row:02d}_{col:02d}',
-                                    .40 * mm, .10 * mm, dark, collection,
-                                    (x, y, base_height - .55 * mm), axis='Z', vertices=20)
-                floor.parent = root
+        center_x = side*(width/2-10*mm)
+        backing = fc.rounded_prism(f'SPEAKER_BACKING_{side}', 6.2*mm,73*mm,.10*mm,.3*mm,dark,collection,
+                                   axis='Z',location=(center_x,37.67*mm,base_height-.68*mm)); backing.parent=root
+        for row in range(88):
+            for col in range(9):
+                x = center_x+(col-4)*.68*mm
+                y = (2+row*.82)*mm
+                bmesh.ops.create_cone(bm,cap_ends=True,cap_tris=False,segments=12,
+                                      radius1=.20*mm,radius2=.20*mm,depth=.75*mm,
+                                      matrix=Matrix.Translation((x,y,base_height-.25*mm)))
+                # Preserve the two public legacy identifiers without one object per hole.
+                if (side,row,col) in ((-1,0,0),(1,14,4)):
+                    floor=fc.cylinder(f'SPEAKER_{"L" if side<0 else "R"}_{row:02d}_{col:02d}',
+                                      .18*mm,.04*mm,dark,collection,(x,y,base_height-.67*mm),axis='Z',vertices=12)
+                    floor.parent=root
     mesh = bpy.data.meshes.new('SPEAKER_CUTTERS'); bm.to_mesh(mesh); bm.free()
     cutter = bpy.data.objects.new('SPEAKER_CUTTERS', mesh); collection.objects.link(cutter)
     bpy.context.view_layer.update()
-    fc.boolean_difference(base, cutter, name='CUT_SPEAKER_FIELDS')
+    bpy.ops.object.select_all(action='DESELECT'); base.select_set(True); bpy.context.view_layer.objects.active=base
+    modifier=base.modifiers.new('CUT_SPEAKER_FIELDS','BOOLEAN')
+    modifier.operation='DIFFERENCE'; modifier.solver='MANIFOLD'; modifier.object=cutter
+    bpy.ops.object.modifier_apply(modifier=modifier.name)
+    bpy.data.objects.remove(cutter,do_unlink=True)
+    base['speaker_apertures']=1584

@@ -66,6 +66,7 @@ camera_data = bpy.data.cameras.new("ACC_CAMERA")
 camera_data.type = "ORTHO"
 camera_data.ortho_scale = 0.46
 camera_data.clip_start = 0.01
+camera_data.clip_end = 2.0  # Orthographic depth steps <0.12 micron, below 10-micron legend seating.
 camera = bpy.data.objects.new("ACC_CAMERA", camera_data)
 scene.collection.objects.link(camera)
 camera.location = (0.43, -0.57, 0.34)
@@ -106,5 +107,22 @@ for label, location, target, scale in (
     aim(camera, target)
     scene.render.filepath = os.path.join(OUT, f'macbook_{label}.png')
     bpy.ops.render.render(write_still=True)
+
+for label, location, target, scale in (
+    ('hero_full', (.43,-.57,.34), (0,.025,.102), .51),
+    ('camera_macro', (.014,-.13,.253), (0,.060,.214), .055),
+    ('keycap_macro', (-.07,-.10,.15), (-.075,.05,.009), .055),
+    ('speaker_macro', (.16,-.030,.120), (.1463,.04,.0083), .060),
+    ('front_recess', (0,-.25,.024), (0,-.108,.006), .058),
+    ('lid_back', (.03,.40,.23), (0,.11,.115), .34),
+):
+    camera.data.ortho_scale=scale; camera.location=location; aim(camera,target)
+    scene.render.filepath=os.path.join(OUT,f'macbook_{label}.png')
+    bpy.ops.render.render(write_still=True)
+
+set_angle(0)
+camera.data.ortho_scale=.36; camera.location=(0,-.05,-.50); aim(camera,(0,0,0))
+scene.render.filepath=os.path.join(OUT,'macbook_underside.png')
+bpy.ops.render.render(write_still=True)
 
 print("MACBOOK_HINGE_ACCEPTANCE_RENDERS", OUT)

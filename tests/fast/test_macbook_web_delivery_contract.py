@@ -51,7 +51,7 @@ class MacBookWebDeliveryContractTests(unittest.TestCase):
         self.assertEqual(manifest['root'], 'CTRL_MACBOOK_PRO_14')
         self.assertEqual(manifest['hinge_control'], 'CTRL_HINGE')
         source_paths = set(manifest['source_files'])
-        self.assertIn('assets/device_mockups/macbook_pro_14/reference/macos26_official_screen.png', source_paths)
+        self.assertIn('assets/device_mockups/macbook_pro_14/reference/looksawful_home_3024x1964.png', source_paths)
         self.assertEqual(set(manifest['screen_states']), {'screen_off', 'screen_on'})
         self.assertGreater(manifest['screen_states']['screen_on']['emission_strength'], 0.0)
         self.assertLessEqual(manifest['screen_states']['screen_on']['emission_strength'], 1.0)

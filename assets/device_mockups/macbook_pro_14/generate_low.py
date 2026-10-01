@@ -5,6 +5,7 @@ if COMMON not in sys.path: sys.path.insert(0,COMMON)
 if HERE not in sys.path: sys.path.insert(0,HERE)
 import foundation_common as fc
 import deck_details
+import construction_details as cd
 MM=fc.MM
 W,D,CLOSED_H=312.6*MM,221.2*MM,15.5*MM
 LID_T=4.7*MM; BASE_H=8.3*MM; GAP=CLOSED_H-LID_T-BASE_H
@@ -43,33 +44,41 @@ ctrl_c=fc.make_collection('MACBOOK_PRO_14_CONTROLS')
 metal=fc.make_material('MAT_SPACE_BLACK_ALUMINUM',(0.018,0.020,0.024),0.86,0.30)
 metal2=fc.make_material('MAT_EDGE_ALUMINUM',(0.040,0.043,0.048),0.88,0.26)
 keymat=fc.make_material('MAT_KEYCAP',(0.0020,0.0024,0.0030),0.0,0.46)
-keymat.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value=.12
+keymat.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value=.04
 dark=fc.make_material('MAT_PORT_DARK',(0.004,0.005,0.007),0.02,0.16)
+wellmat=fc.make_material('MAT_KEYBOARD_WELL',(0.001,0.0015,0.002),0.0,0.55)
+wellmat.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value=.08
 trackmat=fc.make_material('MAT_TRACKPAD',(0.014,0.016,0.020),0.52,0.33)
 bezelmat=fc.make_material('MAT_DISPLAY_BEZEL',(0.002,0.003,0.005),0.0,0.28)
-bezelmat.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value=.12
+bezelmat.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value=.025
 glass=fc.make_material('MAT_DISPLAY_GLASS',(0.012,0.015,0.020),0.0,0.14)
-glass.diffuse_color=(0.012,0.015,0.020,0.16)
-gbsdf=glass.node_tree.nodes.get('Principled BSDF'); gbsdf.inputs['Base Color'].default_value=(0.012,0.015,0.020,0.16); gbsdf.inputs['Alpha'].default_value=0.16; gbsdf.inputs['Coat Weight'].default_value=0.10; gbsdf.inputs['Coat Roughness'].default_value=0.12
+glass.diffuse_color=(0.012,0.015,0.020,0.04)
+gbsdf=glass.node_tree.nodes.get('Principled BSDF'); gbsdf.inputs['Base Color'].default_value=(0.012,0.015,0.020,0.04); gbsdf.inputs['Alpha'].default_value=0.04; gbsdf.inputs['Coat Weight'].default_value=0.025; gbsdf.inputs['Coat Roughness'].default_value=0.12; gbsdf.inputs['Specular IOR Level'].default_value=.12
 try: glass.surface_render_method='DITHERED'
 except Exception: pass
 screenmat=fc.make_screen_material('MAT_SCREEN_CONTENT',(0.002,0.003,0.006),0.65)
 root=fc.empty('CTRL_MACBOOK_PRO_14',ctrl_c)
 root['asset_id']='macbook_pro_14_m5'; root['stage']='LOW_DRAFT'; root['asset_version']='low_draft_0.2'
 root['closed_dimensions_mm']='312.6 x 221.2 x 15.5'
-base=fc.rounded_prism('BASE_UNIBODY',W,D,BASE_H,8.4*MM,metal,base_c,axis='Z',location=(0,0,BASE_H*.5))
+base=cd.profiled_shell(fc,'BASE_UNIBODY',W,D,BASE_H,8.4*MM,
+ [(z*MM,i*MM) for z,i in ((-4.15,1.8),(-3.95,1.0),(-3.55,.42),(-3.05,.08),(-2.6,0),(3.50,0),(3.85,.08),(4.08,.26),(4.15,.46))],
+ metal,base_c,location=(0,0,BASE_H*.5))
 base.parent=root
 for poly in base.data.polygons: poly.use_smooth = poly.index >= 2
 bottom=fc.rounded_prism('BOTTOM_PANEL',W-3.0*MM,D-3.0*MM,.55*MM,7.4*MM,metal2,detail_c,axis='Z',location=(0,0,.30*MM),edge_bevel=.00018); bottom.parent=root
-keywell=fc.rounded_prism('KEYBOARD_WELL',275*MM,102*MM,.32*MM,4.5*MM,dark,detail_c,axis='Z',location=(0,39*MM,BASE_H+.08*MM),edge_bevel=.00012); keywell.parent=root
-track_gap=fc.rounded_prism('TRACKPAD_GAP',134*MM,88*MM,.22*MM,4.7*MM,dark,detail_c,axis='Z',location=(0,-50*MM,BASE_H+.10*MM)); track_gap.parent=root
-track=fc.rounded_prism('TRACKPAD',132*MM,86*MM,.24*MM,4.2*MM,trackmat,detail_c,axis='Z',location=(0,-50*MM,BASE_H+.23*MM),edge_bevel=.00012); track.parent=root
+keycut=fc.rounded_prism('KEYBOARD_CUT',275*MM,95*MM,.85*MM,4.5*MM,None,detail_c,axis='Z',location=(0,35.5*MM,BASE_H-.20*MM))
+bpy.context.view_layer.update(); fc.boolean_difference(base,keycut,name='CUT_KEYBOARD_DECK')
+keywell=fc.rounded_prism('KEYBOARD_WELL',274.8*MM,94.8*MM,.12*MM,4.4*MM,wellmat,detail_c,axis='Z',location=(0,35.5*MM,BASE_H-.52*MM),edge_bevel=.00004); keywell.parent=root
+trackcut=fc.rounded_prism('TRACKPAD_CUT',133*MM,81*MM,.42*MM,4.7*MM,None,detail_c,axis='Z',location=(0,-57*MM,BASE_H-.08*MM))
+bpy.context.view_layer.update(); fc.boolean_difference(base,trackcut,name='CUT_TRACKPAD_SEAT')
+track_gap=fc.rounded_prism('TRACKPAD_GAP',132.9*MM,80.9*MM,.08*MM,4.65*MM,dark,detail_c,axis='Z',location=(0,-57*MM,BASE_H-.23*MM)); track_gap.parent=root
+track=fc.rounded_prism('TRACKPAD',132*MM,80*MM,.22*MM,4.2*MM,trackmat,detail_c,axis='Z',location=(0,-57*MM,BASE_H-.03*MM),edge_bevel=.00006); track.parent=root
 
 hinge_y=D*.5-8.5*MM
 for side in (-1,1):
     x=side*(W*.5-48*MM)
     subtract_cylinder_x(base,3.90*MM,60*MM,(x,hinge_y,BASE_H+GAP))
-base_bevel=base.modifiers.new('EDGE_BEVEL','BEVEL'); base_bevel.width=.00055; base_bevel.segments=4; base_bevel.limit_method='ANGLE'
+base_bevel=base.modifiers.new('EDGE_BEVEL','BEVEL'); base_bevel.width=.00008; base_bevel.segments=3; base_bevel.limit_method='ANGLE'
 hinge=fc.empty('CTRL_HINGE',ctrl_c,location=(0,hinge_y,BASE_H+GAP)); hinge.parent=root
 hinge.rotation_euler.x=math.radians(90.0-OPEN_ANGLE)
 hinge['open_angle_deg']=OPEN_ANGLE; hinge['preset']='OPEN_102'
@@ -94,11 +103,14 @@ for side in (-1,1):
     barrel=cyl_x(f'HINGE_BARREL_{"L" if side<0 else "R"}',3.3*MM,58*MM,metal2,detail_c,(x,hinge_y,BASE_H+GAP)); barrel.parent=root
     cover=cyl_x(f'HINGE_COVER_{"L" if side<0 else "R"}',3.65*MM,51*MM,metal,detail_c,(x,0,0),inner_radius=3.42*MM); cover.parent=hinge
 
-lid=fc.rounded_prism('LID_UNIBODY',LID_W,LID_H,LID_T,8.0*MM,metal,lid_c,axis='Y',edge_bevel=.00035); lid.parent=hinge; lid.location=(0,LID_T*.5,LID_H*.5)
+lid=cd.profiled_shell(fc,'LID_UNIBODY',LID_W,LID_H,LID_T,8.0*MM,
+ [(y*MM,i*MM) for y,i in ((-2.35,.35),(-2.25,.14),(-2.05,.03),(-1.80,0),(1.45,0),(1.80,.08),(2.10,.28),(2.29,.55),(2.35,.82))],
+ metal,lid_c,axis='Y'); lid.parent=hinge; lid.location=(0,LID_T*.5,LID_H*.5)
 for poly in lid.data.polygons: poly.use_smooth = poly.index >= 2
 bezel=fc.rounded_prism('DISPLAY_BEZEL',307.2*MM,204.2*MM,.28*MM,6.6*MM,bezelmat,screen_c,axis='Y',edge_bevel=.00010); bezel.parent=hinge; bezel.location=(0,-.12*MM,LID_H*.5+2.6*MM)
+gasket=fc.rounded_prism('DISPLAY_GASKET',309.3*MM,207*MM,.20*MM,7.1*MM,keymat,screen_c,axis='Y',edge_bevel=.00003); gasket.parent=hinge; gasket.location=(0,-.05*MM,LID_H*.5+2.3*MM)
 screen=fc.rounded_prism('SCREEN_CONTENT',SCREEN_W,SCREEN_H,.12*MM,5.8*MM,screenmat,screen_c,axis='Y'); screen.parent=hinge; screen.location=(0,-.28*MM,LID_H*.5+2.0*MM)
-screen_path=os.path.join(HERE,'reference','macos26_official_screen.png')
+screen_path=os.path.join(HERE,'reference','looksawful_home_3024x1964.png')
 img=bpy.data.images.load(screen_path,check_existing=True); img.pack()
 nodes=screenmat.node_tree.nodes; links=screenmat.node_tree.links; sbsdf=nodes.get('Principled BSDF')
 tex=nodes.get('AWFUL_SCREEN_IMAGE') or nodes.new('ShaderNodeTexImage'); tex.name='AWFUL_SCREEN_IMAGE'; tex.image=img
@@ -120,13 +132,15 @@ screen_glass=fc.rounded_prism('SCREEN_GLASS',307.6*MM,204.6*MM,.36*MM,6.8*MM,gla
 glow_anchor=fc.empty('SCREEN_GLOW_ANCHOR',ctrl_c,location=(0,-1.2*MM,LID_H*.5+2.0*MM)); glow_anchor.parent=hinge
 glow_anchor['screen_on_energy']=8.0; glow_anchor['glow_type']='rect_area'; glow_anchor['glow_width_m']=SCREEN_W; glow_anchor['glow_height_m']=SCREEN_H
 root['screen_states']='screen_off,screen_on'; root['screen_glow_anchor']='SCREEN_GLOW_ANCHOR'; root['screen_glow_energy']=8.0
-notch=fc.rounded_prism('CAMERA_NOTCH',36*MM,10.5*MM,.20*MM,4.3*MM,bezelmat,detail_c,axis='Y'); notch.parent=hinge; notch.location=(0,-.55*MM,LID_H-5.8*MM)
-cam=fc.cylinder('FACETIME_CAMERA',1.35*MM,.20*MM,dark,detail_c,axis='Y',vertices=48); cam.parent=hinge; cam.location=(0,-.72*MM,LID_H-5.8*MM)
+cd.camera_stack(fc,detail_c,hinge,LID_H,bezelmat,dark)
+cd.underside(fc,detail_c,root,base,W,D,BASE_H,metal2,keymat)
 
 deck_details.keyboard(fc,detail_c,root,keymat,BASE_H)
-deck_details.speakers(fc,detail_c,root,base,W,BASE_H,dark)
-
+print('MACBOOK_CONSTRUCTION_PORTS_BEGIN',flush=True)
 deck_details.ports(fc,detail_c,root,base,W,BASE_H,dark)
+print('MACBOOK_CONSTRUCTION_SPEAKERS_BEGIN',flush=True)
+deck_details.speakers(fc,detail_c,root,base,W,BASE_H,dark)
+print('MACBOOK_CONSTRUCTION_CUTS_END',flush=True)
 
 for i,(x,y) in enumerate(((-W*.5+18*MM,-D*.5+17*MM),(W*.5-18*MM,-D*.5+17*MM),(-W*.5+18*MM,D*.5-20*MM),(W*.5-18*MM,D*.5-20*MM)),1):
     foot=fc.cylinder(f'FOOT_{i:02d}',5.2*MM,.75*MM,keymat,detail_c,(x,y,-.28*MM),axis='Z',vertices=48); foot.parent=root
@@ -148,7 +162,9 @@ lbsdf.inputs['Metallic'].default_value=.82; lbsdf.inputs['Roughness'].default_va
 links.new(tex.outputs['Alpha'],lbsdf.inputs['Alpha']); links.new(lbsdf.outputs['BSDF'],outn.inputs['Surface'])
 try: logo_mat.surface_render_method='DITHERED'
 except Exception: pass
-verts=[(-13.838*MM,4.75*MM,89*MM),(13.838*MM,4.75*MM,89*MM),(13.838*MM,4.75*MM,0.12299999594688416),(-13.838*MM,4.75*MM,0.12299999594688416)]
+logo_image=tex.image
+logo_w=27.676*MM; logo_h=logo_w*logo_image.size[1]/logo_image.size[0]; logo_z=LID_H*.52
+verts=[(-logo_w/2,4.75*MM,logo_z-logo_h/2),(logo_w/2,4.75*MM,logo_z-logo_h/2),(logo_w/2,4.75*MM,logo_z+logo_h/2),(-logo_w/2,4.75*MM,logo_z+logo_h/2)]
 mesh=bpy.data.meshes.new('APPLE_LOGO_RELEASE_MESH'); mesh.from_pydata(verts,[],[(0,1,2,3)]); mesh.update()
 logo=bpy.data.objects.new('APPLE_LOGO_RELEASE',mesh); bpy.context.scene.collection.objects.link(logo); logo.parent=hinge; logo.data.materials.append(logo_mat)
 uv=mesh.uv_layers.new(name='UVMap')

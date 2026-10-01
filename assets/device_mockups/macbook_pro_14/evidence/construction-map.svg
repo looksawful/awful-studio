@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1060" viewBox="0 0 1440 1060">
+<rect width="1440" height="1060" fill="#f5f5f2"/>
+<style>text{font-family:Arial,sans-serif;fill:#17212b}.title{font-size:32px;font-weight:700}.h{font-size:22px;font-weight:700}.p{font-size:17px}.s{font-size:14px}.line{stroke:#344557;stroke-width:2;fill:none}.dim{stroke:#637384;stroke-width:1;fill:none}.blue{fill:#195ca3}.note{fill:#596572}</style>
+<text x="48" y="56" class="title">MacBook Pro 14 · карта конструкции и операций</text>
+<text x="48" y="88" class="p note">Габариты подтверждены спецификацией. Локальные радиусы и внутренние детали — оценки по референсам.</text>
+<text x="48" y="137" class="h">01 / Внешняя форма и закрытое положение</text>
+<rect x="82" y="177" width="625" height="442" rx="17" fill="#30353b" stroke="#17212b" stroke-width="2"/>
+<rect x="88" y="183" width="613" height="430" rx="14" fill="none" stroke="#646a71" stroke-width="2"/>
+<rect x="121" y="232" width="547" height="190" rx="9" fill="#101418"/>
+<path d="M145 244H643M145 276H643M145 308H643M145 340H643M145 372H643" stroke="#67707b" stroke-width="2"/>
+<rect x="262" y="432" width="264" height="160" rx="8" fill="#42484f" stroke="#101418" stroke-width="2"/>
+<path d="M82 164H707M82 157V171M707 157V171" class="dim"/>
+<text x="342" y="157" class="p">312,6 мм</text>
+<path d="M66 177V619M59 177H73M59 619H73" class="dim"/>
+<text x="18" y="427" class="s" transform="rotate(-90 18 427)">221,2 мм</text>
+<text x="760" y="191" class="h">Сечение корпуса</text>
+<path d="M780 224L1265 224Q1273 224 1273 231L1273 268Q1273 292 1248 292L794 292Q770 292 770 269L770 233Q770 224 780 224Z" fill="#30353b" stroke="#17212b" stroke-width="2"/>
+<path d="M777 285H1264" stroke="#7c8793" stroke-width="2"/>
+<text x="760" y="325" class="p">9 колец профиля: верхняя кромка → стенка → плечо дна</text>
+<text x="760" y="355" class="s note">Основание 8,3 мм; крышка 4,7 мм; закрытый габарит 15,5 мм.</text>
+<text x="760" y="389" class="p">Проверки: габарит, manifold, нормали, 103 угла шарнира.</text>
+<text x="760" y="445" class="h">02 / Дисплей: слои и камера</text>
+<rect x="777" y="471" width="490" height="20" fill="#30353b"/>
+<rect x="782" y="500" width="480" height="8" fill="#090b0f"/>
+<rect x="790" y="517" width="464" height="5" fill="#195ca3"/>
+<rect x="785" y="531" width="474" height="4" fill="#9bc6e3"/>
+<text x="1280" y="487" class="s">Крышка</text><text x="1280" y="509" class="s">Уплотнение</text>
+<text x="1280" y="524" class="s">Изображение</text><text x="1280" y="540" class="s">Стекло</text>
+<text x="760" y="571" class="p">Камера: чёрная площадка → зрачок → линза → стекло.</text>
+<text x="760" y="601" class="p">Контроль: порядок слоёв, крупный план, отражения.</text>
+<text x="48" y="680" class="h">03 / Изображение нашего сайта</text>
+<rect x="48" y="701" width="663" height="120" rx="10" fill="white" stroke="#b9c2ca"/>
+<text x="69" y="733" class="p">www.looksawful.ru · настоящий снимок страницы</text>
+<text x="69" y="764" class="p">1512 × 982 CSS px × 2 = 3024 × 1964 px</text>
+<text x="69" y="794" class="s">Масштаб 2×; весь viewport; без растяжения и выдуманного интерфейса ОС.</text>
+<text x="760" y="680" class="h">04 / Детали и проверки</text>
+<text x="760" y="720" class="p">Клавиши: профиль, посадка в вырезе, легенды, Touch ID.</text>
+<text x="760" y="755" class="p">Порты: отверстие → полость → контактный язычок.</text>
+<text x="760" y="790" class="p">Дно: шов панели, опоры, крепёж; спереди — выемка.</text>
+<text x="48" y="878" class="h">05 / Цикл работы, как при доработке iPhone</text>
+<text x="48" y="916" class="p">Референс → размеры и схема → геометрия → материалы → одинаковые крупные планы → Blender → браузер</text>
+<text x="48" y="953" class="s note">Не считать объект готовым по именам узлов или зелёным тестам. Визуальная проверка каждого узла обязательна.</text>
+<text x="48" y="993" class="s note">Официальный источник габаритов и разрешения: apple.com/macbook-pro/specs/ · локальные оценки отмечаются в отчёте.</text>
+</svg>

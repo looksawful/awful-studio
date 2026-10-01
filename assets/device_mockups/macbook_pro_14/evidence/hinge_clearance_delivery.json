@@ -1341,5 +1341,6 @@
       }
     }
   ],
+  "solver": "MANIFOLD for closed meshes; EXACT fallback",
   "passed": true
 }
