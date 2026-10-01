@@ -69,13 +69,19 @@ def main():
     ).strip()
     generated = DEVICE / 'generated/macbook_pro_14_m5_low_v1_release.blend'
     source_blend = ROOT / 'extension/awful_studio/assets/devices/macbook_pro_14_m5_low_v1_release.blend'
-    run(args.blender.resolve(), '--factory-startup', '--background', generated, '--python', ROOT / 'tools/package_device_asset.py', '--',
+    # Package freshly generated geometry only after its mechanical contract passes.
+    run(args.blender.resolve(), '--factory-startup', '--background', '--python-exit-code', '1',
+        '--python', DEVICE / 'generate_low.py', '--', '--out', generated)
+    run(args.blender.resolve(), '--factory-startup', '--background', generated, '--python-exit-code', '1',
+        '--python', DEVICE / 'validate_hinge_clearance.py', '--',
+        '--out', DEVICE / 'evidence/hinge_clearance_delivery.json')
+    run(args.blender.resolve(), '--factory-startup', '--background', generated, '--python-exit-code', '1', '--python', ROOT / 'tools/package_device_asset.py', '--',
         '--output', source_blend, '--entry', 'AWFUL_DEVICE_MACBOOK_PRO_14', '--root', 'CTRL_MACBOOK_PRO_14',
         '--key', 'MACBOOK_PRO_14', '--stage', 'RELEASE_CANDIDATE', '--variant', 'low_v1_release', '--revision', revision)
     update_loader_revision(LOADER_PATH, 'DEVICE_MACBOOK_PRO_14', revision)
     plugin_revision = revision
     run(
-        args.blender.resolve(), source_blend, '--background',
+        args.blender.resolve(), '--factory-startup', '--background', source_blend, '--python-exit-code', '1',
         '--python', DEVICE / 'export_runtime_v1.py', '--',
         '--source-revision', revision,
         '--source-commit', source_commit,

@@ -451,15 +451,15 @@
   "artifacts": {
     "delivery_blend": {
       "path": "assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_delivery.blend",
-      "sha256": "856cd20d13a8188049ed919aed77daa5532ec73d3e8771eaf6e92a3002c5a7ef"
+      "sha256": "291cb46359c9535c7e29456dcf31f20aae5b30501f58d196edac43bf4d969616"
     },
     "compat_glb": {
       "path": "assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web.glb",
-      "sha256": "7057b25c0c86f29a25ed9b6efd03df561e34127516359d06bf022237ac5952c1"
+      "sha256": "fcdd08d2474afaae9c603f9395219e76af82927ec66f634de57f14987c5ea27a"
     },
     "meshopt_glb": {
       "path": "assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web_meshopt.glb",
-      "sha256": "0696b7429315edb76a44cd327ff48c018717e123669bb4256fd697649acb6c27"
+      "sha256": "99defc243ba39494939c2b205e7d3f57c2e40836fa237095b6170b11453945af"
     }
   }
 }
