@@ -22,6 +22,12 @@ assert bpy.data.objects['BASE_UNIBODY'].get('speaker_apertures', 0) >= 1000, 'Sp
 key=bpy.data.objects['KEY_03_01']
 assert max(v.co.z for v in key.data.vertices)-key.data.vertices[-1].co.z >= .00005, 'Key top has no shallow dish'
 base=bpy.data.objects['BASE_UNIBODY'].evaluated_get(bpy.context.evaluated_depsgraph_get())
+hit,point,_,_=base.ray_cast(base.matrix_world.inverted()@Vector((0,0,-.01)),Vector((0,0,1)))
+assert hit and (base.matrix_world@point).z >= .0003, 'Bottom panel is hidden behind a solid chassis cap'
+for side in (-1,1):
+    for index in range(12):
+        hit,point,_,_=base.ray_cast(base.matrix_world.inverted()@Vector((side*.160,.0766-index*.0032,.00105)),Vector((-side,0,0)))
+        assert hit and .1563-abs((base.matrix_world@point).x) >= .0015, f'Vent is an exterior plate instead of a chassis opening: {side,index}'
 hit,point,_,_=base.ray_cast(base.matrix_world.inverted()@Vector((0,-.057,.02)),Vector((0,0,-1)))
 assert hit and .0083-(base.matrix_world@point).z >= .0002, 'Trackpad is still placed on top of an uncut deck'
 holes=0
@@ -41,4 +47,16 @@ assert len([o for o in bpy.data.objects if o.name.startswith('BOTTOM_SCREW_')]) 
 assert bpy.data.objects.get('FRONT_FINGER_RECESS'), 'Missing front opening recess'
 logo = bpy.data.objects['APPLE_LOGO_RELEASE']
 assert max(v.co.z for v in logo.data.vertices)-min(v.co.z for v in logo.data.vertices) < .040, 'Logo is stretched vertically'
+hinge=bpy.data.objects['CTRL_HINGE']; original=hinge.rotation_euler.x
+hinge.rotation_euler.x=__import__('math').pi/2; bpy.context.view_layer.update()
+points=[]
+depsgraph=bpy.context.evaluated_depsgraph_get()
+for obj in bpy.data.objects:
+    if obj.type=='MESH':
+        evaluated=obj.evaluated_get(depsgraph)
+        points.extend(evaluated.matrix_world@Vector(v) for v in evaluated.bound_box)
+closed=[(max(p[i] for p in points)-min(p[i] for p in points))*1000 for i in range(3)]
+hinge.rotation_euler.x=original; bpy.context.view_layer.update()
+assert all(abs(a-b)<=.01 for a,b in zip(closed,(312.6,221.2,15.5))), f'Complete closed assembly including feet exceeds envelope: {closed}'
 print('MACBOOK_CONSTRUCTION_PASS', bpy.app.version_string, 'verified_apertures', holes)
+print('MACBOOK_CLOSED_ASSEMBLY_MM',closed)

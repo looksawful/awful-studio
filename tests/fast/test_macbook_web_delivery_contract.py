@@ -38,6 +38,10 @@ def glb_node_names(path: Path) -> set[str]:
 
 
 class MacBookWebDeliveryContractTests(unittest.TestCase):
+    def test_all_geometry_respects_chassis_width(self):
+        manifest=contract.load_manifest(MANIFEST)
+        self.assertLessEqual(manifest['glb_qa']['runtime_bounds_mm'][0],312.61, 'Exterior vent plates exceed the verified chassis width')
+
     def test_v1_runtime_manifest_is_current_and_matches_plugin_source(self):
         self.assertTrue(MANIFEST.is_file(), 'missing MacBook v1 runtime manifest')
         manifest = contract.load_manifest(MANIFEST)

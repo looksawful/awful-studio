@@ -8,7 +8,8 @@ import deck_details
 import construction_details as cd
 MM=fc.MM
 W,D,CLOSED_H=312.6*MM,221.2*MM,15.5*MM
-LID_T=4.7*MM; BASE_H=8.3*MM; GAP=CLOSED_H-LID_T-BASE_H
+LID_T=4.7*MM; BASE_H=8.3*MM; FOOT_BOTTOM=-.655*MM
+GAP=CLOSED_H+FOOT_BOTTOM-LID_T-BASE_H
 LID_W,LID_H=312.0*MM,212.0*MM
 SCREEN_W,SCREEN_H=301.66*MM,195.92*MM
 OPEN_ANGLE=102.0
@@ -65,7 +66,9 @@ base=cd.profiled_shell(fc,'BASE_UNIBODY',W,D,BASE_H,8.4*MM,
  metal,base_c,location=(0,0,BASE_H*.5))
 base.parent=root
 for poly in base.data.polygons: poly.use_smooth = poly.index >= 2
-bottom=fc.rounded_prism('BOTTOM_PANEL',W-3.0*MM,D-3.0*MM,.55*MM,7.4*MM,metal2,detail_c,axis='Z',location=(0,0,.30*MM),edge_bevel=.00018); bottom.parent=root
+bottomcut=fc.rounded_prism('BOTTOM_PANEL_CUT',W-4.2*MM,D-4.2*MM,.75*MM,6.3*MM,None,detail_c,axis='Z',location=(0,0,.03*MM))
+bpy.context.view_layer.update(); fc.boolean_difference(base,bottomcut,name='CUT_BOTTOM_PANEL_SEAT')
+bottom=fc.rounded_prism('BOTTOM_PANEL',W-4.6*MM,D-4.6*MM,.30*MM,6.1*MM,metal2,detail_c,axis='Z',location=(0,0,.17*MM),edge_bevel=.00006); bottom.parent=root
 keycut=fc.rounded_prism('KEYBOARD_CUT',275*MM,95*MM,.85*MM,4.5*MM,None,detail_c,axis='Z',location=(0,35.5*MM,BASE_H-.20*MM))
 bpy.context.view_layer.update(); fc.boolean_difference(base,keycut,name='CUT_KEYBOARD_DECK')
 keywell=fc.rounded_prism('KEYBOARD_WELL',274.8*MM,94.8*MM,.12*MM,4.4*MM,wellmat,detail_c,axis='Z',location=(0,35.5*MM,BASE_H-.52*MM),edge_bevel=.00004); keywell.parent=root
@@ -137,17 +140,14 @@ cd.underside(fc,detail_c,root,base,W,D,BASE_H,metal2,keymat)
 
 deck_details.keyboard(fc,detail_c,root,keymat,BASE_H)
 print('MACBOOK_CONSTRUCTION_PORTS_BEGIN',flush=True)
+cd.vents(fc,detail_c,root,base,W,D,dark)
 deck_details.ports(fc,detail_c,root,base,W,BASE_H,dark)
 print('MACBOOK_CONSTRUCTION_SPEAKERS_BEGIN',flush=True)
 deck_details.speakers(fc,detail_c,root,base,W,BASE_H,dark)
 print('MACBOOK_CONSTRUCTION_CUTS_END',flush=True)
 
 for i,(x,y) in enumerate(((-W*.5+18*MM,-D*.5+17*MM),(W*.5-18*MM,-D*.5+17*MM),(-W*.5+18*MM,D*.5-20*MM),(W*.5-18*MM,D*.5-20*MM)),1):
-    foot=fc.cylinder(f'FOOT_{i:02d}',5.2*MM,.75*MM,keymat,detail_c,(x,y,-.28*MM),axis='Z',vertices=48); foot.parent=root
-for side in (-1,1):
-    for idx in range(12):
-        y=(D*.5-34*MM)-idx*3.2*MM
-        vent=fc.rounded_cube(f'VENT_{"L" if side<0 else "R"}_{idx:02d}',(.35*MM,2.0*MM,1.0*MM),.15*MM,dark,detail_c,(side*(W*.5+.06*MM),y,2.2*MM)); vent.parent=root
+    foot=fc.cylinder(f'FOOT_{i:02d}',5.2*MM,.75*MM,keymat,detail_c,(x,y,FOOT_BOTTOM+.375*MM),axis='Z',vertices=48); foot.parent=root
 
 
 # Release polish recovered from the verified low_v1 release file.
@@ -164,7 +164,7 @@ try: logo_mat.surface_render_method='DITHERED'
 except Exception: pass
 logo_image=tex.image
 logo_w=27.676*MM; logo_h=logo_w*logo_image.size[1]/logo_image.size[0]; logo_z=LID_H*.52
-verts=[(-logo_w/2,4.75*MM,logo_z-logo_h/2),(logo_w/2,4.75*MM,logo_z-logo_h/2),(logo_w/2,4.75*MM,logo_z+logo_h/2),(-logo_w/2,4.75*MM,logo_z+logo_h/2)]
+verts=[(-logo_w/2,LID_T+.004*MM,logo_z-logo_h/2),(logo_w/2,LID_T+.004*MM,logo_z-logo_h/2),(logo_w/2,LID_T+.004*MM,logo_z+logo_h/2),(-logo_w/2,LID_T+.004*MM,logo_z+logo_h/2)]
 mesh=bpy.data.meshes.new('APPLE_LOGO_RELEASE_MESH'); mesh.from_pydata(verts,[],[(0,1,2,3)]); mesh.update()
 logo=bpy.data.objects.new('APPLE_LOGO_RELEASE',mesh); bpy.context.scene.collection.objects.link(logo); logo.parent=hinge; logo.data.materials.append(logo_mat)
 uv=mesh.uv_layers.new(name='UVMap')

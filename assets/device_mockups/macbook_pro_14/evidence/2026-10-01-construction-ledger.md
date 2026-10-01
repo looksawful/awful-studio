@@ -41,4 +41,12 @@ The keycap macro exposed striped glyphs: 10-micron legend seating was below the 
 
 Blender 5.2.1 LTS: both main shells have zero non-manifold edges and match the locked outer dimensions within 0.01 mm. All 103 hinge samples, seven port depths, all 1584 aperture rays, camera layers, own-site packed image, key profiles/icons and trackpad pocket/gap pass. The solver fixture agrees with EXACT and retains stable temporary mesh counts.
 
-172 fast tests, 12 preview tests, Storybook build, and browser smoke for all 11 canonical assets pass. Browser captures verify MacBook on/off states using the actual site image. Compatibility GLB is 8,551,872 bytes; meshopt GLB is 2,159,660 bytes. The increased detail has a larger payload than the earlier proxy; no final LOD/frame-rate claim is made. No Remote Desktop Commander used. No production deployment.
+Fresh checks are recorded below after the complete assembly pass. The increased detail has a larger payload than the earlier proxy; no final LOD/frame-rate claim is made. No Remote Desktop Commander used. No production deployment.
+
+## Complete assembly corrections
+
+The underside diagnostic initially had insufficient light and could not support visual acceptance. It now adds a documented bottom softbox only for the underside view; other comparison lights are unchanged. Actual inspection then found that the panel lay behind a solid chassis cap. The generator cuts its seat and retains a 0.3 mm perimeter lip at the bottom profile, so the panel can be seen and removed conceptually as a separate component. Twenty-four vents are now real low-side cuts with recessed backing. Their centers are checked by rays. This removes the old exterior plates, which expanded web width from 312.6 to 313.07 mm; a dedicated fast regression reproduced that failure.
+
+The complete closed assembly, including feet and the logo, measured 16.205 mm high despite the earlier component-only 15.5 mm check. The hinge gap now includes the modeled 0.655 mm foot allowance, and the logo sits 4 microns above the lid instead of 0.05 mm. Full assembly bounds now pass the unchanged 0.01 mm tolerance. The base/lid split and foot geometry remain construction estimates constrained by the official outer dimensions.
+
+Final measured closed assembly: 312.599987 × 221.200004 × 15.503996 mm. Fresh verification: 173 fast tests, 12 preview tests, Storybook build, all 11 browser assets, on/off captures, 103 hinge positions, 1584 speaker rays and 24 vent rays. All 16 tracked views were rerendered after the final geometry changes. Compatibility GLB: 8,902,272 bytes; meshopt: 2,225,684 bytes. These are acceptance candidates with disclosed local estimates, not a claim of final photographic fidelity.

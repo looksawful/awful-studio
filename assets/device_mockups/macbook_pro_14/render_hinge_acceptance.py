@@ -74,6 +74,12 @@ aim(camera, (0, 0.025, 0.082))
 scene.camera = camera
 
 
+def render_current():
+    only=arg('--only','')
+    if not only or os.path.basename(scene.render.filepath)==only:
+        bpy.ops.render.render(write_still=True)
+
+
 def set_angle(degrees):
     if hinge.animation_data:
         hinge.animation_data.action = None
@@ -87,14 +93,14 @@ for angle in (0, 30, 60, 90, 102):
     scene.render.filepath = os.path.join(
         OUT, f"macbook_hinge_{angle:03d}.png"
     )
-    bpy.ops.render.render(write_still=True)
+    render_current()
 
 set_angle(30)
 camera.data.ortho_scale = 0.19
 camera.location = (0.27, 0.20, 0.16)
 aim(camera, (0, 0.105, 0.035))
 scene.render.filepath = os.path.join(OUT, "macbook_hinge_macro_030.png")
-bpy.ops.render.render(write_still=True)
+render_current()
 
 set_angle(102)
 for label, location, target, scale in (
@@ -106,7 +112,7 @@ for label, location, target, scale in (
     camera.location = location
     aim(camera, target)
     scene.render.filepath = os.path.join(OUT, f'macbook_{label}.png')
-    bpy.ops.render.render(write_still=True)
+    render_current()
 
 for label, location, target, scale in (
     ('hero_full', (.43,-.57,.34), (0,.025,.102), .51),
@@ -118,11 +124,12 @@ for label, location, target, scale in (
 ):
     camera.data.ortho_scale=scale; camera.location=location; aim(camera,target)
     scene.render.filepath=os.path.join(OUT,f'macbook_{label}.png')
-    bpy.ops.render.render(write_still=True)
+    render_current()
 
 set_angle(0)
 camera.data.ortho_scale=.36; camera.location=(0,-.05,-.50); aim(camera,(0,0,0))
 scene.render.filepath=os.path.join(OUT,'macbook_underside.png')
-bpy.ops.render.render(write_still=True)
+area('ACC_UNDERSIDE_DIAGNOSTIC',(.12,-.20,-.26),18,.23,(0,0,0))
+render_current()
 
 print("MACBOOK_HINGE_ACCEPTANCE_RENDERS", OUT)

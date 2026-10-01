@@ -56,6 +56,18 @@ def underside(fc, collection, root, base, width, depth, base_height, metal, rubb
                  (-55*mm, depth/2-11*mm), (55*mm, depth/2-11*mm)]
     for index, (x, y) in enumerate(positions):
         obj = fc.cylinder(f'BOTTOM_SCREW_{index:02d}', 1.1*mm, .12*mm, metal, collection,
-                          (x, y, -.065*mm), axis='Z', vertices=40); obj.parent = root
+                          (x, y, .035*mm), axis='Z', vertices=40); obj.parent = root
         slot = fc.cylinder(f'SCREW_SOCKET_{index:02d}', .40*mm, .012*mm, rubber, collection,
-                           (x, y, -.132*mm), axis='Z', vertices=6); slot.parent = root
+                           (x, y, -.032*mm), axis='Z', vertices=6); slot.parent = root
+
+
+def vents(fc, collection, root, base, width, depth, dark):
+    mm=fc.MM
+    for side in (-1,1):
+        for index in range(12):
+            y=depth/2-34*mm-index*3.2*mm
+            cutter=fc.rounded_cube('VENT_CUT', (3*mm,2*mm,.55*mm),.13*mm,None,collection,
+                                   (side*(width/2-1.1*mm),y,1.05*mm))
+            bpy.context.view_layer.update(); fc.boolean_difference(base,cutter,name='CUT_VENT')
+            backing=fc.rounded_cube(f'VENT_{"L" if side<0 else "R"}_{index:02d}',(.16*mm,1.8*mm,.40*mm),.04*mm,dark,collection,
+                                    (side*(width/2-2.45*mm),y,1.05*mm)); backing.parent=root

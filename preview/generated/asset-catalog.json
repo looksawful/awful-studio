@@ -127,9 +127,9 @@
         }
       ],
       "collision": null,
-      "sourceRevision": "3c0086dfc731d47b9ffb902922fb6412af7fc4af4bcc523846c0865c3cf4363a",
-      "sourceCommit": "55505e9f8929419f452bc2c84355e17e766e0c5c",
-      "triangleCount": 192767,
+      "sourceRevision": "fed26edc4f8c9d6aab8beae842562af4bc6ac77f21f81a6f2c4233a9478a0428",
+      "sourceCommit": "bfa73e3615cc1f74a9a22d04c8872552e496197f",
+      "triangleCount": 197711,
       "materialCount": 14,
       "animations": [
         "lid_open",

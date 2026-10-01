@@ -16,8 +16,8 @@
     "closed_height_z"
   ],
   "runtime_bounds_mm": [
-    313.07,
-    218.822,
+    312.6,
+    218.167,
     261.375
   ],
   "units": "meters",
@@ -440,9 +440,9 @@
     }
   },
   "camera_fit": "runtime_bounds",
-  "source_revision": "3c0086dfc731d47b9ffb902922fb6412af7fc4af4bcc523846c0865c3cf4363a",
-  "source_commit": "55505e9f8929419f452bc2c84355e17e766e0c5c",
-  "plugin_source_revision": "3c0086dfc731d47b9ffb902922fb6412af7fc4af4bcc523846c0865c3cf4363a",
+  "source_revision": "fed26edc4f8c9d6aab8beae842562af4bc6ac77f21f81a6f2c4233a9478a0428",
+  "source_commit": "bfa73e3615cc1f74a9a22d04c8872552e496197f",
+  "plugin_source_revision": "fed26edc4f8c9d6aab8beae842562af4bc6ac77f21f81a6f2c4233a9478a0428",
   "generator_version": "macbook_v1_packaged_blend_web_delivery",
   "delivery_profile": {
     "simplification": "none",
@@ -459,17 +459,17 @@
   },
   "source_files": {
     "assets/device_mockups/common/foundation_common.py": "1d68c3fff908b7ae149f74c31a19064eb6d2384234d33bd71071fea70d651d12",
-    "assets/device_mockups/macbook_pro_14/construction_details.py": "5eadba85b47c15fa9b0c7935ebdfc2aad276fd4ec5b8865cb3f870e283335faf",
+    "assets/device_mockups/macbook_pro_14/construction_details.py": "c9f08c3ff4ebf7f7d8207e7f5fe7d3cdd1e24244d8249d4fff066aa400dce185",
     "assets/device_mockups/macbook_pro_14/deck_details.py": "b062bef6890eee54fd38b342cdffdab088d59b92e6d760deebf1597bb44dbb24",
     "assets/device_mockups/macbook_pro_14/export_runtime_v1.py": "47fa68b82924a79be1bde41be75d887ec004cdffe5ed4c9b7101e0b9b82b195a",
     "assets/device_mockups/macbook_pro_14/function_legends.py": "051bfd2c643cd1327f75251c0c7ff270837611adc1f13bc9d3421a6d2dae7e61",
-    "assets/device_mockups/macbook_pro_14/generate_low.py": "2a4d02182e61d159a0a7c84a720def07ec69bc3c965f0daa1aa61074b4ed58f2",
+    "assets/device_mockups/macbook_pro_14/generate_low.py": "9eac8d71d9b95440bb8ca753fcdc721b2dc106b7fc5b3cc8f7d72bf3e514c0ee",
     "assets/device_mockups/macbook_pro_14/optimize_runtime_v1.py": "f7cda0a120b8a0e6f7d7194357d4d86035898594f0c21742f1d3d9d1577d250a",
     "assets/device_mockups/macbook_pro_14/reference/apple_logo_alpha.png": "50209309a1cf3bcb874118b27fe9c9779aaafabaf79bb304cf0aa3a2898c9833",
     "assets/device_mockups/macbook_pro_14/reference/looksawful_home_3024x1964.png": "1990fab58803f023868fdd7c6efd8ee124425a59f382c13d025822670f7f04a4"
   },
   "glb_qa": {
-    "triangle_count": 192767,
+    "triangle_count": 197711,
     "required_nodes": [
       "ANCHOR_BOTTOM_CENTER",
       "ANCHOR_CENTER",
@@ -491,23 +491,23 @@
     "node_count": 325,
     "material_count": 14,
     "runtime_bounds_mm": [
-      313.07,
-      218.822,
+      312.6,
+      218.167,
       261.375
     ]
   },
   "artifacts": {
     "delivery_blend": {
       "path": "assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_delivery.blend",
-      "sha256": "57eb4438616206e9bac02334b6f252ea93626e0eeef7d0653e716a7dd8cc1006"
+      "sha256": "957533906d38e9929566de4a4aaf910bd54088eaac5ee640213914578a9b9191"
     },
     "compat_glb": {
       "path": "assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web.glb",
-      "sha256": "5c6df66ea0e0d7fa198ee561c09be79d46062a6680ef5f625ad6bd4fa6168e78"
+      "sha256": "0f308ada766b79b1b767bda0d675bd69c49d6a5c6b45dc2d498fb8616873a01b"
     },
     "meshopt_glb": {
       "path": "assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web_meshopt.glb",
-      "sha256": "f60f90ad4df387115840276f9c3addecfa3e7b5c84e638751ff09b76d86a5952"
+      "sha256": "7ca8ac266ce77b3dde436c1ff663975c17749b70ccf359be5e98409a5d4f7458"
     }
   }
 }
