@@ -88,7 +88,9 @@ class IPadWebDeliveryContractTests(unittest.TestCase):
             self.assertEqual(manifest['preferred_web_variant'], 'meshopt')
             doc = glb_doc(compat)
             screen_material = next(m for m in doc['materials'] if m.get('name') == 'MAT_SCREEN_CONTENT')
-            self.assertIn('baseColorTexture', screen_material['pbrMetallicRoughness'])
+            self.assertNotIn('baseColorTexture', screen_material['pbrMetallicRoughness'])
+            self.assertLessEqual(max(screen_material['pbrMetallicRoughness']['baseColorFactor'][:3]), 0.01)
+            self.assertEqual(screen_material['extensions']['KHR_materials_specular']['specularFactor'], 0)
             self.assertIn('emissiveTexture', screen_material)
 
 

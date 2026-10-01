@@ -42,6 +42,10 @@ export function cameraDirection(preset) {
   return direction;
 }
 
+export function perspectiveClipPlanes(distance) {
+  return { near: Math.max(distance / 100, 0.0001), far: Math.max(distance * 10, 0.1) };
+}
+
 export function previewMaterialPolicy(name, { hasTexture = false } = {}) {
   const surfacePolicies = {
     MAT_ANODIZED_ALUMINUM: { frontSide: true, envMapIntensity: 0.55, minRoughness: 0.28 },

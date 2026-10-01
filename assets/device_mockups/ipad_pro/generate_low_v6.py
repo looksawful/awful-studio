@@ -26,20 +26,23 @@ ctrl_c=fc.make_collection(f'IPAD_PRO_{SIZE}_CONTROLLERS')
 metal=fc.make_material('MAT_IPAD_ALUMINUM',(0.0045,0.0055,0.0080),1.0,0.30)
 metal_dark=fc.make_material('MAT_IPAD_EDGE',(0.010,0.012,0.017),1.0,0.22)
 black=fc.make_material('MAT_OPTICS_BLACK',(0.0005,0.0007,0.0010),0.0,0.08)
-gap=fc.make_material('MAT_ASSEMBLY_GAP',(0.0003,0.0004,0.0006),0.0,0.34)
-bezel=fc.make_material('MAT_DISPLAY_BEZEL',(0.0005,0.0007,0.0010),0.0,0.12)
+gap=fc.make_material('MAT_ASSEMBLY_GAP',(0.0003,0.0004,0.0006),0.0,0.55)
+gap.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value=.08
+bezel=fc.make_material('MAT_DISPLAY_BEZEL',(0.0005,0.0007,0.0010),0.0,0.30)
+bezel.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value=.12
 glass=fc.make_material('MAT_DISPLAY_GLASS',(0.008,0.010,0.014),0.0,0.12)
 gbsdf=glass.node_tree.nodes.get('Principled BSDF'); gbsdf.inputs['Coat Weight'].default_value=.14; gbsdf.inputs['Coat Roughness'].default_value=.10; gbsdf.inputs['Alpha'].default_value=.10
 try: glass.surface_render_method='DITHERED'
 except Exception: pass
-optic=fc.make_material('MAT_OPTICAL_GLASS',(0.0008,0.0012,0.0020),0.0,0.025)
+optic=fc.make_glass_material('MAT_OPTICAL_GLASS',(0.015,0.020,0.028),0.035,transmission=.90,ior=1.52)
 obsdf=optic.node_tree.nodes.get('Principled BSDF'); obsdf.inputs['Coat Weight'].default_value=.55; obsdf.inputs['Coat Roughness'].default_value=.010
 front_optic=fc.make_material('MAT_FRONT_OPTIC',(0.0040,0.0060,0.0100),0.0,0.028)
 fobsdf=front_optic.node_tree.nodes.get('Principled BSDF'); fobsdf.inputs['Coat Weight'].default_value=.62; fobsdf.inputs['Coat Roughness'].default_value=.012
 screen_mat=fc.make_material('MAT_SCREEN_CONTENT',(0.0018,0.0026,0.0040),0.0,0.18)
 screen_path=os.path.join(HERE,'reference',f'ipados26_lock_screen_{SIZE}.png')
 screen_tex=screen_mat.node_tree.nodes.new('ShaderNodeTexImage'); screen_tex.image=bpy.data.images.load(screen_path,check_existing=True); screen_tex.image.colorspace_settings.name='sRGB'; screen_tex.image.pack()
-screen_bsdf=screen_mat.node_tree.nodes.get('Principled BSDF'); screen_mat.node_tree.links.new(screen_tex.outputs['Color'],screen_bsdf.inputs['Base Color']); screen_mat.node_tree.links.new(screen_tex.outputs['Color'],screen_bsdf.inputs['Emission Color']); screen_bsdf.inputs['Emission Strength'].default_value=.85
+screen_bsdf=screen_mat.node_tree.nodes.get('Principled BSDF'); screen_mat.node_tree.links.new(screen_tex.outputs['Color'],screen_bsdf.inputs['Emission Color']); screen_bsdf.inputs['Emission Strength'].default_value=.85
+screen_bsdf.inputs['Specular IOR Level'].default_value=0.0
 flash=fc.make_material('MAT_FLASH',(0.90,0.84,0.68),0.0,0.16)
 body=fc.rounded_prism('BODY_ALUMINUM',W,H,CORE_D,s['br']*MM,metal,body_c,axis='Y',location=(0,CORE_Y,0),outline_segments=48)
 fc.rounded_prism('DISPLAY_GLASS_SEAT',W-.30*MM,H-.30*MM,.05*MM,(s['br']-.15)*MM,gap,screen_c,axis='Y',location=(0,FRONT_Y+.025*MM,0),outline_segments=48)
@@ -59,10 +62,14 @@ fc.cylinder('FRONT_CAMERA_INNER',.55*MM,.016*MM,black,detail_c,(W*.5-4.5*MM,FRON
 fc.cylinder('FRONT_CAMERA_PUPIL',.24*MM,.012*MM,front_optic,detail_c,(W*.5-4.5*MM,FRONT_SURFACE+.002*MM,0),axis='Y',vertices=48)
 hs=29.0*MM; hx=-W*.5+hs*.5+5.5*MM; hz=H*.5-hs*.5-6.5*MM
 housing=fc.rounded_prism('CAMERA_HOUSING',hs,hs,.82*MM,6.4*MM,metal,detail_c,axis='Y',location=(hx,D*.5+.39*MM,hz),edge_bevel=.00018,outline_segments=48)
-fc.cylinder('REAR_CAMERA_RING',6.35*MM,.46*MM,metal_dark,detail_c,(hx-5.8*MM,D*.5+.86*MM,hz+5.5*MM),axis='Y',vertices=128)
+rear_ring=fc.cylinder('REAR_CAMERA_RING',6.35*MM,.46*MM,metal_dark,detail_c,(hx-5.8*MM,D*.5+.86*MM,hz+5.5*MM),axis='Y',vertices=128)
+ring_cut=fc.cylinder('REAR_RING_CUTTER',5.25*MM,1.2*MM,None,detail_c,(hx-5.8*MM,D*.5+.86*MM,hz+5.5*MM),axis='Y',vertices=96)
+fc.boolean_difference(rear_ring,ring_cut,name='OPEN_LENS_RING')
+housing_cut=fc.cylinder('CAMERA_HOUSING_CUTTER',5.10*MM,1.6*MM,None,detail_c,(hx-5.8*MM,D*.5+.70*MM,hz+5.5*MM),axis='Y',vertices=96)
+fc.boolean_difference(housing,housing_cut,name='CAMERA_OPTICAL_WELL')
 fc.cylinder('REAR_CAMERA_GLASS',5.20*MM,.22*MM,optic,detail_c,(hx-5.8*MM,D*.5+1.18*MM,hz+5.5*MM),axis='Y',vertices=128)
-fc.cylinder('REAR_CAMERA_INNER',3.75*MM,.12*MM,black,detail_c,(hx-5.8*MM,D*.5+1.34*MM,hz+5.5*MM),axis='Y',vertices=96)
-fc.cylinder('REAR_CAMERA_PUPIL',1.55*MM,.06*MM,optic,detail_c,(hx-5.8*MM,D*.5+1.43*MM,hz+5.5*MM),axis='Y',vertices=80)
+fc.cylinder('REAR_CAMERA_INNER',4.85*MM,.12*MM,black,detail_c,(hx-5.8*MM,D*.5+.96*MM,hz+5.5*MM),axis='Y',vertices=96)
+fc.cylinder('REAR_CAMERA_PUPIL',1.55*MM,.06*MM,front_optic,detail_c,(hx-5.8*MM,D*.5+1.04*MM,hz+5.5*MM),axis='Y',vertices=80)
 fc.cylinder('FLASH',2.75*MM,.16*MM,flash,detail_c,(hx+5.8*MM,D*.5+.92*MM,hz+5.5*MM),axis='Y',vertices=80)
 fc.cylinder('LIDAR_RING',4.15*MM,.18*MM,metal_dark,detail_c,(hx-5.8*MM,D*.5+.88*MM,hz-5.5*MM),axis='Y',vertices=96)
 fc.cylinder('LIDAR',3.35*MM,.14*MM,optic,detail_c,(hx-5.8*MM,D*.5+1.02*MM,hz-5.5*MM),axis='Y',vertices=96)
@@ -84,8 +91,10 @@ for loop,coord in zip(mesh.loops,((0,0),(1,0),(1,1),(0,1))): uv.data[loop.index]
 boolean_cuts=[]
 usb_cut=fc.rounded_cube('USB_C_CUTTER',(12.8*MM,3.2*MM,1.8*MM),.55*MM,None,detail_c)
 fc.place_on_rounded_edge(usb_cut,W,H,s['br']*MM,'BOTTOM',0,outward=-.55*MM,local_normal=(0,0,1)); fc.boolean_difference(body,usb_cut,name='CUT_USB_C'); boolean_cuts.append('USB_C')
-usb=fc.rounded_cube('USB_C_CAVITY',(11.3*MM,1.65*MM,.46*MM),.40*MM,black,detail_c)
-fc.place_on_rounded_edge(usb,W,H,s['br']*MM,'BOTTOM',0,outward=-.24*MM,local_normal=(0,0,1))
+usb=fc.rounded_cube('USB_C_CAVITY',(11.3*MM,2.3*MM,.16*MM),.07*MM,black,detail_c)
+fc.place_on_rounded_edge(usb,W,H,s['br']*MM,'BOTTOM',0,outward=-1.25*MM,local_normal=(0,0,1))
+tongue=fc.rounded_cube('USB_C_TONGUE',(7.2*MM,.55*MM,.80*MM),.12*MM,black,detail_c)
+fc.place_on_rounded_edge(tongue,W,H,s['br']*MM,'BOTTOM',0,outward=-.65*MM,local_normal=(0,0,1))
 for edge_name in ('BOTTOM','TOP'):
     for side in (-1,1):
         base_x=side*(W*.5-20*MM)
@@ -116,6 +125,13 @@ for idx,x_mm in enumerate((-5.27,0,5.27),1):
     fc.cylinder(f'SMART_CONNECTOR_{idx}',1.35*MM,.22*MM,metal_dark,detail_c,(x_mm*MM,D*.5+.08*MM,-H*.5+12*MM),axis='Y',vertices=32)
 rail=fc.rounded_cube('PENCIL_MAGNETIC_RAIL',(.04*MM,.72*MM,82*MM),.04*MM,metal_dark,detail_c)
 fc.place_on_rounded_edge(rail,W,H,s['br']*MM,'RIGHT',6*MM,outward=-.012*MM,local_normal=(1,0,0))
+# Correct handedness of closed X/Z prisms before shading and web export.
+for obj in list(bpy.data.objects):
+    if obj.type != 'MESH': continue
+    bm=bmesh.new(); bm.from_mesh(obj.data)
+    if bm.faces and all(edge.is_manifold for edge in bm.edges) and bm.calc_volume(signed=True)<0:
+        bmesh.ops.reverse_faces(bm,faces=list(bm.faces)); bm.to_mesh(obj.data); obj.data.update()
+    bm.free()
 root=fc.empty(f'CTRL_IPAD_PRO_{SIZE}',ctrl_c)
 glow_anchor.parent=root
 for c in (body_c,detail_c,screen_c):

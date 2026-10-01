@@ -82,6 +82,8 @@ def build_one(blender: Path, size: str, loader):
         '--out', generated, '--skip-previews')
     run(blender, '--factory-startup', '--background', generated, '--python-exit-code', '1',
         '--python', ROOT / 'tests/runtime/ipad_control_geometry_contract.py', '--', '--size', size)
+    run(blender, '--factory-startup', '--background', generated, '--python-exit-code', '1',
+        '--python', DEVICE / 'validate_optics_ports.py')
     run(blender, '--factory-startup', '--background', generated, '--python-exit-code', '1', '--python', ROOT / 'tools/package_device_asset.py', '--',
         '--output', source_blend, '--entry', f'AWFUL_DEVICE_IPAD_PRO_{size}', '--root', root_name,
         '--key', f'IPAD_PRO_{size}', '--stage', 'LOW_DRAFT', '--variant', 'low_v6', '--revision', revision)
