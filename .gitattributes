@@ -25,6 +25,10 @@ tools/build_iphone17_v30.py text eol=lf
 tests/fast/test_device_delivery_contract.py text eol=lf
 
 assets/device_mockups/ipad_pro/export_runtime_v6.py text eol=lf
+assets/device_mockups/common/foundation_common.py text eol=lf
+assets/device_mockups/ipad_pro/generate_low_v6.py text eol=lf
+assets/device_mockups/ipad_pro/reference/ipados26_lock_screen_11.png -text
+assets/device_mockups/ipad_pro/reference/ipados26_lock_screen_13.png -text
 assets/device_mockups/ipad_pro/optimize_runtime_v6.py text eol=lf
 assets/device_mockups/ipad_pro/runtime/v6/*.json text eol=lf
 tools/build_ipad_v6_web.py text eol=lf

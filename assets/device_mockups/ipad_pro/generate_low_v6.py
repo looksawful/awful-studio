@@ -37,7 +37,7 @@ obsdf=optic.node_tree.nodes.get('Principled BSDF'); obsdf.inputs['Coat Weight'].
 front_optic=fc.make_material('MAT_FRONT_OPTIC',(0.0040,0.0060,0.0100),0.0,0.028)
 fobsdf=front_optic.node_tree.nodes.get('Principled BSDF'); fobsdf.inputs['Coat Weight'].default_value=.62; fobsdf.inputs['Coat Roughness'].default_value=.012
 screen_mat=fc.make_material('MAT_SCREEN_CONTENT',(0.0018,0.0026,0.0040),0.0,0.18)
-screen_path=os.path.join(HERE,'reference',f'ipados26_official_screen_{SIZE}.png')
+screen_path=os.path.join(HERE,'reference',f'ipados26_lock_screen_{SIZE}.png')
 screen_tex=screen_mat.node_tree.nodes.new('ShaderNodeTexImage'); screen_tex.image=bpy.data.images.load(screen_path,check_existing=True); screen_tex.image.colorspace_settings.name='sRGB'; screen_tex.image.pack()
 screen_bsdf=screen_mat.node_tree.nodes.get('Principled BSDF'); screen_mat.node_tree.links.new(screen_tex.outputs['Color'],screen_bsdf.inputs['Base Color']); screen_mat.node_tree.links.new(screen_tex.outputs['Color'],screen_bsdf.inputs['Emission Color']); screen_bsdf.inputs['Emission Strength'].default_value=.85
 flash=fc.make_material('MAT_FLASH',(0.90,0.84,0.68),0.0,0.16)
@@ -122,7 +122,7 @@ for c in (body_c,detail_c,screen_c):
     for o in c.objects: o.parent=root
 root['asset_id']=f'ipad_pro_{SIZE}_m5'; root['asset_version']='low_v6_0.3'; root['stage']='LOW_DRAFT'; root['size_variant']=SIZE
 root['dimensions_mm']=f"{s['w']} x {s['h']} x {s['d']}"; root['screen_object']='SCREEN_CONTENT'; root['runtime_contract']='awful-device-v1'
-root['screen_texture']=f'reference/ipados26_official_screen_{SIZE}.png'; root['screen_texture_source']='Apple Support iPad User Guide, iPadOS 26 official lock screen artwork'; root['screen_texture_source_url']='https://help.apple.com/assets/698A8EFC4AF0A5C4CF042598/698A8F004AF0A5C4CF04259E/en_US/3fc0f24ff5065da6a985df207b96d8f2.png'
+root['screen_texture']=f'reference/ipados26_lock_screen_{SIZE}.png'; root['screen_texture_source']='Derived clean lock screen from Apple Support iPadOS 26 reference art'; root['screen_texture_source_url']='https://help.apple.com/assets/698A8EFC4AF0A5C4CF042598/698A8F004AF0A5C4CF04259E/en_US/3fc0f24ff5065da6a985df207b96d8f2.png'
 root['screen_state_default']='screen_on'; root['screen_on_emission_strength']=.85; root['screen_off_emission_strength']=0.0; root['screen_glow_energy']=8.0; root['screen_glow_type']='rect_area'
 root['dimensional_drawing_url']=f'https://developer.apple.com/download/files/accessories/dimensional-drawings/ipad-pro-{SIZE}-inch-m5.pdf'
 scene=bpy.context.scene; scene.render.resolution_x=1600; scene.render.resolution_y=1600; scene.render.resolution_percentage=100; scene.view_settings.exposure=-1.05
@@ -185,6 +185,7 @@ def render_profile(cam, filename):
     scene.view_settings.exposure=profile[0]
     for n,e in profile[1].items(): set_light(n,e)
     fc.render_camera(cam,os.path.join(PREVIEWS,filename))
-for cam,filename in renders: render_profile(cam,filename)
+if '--skip-previews' not in sys.argv:
+    for cam,filename in renders: render_profile(cam,filename)
 print('AWFUL_LOW_VALIDATION',json.dumps(evidence,sort_keys=True))
 if not passed: raise RuntimeError(f'iPad Pro {SIZE} LOW v6 validation failed')

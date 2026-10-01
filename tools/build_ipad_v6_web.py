@@ -61,6 +61,7 @@ def source_files_for(size: str, asset_id: str) -> list[str]:
         'assets/device_mockups/ipad_pro/export_runtime_v6.py',
         'assets/device_mockups/ipad_pro/optimize_runtime_v6.py',
         f'assets/device_mockups/ipad_pro/reference/ipados26_official_screen_{size}.png',
+        f'assets/device_mockups/ipad_pro/reference/ipados26_lock_screen_{size}.png',
         'assets/device_mockups/ipad_pro/reference/apple_logo_alpha.png',
     ]
 
@@ -75,13 +76,19 @@ def build_one(blender: Path, size: str, loader):
     ).strip()
     generated = DEVICE / f'generated/{asset_id}_low_v6.blend'
     source_blend = ROOT / f'extension/awful_studio/assets/devices/{asset_id}_low_v6.blend'
-    run(blender, '--factory-startup', '--background', generated, '--python', ROOT / 'tools/package_device_asset.py', '--',
+    # Never label a cached blend with the fingerprint of newer generator code.
+    run(blender, '--factory-startup', '--background', '--python-exit-code', '1',
+        '--python', DEVICE / 'generate_low_v6.py', '--', '--size', size,
+        '--out', generated, '--skip-previews')
+    run(blender, '--factory-startup', '--background', generated, '--python-exit-code', '1',
+        '--python', ROOT / 'tests/runtime/ipad_control_geometry_contract.py', '--', '--size', size)
+    run(blender, '--factory-startup', '--background', generated, '--python-exit-code', '1', '--python', ROOT / 'tools/package_device_asset.py', '--',
         '--output', source_blend, '--entry', f'AWFUL_DEVICE_IPAD_PRO_{size}', '--root', root_name,
         '--key', f'IPAD_PRO_{size}', '--stage', 'LOW_DRAFT', '--variant', 'low_v6', '--revision', revision)
     update_loader_revision(LOADER_PATH, loader_key, revision)
     plugin_revision = revision
     run(
-        blender, source_blend, '--background', '--python', DEVICE / 'export_runtime_v6.py', '--',
+        blender, '--factory-startup', '--background', source_blend, '--python-exit-code', '1', '--python', DEVICE / 'export_runtime_v6.py', '--',
         '--size', size,
         '--source-revision', revision,
         '--source-commit', source_commit,

@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
-import { availableLods, cameraDirection, previewMaterialPolicy, resolveAssetUrl } from './viewer-core.mjs';
+import { availableLods, cameraDirection, previewMaterialPolicy, resolveAssetUrl, screenGlowDimensions } from './viewer-core.mjs';
 
 const tagName = 'awful-model-viewer';
 
@@ -272,7 +272,7 @@ class AwfulModelViewer extends HTMLElement {
     if (!screen || !this._asset.screenStates) return;
     screen.geometry?.computeBoundingBox?.();
     const size = screen.geometry?.boundingBox?.getSize(new THREE.Vector3()) ?? new THREE.Vector3(0.12, 0.2, 0.001);
-    const dimensions = [Math.abs(size.x), Math.abs(size.y), Math.abs(size.z)].sort((a, b) => b - a);
+    const dimensions = screenGlowDimensions(this._asset, size);
     const energy = Number(this._asset.screenGlow?.energy ?? this._asset.screenGlow?.source_energy_w ?? 8);
     this._screenGlow = new THREE.RectAreaLight(0xe6f0ff, energy, dimensions[0], dimensions[1]);
     this._screenGlow.name = 'AWFUL_SCREEN_GLOW';

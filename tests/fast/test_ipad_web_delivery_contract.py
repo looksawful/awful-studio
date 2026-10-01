@@ -43,6 +43,8 @@ def glb_node_names(path: Path) -> set[str]:
 class IPadWebDeliveryContractTests(unittest.TestCase):
     def test_v6_runtime_manifests_are_current_and_match_plugin_sources(self):
         loader = load_loader()
+        generator = (ROOT / 'assets/device_mockups/ipad_pro/generate_low_v6.py').read_text(encoding='utf-8')
+        self.assertIn('ipados26_lock_screen_', generator)
         for size, (asset_id, key, root_name) in CASES.items():
             manifest_path = RUNTIME / f'{asset_id}_v6.asset.json'
             self.assertTrue(manifest_path.is_file(), f'missing iPad {size} runtime manifest')

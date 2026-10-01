@@ -5,6 +5,7 @@ import {
   cameraDirection,
   resolveAssetUrl,
   previewMaterialPolicy,
+  screenGlowDimensions,
 } from '../src/viewer-core.mjs';
 
 test('preview URLs expose repository assets without copying binaries', () => {
@@ -44,6 +45,11 @@ test('camera presets are explicit and normalized', () => {
   assert.deepEqual(cameraDirection('side'), [1, 0, 0]);
   assert.deepEqual(cameraDirection('top'), [0, 1, 0]);
   assert.throws(() => cameraDirection('diagonal'), /Unknown camera preset/);
+});
+
+test('screen glow preserves manifest width and height orientation', () => {
+  assert.deepEqual(screenGlowDimensions({ screenGlow: { width_mm: 160.13, height_mm: 232.32 } }, { x: 0.16013, y: 0.23232, z: 0.00006 }), [0.16013, 0.23232]);
+  assert.deepEqual(screenGlowDimensions({}, { x: 0.16, y: 0.23, z: 0.001 }), [0.16, 0.23]);
 });
 
 test('binary Apple decal uses crisp preview alpha policy', () => {
