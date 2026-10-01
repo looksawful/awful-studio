@@ -234,7 +234,7 @@ class AwfulModelViewer extends HTMLElement {
         }
         if (material.name === 'MAT_SCREEN_CONTENT' && !material.userData.previewScreenOn) {
           material.userData.previewScreenOn = {
-            map: material.map,
+              map: material.map ?? material.emissiveMap,
             emissiveMap: material.emissiveMap,
             color: material.color?.clone(),
             emissive: material.emissive?.clone(),

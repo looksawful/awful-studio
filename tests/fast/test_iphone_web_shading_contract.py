@@ -77,6 +77,29 @@ class IPhoneWebShadingContractTests(unittest.TestCase):
         material = next(item for item in doc['materials'] if item.get('name') == 'MAT_SCREEN_CONTENT')
         self.assertNotEqual(material.get('alphaMode', 'OPAQUE'), 'BLEND')
 
+    def test_grille_normal_is_embedded_and_uv_mapped(self):
+        doc, _ = read_glb(GLB)
+        material_index = next((i for i, material in enumerate(doc['materials']) if material.get('name') == 'MAT_APERTURE_GRILLE'), None)
+        self.assertIsNotNone(material_index, 'cavities still reuse reflective lens material')
+        material = doc['materials'][material_index]
+        texture = material.get('normalTexture')
+        self.assertIsNotNone(texture, 'grille normal missing from GLB')
+        image = doc['images'][doc['textures'][texture['index']]['source']]
+        self.assertIn('bufferView', image, 'normal image must travel inside GLB')
+        for mesh in doc['meshes']:
+            for primitive in mesh['primitives']:
+                if primitive.get('material') == material_index:
+                    self.assertIn('TEXCOORD_0', primitive['attributes'])
+
+    def test_canonical_screen_edges_do_not_sample_or_emit_screen_pixels(self):
+        doc, _ = read_glb(GLB)
+        screen = next(mesh for mesh in doc['meshes'] if mesh.get('name') == 'SCREEN_CONTENT')
+        material_names = {doc['materials'][primitive['material']]['name'] for primitive in screen['primitives']}
+        self.assertIn('MAT_SCREEN_EDGE', material_names, 'screen texture wraps around the edge')
+        edge = next(material for material in doc['materials'] if material.get('name') == 'MAT_SCREEN_EDGE')
+        self.assertNotIn('baseColorTexture', edge.get('pbrMetallicRoughness', {}))
+        self.assertNotIn('emissiveTexture', edge)
+
     def test_web_delivery_has_one_screen_surface(self):
         doc, _ = read_glb(GLB)
         names = [node.get("name") for node in doc.get("nodes", [])]

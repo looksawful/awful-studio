@@ -26,8 +26,10 @@ export function prepareIphonePresentation(model) {
   }
   const screen = model.getObjectByName('SCREEN_CONTENT');
   let glow = null;
-  if (screen?.isMesh && !Array.isArray(screen.material)) {
-    const front = screen.material;
+  if (screen?.isMesh) {
+    const front = Array.isArray(screen.material) ? screen.material.find(material => material.name === 'MAT_SCREEN_CONTENT') : screen.material;
+    if (!front) throw new Error('iPhone display has no content material');
+    front.map ??= front.emissiveMap;
     front.toneMapped = false;
     front.color.set(0x000000);
     front.roughness = 1;
@@ -38,8 +40,9 @@ export function prepareIphonePresentation(model) {
     front.emissiveMap = front.map;
     front.emissiveIntensity = 1;
     // OLED edge/back are opaque, unlit black; planar screen UVs only belong on the front.
-    const edge = new THREE.MeshStandardMaterial({ color: 0x020203, roughness: .36, metalness: 0, emissiveIntensity: 0 });
-    ownedMaterials.push(edge);
+    const sourceEdge = Array.isArray(screen.material) ? screen.material.find(material => material.name === 'MAT_SCREEN_EDGE') : null;
+    const edge = sourceEdge ?? new THREE.MeshStandardMaterial({ color: 0x020203, roughness: .36, metalness: 0, emissiveIntensity: 0 });
+    if (!sourceEdge) ownedMaterials.push(edge);
     const geometry = screen.geometry;
     const normal = geometry.getAttribute('normal');
     const index = geometry.index;
@@ -80,6 +83,10 @@ export function prepareIphonePresentation(model) {
         object.material = interior;
       }
       if (material.name === 'MAT_FASTENER') { material.roughness = .5;material.envMapIntensity = .35; }
+      if (material.name === 'MAT_FRONT_OPTIC') {
+        material.envMapIntensity = .1;
+        if ('specularIntensity' in material) material.specularIntensity = .15;
+      }
     }
   });
   return { glow, dispose() { glow?.removeFromParent();ownedMaterials.forEach(material => material.dispose()); } };

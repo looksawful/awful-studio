@@ -33,3 +33,22 @@ test('visible front camera follows the island while other device objects keep th
   assert.equal(camera.position.y,pill.position.y);
   assert.equal(body.position.y,0);
 });
+
+test('canonical multi-material display keeps emission, state controls and source edge ownership', () => {
+  const model = new THREE.Group();
+  const front = new THREE.MeshStandardMaterial({ emissiveMap: new THREE.Texture() });
+  front.name = 'MAT_SCREEN_CONTENT';
+  const edge = new THREE.MeshStandardMaterial({ color: 0x020203 });
+  edge.name = 'MAT_SCREEN_EDGE';
+  const screen = new THREE.Mesh(new THREE.BoxGeometry(.06657,.14479,.000325), [front,edge]);
+  screen.name = 'SCREEN_CONTENT'; model.add(screen);
+  let edgeDisposed = false;
+  edge.addEventListener('dispose', () => { edgeDisposed = true; });
+  const presentation = prepareIphonePresentation(model);
+  assert.ok(presentation.glow);
+  assert.equal(screen.material[0], front);
+  assert.equal(screen.material[1], edge);
+  assert.equal(front.emissiveIntensity, 1);
+  presentation.dispose();
+  assert.equal(edgeDisposed, false, 'source materials belong to model teardown');
+});

@@ -89,14 +89,35 @@ back_bsdf.inputs["Coat Roughness"].default_value = 0.09
 if back_bsdf.inputs.get("Specular IOR Level"):
     back_bsdf.inputs["Specular IOR Level"].default_value = 0.18
 black = fc.make_material("MAT_OPTICS_BLACK", (0.0008, 0.0010, 0.0014), 0.0, 0.07)
+grille_mat = fc.make_material("MAT_APERTURE_GRILLE", (0.0010, 0.0012, 0.0016), 0.0, 0.82)
+# A fine woven grille is surface detail; the surrounding recess remains geometry.
+# Pack the tangent-space normal so both Blender and GLB use the same microtexture.
+grille_image = bpy.data.images.new("aperture_weave_normal_128", width=128, height=128)
+grille_image.colorspace_settings.name = "Non-Color"
+pixels = []
+for row in range(128):
+    for column in range(128):
+        nx = 0.22 * math.sin(2 * math.pi * column / 8)
+        ny = 0.22 * math.sin(2 * math.pi * row / 8)
+        length = math.sqrt(nx * nx + ny * ny + 1)
+        pixels.extend((0.5 + nx / length * 0.5, 0.5 + ny / length * 0.5, 0.5 + 0.5 / length, 1.0))
+grille_image.pixels.foreach_set(pixels)
+grille_image.pack()
+grille_tex = grille_mat.node_tree.nodes.new("ShaderNodeTexImage")
+grille_tex.image = grille_image
+grille_normal = grille_mat.node_tree.nodes.new("ShaderNodeNormalMap")
+grille_normal.inputs["Strength"].default_value = 0.45
+grille_mat.node_tree.links.new(grille_tex.outputs["Color"], grille_normal.inputs["Color"])
+grille_mat.node_tree.links.new(grille_normal.outputs["Normal"], grille_mat.node_tree.nodes.get("Principled BSDF").inputs["Normal"])
 island_mat = fc.make_material("MAT_DYNAMIC_ISLAND", (0.00001, 0.000012, 0.000016), 0.0, 0.11)
 island_bsdf = island_mat.node_tree.nodes.get("Principled BSDF")
 island_bsdf.inputs["Coat Weight"].default_value = 0.42
 island_bsdf.inputs["Coat Roughness"].default_value = 0.025
-front_optic = fc.make_material("MAT_FRONT_OPTIC", (0.055, 0.072, 0.105), 0.0, 0.075)
+front_optic = fc.make_material("MAT_FRONT_OPTIC", (0.002, 0.004, 0.009), 0.0, 0.20)
 front_bsdf = front_optic.node_tree.nodes.get("Principled BSDF")
-front_bsdf.inputs["Coat Weight"].default_value = 0.58
-front_bsdf.inputs["Coat Roughness"].default_value = 0.012
+front_bsdf.inputs["Coat Weight"].default_value = 0.18
+front_bsdf.inputs["Coat Roughness"].default_value = 0.08
+front_bsdf.inputs["Specular IOR Level"].default_value = 0.15
 sensor_pill_mat = fc.make_material("MAT_FRONT_SENSOR_PILL", (0.00005, 0.00006, 0.00009), 0.0, 0.19)
 sensor_pill_bsdf = sensor_pill_mat.node_tree.nodes.get("Principled BSDF")
 sensor_pill_bsdf.inputs["Coat Weight"].default_value = 0.20
@@ -114,7 +135,9 @@ screen_tex.image = bpy.data.images.load(screen_texture_path, check_existing=True
 screen_tex.image.colorspace_settings.name = "sRGB"
 screen_tex.image.pack()
 screen_bsdf = screen_mat.node_tree.nodes.get("Principled BSDF")
-screen_mat.node_tree.links.new(screen_tex.outputs["Color"], screen_bsdf.inputs["Base Color"])
+screen_bsdf.inputs["Base Color"].default_value = (0, 0, 0, 1)
+screen_bsdf.inputs["Roughness"].default_value = 1.0
+screen_bsdf.inputs["Specular IOR Level"].default_value = 0.0
 screen_mat.node_tree.links.new(screen_tex.outputs["Color"], screen_bsdf.inputs["Emission Color"])
 screen_bsdf.inputs["Emission Strength"].default_value = 0.85
 optic_glass = fc.make_material("MAT_OPTICAL_GLASS", (0.0010, 0.0014, 0.0024), 0.0, 0.030)
@@ -183,6 +206,11 @@ screen_content = outward_prism("SCREEN_CONTENT", SCREEN_W, SCREEN_H, GLASS_T - 0
                                   location=(0, front_y + 0.010*MM, 0), edge_bevel=0.00004,
                                   outline_segments=48)
 # Planar UVs map the real raster screen image to the active display surface.
+screen_edge_mat = fc.make_material("MAT_SCREEN_EDGE", (0.001, 0.0012, 0.0015), 0.0, 0.36)
+screen_content.data.materials.append(screen_edge_mat)
+for polygon in screen_content.data.polygons:
+    # In Blender the display faces -Y; the export maps that to Three.js +Z.
+    polygon.material_index = 0 if polygon.normal.y < -0.995 else 1
 uv = screen_content.data.uv_layers.new(name="UVMap")
 for loop in screen_content.data.loops:
     co = screen_content.data.vertices[loop.vertex_index].co
@@ -209,7 +237,7 @@ for poly in back_glass.data.polygons:
 hard_surface_glass(screen_glass)
 # Screen material doubles as the clean glossy active glass surface for the current publishable LOW asset.
 sbsdf = screen_mat.node_tree.nodes.get("Principled BSDF")
-sbsdf.inputs["Coat Weight"].default_value = 0.16
+sbsdf.inputs["Coat Weight"].default_value = 0.0
 sbsdf.inputs["Coat Roughness"].default_value = 0.035
 
 # The visible Dynamic Island follows the official screen raster. Apple's Detail Q dimensions
@@ -339,18 +367,19 @@ usb_cutter = fc.rounded_cube("USB_C_CUTTER", (9.05*MM, 3.00*MM, 1.82*MM), 0.91*M
 fc.place_on_rounded_edge(usb_cutter, W, H, BODY_R, "BOTTOM", 0.0, outward=-0.70*MM, local_normal=(0,0,1))
 fc.boolean_difference(body, usb_cutter, name="CUT_USB_C")
 boolean_cuts.append("USB_C")
-usb_cavity = fc.rounded_cube("USB_C_CAVITY", (8.45*MM, 2.38*MM, 0.66*MM), 0.72*MM, black, detail_c)
-fc.place_on_rounded_edge(usb_cavity, W, H, BODY_R, "BOTTOM", 0.0, outward=-0.67*MM, local_normal=(0,0,1))
+usb_cavity = fc.rounded_cube("USB_C_CAVITY", (8.45*MM, 2.38*MM, 0.12*MM), 0.04*MM, grille_mat, detail_c)
+fc.place_on_rounded_edge(usb_cavity, W, H, BODY_R, "BOTTOM", 0.0, outward=-1.40*MM, local_normal=(0,0,1))
 usb_tongue = fc.rounded_cube("USB_C_TONGUE", (5.25*MM, 0.48*MM, 0.18*MM), 0.08*MM, metal_dark, detail_c)
-fc.place_on_rounded_edge(usb_tongue, W, H, BODY_R, "BOTTOM", 0.0, outward=-0.49*MM, local_normal=(0,0,1))
+fc.place_on_rounded_edge(usb_tongue, W, H, BODY_R, "BOTTOM", 0.0, outward=-0.80*MM, local_normal=(0,0,1))
 
 def bottom_aperture(name, x_mm):
     cutter = fc.cylinder(f"{name}_CUTTER", 0.675*MM, 1.80*MM, None, detail_c, vertices=40)
     fc.place_on_rounded_edge(cutter, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.52*MM, local_normal=(0,0,1))
     fc.boolean_difference(body, cutter, name=f"CUT_{name}")
     boolean_cuts.append(name)
-    cavity = fc.cylinder(name, 0.56*MM, 0.50*MM, black, detail_c, vertices=40)
-    fc.place_on_rounded_edge(cavity, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.45*MM, local_normal=(0,0,1))
+    cavity = fc.cylinder(name, 0.64*MM, 0.12*MM, grille_mat, detail_c, vertices=40)
+    fc.place_on_rounded_edge(cavity, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.98*MM, local_normal=(0,0,1))
+    smooth_sharp_boundaries(cavity)
 
 # Apple drawing: 3 microphone ports on the left and 6 speaker ports on the right, each 1.35 mm diameter.
 for idx, x_mm in enumerate((-18.2, -15.1, -12.0), 1):
