@@ -98,11 +98,15 @@ screen_path=os.path.join(HERE,'reference','macos26_official_screen.png')
 img=bpy.data.images.load(screen_path,check_existing=True); img.pack()
 nodes=screenmat.node_tree.nodes; links=screenmat.node_tree.links; sbsdf=nodes.get('Principled BSDF')
 tex=nodes.get('AWFUL_SCREEN_IMAGE') or nodes.new('ShaderNodeTexImage'); tex.name='AWFUL_SCREEN_IMAGE'; tex.image=img
-for socket_name in ('Base Color','Emission Color'):
+for socket_name in ('Emission Color',):
  socket=sbsdf.inputs.get(socket_name)
  if socket:
   for old in list(socket.links): links.remove(old)
   links.new(tex.outputs['Color'],socket)
+# OLED content emits the image; the separate cover glass owns reflections.
+for old in list(sbsdf.inputs['Base Color'].links): links.remove(old)
+sbsdf.inputs['Base Color'].default_value=(0.002,0.003,0.006,1.0)
+sbsdf.inputs['Specular IOR Level'].default_value=0.0
 if sbsdf.inputs.get('Emission Strength'): sbsdf.inputs['Emission Strength'].default_value=0.65
 uv=screen.data.uv_layers.new(name='UVMap')
 for loop in screen.data.loops:

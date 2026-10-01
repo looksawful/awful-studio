@@ -395,9 +395,9 @@
     }
   },
   "camera_fit": "runtime_bounds",
-  "source_revision": "1ba32d2af56bbe861b088c45419c6d42b6a96bb66b7d4d1858d9a5e179a79b47",
+  "source_revision": "bbb71bbde1617e24c913dd7be0640ff98d9474ab55c4aecb5c40c2ff9acb5712",
   "source_commit": "9f5d74b9122e11828375b5f77983bbc919552f60",
-  "plugin_source_revision": "1ba32d2af56bbe861b088c45419c6d42b6a96bb66b7d4d1858d9a5e179a79b47",
+  "plugin_source_revision": "bbb71bbde1617e24c913dd7be0640ff98d9474ab55c4aecb5c40c2ff9acb5712",
   "generator_version": "macbook_v1_packaged_blend_web_delivery",
   "delivery_profile": {
     "simplification": "none",
@@ -415,7 +415,7 @@
   "source_files": {
     "assets/device_mockups/common/foundation_common.py": "1d68c3fff908b7ae149f74c31a19064eb6d2384234d33bd71071fea70d651d12",
     "assets/device_mockups/macbook_pro_14/export_runtime_v1.py": "47fa68b82924a79be1bde41be75d887ec004cdffe5ed4c9b7101e0b9b82b195a",
-    "assets/device_mockups/macbook_pro_14/generate_low.py": "1051a0719f94a66f304e74b83bcd47d89ecfc406c9c511b453b010024f44c621",
+    "assets/device_mockups/macbook_pro_14/generate_low.py": "aec7626ef512adfedc31a9a78df1a6e78ae08ced8cb83e098a33a993d0423c4c",
     "assets/device_mockups/macbook_pro_14/optimize_runtime_v1.py": "f7cda0a120b8a0e6f7d7194357d4d86035898594f0c21742f1d3d9d1577d250a",
     "assets/device_mockups/macbook_pro_14/reference/apple_logo_alpha.png": "50209309a1cf3bcb874118b27fe9c9779aaafabaf79bb304cf0aa3a2898c9833",
     "assets/device_mockups/macbook_pro_14/reference/macos26_official_screen.png": "95a228a03c6c1d83ba6e79703f0df1cbe7d464ddbd1e2be82239cc938ea1b0f8"
@@ -451,15 +451,15 @@
   "artifacts": {
     "delivery_blend": {
       "path": "assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_delivery.blend",
-      "sha256": "291cb46359c9535c7e29456dcf31f20aae5b30501f58d196edac43bf4d969616"
+      "sha256": "7f94d867ed8757e18f65917963b0b6cb015c06bfc22d8f6560b76172a731ad4d"
     },
     "compat_glb": {
       "path": "assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web.glb",
-      "sha256": "fcdd08d2474afaae9c603f9395219e76af82927ec66f634de57f14987c5ea27a"
+      "sha256": "e4bb2e3ba8f2fcb313ba7fb7ec0b5865044bb6189a5531b53bc540f109b961c2"
     },
     "meshopt_glb": {
       "path": "assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web_meshopt.glb",
-      "sha256": "99defc243ba39494939c2b205e7d3f57c2e40836fa237095b6170b11453945af"
+      "sha256": "e9a6b0c87060227c2ded07c31da0b09ed08dae42536a5ddc5590e4375a0f1c2b"
     }
   }
 }
