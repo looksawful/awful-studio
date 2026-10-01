@@ -1,6 +1,7 @@
 import json
 import os
 import bpy
+import bmesh
 from mathutils import Vector
 
 import sys
@@ -38,6 +39,13 @@ if logo_mat and logo_mat.use_nodes:
 for obj in [root] + list(root.children_recursive):
     if obj.type == "MESH":
         obj.data.name = obj.name
+        if any(material and material.name == "MAT_APERTURE_GRILLE" for material in obj.data.materials):
+            # Blender cannot calculate UV tangents on the grille's n-gon caps.
+            mesh = bmesh.new()
+            mesh.from_mesh(obj.data)
+            bmesh.ops.triangulate(mesh, faces=list(mesh.faces))
+            mesh.to_mesh(obj.data)
+            mesh.free()
 roles = {
     "BODY_ALUMINUM": "body",
     "SCREEN_CONTENT": "screen",
@@ -104,6 +112,7 @@ bpy.ops.export_scene.gltf(
     export_format="GLB",
     use_selection=True,
     export_extras=True,
+    export_tangents=True,
 )
 bpy.ops.file.pack_all()
 delivery = os.path.join(RUNTIME, "iphone_17_v30_delivery.blend")

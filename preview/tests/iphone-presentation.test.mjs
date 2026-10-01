@@ -52,3 +52,16 @@ test('canonical multi-material display keeps emission, state controls and source
   presentation.dispose();
   assert.equal(edgeDisposed, false, 'source materials belong to model teardown');
 });
+
+test('GLTFLoader split primitives retain a working display and glow', () => {
+  const model = new THREE.Group(), node = new THREE.Group();
+  node.name = 'SCREEN_CONTENT'; model.add(node);
+  const front = new THREE.MeshStandardMaterial({ emissiveMap: new THREE.Texture() });
+  front.name = 'MAT_SCREEN_CONTENT';
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(.06657,.14479), front);
+  node.add(mesh);
+  const presentation = prepareIphonePresentation(model);
+  assert.ok(presentation.glow, 'GLTFLoader emits a Group for multiple material primitives');
+  assert.equal(mesh.material[0].map, front.emissiveMap);
+  presentation.dispose();
+});

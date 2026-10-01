@@ -90,6 +90,7 @@ class IPhoneWebShadingContractTests(unittest.TestCase):
             for primitive in mesh['primitives']:
                 if primitive.get('material') == material_index:
                     self.assertIn('TEXCOORD_0', primitive['attributes'])
+                    self.assertIn('TANGENT', primitive['attributes'], 'normal mapped grilles need portable tangent space')
 
     def test_canonical_screen_edges_do_not_sample_or_emit_screen_pixels(self):
         doc, _ = read_glb(GLB)

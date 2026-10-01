@@ -24,7 +24,8 @@ export function prepareIphonePresentation(model) {
       if (/^FRONT_CAMERA_|^FRONT_SENSOR_PILL$/.test(object.name)) object.position.y += delta;
     });
   }
-  const screen = model.getObjectByName('SCREEN_CONTENT');
+  const screenNode = model.getObjectByName('SCREEN_CONTENT');
+  const screen = screenNode?.isMesh ? screenNode : screenNode?.children.find(child => child.isMesh && (Array.isArray(child.material) ? child.material : [child.material]).some(material => material.name === 'MAT_SCREEN_CONTENT'));
   let glow = null;
   if (screen?.isMesh) {
     const front = Array.isArray(screen.material) ? screen.material.find(material => material.name === 'MAT_SCREEN_CONTENT') : screen.material;
