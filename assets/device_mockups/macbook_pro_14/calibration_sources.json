@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "captured_date": "2026-10-02",
+  "policy": "Apple source artwork is cached locally only; commit URLs, hashes, metadata and derived evidence.",
+  "sources": [
+    {
+      "id": "apple_tech_specs",
+      "source_class": "APPLE_EXACT",
+      "source_url": "https://support.apple.com/en-gb/125405",
+      "intended_use": ["closed envelope", "display facts", "keyboard high-level facts"]
+    },
+    {
+      "id": "keyboard_image",
+      "source_class": "APPLE_CALIBRATED",
+      "source_url": "https://www.apple.com/macbook-pro/specs/",
+      "cache_key": "apple-mbp-m5-reference/keyboard.jpg",
+      "sha256": "bbe7b727a9c9ee9ada1b8ffd5bfedcdeb0853832d9d1277bbd53381932759788",
+      "bytes": 87326,
+      "pixel_dimensions": [1138, 746],
+      "intended_use": ["keyboard lattice", "trackpad bounds", "speaker field"]
+    },
+    {
+      "id": "dimensions_top",
+      "source_class": "APPLE_CALIBRATED",
+      "source_url": "https://www.apple.com/macbook-pro/specs/",
+      "cache_key": "apple-mbp-m5-reference/dimensions_top.jpg",
+      "sha256": "f616b65191e3c598e6a8da966ef30770673baef9d60d60b63995b8ba9dadeaf2",
+      "bytes": 26142,
+      "pixel_dimensions": [874, 634],
+      "intended_use": ["top silhouette", "plan-envelope cross-check"]
+    },
+    {
+      "id": "dimensions_side",
+      "source_class": "APPLE_CALIBRATED",
+      "source_url": "https://www.apple.com/macbook-pro/specs/",
+      "cache_key": "apple-mbp-m5-reference/dimensions_side.jpg",
+      "sha256": "03154bf670cec4dd417e6c8f08f365df0071fc6fc01192d9a3489de1d0768afa",
+      "bytes": 6489,
+      "pixel_dimensions": [874, 52],
+      "intended_use": ["closed-height silhouette", "edge-profile cross-check"]
+    },
+    {
+      "id": "display_image",
+      "source_class": "APPLE_CALIBRATED",
+      "source_url": "https://www.apple.com/macbook-pro/specs/",
+      "cache_key": "apple-mbp-m5-reference/display.jpg",
+      "sha256": "1e7050f7cdf8408769860581e370f837ce6ba450655f5f3a082c8fd22062a18c",
+      "bytes": 280948,
+      "pixel_dimensions": [1092, 668],
+      "intended_use": ["display front cross-check", "notch/camera relationship"]
+    },
+    {
+      "id": "ports_1",
+      "source_class": "APPLE_CALIBRATED",
+      "source_url": "https://www.apple.com/macbook-pro/specs/",
+      "cache_key": "apple-mbp-m5-reference/ports_1.jpg",
+      "sha256": "202e8ea94e459b13c4bf3cdf254985d54f0671ba1dce7afc7858c2b0984a53b7",
+      "bytes": 17735,
+      "pixel_dimensions": [818, 274],
+      "intended_use": ["side-port placement cross-check"]
+    },
+    {
+      "id": "ports_2",
+      "source_class": "APPLE_CALIBRATED",
+      "source_url": "https://www.apple.com/macbook-pro/specs/",
+      "cache_key": "apple-mbp-m5-reference/ports_2.jpg",
+      "sha256": "7fd56f7e465e52ec27b51999be3a512952c7b3d99df54aa5ab024fc3d17149a7",
+      "bytes": 16748,
+      "pixel_dimensions": [818, 182],
+      "intended_use": ["side-port placement cross-check"]
+    },
+    {
+      "id": "ports_3",
+      "source_class": "APPLE_CALIBRATED",
+      "source_url": "https://www.apple.com/macbook-pro/specs/",
+      "cache_key": "apple-mbp-m5-reference/ports_3.jpg",
+      "sha256": "353e8ea0e34eb448dd472c9db42b7b83d642824f45adcea22b63f34bc1278d0f",
+      "bytes": 12828,
+      "pixel_dimensions": [818, 274],
+      "intended_use": ["side-port placement cross-check"]
+    },
+    {
+      "id": "ports_4",
+      "source_class": "APPLE_CALIBRATED",
+      "source_url": "https://www.apple.com/macbook-pro/specs/",
+      "cache_key": "apple-mbp-m5-reference/ports_4.jpg",
+      "sha256": "b578807d7bed1d3df6188fcfd6747609afa1c18ab0de951a98066709c9b866cc",
+      "bytes": 12442,
+      "pixel_dimensions": [818, 182],
+      "intended_use": ["side-port placement cross-check"]
+    },
+    {
+      "id": "product_bezel_space_black",
+      "source_class": "APPLE_CALIBRATED",
+      "source_url": "https://developer.apple.com/design/resources/",
+      "cache_key": "apple-macbook-pro-m5-bezel/Bezel-MacBook-Pro-M5/PNG/MacBook Pro M5 14-inch Space Black.png",
+      "sha256": "1863c54dd9464f198ca5b83ff8c3d7b0168cebf8d7028d92b5e6d7d2298c6d57",
+      "bytes": 843916,
+      "pixel_dimensions": [3860, 2540],
+      "intended_use": ["lid/display front calibration", "bezel", "notch", "camera"]
+    },
+    {
+      "id": "apple_repair_manual_m5",
+      "source_class": "APPLE_RELATIONAL",
+      "source_url": "https://support.apple.com/en-us/123173",
+      "intended_use": ["assembly topology", "part identity", "hinge/display relationships"]
+    },
+    {
+      "id": "apple_trackpad_repair",
+      "source_class": "APPLE_RELATIONAL",
+      "source_url": "https://support.apple.com/en-us/123161",
+      "intended_use": ["trackpad gap relationship", "flush-height relationship"]
+    },
+    {
+      "id": "apple_key_service_1x1",
+      "source_class": "APPLE_RELATIONAL",
+      "source_url": "https://support.apple.com/en-us/101269",
+      "intended_use": ["keyboard service-family topology"]
+    },
+    {
+      "id": "apple_key_service_1x05",
+      "source_class": "APPLE_RELATIONAL",
+      "source_url": "https://support.apple.com/en-us/101270",
+      "intended_use": ["keyboard service-family topology"]
+    },
+    {
+      "id": "apple_key_service_link_bar",
+      "source_class": "APPLE_RELATIONAL",
+      "source_url": "https://support.apple.com/en-us/101271",
+      "intended_use": ["keyboard service-family topology"]
+    }
+  ],
+  "visual_references": [
+    {
+      "id": "may_jestei_macbook",
+      "role": "VISUAL_ONLY",
+      "geometry_authority": false,
+      "local_reference": "D:/inwork/JSP/landing-mockup/macbook_webprep_04.blend",
+      "intended_use": ["surface quality", "normals", "materials", "mechanical read", "bake strategy"]
+    }
+  ]
+}

@@ -1,0 +1,321 @@
+{
+  "gate": "G1",
+  "status": "awaiting_human_overlay_approval",
+  "coordinate_frame": {
+    "origin": "chassis plan center",
+    "x": "positive right",
+    "y": "positive toward hinge",
+    "z": "positive upward"
+  },
+  "deck_calibration": {
+    "source_class": "PROVISIONAL",
+    "source": "keyboard_image",
+    "source_quad_px": [
+      [
+        119.0,
+        28.0
+      ],
+      [
+        1020.0,
+        32.0
+      ],
+      [
+        1017.0,
+        667.0
+      ],
+      [
+        113.0,
+        662.0
+      ]
+    ],
+    "physical_size_mm": [
+      312.6,
+      221.2
+    ],
+    "px_per_mm": 4.0,
+    "method": "manual four-corner deck-plane pick followed by projective homography",
+    "control_point_fit_residual_px": 0.0,
+    "corner_pick_tolerance_px": 1.0,
+    "tolerance_mm": 0.25,
+    "frame": "chassis_center",
+    "confidence": "MEDIUM",
+    "frozen": false
+  },
+  "exact_datums": {
+    "width": {
+      "id": "chassis.width",
+      "value_mm": 312.6,
+      "source_class": "APPLE_EXACT",
+      "source": "https://support.apple.com/en-gb/125405",
+      "method": "Apple-published external envelope",
+      "tolerance_mm": 0.05,
+      "frame": "chassis_center",
+      "confidence": "VERIFIED",
+      "frozen": true
+    },
+    "depth": {
+      "id": "chassis.depth",
+      "value_mm": 221.2,
+      "source_class": "APPLE_EXACT",
+      "source": "https://support.apple.com/en-gb/125405",
+      "method": "Apple-published external envelope",
+      "tolerance_mm": 0.05,
+      "frame": "chassis_center",
+      "confidence": "VERIFIED",
+      "frozen": true
+    },
+    "closed_height": {
+      "id": "chassis.closed_height",
+      "value_mm": 15.5,
+      "source_class": "APPLE_EXACT",
+      "source": "https://support.apple.com/en-gb/125405",
+      "method": "Apple-published external envelope",
+      "tolerance_mm": 0.05,
+      "frame": "chassis_center",
+      "confidence": "VERIFIED",
+      "frozen": true
+    }
+  },
+  "measurements": {
+    "keyboard": {
+      "key_outer_px": [
+        67.0,
+        65.0
+      ],
+      "pitch_px": [
+        77.0,
+        75.832
+      ],
+      "source_class": "PROVISIONAL",
+      "source": "keyboard_image",
+      "method": "median key contours after chassis-plane homography",
+      "tolerance_mm": 0.25,
+      "frame": "chassis_center",
+      "confidence": "MEDIUM",
+      "frozen": false,
+      "key_outer_width_mm": 16.75,
+      "key_outer_height_mm": 16.25,
+      "pitch_x_mm": 19.25,
+      "pitch_y_mm": 18.958,
+      "gap_x_mm": 2.5,
+      "gap_y_mm": 2.7079999999999984
+    },
+    "trackpad": {
+      "left_x_px": 363.64476210769783,
+      "right_x_px": 891.4070901746444,
+      "top_y_px": 542.6468469608157,
+      "bottom_y_px": 873.9046196782626,
+      "physical_front_edge_px": 884.8,
+      "target_center_x_mm": 0.0,
+      "residual_tolerance_mm": 0.75,
+      "source_class": "PROVISIONAL",
+      "source": "keyboard_image",
+      "method": "Sobel seam centroids on exact 4 px/mm rectified chassis plane",
+      "tolerance_mm": 0.25,
+      "frame": "chassis_center",
+      "confidence": "MEDIUM",
+      "frozen": false,
+      "left_x_mm": -65.38880947307555,
+      "right_x_mm": 66.55177254366109,
+      "measured_center_x_mm": 0.5814815352927667,
+      "height_mm": 82.81444317936175,
+      "front_gap_mm": 2.72384508043433,
+      "center_y_mm": -66.46893332988478
+    },
+    "touch_id": {
+      "outer_bbox_px": [
+        1113.0,
+        69.0,
+        67.0,
+        67.0
+      ],
+      "sensor_center_px": [
+        1145.5,
+        105.5
+      ],
+      "sensor_diameter_px": 36.0,
+      "default_appearance": "black",
+      "source_class": "PROVISIONAL",
+      "source": "keyboard_image",
+      "method": "rectified key contour plus circular sensor extent",
+      "tolerance_mm": 0.5,
+      "frame": "chassis_center",
+      "confidence": "MEDIUM",
+      "frozen": false,
+      "outer_width_mm": 16.75,
+      "outer_height_mm": 16.75,
+      "center_x_mm": 130.325,
+      "center_y_mm": 84.975,
+      "sensor_diameter_mm": 9.0
+    },
+    "speaker": {
+      "pitch_px": [
+        4.0,
+        4.0
+      ],
+      "left_field_bbox_px": [
+        0.0,
+        80.0,
+        54.0,
+        515.0
+      ],
+      "column_count": null,
+      "row_count": null,
+      "source_class": "PROVISIONAL",
+      "source": "keyboard_image",
+      "method": "rectified-raster periodicity plus dark-blob field extent",
+      "tolerance_mm": 0.25,
+      "frame": "chassis_center",
+      "confidence": "MEDIUM",
+      "frozen": false,
+      "pitch_x_mm": 1.0,
+      "pitch_y_mm": 1.0,
+      "observed_width_mm": 13.5,
+      "observed_height_mm": 108.75
+    },
+    "display": {
+      "opening_origin_px": [
+        418.0,
+        288.0
+      ],
+      "opening_px": [
+        3024.0,
+        1964.0
+      ],
+      "px_per_mm": 10.0,
+      "notch_relative_bbox_px": [
+        1319.0,
+        0.0,
+        1705.0,
+        64.0
+      ],
+      "camera_center_px": [
+        1929.0,
+        304.5
+      ],
+      "outer_lid_x_px": [
+        362.0,
+        3496.0
+      ],
+      "opening_corner_radius_px": 40.966,
+      "opening_corner_fit_rms_px": 0.642,
+      "notch_lower_radius_px": 21.911,
+      "notch_fit_rms_px": 0.303,
+      "outer_lid_radius_fit_px": 89.85,
+      "outer_lid_fit_rms_px": 0.324,
+      "outer_lid_frozen": false,
+      "source_class": "PROVISIONAL",
+      "source": "product_bezel_space_black",
+      "method": "Product Bezel alpha geometry at native 3024x1964 / 254 ppi scale",
+      "tolerance_mm": 0.1,
+      "frame": "display_active_center",
+      "confidence": "HIGH",
+      "frozen": false,
+      "active_width_mm": 302.4,
+      "active_height_mm": 196.4,
+      "notch_top_width_mm": 38.6,
+      "notch_height_mm": 6.4,
+      "camera_center_x_mm": -0.1,
+      "camera_from_top_mm": 1.65,
+      "outer_lid_width_px": 3135.0,
+      "outer_lid_width_mm_at_display_scale": 313.5,
+      "outer_lid_width_residual_mm": 0.8999999999999773,
+      "opening_corner_radius_mm": 4.0966000000000005,
+      "opening_corner_fit_rms_mm": 0.06420000000000001,
+      "notch_lower_radius_mm": 2.1911,
+      "notch_fit_rms_mm": 0.0303,
+      "outer_lid_radius_fit_mm": 8.985,
+      "outer_lid_fit_rms_mm": 0.0324
+    }
+  },
+  "source_verification": [
+    {
+      "id": "keyboard_image",
+      "cache_key": "apple-mbp-m5-reference/keyboard.jpg",
+      "sha256": "bbe7b727a9c9ee9ada1b8ffd5bfedcdeb0853832d9d1277bbd53381932759788",
+      "bytes": 87326
+    },
+    {
+      "id": "dimensions_top",
+      "cache_key": "apple-mbp-m5-reference/dimensions_top.jpg",
+      "sha256": "f616b65191e3c598e6a8da966ef30770673baef9d60d60b63995b8ba9dadeaf2",
+      "bytes": 26142
+    },
+    {
+      "id": "dimensions_side",
+      "cache_key": "apple-mbp-m5-reference/dimensions_side.jpg",
+      "sha256": "03154bf670cec4dd417e6c8f08f365df0071fc6fc01192d9a3489de1d0768afa",
+      "bytes": 6489
+    },
+    {
+      "id": "display_image",
+      "cache_key": "apple-mbp-m5-reference/display.jpg",
+      "sha256": "1e7050f7cdf8408769860581e370f837ce6ba450655f5f3a082c8fd22062a18c",
+      "bytes": 280948
+    },
+    {
+      "id": "ports_1",
+      "cache_key": "apple-mbp-m5-reference/ports_1.jpg",
+      "sha256": "202e8ea94e459b13c4bf3cdf254985d54f0671ba1dce7afc7858c2b0984a53b7",
+      "bytes": 17735
+    },
+    {
+      "id": "ports_2",
+      "cache_key": "apple-mbp-m5-reference/ports_2.jpg",
+      "sha256": "7fd56f7e465e52ec27b51999be3a512952c7b3d99df54aa5ab024fc3d17149a7",
+      "bytes": 16748
+    },
+    {
+      "id": "ports_3",
+      "cache_key": "apple-mbp-m5-reference/ports_3.jpg",
+      "sha256": "353e8ea0e34eb448dd472c9db42b7b83d642824f45adcea22b63f34bc1278d0f",
+      "bytes": 12828
+    },
+    {
+      "id": "ports_4",
+      "cache_key": "apple-mbp-m5-reference/ports_4.jpg",
+      "sha256": "b578807d7bed1d3df6188fcfd6747609afa1c18ab0de951a98066709c9b866cc",
+      "bytes": 12442
+    },
+    {
+      "id": "product_bezel_space_black",
+      "cache_key": "apple-macbook-pro-m5-bezel/Bezel-MacBook-Pro-M5/PNG/MacBook Pro M5 14-inch Space Black.png",
+      "sha256": "1863c54dd9464f198ca5b83ff8c3d7b0168cebf8d7028d92b5e6d7d2298c6d57",
+      "bytes": 843916
+    }
+  ],
+  "overlays": {
+    "deck": {
+      "path": "assets\\device_mockups\\macbook_pro_14\\evidence\\g1_calibration\\deck_calibration_overlay.png",
+      "size_px": [
+        1252,
+        886
+      ],
+      "homography": [
+        [
+          1.3903718314572917,
+          0.013158093042182599,
+          -165.82267454859883
+        ],
+        [
+          -0.006218285007403556,
+          1.4006686979176508,
+          -38.4787476258132
+        ],
+        [
+          1.6986297496525978e-06,
+          5.277864214895393e-06,
+          1.0
+        ]
+      ],
+      "corner_pick_tolerance_px": 1.0
+    },
+    "display": {
+      "path": "assets\\device_mockups\\macbook_pro_14\\evidence\\g1_calibration\\display_calibration_overlay.png",
+      "size_px": [
+        3860,
+        2540
+      ]
+    }
+  }
+}
