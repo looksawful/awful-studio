@@ -7,6 +7,21 @@
 
 
 This file is the default entry point for GPT Chat, GPT Work, Codex-like agents, and human contributors.
+
+## Agent skills
+
+### Issue tracker
+
+Implementation issues live in GitHub Issues for `looksawful/awful-studio`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Use the canonical five-role triage vocabulary. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context layout: root `CONTEXT.md` plus `docs/adr/`. See `docs/agents/domain.md`.
+
 ## Cross-repository coordination
 
 - Before starting a new independent production stream or reprioritizing existing work, consult the owner's private cross-repository program control when it is accessible.
