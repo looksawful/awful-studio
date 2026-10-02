@@ -48,6 +48,8 @@ class MacBookG1ModelContractTests(unittest.TestCase):
         self.assertIn("KEYBOARD_LAYOUT_PX", deck)
         self.assertNotIn("SPEAKER_ROWS = 88", deck)
         self.assertNotIn("SPEAKER_COLS = 9", deck)
+        self.assertNotIn("CUT_SPEAKER_FIELDS", deck)
+        self.assertIn("SPEAKER_MASTER_PROXY_", deck)
         self.assertNotIn("location=(0, -57*mm", deck)
         self.assertNotIn("32*mm, 8.2*mm", construction)
 

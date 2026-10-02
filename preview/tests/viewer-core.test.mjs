@@ -4,6 +4,7 @@ import {
   availableLods,
   cameraDirection,
   perspectiveClipPlanes,
+  perspectiveFitDistance,
   resolveAssetUrl,
   previewMaterialPolicy,
 } from '../src/viewer-core.mjs';
@@ -15,6 +16,18 @@ test('perspective depth separates the display from its bezel at a 40 micron gap'
     assert.ok(Math.abs(depth(distance) - depth(distance + 0.00004)) >= 4);
     assert.ok(near < distance / 2 && far > distance * 2, 'product must remain inside the camera range');
   }
+});
+
+test('portrait fit uses horizontal FOV so wide devices stay inside frame', () => {
+  const size = { width: 0.3126, height: 0.218167 };
+  const portrait = perspectiveFitDistance(size, 35, 393 / 600, 1.15);
+  const landscape = perspectiveFitDistance(size, 35, 844 / 600, 1.15);
+  assert.ok(portrait > landscape);
+
+  const tanVertical = Math.tan((35 * Math.PI / 180) / 2);
+  const tanHorizontal = tanVertical * (393 / 600);
+  assert.ok(size.width / 2 < portrait * tanHorizontal);
+  assert.ok(size.height / 2 < portrait * tanVertical);
 });
 
 test('preview URLs expose repository assets without copying binaries', () => {

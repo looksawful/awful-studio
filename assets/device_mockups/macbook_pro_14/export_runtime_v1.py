@@ -37,20 +37,26 @@ if root is None or hinge is None:
     raise RuntimeError('MacBook root or hinge control missing')
 owned_objects = [root] + list(root.children_recursive)
 
-# The authoritative master keeps physical speaker apertures. Runtime swaps in
-# the clean pre-speaker body plus the alpha+normal speaker proxies.
+# The authoritative master keeps the calibrated speaker review surface.
+# Runtime swaps to the clean body plus the same alpha+normal speaker proxies.
 master_base = bpy.data.objects.get('BASE_UNIBODY')
 runtime_base = bpy.data.objects.get('BASE_UNIBODY_RUNTIME_SOURCE')
 if master_base is None or runtime_base is None:
     raise RuntimeError('Hybrid deck master/runtime body seam missing')
 master_base.name = 'BASE_UNIBODY_MASTER_SOURCE'
-master_base.hide_render = True
 runtime_base.name = 'BASE_UNIBODY'
 runtime_base.hide_render = False
 runtime_base['speaker_runtime'] = 'derived_alpha_normal_proxy'
+
+# Selection-only glTF export still traverses descendants of a selected parent.
+# Remove master-only review geometry from this temporary runtime scene instead
+# of relying on hide_render, otherwise those nodes leak into the GLB hierarchy.
+for obj in list(owned_objects):
+    if obj is not master_base and obj.get('master_only'):
+        bpy.data.objects.remove(obj, do_unlink=True)
+bpy.data.objects.remove(master_base, do_unlink=True)
+owned_objects = [root] + list(root.children_recursive)
 for obj in owned_objects:
-    if obj.get('master_only'):
-        obj.hide_render = True
     if obj.get('runtime_only'):
         obj.hide_render = False
 

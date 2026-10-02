@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
-import { availableLods, cameraDirection, perspectiveClipPlanes, previewMaterialPolicy, resolveAssetUrl } from './viewer-core.mjs';
+import { availableLods, cameraDirection, perspectiveClipPlanes, perspectiveFitDistance, previewMaterialPolicy, resolveAssetUrl } from './viewer-core.mjs';
 
 const tagName = 'awful-model-viewer';
 
@@ -320,8 +320,17 @@ class AwfulModelViewer extends HTMLElement {
   #fitModel() {
     const bounds = this.#bounds();
     if (!bounds) return;
-    const { center, max } = bounds;
-    const distance = max / (2 * Math.tan(THREE.MathUtils.degToRad(this._perspective.fov / 2))) * 1.45;
+    const { center, max, size } = bounds;
+    const aspect = Math.max(
+      this._renderer.domElement.clientWidth
+        / Math.max(this._renderer.domElement.clientHeight, 1),
+      0.1,
+    );
+    const distance = perspectiveFitDistance(
+      { width: size.x, height: size.y },
+      this._perspective.fov,
+      aspect,
+    );
     const direction = new THREE.Vector3(...cameraDirection('front'));
     this._perspective.position.copy(center).add(direction.multiplyScalar(distance));
     const { near, far } = perspectiveClipPlanes(distance);
@@ -330,7 +339,6 @@ class AwfulModelViewer extends HTMLElement {
     this._perspective.updateProjectionMatrix();
 
     const half = max * 0.72;
-    const aspect = Math.max(this._renderer.domElement.clientWidth / Math.max(this._renderer.domElement.clientHeight, 1), 0.1);
     this._ortho.left = -half * aspect;
     this._ortho.right = half * aspect;
     this._ortho.top = half;
@@ -458,8 +466,8 @@ class AwfulModelViewer extends HTMLElement {
 }
 
 const styles = `
-  :host { display:block; min-height:720px; color:#ececec; font:12px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace; }
-  .shell { display:grid; grid-template-rows:auto minmax(560px,1fr) auto; min-height:720px; background:#0b0b0c; border:1px solid #252527; }
+  :host { display:block; min-height:100vh; color:#ececec; font:12px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace; }
+  .shell { display:grid; grid-template-rows:auto minmax(0,1fr) auto; min-height:100vh; background:#0b0b0c; border:1px solid #252527; }
   .toolbar { display:flex; flex-wrap:wrap; gap:6px; align-items:center; padding:8px; border-bottom:1px solid #252527; background:#111113; }
   label { display:inline-flex; gap:5px; align-items:center; }
   button, select, input { font:inherit; color:#ececec; background:#19191c; border:1px solid #343438; border-radius:4px; }
@@ -470,6 +478,17 @@ const styles = `
   .stage { position:relative; min-height:560px; overflow:hidden; background:#111; }
   .stage canvas { display:block; width:100%; height:100%; min-height:560px; }
   .meta { margin:0; padding:10px; border-top:1px solid #252527; white-space:pre-wrap; color:#a9a9ad; background:#0e0e10; }
+  @media (max-width:700px) {
+    :host { height:100dvh; min-height:100dvh; }
+    .shell { height:100dvh; min-height:100dvh; grid-template-rows:auto minmax(0,1fr) auto; }
+    .toolbar { gap:4px; padding:6px; max-height:30dvh; overflow:auto; overscroll-behavior:contain; }
+    button, select { min-height:36px; padding:5px 8px; }
+    input[type='range'] { width:76px; }
+    input[type='color'] { height:36px; }
+    .stage { min-height:0; }
+    .stage canvas { min-height:0; touch-action:none; }
+    .meta { max-height:18dvh; overflow:auto; padding:6px; font-size:10px; }
+  }
 `;
 
 if (!customElements.get(tagName)) customElements.define(tagName, AwfulModelViewer);

@@ -33,6 +33,20 @@ export function perspectiveClipPlanes(distance) {
   return { near: Math.max(distance / 100, 0.0001), far: Math.max(distance * 10, 0.1) };
 }
 
+export function perspectiveFitDistance(
+  { width, height },
+  verticalFovDeg,
+  aspect,
+  margin = 1.15,
+) {
+  const halfVertical = Math.tan((verticalFovDeg * Math.PI / 180) / 2);
+  const safeAspect = Math.max(Number(aspect) || 0, 0.1);
+  const halfHorizontal = halfVertical * safeAspect;
+  const horizontalDistance = Math.abs(width) / (2 * halfHorizontal);
+  const verticalDistance = Math.abs(height) / (2 * halfVertical);
+  return Math.max(horizontalDistance, verticalDistance, 0.001) * margin;
+}
+
 export function previewMaterialPolicy(name, { hasTexture = false } = {}) {
   const surfacePolicies = {
     MAT_ANODIZED_ALUMINUM: { frontSide: true, envMapIntensity: 0.55, minRoughness: 0.28 },

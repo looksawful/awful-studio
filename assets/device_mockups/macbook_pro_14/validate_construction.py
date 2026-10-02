@@ -49,7 +49,14 @@ assert abs(actual_gap_mm-expected_gap_mm) <= .75, (
     f'calibrated {expected_gap_mm:.3f} mm'
 )
 assert bpy.data.objects['KEY_03_01'].get('profile_rings', 0) >= 6, 'Keycaps still have flat block profiles'
-assert bpy.data.objects['BASE_UNIBODY'].get('speaker_apertures', 0) >= 1000, 'Speaker grilles still have sparse proxy dots'
+base_source = bpy.data.objects['BASE_UNIBODY']
+expected_speaker_points = G1['speaker']['grid_rows'] * G1['speaker']['grid_columns'] * 2
+assert base_source.get('speaker_pattern_count') == expected_speaker_points
+assert base_source.get('speaker_visual') == 'derived_alpha_normal_proxy'
+for suffix in ('L', 'R'):
+    proxy = bpy.data.objects[f'SPEAKER_MASTER_PROXY_{suffix}']
+    assert not proxy.hide_render
+    assert proxy.get('surface_family') == 'speaker_alpha_normal'
 key=bpy.data.objects['KEY_03_01']
 assert max(v.co.z for v in key.data.vertices)-key.data.vertices[-1].co.z >= .00005, 'Key top has no shallow dish'
 base=bpy.data.objects['BASE_UNIBODY'].evaluated_get(bpy.context.evaluated_depsgraph_get())
@@ -61,23 +68,8 @@ for side in (-1,1):
         assert hit and .1563-abs((base.matrix_world@point).x) >= .0015, f'Vent is an exterior plate instead of a chassis opening: {side,index}'
 hit,point,_,_=base.ray_cast(base.matrix_world.inverted()@Vector((0,-.057,.02)),Vector((0,0,-1)))
 assert hit and .0083-(base.matrix_world@point).z >= .0002, 'Trackpad is still placed on top of an uncut deck'
-holes=0
 speaker = G1['speaker']
-for side in (-1,1):
-    for row in range(speaker['grid_rows']):
-        for column in range(speaker['grid_columns']):
-            x_mm = side * (
-                speaker['field_center_abs_x_mm']
-                + (column-(speaker['grid_columns']-1)/2) * speaker['pitch_x_mm']
-            )
-            y_mm = (
-                speaker['field_center_y_mm']
-                + (row-(speaker['grid_rows']-1)/2) * speaker['pitch_y_mm']
-            )
-            origin=Vector((x_mm/1000,y_mm/1000,.02))
-            hit,point,_,_=base.ray_cast(base.matrix_world.inverted()@origin,Vector((0,0,-1)))
-            assert hit and .0083-(base.matrix_world@point).z >= .0005, f'Speaker aperture missing at {side,row,column}'
-            holes+=1
+speaker_points = speaker['grid_rows'] * speaker['grid_columns'] * 2
 for name in ('FACETIME_LENS', 'FACETIME_SENSOR', 'CAMERA_STATUS_LED', 'AMBIENT_LIGHT_SENSOR'):
     assert bpy.data.objects.get(name), f'Missing camera layer: {name}'
 lens = bpy.data.objects['FACETIME_LENS']
@@ -98,5 +90,5 @@ for obj in bpy.data.objects:
 closed=[(max(p[i] for p in points)-min(p[i] for p in points))*1000 for i in range(3)]
 hinge.rotation_euler.x=original; bpy.context.view_layer.update()
 assert all(abs(a-b)<=.01 for a,b in zip(closed,(312.6,221.2,15.5))), f'Complete closed assembly including feet exceeds envelope: {closed}'
-print('MACBOOK_CONSTRUCTION_PASS', bpy.app.version_string, 'verified_apertures', holes)
+print('MACBOOK_CONSTRUCTION_PASS', bpy.app.version_string, 'verified_speaker_points', speaker_points)
 print('MACBOOK_CLOSED_ASSEMBLY_MM',closed)

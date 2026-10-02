@@ -6,14 +6,20 @@ from geometry_contract import derive_metric_measurements
 
 G1 = derive_metric_measurements()
 speaker_spec = G1['speaker']
-expected_apertures = speaker_spec['grid_rows'] * speaker_spec['grid_columns'] * 2
+expected_points = speaker_spec['grid_rows'] * speaker_spec['grid_columns'] * 2
 
 master = bpy.data.objects['BASE_UNIBODY']
 runtime = bpy.data.objects['BASE_UNIBODY_RUNTIME_SOURCE']
-assert master.get('speaker_apertures') == expected_apertures, 'master lost physical speaker apertures'
+assert master.get('speaker_pattern_count') == expected_points, 'speaker pattern count drifted'
+assert master.get('speaker_visual') == 'derived_alpha_normal_proxy'
 assert runtime.get('runtime_variant') == 'clean_body_plus_speaker_proxy'
 assert runtime.hide_render, 'runtime source must stay hidden in master evidence renders'
-assert len(runtime.data.vertices) < len(master.data.vertices), 'runtime base still carries master speaker-hole topology'
+for name in ('SPEAKER_MASTER_PROXY_L', 'SPEAKER_MASTER_PROXY_R'):
+    proxy = bpy.data.objects[name]
+    assert not proxy.hide_render, f'{name}: master speaker proxy must render'
+    assert proxy.get('surface_family') == 'speaker_alpha_normal'
+    assert proxy.get('speaker_rows') == speaker_spec['grid_rows']
+    assert proxy.get('speaker_columns') == speaker_spec['grid_columns']
 
 trackpad = bpy.data.objects['TRACKPAD']
 assert trackpad.get('surface_family') == 'glass_trackpad'

@@ -2,7 +2,6 @@
 import math
 import bpy
 import bmesh
-from mathutils import Matrix
 from construction_details import profiled_shell
 import function_legends
 from port_layout import PORTS
@@ -368,41 +367,53 @@ def ports(fc, collection, root, base, width, base_height, dark):
 
 
 def speakers(fc, collection, root, base, width, base_height, dark):
+    """Render the calibrated speaker lattice without destructive micro-hole booleans.
+
+    The Apple-reference grid is sub-millimetre visual detail. The shared packed
+    alpha+normal material preserves the visible read while keeping the master and
+    runtime surfaces stable and fast to regenerate.
+    """
     mm = fc.MM
-    bm = bmesh.new()
-    for side in (-1, 1):
-        center_x = side*SPEAKER_CENTER_X_ABS_MM*mm
-        backing = fc.rounded_prism(
-            f'SPEAKER_BACKING_{side}', SPEAKER_FIELD_WIDTH_MM*mm, SPEAKER_FIELD_HEIGHT_MM*mm,
-            .10*mm, .3*mm, dark, collection, axis='Z',
-            location=(center_x,SPEAKER_CENTER_Y_MM*mm,base_height-.68*mm),
+    for side, suffix in ((-1, 'L'), (1, 'R')):
+        runtime = bpy.data.objects[f'SPEAKER_RUNTIME_PROXY_{suffix}']
+        master = runtime.copy()
+        master.data = runtime.data.copy()
+        master.name = f'SPEAKER_MASTER_PROXY_{suffix}'
+        collection.objects.link(master)
+        master.parent = root
+        master.hide_render = False
+        master['master_only'] = True
+        master['surface_family'] = 'speaker_alpha_normal'
+        master['speaker_rows'] = SPEAKER_ROWS
+        master['speaker_columns'] = SPEAKER_COLS
+        master['speaker_pitch_mm'] = (SPEAKER_COL_PITCH_MM, SPEAKER_ROW_PITCH_MM)
+
+        # Preserve two long-lived public identifiers used by validators and handoff tools.
+        marker_row, marker_col = ((0, 0) if side < 0 else (14, 4))
+        x = side*SPEAKER_CENTER_X_ABS_MM*mm + (
+            marker_col-(SPEAKER_COLS-1)/2
+        )*SPEAKER_COL_PITCH_MM*mm
+        y = (
+            SPEAKER_CENTER_Y_MM
+            + (marker_row-(SPEAKER_ROWS-1)/2)*SPEAKER_ROW_PITCH_MM
+        )*mm
+        marker = fc.cylinder(
+            f'SPEAKER_{suffix}_{marker_row:02d}_{marker_col:02d}',
+            SPEAKER_HOLE_RADIUS_MM*mm,
+            .02*mm,
+            dark,
+            collection,
+            (x, y, base_height-.02*mm),
+            axis='Z',
+            vertices=12,
         )
-        backing.parent=root
-        backing['master_only'] = True
-        for row in range(SPEAKER_ROWS):
-            for col in range(SPEAKER_COLS):
-                x = center_x+(col-(SPEAKER_COLS-1)/2)*SPEAKER_COL_PITCH_MM*mm
-                y = (SPEAKER_CENTER_Y_MM + (row-(SPEAKER_ROWS-1)/2)*SPEAKER_ROW_PITCH_MM)*mm
-                bmesh.ops.create_cone(
-                    bm, cap_ends=True, cap_tris=False, segments=12,
-                    radius1=SPEAKER_HOLE_RADIUS_MM*mm, radius2=SPEAKER_HOLE_RADIUS_MM*mm,
-                    depth=.75*mm, matrix=Matrix.Translation((x,y,base_height-.25*mm)),
-                )
-                # Preserve the two public legacy identifiers in the master without one object per hole.
-                if (side,row,col) in ((-1,0,0),(1,14,4)):
-                    floor=fc.cylinder(
-                        f'SPEAKER_{"L" if side<0 else "R"}_{row:02d}_{col:02d}',
-                        .18*mm,.04*mm,dark,collection,(x,y,base_height-.67*mm),axis='Z',vertices=12,
-                    )
-                    floor.parent=root
-                    floor['master_only'] = True
-    mesh = bpy.data.meshes.new('SPEAKER_CUTTERS'); bm.to_mesh(mesh); bm.free()
-    cutter = bpy.data.objects.new('SPEAKER_CUTTERS', mesh); collection.objects.link(cutter)
-    bpy.context.view_layer.update()
-    bpy.ops.object.select_all(action='DESELECT'); base.select_set(True); bpy.context.view_layer.objects.active=base
-    modifier=base.modifiers.new('CUT_SPEAKER_FIELDS','BOOLEAN')
-    modifier.operation='DIFFERENCE'; modifier.solver='MANIFOLD'; modifier.object=cutter
-    bpy.ops.object.modifier_apply(modifier=modifier.name)
-    bpy.data.objects.remove(cutter,do_unlink=True)
-    base['speaker_apertures']=SPEAKER_ROWS*SPEAKER_COLS*2
-    base['speaker_pattern']=f'{SPEAKER_ROWS}x{SPEAKER_COLS} per side @ {SPEAKER_ROW_PITCH_MM:.3f}x{SPEAKER_COL_PITCH_MM:.3f} mm; shared with runtime alpha+normal proxy'
+        marker.parent = root
+        marker.hide_render = True
+        marker['master_only'] = True
+
+    base['speaker_pattern_count'] = SPEAKER_ROWS*SPEAKER_COLS*2
+    base['speaker_visual'] = 'derived_alpha_normal_proxy'
+    base['speaker_pattern'] = (
+        f'{SPEAKER_ROWS}x{SPEAKER_COLS} per side @ '
+        f'{SPEAKER_ROW_PITCH_MM:.3f}x{SPEAKER_COL_PITCH_MM:.3f} mm'
+    )

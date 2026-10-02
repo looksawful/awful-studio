@@ -40,20 +40,20 @@ for name, (side, y) in ports.items():
     depths[name] = round(depth, 4)
     assert depth >= 1.5, f'{name}: opening has no depth ({depth:.3f} mm)'
 speaker = derive_metric_measurements()['speaker']
-probe_col = (speaker['grid_columns'] - 1) // 2
-probe_row = (speaker['grid_rows'] - 1) // 2
-for side in (-1, 1):
-    x_mm = side * (
-        speaker['field_center_abs_x_mm']
-        + (probe_col - (speaker['grid_columns'] - 1) / 2) * speaker['pitch_x_mm']
-    )
-    y_mm = (
-        speaker['field_center_y_mm']
-        + (probe_row - (speaker['grid_rows'] - 1) / 2) * speaker['pitch_y_mm']
-    )
-    origin = base.matrix_world.inverted() @ Vector((x_mm / 1000, y_mm / 1000, .02))
-    hit, location, _, _ = base.ray_cast(origin, Vector((0, 0, -1)))
-    assert hit and .0083 - (base.matrix_world @ location).z >= .0003, 'Speaker perforations must recess into the deck'
+for suffix, side in (('L', -1), ('R', 1)):
+    proxy = bpy.data.objects[f'SPEAKER_MASTER_PROXY_{suffix}']
+    assert not proxy.hide_render, f'{suffix} speaker master proxy is hidden'
+    assert proxy.get('surface_family') == 'speaker_alpha_normal'
+    assert proxy.get('speaker_rows') == speaker['grid_rows']
+    assert proxy.get('speaker_columns') == speaker['grid_columns']
+    assert abs(proxy.location.x * 1000 - side * speaker['field_center_abs_x_mm']) <= .25
+    assert abs(proxy.location.y * 1000 - speaker['field_center_y_mm']) <= .25
+    assert abs(proxy.dimensions.x * 1000 - speaker['observed_width_mm']) <= .25
+    assert abs(proxy.dimensions.y * 1000 - speaker['observed_height_mm']) <= .25
+speaker_material = bpy.data.materials['MAT_SPEAKER_PROXY']
+speaker_nodes = speaker_material.node_tree.nodes
+assert speaker_nodes['SPEAKER_PROXY_RGBA'].image.packed_file
+assert speaker_nodes['SPEAKER_PROXY_NORMAL'].image.packed_file
 keys = [obj for obj in bpy.data.objects if obj.name.startswith('KEY_') and obj.type == 'MESH']
 assert len(keys) + 1 == 78, f'ANSI deck including Touch ID must have 78 keys, got {len(keys) + 1}'
 legends = [obj for obj in bpy.data.objects if obj.name.startswith('LEGEND_')]
