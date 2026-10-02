@@ -69,7 +69,7 @@ def main():
     args = parser.parse_args()
     revision, source_hashes = source_fingerprint(ROOT, SOURCE_FILES)
     source_commit = subprocess.check_output(
-        ['git', 'log', '-1', '--format=%H', '--', 'assets/device_mockups/macbook_pro_14/generate_low.py'],
+        ['git', 'rev-parse', 'HEAD'],
         cwd=ROOT, text=True,
     ).strip()
     generated = DEVICE / 'generated/macbook_pro_14_m5_low_v1_release.blend'
@@ -134,7 +134,10 @@ def main():
         'triangle_count': triangles,
         'required_nodes': sorted(required),
         'node_count': len(doc.get('nodes', [])),
+        'render_mesh_count': len(doc.get('meshes', [])),
         'material_count': len(doc.get('materials', [])),
+        'compat_bytes': compat.stat().st_size,
+        'meshopt_bytes': meshopt.stat().st_size,
         'runtime_bounds_mm': manifest['runtime_bounds_mm'],
     }
     artifacts = {

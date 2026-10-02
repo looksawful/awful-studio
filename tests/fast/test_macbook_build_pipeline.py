@@ -17,11 +17,12 @@ class MacBookBuildPipelineTests(TestCase):
                 raise RuntimeError('stop before packaging')
         with mock.patch.object(sys, 'argv', ['build', '--blender', 'blender']), \
              mock.patch.object(build, 'source_fingerprint', return_value=('a' * 64, {})), \
-             mock.patch.object(build.subprocess, 'check_output', return_value='commit'), \
+             mock.patch.object(build.subprocess, 'check_output', return_value='commit') as check_output, \
              mock.patch.object(build, 'update_loader_revision'), \
              mock.patch.object(build, 'run', side_effect=run):
             with self.assertRaisesRegex(RuntimeError, 'stop before packaging'):
                 build.main()
+        check_output.assert_called_once_with(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True)
         self.assertIn(str(build.DEVICE / 'generate_low.py'), calls[0])
         self.assertIn(str(build.DEVICE / 'validate_hinge_clearance.py'), calls[1])
         self.assertIn(str(build.DEVICE / 'validate_deck_ports.py'), calls[2])

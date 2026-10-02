@@ -31,9 +31,9 @@ class MacBookHybridDeckContractTests(unittest.TestCase):
         accessor = primitive['attributes']['POSITION']
         return self.doc['accessors'][accessor]['count']
 
-    def test_runtime_uses_clean_body_plus_baked_speaker_proxy(self):
+    def test_runtime_uses_clean_body_plus_derived_speaker_proxy(self):
         hybrid = self.manifest['hybrid_deck']
-        self.assertEqual(hybrid['speaker_runtime'], 'baked_alpha_normal_proxy')
+        self.assertEqual(hybrid['speaker_runtime'], 'derived_alpha_normal_proxy')
         self.assertLess(self.position_count('BASE_UNIBODY'), 30000)
         speaker_nodes = sorted(name for name in self.nodes if 'SPEAKER' in name)
         self.assertEqual(speaker_nodes, ['SPEAKER_RUNTIME_PROXY_L', 'SPEAKER_RUNTIME_PROXY_R'])
@@ -43,6 +43,12 @@ class MacBookHybridDeckContractTests(unittest.TestCase):
         self.assertIn('baseColorTexture', speaker['pbrMetallicRoughness'])
         self.assertIn('normalTexture', speaker)
         self.assertIn(speaker.get('alphaMode'), {'BLEND', 'MASK'})
+
+    def test_runtime_metrics_are_recorded_in_manifest(self):
+        qa = self.manifest['glb_qa']
+        self.assertGreater(qa['render_mesh_count'], 0)
+        self.assertGreater(qa['compat_bytes'], 0)
+        self.assertGreater(qa['meshopt_bytes'], 0)
 
     def test_trackpad_key_families_and_dark_material_hierarchy_ship(self):
         self.assertGreaterEqual(self.position_count('TRACKPAD'), 600)
