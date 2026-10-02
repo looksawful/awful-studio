@@ -13,14 +13,108 @@ import foundation_common as fc
 
 MM = fc.MM
 
-def reverse_prism_caps(obj):
+def outward_prism(*args, **kwargs):
+    """Correct the Y-axis basis reflection before booleans or bevel evaluation.
+
+    Keep this repair iPhone-local: other released device deliveries retain their
+    existing source fingerprints until their own production review.
+    """
+    obj = fc.rounded_prism(*args, **kwargs)
+    if kwargs.get("axis", "Y") == "Y":
+        bm = bmesh.new()
+        bm.from_mesh(obj.data)
+        bmesh.ops.reverse_faces(bm, faces=list(bm.faces))
+        bm.normal_update()
+        bm.to_mesh(obj.data)
+        bm.free()
+        obj.data.update()
+    return obj
+
+def smooth_sharp_boundaries(obj):
+    # Booleans reorder faces. Polygon indices cannot identify caps or rails.
+    # Keep planar rails separate from aperture walls and bevel transitions.
+    for poly in obj.data.polygons:
+        poly.use_smooth = True
+    obj.data.set_sharp_from_angle(angle=math.radians(30.0))
+
+
+def apply_runtime_bevel(obj, width, segments=4):
+    bevel = obj.modifiers.get("EDGE_BEVEL")
+    if bevel is None:
+        raise RuntimeError(f"{obj.name} is missing EDGE_BEVEL")
+    bevel.width = width
+    bevel.segments = segments
+    bevel.harden_normals = False
+    bpy.ops.object.select_all(action="DESELECT")
+    bpy.context.view_layer.objects.active = obj
+    obj.select_set(True)
+    bpy.ops.object.modifier_apply(modifier=bevel.name)
+    obj.select_set(False)
+    smooth_sharp_boundaries(obj)
+
+
+APPLE_CORNER_EXTENT = 19.23 * MM
+APPLE_CORNER_BEZIER = (
+    (0.00 * MM, 19.23 * MM),
+    (0.00 * MM, 3.00 * MM),
+    (0.87 * MM, 7.88 * MM),
+    (7.88 * MM, 0.87 * MM),
+    (3.00 * MM, 0.00 * MM),
+    (19.23 * MM, 0.00 * MM),
+)
+
+def iphone17_corner_profile(t):
+    omt = 1.0 - t
+    weights = (
+        omt**5,
+        5.0 * omt**4 * t,
+        10.0 * omt**3 * t**2,
+        10.0 * omt**2 * t**3,
+        5.0 * omt * t**4,
+        t**5,
+    )
+    return tuple(
+        sum(weight * point[axis] for weight, point in zip(weights, APPLE_CORNER_BEZIER))
+        for axis in (0, 1)
+    )
+
+def iphone17_body_outline(width, height, segments=48):
+    half_w, half_h = width * 0.5, height * 0.5
+    quarter = [iphone17_corner_profile(step / segments) for step in range(segments + 1)]
+    return (
+        [(half_w - dx, half_h - dy) for dx, dy in quarter]
+        + [(-half_w + dx, half_h - dy) for dx, dy in reversed(quarter)]
+        + [(-half_w + dx, -half_h + dy) for dx, dy in quarter]
+        + [(half_w - dx, -half_h + dy) for dx, dy in reversed(quarter)]
+    )
+
+def iphone17_body_prism(name, width, height, depth, material, collection, segments=48):
+    outline = iphone17_body_outline(width, height, segments)
+    count = len(outline)
+    verts = (
+        [(x, -depth * 0.5, z) for x, z in outline]
+        + [(x, depth * 0.5, z) for x, z in outline]
+    )
+    faces = [tuple(reversed(range(count))), tuple(range(count, count * 2))]
+    for index in range(count):
+        next_index = (index + 1) % count
+        faces.append((index, next_index, count + next_index, count + index))
+
+    mesh = bpy.data.meshes.new(f"{name}_MESH")
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    collection.objects.link(obj)
+    obj.data.materials.append(material)
+
     bm = bmesh.new()
     bm.from_mesh(obj.data)
-    bm.faces.ensure_lookup_table()
-    bmesh.ops.reverse_faces(bm, faces=[bm.faces[0], bm.faces[1]])
+    bmesh.ops.reverse_faces(bm, faces=list(bm.faces))
+    bm.normal_update()
     bm.to_mesh(obj.data)
     bm.free()
     obj.data.update()
+    return obj
 
 W, H, D = 71.45 * MM, 149.61 * MM, 7.95 * MM
 BODY_R = 13.6 * MM
@@ -74,18 +168,55 @@ back_bsdf.inputs["Coat Roughness"].default_value = 0.09
 if back_bsdf.inputs.get("Specular IOR Level"):
     back_bsdf.inputs["Specular IOR Level"].default_value = 0.18
 black = fc.make_material("MAT_OPTICS_BLACK", (0.0008, 0.0010, 0.0014), 0.0, 0.07)
-island_mat = fc.make_material("MAT_DYNAMIC_ISLAND", (0.00001, 0.000012, 0.000016), 0.0, 0.11)
-island_bsdf = island_mat.node_tree.nodes.get("Principled BSDF")
-island_bsdf.inputs["Coat Weight"].default_value = 0.42
-island_bsdf.inputs["Coat Roughness"].default_value = 0.025
-front_optic = fc.make_material("MAT_FRONT_OPTIC", (0.055, 0.072, 0.105), 0.0, 0.075)
+grille_mat = fc.make_material("MAT_APERTURE_GRILLE", (0.0010, 0.0012, 0.0016), 0.0, 0.82)
+# A fine woven grille is surface detail; the surrounding recess remains geometry.
+# Pack the tangent-space normal so both Blender and GLB use the same microtexture.
+grille_image = bpy.data.images.new("aperture_weave_normal_128", width=128, height=128)
+grille_image.colorspace_settings.name = "Non-Color"
+pixels = []
+for row in range(128):
+    for column in range(128):
+        nx = 0.22 * math.sin(2 * math.pi * column / 8)
+        ny = 0.22 * math.sin(2 * math.pi * row / 8)
+        length = math.sqrt(nx * nx + ny * ny + 1)
+        pixels.extend((0.5 + nx / length * 0.5, 0.5 + ny / length * 0.5, 0.5 + 0.5 / length, 1.0))
+grille_image.pixels.foreach_set(pixels)
+grille_image.pack()
+grille_tex = grille_mat.node_tree.nodes.new("ShaderNodeTexImage")
+grille_tex.image = grille_image
+grille_normal = grille_mat.node_tree.nodes.new("ShaderNodeNormalMap")
+grille_normal.inputs["Strength"].default_value = 0.45
+grille_mat.node_tree.links.new(grille_tex.outputs["Color"], grille_normal.inputs["Color"])
+grille_mat.node_tree.links.new(grille_normal.outputs["Normal"], grille_mat.node_tree.nodes.get("Principled BSDF").inputs["Normal"])
+under_glass_mat = fc.make_material("MAT_UNDER_GLASS_BLACK", (0.000001, 0.000001, 0.000001), 0.0, 1.0)
+under_glass_bsdf = under_glass_mat.node_tree.nodes.get("Principled BSDF")
+if under_glass_bsdf.inputs.get("Specular IOR Level"):
+    under_glass_bsdf.inputs["Specular IOR Level"].default_value = 0.0
+
+camera_control_mat = fc.make_material("MAT_CAMERA_CONTROL_GLASS", (0.00008, 0.00009, 0.00012), 0.0, 0.16)
+camera_control_bsdf = camera_control_mat.node_tree.nodes.get("Principled BSDF")
+camera_control_bsdf.inputs["Coat Weight"].default_value = 0.22
+camera_control_bsdf.inputs["Coat Roughness"].default_value = 0.08
+
+front_optic = fc.make_material("MAT_FRONT_OPTIC", (0.002, 0.004, 0.009), 0.0, 0.20)
 front_bsdf = front_optic.node_tree.nodes.get("Principled BSDF")
-front_bsdf.inputs["Coat Weight"].default_value = 0.58
-front_bsdf.inputs["Coat Roughness"].default_value = 0.012
-sensor_pill_mat = fc.make_material("MAT_FRONT_SENSOR_PILL", (0.00005, 0.00006, 0.00009), 0.0, 0.19)
-sensor_pill_bsdf = sensor_pill_mat.node_tree.nodes.get("Principled BSDF")
-sensor_pill_bsdf.inputs["Coat Weight"].default_value = 0.20
-sensor_pill_bsdf.inputs["Coat Roughness"].default_value = 0.075
+front_bsdf.inputs["Coat Weight"].default_value = 0.18
+front_bsdf.inputs["Coat Roughness"].default_value = 0.08
+front_bsdf.inputs["Specular IOR Level"].default_value = 0.15
+front_detail_tex = front_optic.node_tree.nodes.new("ShaderNodeTexImage")
+front_detail_tex.image = bpy.data.images.load(
+    os.path.join(HERE, "reference", "front_camera_detail_mask.png"),
+    check_existing=True,
+)
+front_detail_tex.image.colorspace_settings.name = "sRGB"
+front_detail_tex.image.pack()
+front_detail_mix = front_optic.node_tree.nodes.new("ShaderNodeMix")
+front_detail_mix.data_type = "RGBA"
+front_detail_mix.blend_type = "MULTIPLY"
+front_detail_mix.inputs[0].default_value = 1.0
+front_detail_mix.inputs[6].default_value = (0.002, 0.004, 0.009, 1.0)
+front_optic.node_tree.links.new(front_detail_tex.outputs["Color"], front_detail_mix.inputs[7])
+front_optic.node_tree.links.new(front_detail_mix.outputs["Result"], front_bsdf.inputs["Base Color"])
 lens_glass = fc.make_material("MAT_LENS_GLASS", (0.00012, 0.00016, 0.00024), 0.0, 0.020)
 lbsdf = lens_glass.node_tree.nodes.get("Principled BSDF")
 lbsdf.inputs["Coat Weight"].default_value = 0.62
@@ -93,17 +224,27 @@ lbsdf.inputs["Coat Roughness"].default_value = 0.008
 gap_mat = fc.make_material("MAT_ASSEMBLY_GAP", (0.0005, 0.0006, 0.0008), 0.0, 0.32)
 bezel_mat = fc.make_material("MAT_DISPLAY_BEZEL", (0.001, 0.0012, 0.0015), 0.0, 0.10)
 screen_mat = fc.make_material("MAT_SCREEN_CONTENT", (0.0038, 0.0052, 0.0078), 0.0, 0.085)
-screen_texture_path = os.path.join(HERE, "reference", "ios26_home_screen_1206x2622.png")
+screen_texture_path = os.path.join(HERE, "reference", "ios26_home_screen_clean_1206x2622.png")
 screen_tex = screen_mat.node_tree.nodes.new("ShaderNodeTexImage")
 screen_tex.image = bpy.data.images.load(screen_texture_path, check_existing=True)
 screen_tex.image.colorspace_settings.name = "sRGB"
 screen_tex.image.pack()
 screen_bsdf = screen_mat.node_tree.nodes.get("Principled BSDF")
-screen_mat.node_tree.links.new(screen_tex.outputs["Color"], screen_bsdf.inputs["Base Color"])
+screen_bsdf.inputs["Base Color"].default_value = (0, 0, 0, 1)
+screen_bsdf.inputs["Roughness"].default_value = 1.0
+screen_bsdf.inputs["Specular IOR Level"].default_value = 0.0
 screen_mat.node_tree.links.new(screen_tex.outputs["Color"], screen_bsdf.inputs["Emission Color"])
 screen_bsdf.inputs["Emission Strength"].default_value = 0.85
 optic_glass = fc.make_material("MAT_OPTICAL_GLASS", (0.0010, 0.0014, 0.0024), 0.0, 0.030)
-flash_mat = fc.make_material("MAT_FLASH", (0.86, 0.80, 0.62), 0.0, 0.14)
+flash_mat = fc.make_material("MAT_FLASH", (1.0, 1.0, 1.0), 0.0, 0.32)
+flash_tex = flash_mat.node_tree.nodes.new("ShaderNodeTexImage")
+flash_tex.image = bpy.data.images.load(os.path.join(HERE, "reference", "flash_diffuser_v30.png"), check_existing=True)
+flash_tex.image.colorspace_settings.name = "sRGB"
+flash_tex.image.pack()
+flash_bsdf = flash_mat.node_tree.nodes.get("Principled BSDF")
+flash_mat.node_tree.links.new(flash_tex.outputs["Color"], flash_bsdf.inputs["Base Color"])
+flash_bsdf.inputs["Coat Weight"].default_value = 0.25
+flash_bsdf.inputs["Coat Roughness"].default_value = 0.10
 screw_mat = fc.make_material("MAT_FASTENER", (0.10, 0.11, 0.13), 0.92, 0.24)
 
 glass = fc.make_material("MAT_DISPLAY_GLASS", (0.0015, 0.0020, 0.0030), 0.0, 0.045)
@@ -121,47 +262,76 @@ gbsdf.inputs["Coat Weight"].default_value = 0.18
 gbsdf.inputs["Coat Roughness"].default_value = 0.028
 
 
-body = fc.rounded_prism("BODY_ALUMINUM", W, H, METAL_D, BODY_R, metal, body_c, axis="Y", outline_segments=48)
+body = iphone17_body_prism("BODY_ALUMINUM", W, H, METAL_D, metal, body_c, segments=48)
 front_y = -(D * 0.5 - GLASS_T * 0.5)
 front_surface = -D * 0.5
 back_y = D * 0.5 - GLASS_T * 0.5
 
 # Official Apple drawing: cover glass 69.45 x 147.61 mm, active area 66.57 x 144.79 mm.
-pocket = fc.rounded_prism("DISPLAY_POCKET_CUTTER", COVER_W + 0.12*MM, COVER_H + 0.12*MM, 0.72*MM,
+pocket = outward_prism("DISPLAY_POCKET_CUTTER", COVER_W + 0.12*MM, COVER_H + 0.12*MM, 0.72*MM,
                           COVER_R + 0.06*MM, None, detail_c, axis="Y",
                           location=(0, -METAL_D*0.5 + 0.16*MM, 0), outline_segments=48)
 fc.boolean_difference(body, pocket, name="CUT_DISPLAY_POCKET")
 
-back_seat = fc.rounded_prism("BACK_GLASS_SEAT", COVER_W + 0.12*MM, COVER_H + 0.12*MM, 0.07*MM,
+back_seat = outward_prism("BACK_GLASS_SEAT", COVER_W + 0.12*MM, COVER_H + 0.12*MM, 0.07*MM,
                              COVER_R + 0.06*MM, gap_mat, body_c, axis="Y",
                              location=(0, METAL_D*0.5 + 0.012*MM, 0), outline_segments=48)
 back_seat.hide_render = True
-back_glass = fc.rounded_prism("BACK_GLASS", COVER_W, COVER_H, GLASS_T, COVER_R,
+back_glass = outward_prism("BACK_GLASS", COVER_W, COVER_H, GLASS_T, COVER_R,
                               back_mat, body_c, axis="Y", location=(0, back_y, 0),
                               edge_bevel=0.0, outline_segments=48)
-reverse_prism_caps(back_glass)
 
-front_seat = fc.rounded_prism("DISPLAY_GLASS_SEAT", COVER_W + 0.10*MM, COVER_H + 0.10*MM, 0.07*MM,
+front_seat = outward_prism("DISPLAY_GLASS_SEAT", COVER_W + 0.10*MM, COVER_H + 0.10*MM, 0.07*MM,
                               COVER_R + 0.05*MM, gap_mat, screen_c, axis="Y",
                               location=(0, -METAL_D*0.5 - 0.010*MM, 0), outline_segments=48)
-bezel = fc.rounded_prism("DISPLAY_BEZEL", SCREEN_W + 0.68*MM, SCREEN_H + 0.68*MM, 0.08*MM,
+bezel = outward_prism("DISPLAY_BEZEL", SCREEN_W + 0.68*MM, SCREEN_H + 0.68*MM, 0.08*MM,
                          SCREEN_R + 0.32*MM, bezel_mat, screen_c, axis="Y",
                          location=(0, front_y + 0.08*MM, 0), outline_segments=48)
 
-screen_glass = fc.rounded_prism("SCREEN_GLASS", COVER_W, COVER_H, GLASS_T, COVER_R,
+screen_glass = outward_prism("SCREEN_GLASS", COVER_W, COVER_H, GLASS_T, COVER_R,
                                 glass, screen_c, axis="Y", location=(0, front_y, 0),
                                 edge_bevel=0.00006, outline_segments=48)
-active_cut = fc.rounded_prism("SCREEN_ACTIVE_CUTTER", SCREEN_W + 0.12*MM, SCREEN_H + 0.12*MM,
+active_cut = outward_prism("SCREEN_ACTIVE_CUTTER", SCREEN_W + 0.12*MM, SCREEN_H + 0.12*MM,
                               GLASS_T + 0.25*MM, SCREEN_R + 0.06*MM, None, detail_c, axis="Y",
                               location=(0, front_y, 0), outline_segments=48)
 fc.boolean_difference(screen_glass, active_cut, name="CUT_ACTIVE_AREA")
 
-screen_content = fc.rounded_prism("SCREEN_CONTENT", SCREEN_W, SCREEN_H, GLASS_T - 0.025*MM,
+front_hardware_z = H*0.5 - 7.79*MM
+cam_x = 6.72*MM
+
+screen_content = outward_prism("SCREEN_CONTENT", SCREEN_W, SCREEN_H, GLASS_T - 0.025*MM,
                                   SCREEN_R, screen_mat, screen_c, axis="Y",
                                   location=(0, front_y + 0.010*MM, 0), edge_bevel=0.00004,
                                   outline_segments=48)
+
+# Physical front hardware occupies real holes in the emissive display instead of
+# competing with near-coplanar screen fragments in the depth buffer.
+sensor_screen_cut = outward_prism("FRONT_SENSOR_SCREEN_CUTTER", 7.08*MM, 2.28*MM,
+                                  GLASS_T + 0.25*MM, 1.14*MM, None, detail_c, axis="Y",
+                                  location=(-4.15*MM, front_y + 0.010*MM, front_hardware_z),
+                                  outline_segments=64)
+fc.boolean_difference(screen_content, sensor_screen_cut, name="CUT_FRONT_SENSOR_SCREEN")
+
+camera_screen_cut = fc.cylinder("FRONT_CAMERA_SCREEN_CUTTER", 1.14*MM,
+                                GLASS_T + 0.25*MM, None, detail_c,
+                                (cam_x, front_y + 0.010*MM, front_hardware_z),
+                                axis="Y", vertices=128)
+fc.boolean_difference(screen_content, camera_screen_cut, name="CUT_FRONT_CAMERA_SCREEN")
+
 # Planar UVs map the real raster screen image to the active display surface.
+# Boolean cutters can leave empty material slots behind; normalize the screen to exactly
+# two explicit slots before assigning front faces vs cut/edge walls.
+screen_edge_mat = fc.make_material("MAT_SCREEN_EDGE", (0.001, 0.0012, 0.0015), 0.0, 0.36)
+screen_content.data.materials.clear()
+screen_content.data.materials.append(screen_mat)
+screen_content.data.materials.append(screen_edge_mat)
+for polygon in screen_content.data.polygons:
+    # In Blender the display faces -Y; the export maps that to Three.js +Z.
+    polygon.material_index = 0 if polygon.normal.y < -0.995 else 1
+while screen_content.data.uv_layers:
+    screen_content.data.uv_layers.remove(screen_content.data.uv_layers[0])
 uv = screen_content.data.uv_layers.new(name="UVMap")
+screen_content.data.uv_layers.active = uv
 for loop in screen_content.data.loops:
     co = screen_content.data.vertices[loop.vertex_index].co
     uv.data[loop.index].uv = ((co.x / SCREEN_W) + 0.5, (co.z / SCREEN_H) + 0.5)
@@ -187,51 +357,58 @@ for poly in back_glass.data.polygons:
 hard_surface_glass(screen_glass)
 # Screen material doubles as the clean glossy active glass surface for the current publishable LOW asset.
 sbsdf = screen_mat.node_tree.nodes.get("Principled BSDF")
-sbsdf.inputs["Coat Weight"].default_value = 0.16
+sbsdf.inputs["Coat Weight"].default_value = 0.0
 sbsdf.inputs["Coat Roughness"].default_value = 0.035
 
-# The visible Dynamic Island follows the official screen raster. Apple's Detail Q dimensions
-# describe the independent front camera / sensor keepout, not the visible silhouette.
-island_visual_z = H*0.5 - 6.14*MM
-front_hardware_z = H*0.5 - 7.79*MM
-island_y = front_surface - 0.012*MM
-detail_y = front_surface - 0.024*MM
-island = fc.rounded_prism("DYNAMIC_ISLAND", 21.47*MM, 6.46*MM, 0.012*MM, 3.23*MM, island_mat, detail_c, axis="Y", location=(0, island_y, island_visual_z), outline_segments=96)
-fc.rounded_prism("FRONT_SENSOR_PILL", 7.10*MM, 2.30*MM, 0.016*MM, 1.15*MM, sensor_pill_mat, detail_c, axis="Y", location=(-4.15*MM, detail_y, front_hardware_z), outline_segments=64)
-cam_x = 5.05*MM
-fc.cylinder("FRONT_CAMERA_RING", 1.15*MM, 0.014*MM, metal_dark, detail_c, (cam_x, detail_y, front_hardware_z), axis="Y", vertices=128)
-fc.cylinder("FRONT_CAMERA_GLASS", 0.84*MM, 0.012*MM, front_optic, detail_c, (cam_x, detail_y - 0.004*MM, front_hardware_z), axis="Y", vertices=128)
-fc.cylinder("FRONT_CAMERA_INNER", 0.52*MM, 0.010*MM, black, detail_c, (cam_x, detail_y - 0.010*MM, front_hardware_z), axis="Y", vertices=96)
-fc.cylinder("FRONT_CAMERA_IRIS", 0.28*MM, 0.008*MM, front_optic, detail_c, (cam_x, detail_y - 0.016*MM, front_hardware_z), axis="Y", vertices=80)
-fc.cylinder("FRONT_CAMERA_PUPIL", 0.12*MM, 0.006*MM, black, detail_c, (cam_x, detail_y - 0.021*MM, front_hardware_z), axis="Y", vertices=64)
+# The physical masks sit behind the display front plane and are revealed only through
+# the two screen cutouts. The orange privacy indicator remains screen-state artwork.
+screen_front_y = (front_y + 0.010*MM) - (GLASS_T - 0.025*MM) * 0.5
+front_hardware_y = screen_front_y + 0.034*MM
+front_optics_y = front_hardware_y + 0.040*MM
+outward_prism("FRONT_SENSOR_MASK", 7.10*MM, 2.30*MM, 0.008*MM, 1.15*MM,
+              under_glass_mat, detail_c, axis="Y",
+              location=(-4.15*MM, front_hardware_y, front_hardware_z), outline_segments=64)
+fc.cylinder("FRONT_CAMERA_MASK", 1.15*MM, 0.008*MM, under_glass_mat, detail_c,
+            (cam_x, front_hardware_y, front_hardware_z), axis="Y", vertices=128)
+fc.cylinder("FRONT_CAMERA_GLASS", 0.84*MM, 0.006*MM, front_optic, detail_c,
+            (cam_x, front_optics_y, front_hardware_z), axis="Y", vertices=128)
+fc.cylinder("FRONT_CAMERA_INNER", 0.52*MM, 0.005*MM, black, detail_c,
+            (cam_x, front_hardware_y + 0.055*MM, front_hardware_z), axis="Y", vertices=96)
+fc.cylinder("FRONT_CAMERA_IRIS", 0.28*MM, 0.004*MM, front_optic, detail_c,
+            (cam_x, front_hardware_y + 0.070*MM, front_hardware_z), axis="Y", vertices=80)
+fc.cylinder("FRONT_CAMERA_PUPIL", 0.12*MM, 0.003*MM, black, detail_c,
+            (cam_x, front_hardware_y + 0.085*MM, front_hardware_z), axis="Y", vertices=64)
 receiver = fc.rounded_cube("FRONT_RECEIVER_MIC", (14.02*MM, 0.020*MM, 0.30*MM), 0.14*MM, black, detail_c, location=(0, front_surface - 0.012*MM, H*0.5 - 0.62*MM))
 
 housing_x = CAM_CENTER_X
 housing_z = CAM_CENTER_Z
 # Detail D is a pair of concentric vertical capsules, not a small-radius rounded rectangle.
-housing_seat = fc.rounded_prism("CAMERA_HOUSING_SEAT", CAM_OUTER_W, CAM_OUTER_H, 0.30*MM, CAM_OUTER_W*0.5, back_mat, detail_c, axis="Y", location=(housing_x, back_y + GLASS_T*0.5 + 0.11*MM, housing_z), edge_bevel=0.00010, outline_segments=128)
-reverse_prism_caps(housing_seat)
-housing_seat_bevel = housing_seat.modifiers.get("EDGE_BEVEL")
-if housing_seat_bevel:
-    housing_seat_bevel.harden_normals = True
-for poly in housing_seat.data.polygons:
-    poly.use_smooth = False
+housing_seat = outward_prism("CAMERA_HOUSING_SEAT", CAM_OUTER_W, CAM_OUTER_H, 0.30*MM, CAM_OUTER_W*0.5, back_mat, detail_c, axis="Y", location=(housing_x, back_y + GLASS_T*0.5 + 0.11*MM, housing_z), edge_bevel=0.00010, outline_segments=128)
+apply_runtime_bevel(housing_seat, 0.11*MM, segments=4)
 housing_seat_wn = housing_seat.modifiers.new("WEIGHTED_NORMAL", "WEIGHTED_NORMAL")
 housing_seat_wn.keep_sharp = True
 housing_seat_wn.weight = 50
-housing = fc.rounded_prism("CAMERA_HOUSING", CAM_INNER_W, CAM_INNER_H, 0.72*MM, CAM_INNER_W*0.5, camera_housing_mat, detail_c, axis="Y", location=(housing_x, back_y + GLASS_T*0.5 + 0.36*MM, housing_z), edge_bevel=0.00018, outline_segments=128)
-reverse_prism_caps(housing)
+housing = outward_prism("CAMERA_HOUSING", CAM_INNER_W, CAM_INNER_H, 0.72*MM, CAM_INNER_W*0.5, camera_housing_mat, detail_c, axis="Y", location=(housing_x, back_y + GLASS_T*0.5 + 0.36*MM, housing_z), edge_bevel=0.00018, outline_segments=128)
+apply_runtime_bevel(housing, 0.24*MM, segments=4)
 for idx,(x_mm,z_mm) in enumerate((((W*0.5-CAM_CENTER_X_REF)/MM,(H*0.5-13.62*MM)/MM),((W*0.5-CAM_CENTER_X_REF)/MM,(H*0.5-31.34*MM)/MM)),1):
     seat=fc.cylinder(f"CAMERA_{idx}_SEAT",8.18*MM,0.14*MM,gap_mat,detail_c,(x_mm*MM,D*0.5+0.88*MM,z_mm*MM),axis="Y",vertices=192); seat.hide_render=True
-    fc.cylinder(f"CAMERA_{idx}_RING",8.00*MM,0.36*MM,metal_dark,detail_c,(x_mm*MM,D*0.5+1.09*MM,z_mm*MM),axis="Y",vertices=192)
-    fc.cylinder(f"CAMERA_{idx}_BEVEL",7.44*MM,0.18*MM,metal,detail_c,(x_mm*MM,D*0.5+1.36*MM,z_mm*MM),axis="Y",vertices=192)
-    fc.cylinder(f"CAMERA_{idx}_GLASS",6.81*MM,0.16*MM,lens_glass,detail_c,(x_mm*MM,D*0.5+1.53*MM,z_mm*MM),axis="Y",vertices=192)
+    ring = fc.cylinder(f"CAMERA_{idx}_RING",8.00*MM,0.36*MM,metal_dark,detail_c,(x_mm*MM,D*0.5+1.09*MM,z_mm*MM),axis="Y",vertices=192)
+    ring_bevel = fc.cylinder(f"CAMERA_{idx}_BEVEL",7.44*MM,0.18*MM,metal,detail_c,(x_mm*MM,D*0.5+1.36*MM,z_mm*MM),axis="Y",vertices=192)
+    camera_glass = fc.cylinder(f"CAMERA_{idx}_GLASS",6.81*MM,0.16*MM,lens_glass,detail_c,(x_mm*MM,D*0.5+1.53*MM,z_mm*MM),axis="Y",vertices=192)
+    apply_runtime_bevel(ring, 0.13*MM, segments=4)
+    apply_runtime_bevel(ring_bevel, 0.07*MM, segments=3)
+    apply_runtime_bevel(camera_glass, 0.06*MM, segments=3)
     fc.cylinder(f"CAMERA_{idx}_INNER",5.20*MM,0.09*MM,black,detail_c,(x_mm*MM,D*0.5+1.65*MM,z_mm*MM),axis="Y",vertices=160)
     fc.cylinder(f"CAMERA_{idx}_IRIS",3.00*MM,0.070*MM,lens_glass,detail_c,(x_mm*MM,D*0.5+1.73*MM,z_mm*MM),axis="Y",vertices=128)
     fc.cylinder(f"CAMERA_{idx}_PUPIL",1.18*MM,0.045*MM,black,detail_c,(x_mm*MM,D*0.5+1.79*MM,z_mm*MM),axis="Y",vertices=96)
 fc.cylinder("REAR_MIC",0.50*MM,0.14*MM,black,detail_c,(13.05*MM,D*0.5+1.02*MM,52.30*MM),axis="Y",vertices=80)
 fc.cylinder("FLASH_RING",3.30*MM,0.12*MM,metal_dark,detail_c,((W*0.5-30.41*MM),D*0.5+0.30*MM,CAM_CENTER_Z),axis="Y",vertices=128)
-fc.cylinder("FLASH",3.14*MM,0.14*MM,flash_mat,detail_c,((W*0.5-30.41*MM),D*0.5+0.43*MM,CAM_CENTER_Z),axis="Y",vertices=128)
+flash = fc.cylinder("FLASH",3.14*MM,0.14*MM,flash_mat,detail_c,((W*0.5-30.41*MM),D*0.5+0.43*MM,CAM_CENTER_Z),axis="Y",vertices=128)
+# Cylinder mesh stays in local XY; object rotation puts its face on the rear Y plane.
+flash_uv = flash.data.uv_layers.active or flash.data.uv_layers.new(name="UVMap")
+for loop in flash.data.loops:
+    co = flash.data.vertices[loop.vertex_index].co
+    flash_uv.data[loop.index].uv = (co.x / (6.28*MM) + 0.5, co.y / (6.28*MM) + 0.5)
 
 # Apple mark decal. Bounding box and vertical datum follow the Apple dimensional drawing.
 logo_img_path = os.path.join(HERE, "reference", "apple_logo_glb_mask.png")
@@ -297,14 +474,14 @@ def physical_side_button(name, edge, z_mm, length_mm, face_width_mm=2.56, protru
     fc.add_bevel(button,0.025*MM,segments=3)
     return button
 
-def camera_control(edge,z_mm,length_mm=17.5,face_width_mm=3.00,protrusion_mm=0.06):
-    return physical_side_button("CAMERA_CONTROL",edge,z_mm,length_mm,face_width_mm,protrusion_mm,metal_dark)
+def camera_control(edge,z_mm,length_mm=17.5,face_width_mm=3.00,recess_mm=0.10):
+    return physical_side_button("CAMERA_CONTROL",edge,z_mm,length_mm,face_width_mm,-recess_mm,camera_control_mat)
 
 physical_side_button("ACTION_BUTTON","LEFT",40.72,11.6,2.56,0.45)
 physical_side_button("VOL_UP","LEFT",26.57,9.2,2.56,0.45)
 physical_side_button("VOL_DOWN","LEFT",12.37,9.2,2.56,0.45)
 physical_side_button("SIDE_BUTTON","RIGHT",19.48,17.7,2.56,0.45)
-camera_control("RIGHT",-23.40,17.5,3.00,0.06)
+camera_control("RIGHT",-23.40,17.5,3.00,0.10)
 for side, edge in (("L", "LEFT"), ("R", "RIGHT")):
     for z_mm in (55.0, -55.0):
         strip = fc.rounded_cube(f"ANTENNA_SIDE_{side}_{int(z_mm)}", (0.10*MM, 1.02*MM, 4.3*MM),
@@ -315,18 +492,19 @@ usb_cutter = fc.rounded_cube("USB_C_CUTTER", (9.05*MM, 3.00*MM, 1.82*MM), 0.91*M
 fc.place_on_rounded_edge(usb_cutter, W, H, BODY_R, "BOTTOM", 0.0, outward=-0.70*MM, local_normal=(0,0,1))
 fc.boolean_difference(body, usb_cutter, name="CUT_USB_C")
 boolean_cuts.append("USB_C")
-usb_cavity = fc.rounded_cube("USB_C_CAVITY", (8.45*MM, 2.38*MM, 0.66*MM), 0.72*MM, black, detail_c)
-fc.place_on_rounded_edge(usb_cavity, W, H, BODY_R, "BOTTOM", 0.0, outward=-0.67*MM, local_normal=(0,0,1))
+usb_cavity = fc.rounded_cube("USB_C_CAVITY", (8.45*MM, 2.38*MM, 0.12*MM), 0.04*MM, grille_mat, detail_c)
+fc.place_on_rounded_edge(usb_cavity, W, H, BODY_R, "BOTTOM", 0.0, outward=-1.40*MM, local_normal=(0,0,1))
 usb_tongue = fc.rounded_cube("USB_C_TONGUE", (5.25*MM, 0.48*MM, 0.18*MM), 0.08*MM, metal_dark, detail_c)
-fc.place_on_rounded_edge(usb_tongue, W, H, BODY_R, "BOTTOM", 0.0, outward=-0.49*MM, local_normal=(0,0,1))
+fc.place_on_rounded_edge(usb_tongue, W, H, BODY_R, "BOTTOM", 0.0, outward=-0.80*MM, local_normal=(0,0,1))
 
 def bottom_aperture(name, x_mm):
     cutter = fc.cylinder(f"{name}_CUTTER", 0.675*MM, 1.80*MM, None, detail_c, vertices=40)
     fc.place_on_rounded_edge(cutter, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.52*MM, local_normal=(0,0,1))
     fc.boolean_difference(body, cutter, name=f"CUT_{name}")
     boolean_cuts.append(name)
-    cavity = fc.cylinder(name, 0.56*MM, 0.50*MM, black, detail_c, vertices=40)
-    fc.place_on_rounded_edge(cavity, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.45*MM, local_normal=(0,0,1))
+    cavity = fc.cylinder(name, 0.64*MM, 0.12*MM, grille_mat, detail_c, vertices=40)
+    fc.place_on_rounded_edge(cavity, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.98*MM, local_normal=(0,0,1))
+    smooth_sharp_boundaries(cavity)
 
 # Apple drawing: 3 microphone ports on the left and 6 speaker ports on the right, each 1.35 mm diameter.
 for idx, x_mm in enumerate((-18.2, -15.1, -12.0), 1):
@@ -344,16 +522,14 @@ for side, x_mm in (("L", -7.15), ("R", 7.15)):
 
 bev = fc.add_bevel(body, 0.00022, segments=4)
 bev.harden_normals = True
-for poly in body.data.polygons[2:]:
-    poly.use_smooth = True
+smooth_sharp_boundaries(body)
 body_wn = body.modifiers.new("WEIGHTED_NORMAL", "WEIGHTED_NORMAL")
 body_wn.keep_sharp = True
 body_wn.weight = 50
 housing_bevel = housing.modifiers.get("EDGE_BEVEL")
 if housing_bevel:
     housing_bevel.harden_normals = True
-for poly in housing.data.polygons:
-    poly.use_smooth = False
+smooth_sharp_boundaries(housing)
 housing_wn = housing.modifiers.new("WEIGHTED_NORMAL", "WEIGHTED_NORMAL")
 housing_wn.keep_sharp = True
 housing_wn.weight = 50
@@ -367,7 +543,7 @@ root["asset_version"] = "low_v30_1.1"
 root["stage"] = "LOW_DRAFT"
 root["dimensions_mm"] = "71.5 x 149.6 x 7.95"
 root["screen_object"] = "SCREEN_CONTENT"
-root["screen_texture"] = "reference/ios26_home_screen_1206x2622.png"
+root["screen_texture"] = "reference/ios26_home_screen_clean_1206x2622.png"
 root["screen_texture_source"] = "Apple Support iPhone User Guide, iOS 26 official Home Screen"
 root["screen_texture_source_url"] = "https://help.apple.com/assets/69F8EBBDF3B89A4F6E0C704C/69F8EBC43862495245036393/en_US/b86263df3b70efb72926baf8a54550bd.png"
 root["screen_texture_px"] = "1206 x 2622"
@@ -445,7 +621,7 @@ body_faces = len(bm.faces)
 bm.free()
 mandatory = [
     "BODY_ALUMINUM", "SCREEN_GLASS", "SCREEN_CONTENT", "DISPLAY_BEZEL", "DISPLAY_GLASS_SEAT",
-    "DYNAMIC_ISLAND", "FRONT_SENSOR_PILL", "FRONT_CAMERA_RING", "FRONT_CAMERA_GLASS", "FRONT_CAMERA_IRIS", "FRONT_CAMERA_PUPIL", "FRONT_RECEIVER_MIC", "APPLE_LOGO_DECAL",
+    "FRONT_SENSOR_MASK", "FRONT_CAMERA_MASK", "FRONT_CAMERA_GLASS", "FRONT_CAMERA_IRIS", "FRONT_CAMERA_PUPIL", "FRONT_RECEIVER_MIC", "APPLE_LOGO_DECAL",
     "ACTION_BUTTON", "VOL_UP", "VOL_DOWN", "SIDE_BUTTON", "CAMERA_CONTROL",
     "USB_C_CAVITY", "BOTTOM_MIC_APERTURE_03", "BOTTOM_SPEAKER_APERTURE_05", "BOTTOM_SPEAKER_APERTURE_06",
     "CAMERA_HOUSING_SEAT", "CAMERA_HOUSING", "CAMERA_1_GLASS", "CAMERA_2_GLASS", "FLASH", "REAR_MIC"
@@ -465,7 +641,8 @@ for control_name in ("ACTION_BUTTON", "VOL_UP", "VOL_DOWN", "SIDE_BUTTON"):
 button_protrusion_mm = min(button_protrusions_mm)
 cc = bpy.data.objects["CAMERA_CONTROL"]
 cc_outer_x = max(abs((cc.matrix_world @ fc.Vector(corner)).x) for corner in cc.bound_box)
-camera_control_protrusion_mm = (cc_outer_x - rail_outer_x) / MM
+camera_control_offset_mm = (cc_outer_x - rail_outer_x) / MM
+camera_control_recess_mm = max(0.0, -camera_control_offset_mm)
 front_camera_center_from_top_mm = (H * 0.5 - front_hardware_z) / MM
 passed = (
     non_manifold == 0
@@ -475,7 +652,7 @@ passed = (
     and all(abs(v) <= 0.01 for v in delta_mm.values())
     and camera_backing_protrusion_mm >= 0.25
     and button_protrusion_mm >= 0.45
-    and 0.0 <= camera_control_protrusion_mm <= 0.20
+    and 0.075 <= camera_control_recess_mm <= 0.125
     and abs(front_camera_center_from_top_mm - 7.79) <= 0.01
 )
 evidence = {
@@ -500,7 +677,8 @@ evidence = {
     "camera_backing_protrusion_mm": round(camera_backing_protrusion_mm, 4),
     "camera_backing_visible": not housing_seat.hide_render,
     "button_min_protrusion_mm": round(button_protrusion_mm, 4),
-    "camera_control_protrusion_mm": max(0.0, round(camera_control_protrusion_mm, 4)),
+    "camera_control_protrusion_mm": max(0.0, round(camera_control_offset_mm, 4)),
+    "camera_control_recess_mm": round(camera_control_recess_mm, 4),
     "front_camera_keepout_mm": [20.75, 5.12],
     "front_camera_center_from_top_mm": round(front_camera_center_from_top_mm, 4),
     "passed": passed,

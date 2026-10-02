@@ -1,6 +1,7 @@
 export default {
   stories: ['../stories/**/*.stories.mjs'],
   staticDirs: [
+    { from: '../public/screens', to: '/screens' },
     { from: '../../assets/device_mockups/iphone_17/runtime/v30', to: '/assets/device_mockups/iphone_17/runtime/v30' },
     { from: '../../assets/device_mockups/ipad_pro/runtime/v6', to: '/assets/device_mockups/ipad_pro/runtime/v6' },
     { from: '../../assets/device_mockups/macbook_pro_14/runtime/v1', to: '/assets/device_mockups/macbook_pro_14/runtime/v1' },
