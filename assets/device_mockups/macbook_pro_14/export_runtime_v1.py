@@ -38,7 +38,7 @@ master_base.name = 'BASE_UNIBODY_MASTER_SOURCE'
 master_base.hide_render = True
 runtime_base.name = 'BASE_UNIBODY'
 runtime_base.hide_render = False
-runtime_base['speaker_runtime'] = 'baked_alpha_normal_proxy'
+runtime_base['speaker_runtime'] = 'derived_alpha_normal_proxy'
 for obj in owned_objects:
     if obj.get('master_only'):
         obj.hide_render = True
@@ -180,7 +180,7 @@ manifest = {
     },
     'hybrid_deck': {
         'master_runtime': 'single_authoritative_master_derived_runtime',
-        'speaker_runtime': 'baked_alpha_normal_proxy',
+        'speaker_runtime': 'derived_alpha_normal_proxy',
         'speaker_proxy_nodes': ['SPEAKER_RUNTIME_PROXY_L', 'SPEAKER_RUNTIME_PROXY_R'],
         'trackpad_surface': 'profiled_glass',
         'key_families': ['regular', 'modifier', 'space', 'arrow', 'function', 'touch_id'],
