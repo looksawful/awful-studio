@@ -1,0 +1,490 @@
+{
+  "gate": "G2_full_surface_audit",
+  "status": "RED",
+  "previous_gate": {
+    "gate": "G1",
+    "status": "REJECTED_BY_HUMAN_VISUAL_GATE",
+    "reason": "Live closed-state review exposed external silhouette and assembly errors. G1 deck/display measurements were PROVISIONAL and frozen=false when consumed by production geometry."
+  },
+  "coordinate_frame": {
+    "origin": "chassis plan center",
+    "x": "+right",
+    "y": "+hinge/rear",
+    "z": "+up"
+  },
+  "source_policy": {
+    "A0": "APPLE_EXACT numeric datum",
+    "A1": "official Apple orthographic image calibrated to A0",
+    "A2": "official Apple repair relation/calibration",
+    "B1": "interface/industry standard as local datum only",
+    "U": "UNVERIFIED; insufficient public evidence to freeze"
+  },
+  "public_source_limit": "Apple's current Dimensional Drawings catalog does not publish a MacBook Pro M5 manufacturing drawing/CAD. Unknown manufacturing dimensions remain UNVERIFIED.",
+  "sources": {
+    "specs": "https://www.apple.com/macbook-pro/specs/",
+    "repair_manual": "https://support.apple.com/en-us/123173",
+    "display_repair": "https://support.apple.com/en-us/123164",
+    "bottom_case": "https://support.apple.com/en-us/123157",
+    "vent_antenna": "https://support.apple.com/en-us/123162",
+    "dimensional_drawings": "https://developer.apple.com/accessories/dimensional-drawings/",
+    "apple_deck_2x": "https://www.apple.com/v/macbook-pro/specs/c/images/specs/14-inch/keyboard_14_inch__n0iptd9xeluu_large_2x.jpg",
+    "apple_closed_top": "https://www.apple.com/v/macbook-pro/specs/c/images/specs/14-inch/dimensions_1_14_inch__da8sc3fnv0cy_large.jpg",
+    "apple_closed_front": "https://www.apple.com/v/macbook-pro/specs/c/images/specs/14-inch/dimensions_2_14_inch__fllye8os816y_large.jpg",
+    "apple_left": "https://www.apple.com/v/macbook-pro/specs/c/images/specs/14-inch/ports_1_14_inch__d5zi3oye530i_large.jpg",
+    "apple_right": "https://www.apple.com/v/macbook-pro/specs/c/images/specs/14-inch/ports_2_14_inch__fyp4hk8z9qi6_large.jpg"
+  },
+  "exact_datums": {
+    "chassis_width_mm": 312.6,
+    "chassis_depth_mm": 221.2,
+    "closed_height_mm": 15.5,
+    "display_px": [
+      3024,
+      1964
+    ],
+    "display_ppi": 254,
+    "display_active_mm": [
+      302.4,
+      196.4
+    ],
+    "ansi_key_count": 78
+  },
+  "calibration": {
+    "deck_source_outer_edges_px": {
+      "left": 108,
+      "right": 1027,
+      "rear": 23,
+      "front": 673
+    },
+    "deck_scale_mm_per_px": {
+      "x": 0.3401523395,
+      "y": 0.3403076923
+    },
+    "deck_scale_axis_residual_pct": 0.0457,
+    "old_g1_homography_implied_chassis_mm": [
+      318.3023,
+      226.5938
+    ],
+    "old_g1_homography_error_mm": [
+      5.7023,
+      5.3938
+    ],
+    "conclusion": "Old G1 homography used inset/rounded-corner picks as physical chassis corners and inflated deck geometry."
+  },
+  "comparisons": [
+    {
+      "id": "chassis.envelope",
+      "source_class": "A0",
+      "target": {
+        "width_mm": 312.6,
+        "depth_mm": 221.2,
+        "closed_height_mm": 15.5
+      },
+      "current": {
+        "base_width_mm": 312.6,
+        "base_depth_mm": 221.2,
+        "validated_closed_height_mm": 15.504
+      },
+      "verdict": "GREEN",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "display.active_matrix",
+      "source_class": "A0",
+      "target": {
+        "width_mm": 302.4,
+        "height_mm": 196.4
+      },
+      "current": {
+        "width_mm": 302.4,
+        "height_mm": 196.4
+      },
+      "verdict": "GREEN",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "deck.calibration",
+      "source_class": "A1",
+      "target": {
+        "outer_width_mm": 312.6,
+        "outer_depth_mm": 221.2
+      },
+      "current_g1_implied": {
+        "outer_width_mm": 318.3023,
+        "outer_depth_mm": 226.5938
+      },
+      "delta_mm": {
+        "width": 5.7023,
+        "depth": 5.3938
+      },
+      "verdict": "RED",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "keyboard.aggregate_bounds",
+      "source_class": "A1",
+      "target": {
+        "width_mm": 274.1241,
+        "height_mm": 111.0074,
+        "center_mm": [
+          -0.262,
+          36.5467
+        ]
+      },
+      "current": {
+        "width_mm": 278.75,
+        "height_mm": 111.3929
+      },
+      "delta_mm": {
+        "width": 4.6259,
+        "height": 0.3855
+      },
+      "tolerance_mm": 0.75,
+      "verdict": "RED",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "keyboard.well",
+      "source_class": "A1",
+      "target": {
+        "width_mm": 280.5396,
+        "height_mm": 116.1566,
+        "center_mm": [
+          -0.2649,
+          36.6614
+        ]
+      },
+      "current": {
+        "width_mm": 284.8,
+        "height_mm": 117.55,
+        "center_mm": [
+          -0.3,
+          37.225
+        ]
+      },
+      "delta_mm": {
+        "width": 4.2604,
+        "height": 1.3934,
+        "center_x": -0.0351,
+        "center_y": 0.5636
+      },
+      "tolerance_mm": 0.75,
+      "verdict": "RED",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "trackpad",
+      "source_class": "A1",
+      "target": {
+        "width_mm": 129.598,
+        "height_mm": 80.9932,
+        "center_mm": [
+          0,
+          -64.6585
+        ],
+        "front_gap_mm": 5.4449
+      },
+      "current": {
+        "width_mm": 131.9406,
+        "height_mm": 82.8144,
+        "center_mm": [
+          0,
+          -66.4689
+        ],
+        "front_gap_mm": 2.7238,
+        "recess_center_x_mm": 0.5815
+      },
+      "delta_mm": {
+        "width": 2.3425,
+        "height": 1.8212,
+        "center_y": -1.8105,
+        "front_gap": -2.7211,
+        "recess_center_x": 0.5815
+      },
+      "tolerance_mm": 0.6,
+      "verdict": "RED",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "touch_id",
+      "source_class": "A1",
+      "target": {
+        "width_mm": 16.533,
+        "height_mm": 16.3946,
+        "center_mm": [
+          128.2881,
+          82.6924
+        ]
+      },
+      "current": {
+        "width_mm": 16.75,
+        "height_mm": 16.25,
+        "center_mm": [
+          130.325,
+          84.2548
+        ]
+      },
+      "delta_mm": {
+        "width": 0.217,
+        "height": -0.1446,
+        "center_x": 2.0369,
+        "center_y": 1.5624
+      },
+      "tolerance_mm": 0.6,
+      "verdict": "RED",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "speaker_grille",
+      "source_class": "A1",
+      "target": {
+        "columns": 15,
+        "rows": 114,
+        "pitch_mm": [
+          0.921,
+          0.9264
+        ],
+        "center_abs_x_mm": 148.0523,
+        "center_y_mm": 36.4999,
+        "hole_center_extent_mm": [
+          13.0939,
+          105.692
+        ],
+        "first_hole_center_side_inset_mm": 1.7008
+      },
+      "current": {
+        "columns": 12,
+        "rows": 109,
+        "pitch_mm": [
+          1,
+          1
+        ],
+        "proxy_size_mm": [
+          13.5,
+          108.75
+        ],
+        "center_abs_x_mm": 149.55,
+        "center_y_mm": 36.225,
+        "proxy_outer_edge_side_inset_mm": 0
+      },
+      "delta": {
+        "columns": -3,
+        "rows": -5,
+        "pitch_x_mm": 0.079,
+        "pitch_y_mm": 0.0736,
+        "center_abs_x_mm": 1.4977,
+        "center_y_mm": -0.2749
+      },
+      "tolerance_mm": 0.35,
+      "verdict": "RED",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "closed_display_assembly.flush",
+      "source_class": "A2",
+      "target": {
+        "relation": "closed display assembly flush with top case"
+      },
+      "current": {
+        "base_y_mm": [
+          -110.6,
+          110.6
+        ],
+        "lid_panel_y_mm": [
+          -109.9,
+          102.1
+        ],
+        "hinge_cover_max_y_mm": 105.75,
+        "rear_uncovered_by_lid_panel_mm": 8.5,
+        "rear_uncovered_by_current_cover_mm": 4.85
+      },
+      "verdict": "RED",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "hinge_covers",
+      "source_class": "A2",
+      "target": {
+        "approx_each_width_mm": 19.9,
+        "approx_center_abs_x_mm": 130.1,
+        "relation": "small corner hinge-cover plates"
+      },
+      "current": {
+        "each_width_mm": 60,
+        "center_abs_x_mm": 108.3,
+        "representation": "long cylindrical sleeve"
+      },
+      "delta_mm": {
+        "width": 40.1,
+        "center_inward": 21.8
+      },
+      "tolerance_mm": 2,
+      "verdict": "RED",
+      "confidence": "MEDIUM_HIGH"
+    },
+    {
+      "id": "front_finger_recess",
+      "source_class": "A1",
+      "target": {
+        "width_mm": 54.2,
+        "center_x_mm": 0
+      },
+      "current": {
+        "cutter_width_mm": 36,
+        "center_x_mm": 0
+      },
+      "delta_mm": {
+        "width": -18.2
+      },
+      "tolerance_mm": 1.5,
+      "verdict": "RED",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "bottom_feet",
+      "source_class": "A2",
+      "target": {
+        "diameter_mm_range": [
+          16.5,
+          18.1
+        ],
+        "side_inset_mm_range": [
+          19.5,
+          22.5
+        ],
+        "front_rear_inset_mm_range": [
+          22,
+          23.5
+        ]
+      },
+      "current": {
+        "diameter_mm": 10.4,
+        "side_inset_mm": 18,
+        "front_inset_mm": 17,
+        "rear_inset_mm": 20
+      },
+      "verdict": "RED",
+      "confidence": "MEDIUM_HIGH"
+    },
+    {
+      "id": "bottom_screws.outer_pair_positions",
+      "source_class": "A2",
+      "target": {
+        "outer_side_inset_mm_range": [
+          3,
+          9
+        ],
+        "rear_edge_inset_mm_range": [
+          5.5,
+          8
+        ],
+        "front_edge_inset_mm_range": [
+          8.5,
+          10.5
+        ],
+        "inner_x_abs_mm_range": [
+          49,
+          54.5
+        ]
+      },
+      "current": {
+        "outer_side_inset_mm": 15,
+        "edge_inset_mm": 11,
+        "inner_x_abs_mm": 55
+      },
+      "verdict": "RED",
+      "confidence": "MEDIUM_HIGH"
+    },
+    {
+      "id": "lid_logo",
+      "source_class": "A1",
+      "target": {
+        "approx_width_mm": 37.2,
+        "approx_height_mm": 44.9
+      },
+      "current": {
+        "width_mm": 27.676,
+        "height_mm": 34
+      },
+      "delta_mm": {
+        "width": -9.5,
+        "height": -10.9
+      },
+      "tolerance_mm": 2,
+      "verdict": "RED",
+      "confidence": "MEDIUM"
+    },
+    {
+      "id": "vertical_stack.base_lid_gap",
+      "source_class": "U",
+      "current": {
+        "base_height_mm": 8.3,
+        "lid_thickness_mm": 4.7,
+        "gap_mm": 1.845,
+        "method": "residual closed-height formula"
+      },
+      "verdict": "UNVERIFIED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "outer_corner_radii",
+      "source_class": "U",
+      "current": {
+        "base_radius_mm": 8.4,
+        "lid_radius_mm": 8
+      },
+      "verdict": "UNVERIFIED",
+      "confidence": "LOW_MEDIUM"
+    },
+    {
+      "id": "display_bezel_glass_gasket",
+      "source_class": "U",
+      "current": {
+        "bezel_mm": [
+          307.2,
+          204.2
+        ],
+        "glass_mm": [
+          307.6,
+          204.6
+        ],
+        "gasket_mm": [
+          309.3,
+          207
+        ],
+        "lower_rail_height_mm": 3.4
+      },
+      "verdict": "UNVERIFIED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "ports.exact_positions_and_openings",
+      "source_class": "A1+B1",
+      "current": {
+        "method": "8.4 mm USB-C / 24 px local ruler; explicitly LOW, not manufacturing dimensions"
+      },
+      "verdict": "UNVERIFIED",
+      "confidence": "MEDIUM"
+    },
+    {
+      "id": "vent_external_apertures",
+      "source_class": "A2",
+      "current": {
+        "count_per_side": 12,
+        "pitch_mm": 3.2
+      },
+      "verdict": "UNVERIFIED",
+      "confidence": "LOW_MEDIUM"
+    }
+  ],
+  "required_red_contracts": [
+    "outer deck silhouette must reproduce 312.6 x 221.2 mm before part measurements",
+    "trackpad and recess share x datum and corrected A1 size/position",
+    "keyboard/well bounds use corrected A1 transform",
+    "speaker grille uses 15 x 114 calibrated lattice and side margin",
+    "closed external display assembly is flush with top-case silhouette",
+    "front finger recess follows calibrated front orthographic width",
+    "feet and bottom-screw centers follow repair-view ranges",
+    "PROVISIONAL or UNVERIFIED facts cannot produce RELEASE_CANDIDATE geometry"
+  ],
+  "next_gate": "RED tests -> rebuild master from corrected datums -> derived runtime -> top/front/left/right/bottom/deck/display overlays -> Storybook phone gate"
+}
