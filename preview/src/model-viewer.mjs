@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { availableLods, cameraDirection, previewMaterialPolicy, resolveAssetUrl, validateModelProvenance } from './viewer-core.mjs';
-import { iphoneScreenStates, prepareIphonePresentation } from './iphone-presentation.mjs';
+import { composeIphoneScreenTexture, iphoneScreenStates, prepareIphonePresentation } from './iphone-presentation.mjs';
 
 const tagName = 'awful-model-viewer';
 
@@ -20,6 +20,7 @@ class AwfulModelViewer extends HTMLElement {
     this._animationClips = [];
     this._screenGlow = null;
     this._screenTextures = new Map();
+    this._screenCompositeTexture = null;
     this._screenRequest = 0;
     this._clock = new THREE.Clock();
   }
@@ -188,6 +189,8 @@ class AwfulModelViewer extends HTMLElement {
     this._screenRequest++;
     this._iphonePresentation?.dispose();
     this._iphonePresentation = null;
+    this._screenCompositeTexture?.dispose();
+    this._screenCompositeTexture = null;
     if (this._model) {
       this._scene.remove(this._model);
       this.#disposeObject(this._model);
@@ -334,6 +337,8 @@ class AwfulModelViewer extends HTMLElement {
       if (this._disposed || request !== this._screenRequest || model !== this._model) return;
     }
     const on = state !== 'screen_off';
+    this._screenCompositeTexture?.dispose();
+    this._screenCompositeTexture = null;
     this._model.traverse((object) => {
       if (!object.isMesh) return;
       const materials = Array.isArray(object.material) ? object.material : [object.material];
@@ -341,8 +346,13 @@ class AwfulModelViewer extends HTMLElement {
         if (material.name !== 'MAT_SCREEN_CONTENT') continue;
         const saved = material.userData.previewScreenOn;
         if (!saved) continue;
-        material.map = on ? (texture ?? saved.map) : null;
-        material.emissiveMap = on ? (texture ?? saved.emissiveMap) : null;
+        const baseTexture = on ? (texture ?? saved.map ?? saved.emissiveMap) : null;
+        if (this._asset.id === 'iphone-17-v30' && baseTexture && !this._screenCompositeTexture) {
+          this._screenCompositeTexture = composeIphoneScreenTexture(baseTexture, stateSpec);
+        }
+        const activeTexture = this._asset.id === 'iphone-17-v30' ? this._screenCompositeTexture : baseTexture;
+        material.map = activeTexture;
+        material.emissiveMap = activeTexture;
         if (material.color) on && saved.color ? material.color.copy(saved.color) : material.color.set(0x010101);
         if (material.emissive) on && saved.emissive ? material.emissive.copy(saved.emissive) : material.emissive.set(0x000000);
         material.emissiveIntensity = on ? Number(stateSpec.emission_strength ?? saved.emissiveIntensity ?? 0.8) : 0;
@@ -503,6 +513,8 @@ class AwfulModelViewer extends HTMLElement {
     this._controls?.dispose();
     this._iphonePresentation?.dispose();
     this._iphonePresentation = null;
+    this._screenCompositeTexture?.dispose();
+    this._screenCompositeTexture = null;
     this._screenTextures?.forEach(pending => { void pending.then(texture => texture.dispose(), () => {}); });
     this._screenTextures?.clear();
     if (this._model) this.#disposeObject(this._model);

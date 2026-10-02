@@ -19,6 +19,7 @@ SOURCE_FILES = [
     'assets/device_mockups/iphone_17/reference/apple_logo_glb_mask.png',
     'assets/device_mockups/iphone_17/reference/ios26_home_screen_1206x2622.png',
     'assets/device_mockups/iphone_17/reference/ios26_home_screen_clean_1206x2622.png',
+    'assets/device_mockups/iphone_17/reference/ios26_home_screen_dynamic_state_1206x2622.png',
     'assets/device_mockups/iphone_17/reference/flash_diffuser_v30.png',
 ]
 sys.path.insert(0, str(ROOT / 'tools'))
@@ -75,7 +76,7 @@ def main():
         raise RuntimeError('invalid GLB JSON chunk')
     doc = json.loads(raw[20:20 + json_len].decode('utf-8').rstrip(' \t\r\n\0'))
     names = {node.get('name') for node in doc.get('nodes', [])}
-    required = {'CTRL_IPHONE_17','DYNAMIC_ISLAND','FRONT_SENSOR_PILL','FRONT_CAMERA_GLASS','APPLE_LOGO_DECAL','SCREEN_CONTENT','SCREEN_GLOW_ANCHOR'}
+    required = {'CTRL_IPHONE_17','FRONT_SENSOR_MASK','FRONT_CAMERA_MASK','FRONT_CAMERA_GLASS','APPLE_LOGO_DECAL','SCREEN_CONTENT','SCREEN_GLOW_ANCHOR'}
     missing = sorted(required - names)
     if missing:
         raise RuntimeError(f'GLB lost required nodes: {missing}')

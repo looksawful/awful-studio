@@ -19,8 +19,8 @@
     "height": -2e-06
   },
   "body_non_manifold_edges": 0,
-  "body_vertices": 4267,
-  "body_faces": 2997,
+  "body_vertices": 4292,
+  "body_faces": 3020,
   "boolean_cuts": [
     "DISPLAY_POCKET",
     "SCREEN_ACTIVE",
@@ -45,7 +45,7 @@
   "boolean_cut_count": 19,
   "mandatory_missing": [],
   "forbidden_front_nodes": [],
-  "object_count": 73,
+  "object_count": 72,
   "material_count": 21,
   "official_reference": "Apple iPhone 17 Dimensional Drawings 2025-09-09",
   "cover_glass_mm": [
@@ -59,7 +59,8 @@
   "camera_backing_protrusion_mm": 0.26,
   "camera_backing_visible": true,
   "button_min_protrusion_mm": 0.45,
-  "camera_control_protrusion_mm": 0.06,
+  "camera_control_protrusion_mm": 0.0,
+  "camera_control_recess_mm": 0.1,
   "front_camera_keepout_mm": [
     20.75,
     5.12

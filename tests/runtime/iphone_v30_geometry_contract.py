@@ -6,7 +6,7 @@ from mathutils import Vector
 
 results = {}
 depsgraph = bpy.context.evaluated_depsgraph_get()
-for name in ('BODY_ALUMINUM', 'BACK_GLASS', 'CAMERA_HOUSING', 'CAMERA_HOUSING_SEAT', 'DYNAMIC_ISLAND'):
+for name in ('BODY_ALUMINUM', 'BACK_GLASS', 'CAMERA_HOUSING', 'CAMERA_HOUSING_SEAT', 'FRONT_SENSOR_MASK', 'FRONT_CAMERA_MASK'):
     obj = bpy.data.objects[name].evaluated_get(depsgraph)
     mesh = obj.to_mesh()
     bm = bmesh.new()
@@ -25,7 +25,8 @@ assert bsdf.inputs['Base Color'].is_linked, 'flash texture missing'
 assert flash.data.uv_layers.active, 'flash UV missing'
 screen_material = bpy.data.objects['SCREEN_CONTENT'].data.materials[0]
 screen_image = next(n.image for n in screen_material.node_tree.nodes if n.type == 'TEX_IMAGE')
-assert 'clean_1206x2622' in screen_image.name, 'baked island reference is still used'
+assert 'clean_1206x2622' in screen_image.name, 'default screen must use clean app artwork without baked Dynamic Island'
+assert 'dynamic_state_1206x2622' not in screen_image.name, 'system Dynamic Island must not be baked into SCREEN_CONTENT'
 
 # Backings must be below the opening; specular caps cannot stand in for cavities.
 for name in [obj.name for obj in bpy.data.objects if 'APERTURE_' in obj.name and not obj.name.endswith('_CUTTER')]:

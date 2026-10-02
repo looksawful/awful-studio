@@ -6,24 +6,53 @@ export function displayMetrics() {
 }
 
 export const iphoneScreenStates = {
-  screen_on: { label: 'Home screen', emission_strength: 1 },
-  screen_off: { label: 'Off', emission_strength: 0, glow_intensity: 0 },
-  screen_lock: { label: 'Lock screen', texture: 'screens/iphone-lock.png', emission_strength: 1 },
-  screen_website: { label: 'looksawful.ru', texture: 'screens/iphone-website.png', emission_strength: 1 },
-  screen_resume: { label: 'Resume', texture: 'screens/iphone-resume.png', emission_strength: 1 },
+  screen_on: { label: 'Home screen', emission_strength: 1, dynamic_island_state: 'idle' },
+  screen_off: { label: 'Off', emission_strength: 0, glow_intensity: 0, dynamic_island_state: 'off' },
+  screen_lock: { label: 'Lock screen', texture: 'screens/iphone-lock.png', emission_strength: 1, dynamic_island_state: 'idle' },
+  screen_website: { label: 'looksawful.ru', texture: 'screens/iphone-website.png', emission_strength: 1, dynamic_island_state: 'idle' },
+  screen_resume: { label: 'Resume', texture: 'screens/iphone-resume.png', emission_strength: 1, dynamic_island_state: 'idle' },
 };
+
+// Derived from the accepted clean/dynamic 1206x2622 reference pair. Apple does not publish idle-mask pixels.
+const idleDynamicIslandRaster = Object.freeze({ x: 405, y: 37, width: 394, height: 121, radius: 60.5 });
+
+export function composeIphoneScreenTexture(source, stateSpec, {
+  createCanvas = () => document.createElement('canvas'),
+} = {}) {
+  if (!source?.image || stateSpec?.dynamic_island_state !== 'idle') return source;
+  const [width, height] = displayMetrics().raster;
+  const canvas = createCanvas();
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext('2d');
+  if (!context) throw new Error('iPhone screen compositor requires a 2D canvas context');
+  context.drawImage(source.image, 0, 0, width, height);
+  context.fillStyle = '#000000';
+  context.beginPath();
+  context.roundRect(
+    idleDynamicIslandRaster.x,
+    idleDynamicIslandRaster.y,
+    idleDynamicIslandRaster.width,
+    idleDynamicIslandRaster.height,
+    idleDynamicIslandRaster.radius,
+  );
+  context.fill();
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.name = 'AWFUL_IPHONE_SCREEN_COMPOSITE';
+  texture.flipY = source.flipY;
+  texture.colorSpace = source.colorSpace || THREE.SRGBColorSpace;
+  texture.anisotropy = source.anisotropy;
+  texture.wrapS = source.wrapS;
+  texture.wrapT = source.wrapT;
+  texture.magFilter = source.magFilter;
+  texture.minFilter = source.minFilter;
+  texture.generateMipmaps = source.generateMipmaps;
+  return texture;
+}
 
 // Presentation corrections are explicit web overrides; source delivery stays intact.
 export function prepareIphonePresentation(model) {
   const ownedMaterials = [];
-  const pill = model.getObjectByName('DYNAMIC_ISLAND');
-  if (pill) {
-    const camera = model.getObjectByName('FRONT_CAMERA_GLASS');
-    const delta = camera ? pill.position.y - camera.position.y : 0;
-    model.traverse(object => {
-      if (/^FRONT_CAMERA_|^FRONT_SENSOR_PILL$/.test(object.name)) object.position.y += delta;
-    });
-  }
   const screenNode = model.getObjectByName('SCREEN_CONTENT');
   const screen = screenNode?.isMesh ? screenNode : screenNode?.children.find(child => child.isMesh && (Array.isArray(child.material) ? child.material : [child.material]).some(material => material.name === 'MAT_SCREEN_CONTENT'));
   let glow = null;
@@ -74,10 +103,6 @@ export function prepareIphonePresentation(model) {
     if (!object.isMesh) return;
     const materials = Array.isArray(object.material) ? object.material : [object.material];
     for (const material of materials) {
-      if (material.name === 'MAT_DYNAMIC_ISLAND' || material.name === 'MAT_FRONT_SENSOR_PILL') {
-        material.roughness = .6;material.envMapIntensity = .1;
-        if ('clearcoat' in material) material.clearcoat = 0;
-      }
       if (/^BOTTOM_.*APERTURE|^USB_C_CAVITY$/.test(object.name)) {
         const interior = material.clone();ownedMaterials.push(interior);
         interior.roughness = .82;interior.metalness = 0;interior.envMapIntensity = .15;

@@ -1,7 +1,44 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import { prepareIphonePresentation, displayMetrics } from '../src/iphone-presentation.mjs';
+import { composeIphoneScreenTexture, prepareIphonePresentation, displayMetrics, iphoneScreenStates } from '../src/iphone-presentation.mjs';
+
+test('active screen states keep the baseline Dynamic Island independent of raster artwork', () => {
+  for (const state of ['screen_on', 'screen_lock', 'screen_website', 'screen_resume']) {
+    assert.equal(iphoneScreenStates[state].dynamic_island_state, 'idle', state);
+  }
+  assert.equal(iphoneScreenStates.screen_off.dynamic_island_state, 'off');
+});
+
+test('website raster gets the baseline idle Dynamic Island in the compositor', () => {
+  const calls = [];
+  const context = {
+    drawImage: (...args) => calls.push(['drawImage', ...args]),
+    beginPath: () => calls.push(['beginPath']),
+    roundRect: (...args) => calls.push(['roundRect', ...args]),
+    fill: () => calls.push(['fill']),
+    set fillStyle(value) { calls.push(['fillStyle', value]); },
+  };
+  const canvas = { width: 0, height: 0, getContext: () => context };
+  const source = new THREE.Texture({ width: 1206, height: 2622 });
+  source.flipY = false;
+  source.colorSpace = THREE.SRGBColorSpace;
+  source.anisotropy = 8;
+
+  const composed = composeIphoneScreenTexture(source, iphoneScreenStates.screen_website, {
+    createCanvas: () => canvas,
+  });
+
+  assert.notEqual(composed, source);
+  assert.equal(canvas.width, 1206);
+  assert.equal(canvas.height, 2622);
+  assert.deepEqual(calls.find(call => call[0] === 'roundRect'), ['roundRect', 405, 37, 394, 121, 60.5]);
+  assert.deepEqual(calls.find(call => call[0] === 'fillStyle'), ['fillStyle', '#000000']);
+  assert.equal(composed.flipY, false);
+  assert.equal(composed.colorSpace, THREE.SRGBColorSpace);
+  assert.equal(composed.anisotropy, 8);
+  composed.dispose();
+});
 
 test('display raster and mobile viewport preserve physical aspect and pixel pitch', () => {
   const metrics = displayMetrics();
@@ -24,14 +61,13 @@ test('only front display triangles emit; sides stay dark without modifying verti
   assert.equal(presentation.glow.rotation.y,Math.PI);
   presentation.dispose();
 });
-test('visible front camera follows the island while other device objects keep their datum', () => {
-  const model = new THREE.Group(),pill=new THREE.Object3D(),camera=new THREE.Object3D(),body=new THREE.Object3D();
-  pill.name='DYNAMIC_ISLAND';pill.position.y=.068665;
-  camera.name='FRONT_CAMERA_GLASS';camera.position.y=.067015;
-  body.name='BODY_ALUMINUM';model.add(pill,camera,body);
+test('front camera keeps its authored hardware datum', () => {
+  const model = new THREE.Group(), camera = new THREE.Object3D(), body = new THREE.Object3D();
+  camera.name = 'FRONT_CAMERA_GLASS'; camera.position.y = .067015;
+  body.name = 'BODY_ALUMINUM'; model.add(camera, body);
   prepareIphonePresentation(model);
-  assert.equal(camera.position.y,pill.position.y);
-  assert.equal(body.position.y,0);
+  assert.equal(camera.position.y, .067015);
+  assert.equal(body.position.y, 0);
 });
 
 test('canonical multi-material display keeps emission, state controls and source edge ownership', () => {
