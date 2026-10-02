@@ -26,6 +26,8 @@ Hardware-control contract: Action, volume and side buttons use capsule-profile g
 
 ## Build and QA
 
+The grille backing surfaces sit approximately 0.92 mm behind the openings; the USB-C backing sits 1.34 mm inside its opening. Their matte material carries a packed procedural weave normal map, exported with UV tangents. Depth comes from geometry, while the normal map adds fine surface variation. The emitting OLED front and opaque dark sidewalls use separate materials. Front-optic reflections are reduced at source; web presentation aligns the visible optic to the illustrated island without changing the independent source hardware datum.
+
 1. Run the v30 generator with Blender 5.2.1 LTS.
 2. Confirm `passed: true` in `low_v30_validation.json`.
 3. Run the runtime exporter against the generated `.blend`.

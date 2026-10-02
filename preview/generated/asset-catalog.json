@@ -18,10 +18,10 @@
         }
       ],
       "collision": null,
-      "sourceRevision": "1a2da674579d14eb853dc211126f0494958122930cebb38ffde1afa9f1f31930",
-      "sourceCommit": "adab006c0d2200bf4321c4655195518cb9dbeb6a",
-      "triangleCount": 32412,
-      "materialCount": 15,
+      "sourceRevision": "07a2a0befde9e6f7c3a209db1635a5dda1d375ea92342c4d81a38a1f8ed2368f",
+      "sourceCommit": "c3bf71518bb7e6b35ebde7bc1fdb42a77a6b468f",
+      "triangleCount": 65182,
+      "materialCount": 17,
       "animations": [],
       "screenStates": {
         "screen_off": {
@@ -48,7 +48,7 @@
       "version": "v6",
       "stage": "LOW_DRAFT",
       "root": "CTRL_IPAD_PRO_11",
-      "sourceBlend": "assets/device_mockups/ipad_pro/generated/ipad_pro_11_m5_low_v6.blend",
+      "sourceBlend": "generated/ipad_pro_11_m5_low_v6.blend",
       "previewGlb": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_web.glb",
       "lods": [
         {
@@ -58,7 +58,7 @@
       ],
       "collision": null,
       "sourceRevision": "8c945793614e5b932579f1ae47e03c28780e7217aeafc553f9f31050cc84eb86",
-      "sourceCommit": "adab006c0d2200bf4321c4655195518cb9dbeb6a",
+      "sourceCommit": "2c659b2754654827c23d62dfc269d2719754a223",
       "triangleCount": 20696,
       "materialCount": 11,
       "animations": [],
@@ -87,7 +87,7 @@
       "version": "v6",
       "stage": "LOW_DRAFT",
       "root": "CTRL_IPAD_PRO_13",
-      "sourceBlend": "assets/device_mockups/ipad_pro/generated/ipad_pro_13_m5_low_v6.blend",
+      "sourceBlend": "generated/ipad_pro_13_m5_low_v6.blend",
       "previewGlb": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_web.glb",
       "lods": [
         {
@@ -97,7 +97,7 @@
       ],
       "collision": null,
       "sourceRevision": "fab88ffb8004423c55851571de446dde3369bef97e8f7908373dcf7b994779dc",
-      "sourceCommit": "adab006c0d2200bf4321c4655195518cb9dbeb6a",
+      "sourceCommit": "2c659b2754654827c23d62dfc269d2719754a223",
       "triangleCount": 20704,
       "materialCount": 11,
       "animations": [],
@@ -126,7 +126,7 @@
       "version": "v1",
       "stage": "RELEASE_CANDIDATE",
       "root": "CTRL_MACBOOK_PRO_14",
-      "sourceBlend": "assets/device_mockups/macbook_pro_14/generated/macbook_pro_14_m5_low_v1_release.blend",
+      "sourceBlend": "extension/awful_studio/assets/devices/macbook_pro_14_m5_low_v1_release.blend",
       "previewGlb": "assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web.glb",
       "lods": [
         {
@@ -136,7 +136,7 @@
       ],
       "collision": null,
       "sourceRevision": "aa57065a4fa9abf3744e2db69cca9be8ae713f04b59f384c13b7518352088261",
-      "sourceCommit": "adab006c0d2200bf4321c4655195518cb9dbeb6a",
+      "sourceCommit": "83d43fa96514372929d48d8798b4dd5526f04c2e",
       "triangleCount": 16722,
       "materialCount": 9,
       "animations": [

@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Install fast-test image dependency
+        run: python3 -m pip install Pillow==12.1.1
       - run: python3 -m unittest discover -s tests/fast -v
       - run: git diff --check
 
