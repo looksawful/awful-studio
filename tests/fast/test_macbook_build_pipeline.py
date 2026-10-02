@@ -32,6 +32,12 @@ class MacBookBuildPipelineTests(TestCase):
             self.assertIn('--python-exit-code', call)
             self.assertIn('--factory-startup', call)
 
+    def test_runtime_export_visibility_is_scoped_to_macbook_ownership(self):
+        source = (ROOT / 'assets/device_mockups/macbook_pro_14/export_runtime_v1.py').read_text(encoding='utf-8')
+        self.assertNotIn('for obj in bpy.data.objects:', source)
+        self.assertIn('owned_objects = [root] + list(root.children_recursive)', source)
+        self.assertIn('for obj in owned_objects:', source)
+
     def test_hinge_failure_stops_packaging(self):
         calls = []
         def run(*args):

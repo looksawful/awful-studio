@@ -25,6 +25,7 @@ root = bpy.data.objects.get('CTRL_MACBOOK_PRO_14')
 hinge = bpy.data.objects.get('CTRL_HINGE')
 if root is None or hinge is None:
     raise RuntimeError('MacBook root or hinge control missing')
+owned_objects = [root] + list(root.children_recursive)
 
 # Derive the runtime body from the authoritative master scene. The master keeps
 # physical speaker apertures for evidence; the runtime swaps in the clean
@@ -38,7 +39,7 @@ master_base.hide_render = True
 runtime_base.name = 'BASE_UNIBODY'
 runtime_base.hide_render = False
 runtime_base['speaker_runtime'] = 'baked_alpha_normal_proxy'
-for obj in bpy.data.objects:
+for obj in owned_objects:
     if obj.get('master_only'):
         obj.hide_render = True
     if obj.get('runtime_only'):
@@ -51,7 +52,7 @@ for cname in ('_STUDIO_RIG', '_DIAGNOSTIC_CAMERAS'):
             bpy.data.objects.remove(obj, do_unlink=True)
         bpy.data.collections.remove(col)
 
-for obj in [root] + list(root.children_recursive):
+for obj in owned_objects:
     if obj.type == 'MESH':
         obj.data.name = obj.name
 
