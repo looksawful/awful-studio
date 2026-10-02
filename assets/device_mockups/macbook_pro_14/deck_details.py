@@ -25,6 +25,50 @@ def _weighted_normals(obj, weight=50):
     return modifier
 
 
+def _dish_keycap_top(obj, depth_mm):
+    """Replace the flat top cap with a shallow concave manufactured surface."""
+    depth = depth_mm * .001
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    flat_caps = [
+        face for face in bm.faces
+        if face.verts
+        and max(vertex.co.z for vertex in face.verts) - min(vertex.co.z for vertex in face.verts) <= 1e-7
+    ]
+    if len(flat_caps) < 2:
+        bm.free()
+        raise RuntimeError(f'{obj.name}: expected flat top/bottom caps before dish, got {len(flat_caps)}')
+    top_face = max(flat_caps, key=lambda face: sum(vertex.co.z for vertex in face.verts) / len(face.verts))
+    top_z = sum(vertex.co.z for vertex in top_face.verts) / len(top_face.verts)
+    outer = list(top_face.verts)
+    bm.faces.remove(top_face)
+    max_x = max(abs(vertex.co.x) for vertex in outer)
+    max_y = max(abs(vertex.co.y) for vertex in outer)
+    inset = 1.45 * .001
+    scale_x = max(.45, (max_x - inset) / max_x)
+    scale_y = max(.45, (max_y - inset) / max_y)
+    inner_z = top_z - depth * .58
+    inner = [
+        bm.verts.new((vertex.co.x * scale_x, vertex.co.y * scale_y, inner_z))
+        for vertex in outer
+    ]
+    center = bm.verts.new((0.0, 0.0, top_z - depth))
+
+    new_faces = []
+    for index in range(len(outer)):
+        nxt = (index + 1) % len(outer)
+        new_faces.append(bm.faces.new((outer[index], outer[nxt], inner[nxt], inner[index])))
+        new_faces.append(bm.faces.new((inner[index], inner[nxt], center)))
+    for face in new_faces:
+        face.smooth = True
+    bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
+    bm.to_mesh(obj.data)
+    bm.free()
+    obj.data.update()
+    obj['dish_depth_mm'] = depth_mm
+    return obj
+
+
 def trackpad(fc, collection, root, material, base_height):
     mm = fc.MM
     obj = profiled_shell(
@@ -200,6 +244,15 @@ def keyboard(fc, collection, root, material, base_height):
         obj['key_label'] = label
         obj['key_family'] = family
         obj['surface_family'] = 'sculpted_keycap'
+        dish_depth_mm = {
+            'regular': .12,
+            'modifier': .10,
+            'space': .08,
+            'arrow': .07,
+            'function': .09,
+            'touch_id': .08,
+        }[family]
+        _dish_keycap_top(obj, dish_depth_mm)
         _weighted_normals(obj, 48)
         stem = fc.rounded_cube('KEYSEAT_'+name, ((width-2)*mm,(height-1.2)*mm,.86*mm), .12*mm,
                                material,collection,(x*mm,y*mm,base_height-.05*mm)); stem.parent=root

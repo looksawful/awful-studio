@@ -26,6 +26,15 @@ for name, family in expected_families.items():
     assert key.get('key_family') == family, f'{name}: expected {family}, got {key.get("key_family")}'
     assert key.get('surface_family') == 'sculpted_keycap'
     assert any(mod.type == 'WEIGHTED_NORMAL' for mod in key.modifiers), f'{name}: no weighted normals'
+    top_z = max(vertex.co.z for vertex in key.data.vertices)
+    interior = [
+        vertex.co.z for vertex in key.data.vertices
+        if abs(vertex.co.x) <= key.dimensions.x * .18
+        and abs(vertex.co.y) <= key.dimensions.y * .18
+    ]
+    assert interior, f'{name}: no interior top geometry for a real dish'
+    dish_depth_mm = (top_z - min(interior)) * 1000.0
+    assert dish_depth_mm >= .06, f'{name}: keycap dish too shallow ({dish_depth_mm:.3f} mm)'
 
 for name in ('SPEAKER_RUNTIME_PROXY_L', 'SPEAKER_RUNTIME_PROXY_R'):
     proxy = bpy.data.objects[name]
