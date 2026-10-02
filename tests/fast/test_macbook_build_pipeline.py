@@ -13,7 +13,7 @@ class MacBookBuildPipelineTests(TestCase):
         calls = []
         def run(*args):
             calls.append(tuple(map(str, args)))
-            if len(calls) == 5:
+            if len(calls) == 6:
                 raise RuntimeError('stop before packaging')
         with mock.patch.object(sys, 'argv', ['build', '--blender', 'blender']), \
              mock.patch.object(build, 'source_fingerprint', return_value=('a' * 64, {})), \
@@ -26,7 +26,8 @@ class MacBookBuildPipelineTests(TestCase):
         self.assertIn(str(build.DEVICE / 'validate_hinge_clearance.py'), calls[1])
         self.assertIn(str(build.DEVICE / 'validate_deck_ports.py'), calls[2])
         self.assertIn(str(build.DEVICE / 'validate_construction.py'), calls[3])
-        self.assertIn(str(ROOT / 'tools/package_device_asset.py'), calls[4])
+        self.assertIn(str(build.DEVICE / 'validate_hybrid_deck.py'), calls[4])
+        self.assertIn(str(ROOT / 'tools/package_device_asset.py'), calls[5])
         for call in calls:
             self.assertIn('--python-exit-code', call)
             self.assertIn('--factory-startup', call)

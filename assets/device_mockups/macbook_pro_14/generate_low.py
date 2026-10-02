@@ -44,12 +44,16 @@ screen_c=fc.make_collection('MACBOOK_PRO_14_LOW_SCREEN')
 ctrl_c=fc.make_collection('MACBOOK_PRO_14_CONTROLS')
 metal=fc.make_material('MAT_SPACE_BLACK_ALUMINUM',(0.018,0.020,0.024),0.86,0.30)
 metal2=fc.make_material('MAT_EDGE_ALUMINUM',(0.040,0.043,0.048),0.88,0.26)
-keymat=fc.make_material('MAT_KEYCAP',(0.0020,0.0024,0.0030),0.0,0.46)
-keymat.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value=.04
-dark=fc.make_material('MAT_PORT_DARK',(0.004,0.005,0.007),0.02,0.16)
-wellmat=fc.make_material('MAT_KEYBOARD_WELL',(0.001,0.0015,0.002),0.0,0.55)
-wellmat.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value=.08
-trackmat=fc.make_material('MAT_TRACKPAD',(0.014,0.016,0.020),0.52,0.33)
+keymat=fc.make_material('MAT_KEYCAP',(0.0020,0.0024,0.0030),0.0,0.78)
+keymat.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value=.12
+dark=fc.make_material('MAT_PORT_DARK',(0.004,0.005,0.007),0.02,0.62)
+wellmat=fc.make_material('MAT_KEYBOARD_WELL',(0.001,0.0015,0.002),0.0,0.70)
+wellmat.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value=.06
+trackmat=fc.make_material('MAT_TRACKPAD',(0.014,0.016,0.020),0.0,0.22)
+track_bsdf=trackmat.node_tree.nodes.get('Principled BSDF')
+track_bsdf.inputs['Specular IOR Level'].default_value=.28
+track_bsdf.inputs['Coat Weight'].default_value=.18
+track_bsdf.inputs['Coat Roughness'].default_value=.16
 bezelmat=fc.make_material('MAT_DISPLAY_BEZEL',(0.002,0.003,0.005),0.0,0.28)
 bezelmat.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value=.025
 hingemat=fc.make_material('MAT_HINGE_SHROUD',(0.003,0.0035,0.004),0.0,0.48)
@@ -76,8 +80,8 @@ bpy.context.view_layer.update(); fc.boolean_difference(base,keycut,name='CUT_KEY
 keywell=fc.rounded_prism('KEYBOARD_WELL',274.8*MM,94.8*MM,.12*MM,4.4*MM,wellmat,detail_c,axis='Z',location=(0,35.5*MM,BASE_H-.52*MM),edge_bevel=.00004); keywell.parent=root
 trackcut=fc.rounded_prism('TRACKPAD_CUT',133*MM,81*MM,.42*MM,4.7*MM,None,detail_c,axis='Z',location=(0,-57*MM,BASE_H-.08*MM))
 bpy.context.view_layer.update(); fc.boolean_difference(base,trackcut,name='CUT_TRACKPAD_SEAT')
-track_gap=fc.rounded_prism('TRACKPAD_GAP',132.9*MM,80.9*MM,.08*MM,4.65*MM,dark,detail_c,axis='Z',location=(0,-57*MM,BASE_H-.23*MM)); track_gap.parent=root
-track=fc.rounded_prism('TRACKPAD',132*MM,80*MM,.22*MM,4.2*MM,trackmat,detail_c,axis='Z',location=(0,-57*MM,BASE_H-.03*MM),edge_bevel=.00006); track.parent=root
+track_gap=fc.rounded_prism('TRACKPAD_GAP',132.9*MM,80.9*MM,.06*MM,4.65*MM,dark,detail_c,axis='Z',location=(0,-57*MM,BASE_H-.25*MM)); track_gap.parent=root
+track=deck_details.trackpad(fc,detail_c,root,trackmat,BASE_H)
 
 hinge_y=D*.5-8.5*MM
 for side in (-1,1):
@@ -145,6 +149,15 @@ deck_details.keyboard(fc,detail_c,root,keymat,BASE_H)
 print('MACBOOK_CONSTRUCTION_PORTS_BEGIN',flush=True)
 cd.vents(fc,detail_c,root,base,W,D,dark)
 deck_details.ports(fc,detail_c,root,base,W,BASE_H,dark)
+
+# Freeze the post-mechanical, pre-speaker body for the derived runtime asset.
+# The authoritative master keeps physical apertures for close evidence renders.
+runtime_base=base.copy(); runtime_base.data=base.data.copy(); runtime_base.name='BASE_UNIBODY_RUNTIME_SOURCE'
+detail_c.objects.link(runtime_base); runtime_base.parent=root; runtime_base.hide_render=True
+runtime_base['runtime_only_source']=True
+runtime_base['runtime_variant']='clean_body_plus_speaker_proxy'
+deck_details.speaker_runtime_proxies(fc,detail_c,root,W,BASE_H)
+
 print('MACBOOK_CONSTRUCTION_SPEAKERS_BEGIN',flush=True)
 deck_details.speakers(fc,detail_c,root,base,W,BASE_H,dark)
 print('MACBOOK_CONSTRUCTION_CUTS_END',flush=True)

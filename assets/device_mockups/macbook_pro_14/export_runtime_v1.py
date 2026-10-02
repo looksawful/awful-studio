@@ -26,6 +26,24 @@ hinge = bpy.data.objects.get('CTRL_HINGE')
 if root is None or hinge is None:
     raise RuntimeError('MacBook root or hinge control missing')
 
+# Derive the runtime body from the authoritative master scene. The master keeps
+# physical speaker apertures for evidence; the runtime swaps in the clean
+# pre-speaker body plus alpha+normal speaker proxies.
+master_base = bpy.data.objects.get('BASE_UNIBODY')
+runtime_base = bpy.data.objects.get('BASE_UNIBODY_RUNTIME_SOURCE')
+if master_base is None or runtime_base is None:
+    raise RuntimeError('Hybrid deck master/runtime body seam missing')
+master_base.name = 'BASE_UNIBODY_MASTER_SOURCE'
+master_base.hide_render = True
+runtime_base.name = 'BASE_UNIBODY'
+runtime_base.hide_render = False
+runtime_base['speaker_runtime'] = 'baked_alpha_normal_proxy'
+for obj in bpy.data.objects:
+    if obj.get('master_only'):
+        obj.hide_render = True
+    if obj.get('runtime_only'):
+        obj.hide_render = False
+
 for cname in ('_STUDIO_RIG', '_DIAGNOSTIC_CAMERAS'):
     col = bpy.data.collections.get(cname)
     if col:
@@ -41,6 +59,7 @@ roles = {
     'BASE_UNIBODY': 'body', 'LID_UNIBODY': 'lid',
     'SCREEN_CONTENT': 'screen', 'SCREEN_GLASS': 'screen_glass',
     'FACETIME_CAMERA': 'front_camera_optic', 'TRACKPAD': 'trackpad',
+    'SPEAKER_RUNTIME_PROXY_L': 'speaker_proxy', 'SPEAKER_RUNTIME_PROXY_R': 'speaker_proxy',
     'TOUCH_ID': 'control', 'MAGSAFE': 'port', 'TB_LEFT_1': 'port',
     'TB_LEFT_2': 'port', 'TB_RIGHT': 'port', 'HEADPHONE': 'port',
     'HDMI': 'port', 'SDXC': 'port', 'APPLE_LOGO_RELEASE': 'branding',
@@ -157,6 +176,13 @@ manifest = {
         'compression': 'compat+meshopt',
         'node_preservation': 'required',
         'hinge_control': 'preserved',
+    },
+    'hybrid_deck': {
+        'master_runtime': 'single_authoritative_master_derived_runtime',
+        'speaker_runtime': 'baked_alpha_normal_proxy',
+        'speaker_proxy_nodes': ['SPEAKER_RUNTIME_PROXY_L', 'SPEAKER_RUNTIME_PROXY_R'],
+        'trackpad_surface': 'profiled_glass',
+        'key_families': ['regular', 'modifier', 'space', 'arrow', 'function', 'touch_id'],
     },
 }
 manifest_path = os.path.join(RUNTIME, prefix + '.asset.json')

@@ -21,6 +21,7 @@ SOURCE_FILES = [
     'assets/device_mockups/macbook_pro_14/port_layout.py',
     'assets/device_mockups/macbook_pro_14/construction_details.py',
     'assets/device_mockups/macbook_pro_14/function_legends.py',
+    'assets/device_mockups/macbook_pro_14/validate_hybrid_deck.py',
     'assets/device_mockups/macbook_pro_14/export_runtime_v1.py',
     'assets/device_mockups/macbook_pro_14/optimize_runtime_v1.py',
     'assets/device_mockups/macbook_pro_14/reference/apple_logo_alpha.png',
@@ -83,6 +84,8 @@ def main():
         '--python', DEVICE / 'validate_deck_ports.py')
     run(args.blender.resolve(), '--factory-startup', '--background', generated, '--python-exit-code', '1',
         '--python', DEVICE / 'validate_construction.py')
+    run(args.blender.resolve(), '--factory-startup', '--background', generated, '--python-exit-code', '1',
+        '--python', DEVICE / 'validate_hybrid_deck.py')
     run(args.blender.resolve(), '--factory-startup', '--background', generated, '--python-exit-code', '1', '--python', ROOT / 'tools/package_device_asset.py', '--',
         '--output', source_blend, '--entry', 'AWFUL_DEVICE_MACBOOK_PRO_14', '--root', 'CTRL_MACBOOK_PRO_14',
         '--key', 'MACBOOK_PRO_14', '--stage', 'RELEASE_CANDIDATE', '--variant', 'low_v1_release', '--revision', revision)
@@ -110,7 +113,7 @@ def main():
         'SCREEN_CONTENT', 'FACETIME_CAMERA', 'TRACKPAD',
         'TOUCH_ID', 'MAGSAFE', 'HDMI', 'SDXC', 'APPLE_LOGO_RELEASE',
         'ANCHOR_CENTER', 'ANCHOR_BOTTOM_CENTER', 'ANCHOR_SCREEN_CENTER',
-        'SCREEN_GLOW_ANCHOR',
+        'SCREEN_GLOW_ANCHOR', 'SPEAKER_RUNTIME_PROXY_L', 'SPEAKER_RUNTIME_PROXY_R',
     }
     missing = sorted(required - names)
     if missing:
