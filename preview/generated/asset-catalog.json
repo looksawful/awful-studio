@@ -127,9 +127,9 @@
         }
       ],
       "collision": null,
-      "sourceRevision": "e2ea016e8cb311fe6fc889f4ce0b5dbf9c99201b4bcd9d2d17d924c817930ecb",
-      "sourceCommit": "cdc35a1e49edacb83c576a2438750e37d1081f9b",
-      "triangleCount": 154623,
+      "sourceRevision": "776f8a1e5ab8ca55cb6ee2a81a2187d152076c0c1c22f64d13c9b1a366204f20",
+      "sourceCommit": "34a4b4973704b7c8cf938ffd393002276399baa5",
+      "triangleCount": 154695,
       "materialCount": 16,
       "animations": [
         "lid_open",
@@ -148,8 +148,8 @@
       "screenGlow": {
         "anchor": "SCREEN_GLOW_ANCHOR",
         "type": "rect_area",
-        "width_mm": 301.66,
-        "height_mm": 195.92,
+        "width_mm": 302.4,
+        "height_mm": 196.4,
         "source_energy_w": 8
       }
     },
