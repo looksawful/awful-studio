@@ -1,9 +1,16 @@
 """Runtime gate for the hybrid deck master -> derived runtime seam."""
 import bpy
+import os, sys
+sys.path.insert(0, os.path.dirname(__file__))
+from geometry_contract import derive_metric_measurements
+
+G1 = derive_metric_measurements()
+speaker_spec = G1['speaker']
+expected_apertures = speaker_spec['grid_rows'] * speaker_spec['grid_columns'] * 2
 
 master = bpy.data.objects['BASE_UNIBODY']
 runtime = bpy.data.objects['BASE_UNIBODY_RUNTIME_SOURCE']
-assert master.get('speaker_apertures') == 1584, 'master lost physical speaker apertures'
+assert master.get('speaker_apertures') == expected_apertures, 'master lost physical speaker apertures'
 assert runtime.get('runtime_variant') == 'clean_body_plus_speaker_proxy'
 assert runtime.hide_render, 'runtime source must stay hidden in master evidence renders'
 assert len(runtime.data.vertices) < len(master.data.vertices), 'runtime base still carries master speaker-hole topology'
@@ -40,7 +47,8 @@ for name in ('SPEAKER_RUNTIME_PROXY_L', 'SPEAKER_RUNTIME_PROXY_R'):
     proxy = bpy.data.objects[name]
     assert proxy.hide_render, f'{name}: runtime proxy must stay hidden in master renders'
     assert proxy.get('runtime_role') == 'speaker_proxy'
-    assert proxy.get('speaker_rows') == 88 and proxy.get('speaker_columns') == 9
+    assert proxy.get('speaker_rows') == speaker_spec['grid_rows']
+    assert proxy.get('speaker_columns') == speaker_spec['grid_columns']
 
 speaker = bpy.data.materials['MAT_SPEAKER_PROXY']
 nodes = speaker.node_tree.nodes

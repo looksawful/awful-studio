@@ -1,7 +1,12 @@
 """Runtime construction gate: physical profiles, camera layers and own-site display."""
 import bpy
 import bmesh
+import os, sys
 from mathutils import Vector
+sys.path.insert(0, os.path.dirname(__file__))
+from geometry_contract import derive_metric_measurements
+
+G1 = derive_metric_measurements()
 
 screen = bpy.data.materials['MAT_SCREEN_CONTENT'].node_tree.nodes['AWFUL_SCREEN_IMAGE'].image
 assert screen.name.startswith('looksawful_home_3024x1964'), 'Display still uses the macOS demo instead of our site'
@@ -34,7 +39,15 @@ for side in ('L','R'):
     assert surface.inputs['Metallic'].default_value<=.15 and surface.inputs['Roughness'].default_value>=.4, 'External hinge still reads as a reflective metal rod'
 assert len([o for o in bpy.data.objects if o.get('function_icon')]) == 12, 'Mac function row still uses F-number proxy labels'
 well=bpy.data.objects['KEYBOARD_WELL']; track=bpy.data.objects['TRACKPAD']
-assert min((well.matrix_world@Vector(v)).y for v in well.bound_box)-max((track.matrix_world@Vector(v)).y for v in track.bound_box) >= .004, 'Trackpad collides visually with keyboard well'
+actual_gap_mm = (
+    min((well.matrix_world@Vector(v)).y for v in well.bound_box)
+    - max((track.matrix_world@Vector(v)).y for v in track.bound_box)
+) * 1000
+expected_gap_mm = G1['keyboard']['trackpad_gap_mm']
+assert abs(actual_gap_mm-expected_gap_mm) <= .75, (
+    f'Trackpad/keyboard gap drift: actual {actual_gap_mm:.3f} mm, '
+    f'calibrated {expected_gap_mm:.3f} mm'
+)
 assert bpy.data.objects['KEY_03_01'].get('profile_rings', 0) >= 6, 'Keycaps still have flat block profiles'
 assert bpy.data.objects['BASE_UNIBODY'].get('speaker_apertures', 0) >= 1000, 'Speaker grilles still have sparse proxy dots'
 key=bpy.data.objects['KEY_03_01']
@@ -49,10 +62,19 @@ for side in (-1,1):
 hit,point,_,_=base.ray_cast(base.matrix_world.inverted()@Vector((0,-.057,.02)),Vector((0,0,-1)))
 assert hit and .0083-(base.matrix_world@point).z >= .0002, 'Trackpad is still placed on top of an uncut deck'
 holes=0
+speaker = G1['speaker']
 for side in (-1,1):
-    for row in range(88):
-        for column in range(9):
-            origin=Vector((side*.1463+(column-4)*.00068,(2+row*.82)/1000,.02))
+    for row in range(speaker['grid_rows']):
+        for column in range(speaker['grid_columns']):
+            x_mm = side * (
+                speaker['field_center_abs_x_mm']
+                + (column-(speaker['grid_columns']-1)/2) * speaker['pitch_x_mm']
+            )
+            y_mm = (
+                speaker['field_center_y_mm']
+                + (row-(speaker['grid_rows']-1)/2) * speaker['pitch_y_mm']
+            )
+            origin=Vector((x_mm/1000,y_mm/1000,.02))
             hit,point,_,_=base.ray_cast(base.matrix_world.inverted()@origin,Vector((0,0,-1)))
             assert hit and .0083-(base.matrix_world@point).z >= .0005, f'Speaker aperture missing at {side,row,column}'
             holes+=1

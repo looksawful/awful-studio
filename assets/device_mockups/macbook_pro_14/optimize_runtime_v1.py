@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 import struct
@@ -5,10 +6,6 @@ import subprocess
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-RUNTIME = HERE / 'runtime' / 'v1'
-COMPAT = RUNTIME / 'macbook_pro_14_m5_v1_web.glb'
-MESHOPT = RUNTIME / 'macbook_pro_14_m5_v1_web_meshopt.glb'
-MANIFEST = RUNTIME / 'macbook_pro_14_m5_v1.asset.json'
 GLTF_TRANSFORM_VERSION = '4.5.0'
 CRITICAL_NODES = {
     'CTRL_MACBOOK_PRO_14', 'CTRL_HINGE', 'BASE_UNIBODY', 'LID_UNIBODY',
@@ -34,29 +31,43 @@ def node_names(doc):
 
 
 def main():
-    for path in (COMPAT, MANIFEST):
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--runtime-dir', default='runtime/v1')
+    parser.add_argument('--prefix', default='macbook_pro_14_m5_v1')
+    args = parser.parse_args()
+
+    runtime = (HERE / args.runtime_dir).resolve()
+    if HERE.resolve() not in runtime.parents and runtime != HERE.resolve():
+        raise RuntimeError('runtime dir must stay inside the MacBook asset directory')
+    compat = runtime / f'{args.prefix}_web.glb'
+    meshopt = runtime / f'{args.prefix}_web_meshopt.glb'
+    manifest_path = runtime / f'{args.prefix}.asset.json'
+
+    for path in (compat, manifest_path):
         if not path.is_file():
             raise FileNotFoundError(path)
+
     npx = 'npx.cmd' if os.name == 'nt' else 'npx'
     subprocess.run([
         npx, '--yes', f'@gltf-transform/cli@{GLTF_TRANSFORM_VERSION}',
-        'meshopt', str(COMPAT), str(MESHOPT), '--level', 'high',
+        'meshopt', str(compat), str(meshopt), '--level', 'high',
     ], check=True, cwd=HERE)
 
-    meshopt_doc = read_glb_json(MESHOPT)
+    meshopt_doc = read_glb_json(meshopt)
     missing = CRITICAL_NODES - node_names(meshopt_doc)
     if missing:
         raise RuntimeError(f'Meshopt output lost critical nodes: {sorted(missing)}')
     required = set(meshopt_doc.get('extensionsRequired', []))
     if 'EXT_meshopt_compression' not in required:
         raise RuntimeError(f'Meshopt extension is not required: {sorted(required)}')
-    if COMPAT.stat().st_size <= MESHOPT.stat().st_size:
+    if compat.stat().st_size <= meshopt.stat().st_size:
         raise RuntimeError('Meshopt output is not smaller than compatibility GLB')
-    manifest = json.loads(MANIFEST.read_text(encoding='utf-8'))
+
+    manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
     manifest['web_variants'] = {
-        'compat': {'file': COMPAT.name, 'requires': []},
+        'compat': {'file': compat.name, 'requires': []},
         'meshopt': {
-            'file': MESHOPT.name,
+            'file': meshopt.name,
             'requires': ['MeshoptDecoder'],
             'extensions_required': sorted(required),
         },
@@ -68,14 +79,16 @@ def main():
         'version': GLTF_TRANSFORM_VERSION,
         'command': 'meshopt --level high',
     }
-    MANIFEST.write_text(
-        json.dumps(manifest, indent=2) + '\n', encoding='utf-8', newline='\n'
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2) + '\n',
+        encoding='utf-8',
+        newline='\n',
     )
 
     print(json.dumps({
-        'compat_bytes': COMPAT.stat().st_size,
-        'meshopt_bytes': MESHOPT.stat().st_size,
-        'ratio': round(MESHOPT.stat().st_size / COMPAT.stat().st_size, 4),
+        'compat_bytes': compat.stat().st_size,
+        'meshopt_bytes': meshopt.stat().st_size,
+        'ratio': round(meshopt.stat().st_size / compat.stat().st_size, 4),
         'critical_nodes': sorted(CRITICAL_NODES),
         'extensions_required': sorted(required),
     }, indent=2))

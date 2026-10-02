@@ -56,11 +56,20 @@ def profiled_shell(fc, name, width, height, depth, radius, rings, material, coll
     return obj
 
 
-def camera_stack(fc, collection, hinge, lid_height, bezel, dark):
+def camera_stack(fc, collection, hinge, screen_center_z, screen_height, display, bezel, dark):
     mm = fc.MM
-    # Black notch joins the top bezel; optics face the viewer on local -Y.
-    notch = fc.rounded_prism('CAMERA_NOTCH', 32*mm, 8.2*mm, .15*mm, 2.8*mm, bezel, collection, axis='Y')
-    notch.parent = hinge; notch.location = (0, -.57*mm, lid_height-4.7*mm)
+    notch_w = display['notch_top_width_mm']
+    notch_h = display['notch_height_mm']
+    notch_radius = min(display['notch_lower_radius_mm'], notch_h/2)
+    screen_top_z = screen_center_z + screen_height/2
+    notch_center_z = screen_top_z - notch_h*mm/2
+    camera_x = display['camera_center_x_mm']*mm
+    camera_z = screen_top_z - display['camera_from_top_mm']*mm
+    # Black notch intrudes from the calibrated active-display top edge.
+    notch = fc.rounded_prism(
+        'CAMERA_NOTCH', notch_w*mm, notch_h*mm, .15*mm, notch_radius*mm,
+        bezel, collection, axis='Y')
+    notch.parent = hinge; notch.location = (0, -.57*mm, notch_center_z)
     optical = fc.make_glass_material('MAT_FACETIME_OPTICAL', (.009, .022, .041), .06, .92, 1.52)
     coating = fc.make_material('MAT_FACETIME_COATING', (.018, .045, .095), .28, .10)
     for name, radius, depth, y, mat in (
@@ -70,10 +79,13 @@ def camera_stack(fc, collection, hinge, lid_height, bezel, dark):
         ('FACETIME_INNER_LENS', .49, .015, -.788, coating),
     ):
         obj = fc.cylinder(name, radius*mm, depth*mm, mat, collection, axis='Y', vertices=64)
-        obj.parent = hinge; obj.location = (0, y*mm, lid_height-4.7*mm)
-    for name, x, radius in (('CAMERA_STATUS_LED', 3.4, .19), ('AMBIENT_LIGHT_SENSOR', -5.6, .40)):
+        obj.parent = hinge; obj.location = (camera_x, y*mm, camera_z)
+    for name, x_offset, radius in (
+        ('CAMERA_STATUS_LED', 3.4, .19),
+        ('AMBIENT_LIGHT_SENSOR', -5.6, .40),
+    ):
         obj = fc.cylinder(name, radius*mm, .025*mm, dark, collection, axis='Y', vertices=32)
-        obj.parent = hinge; obj.location = (x*mm, -.675*mm, lid_height-4.7*mm)
+        obj.parent = hinge; obj.location = (camera_x+x_offset*mm, -.675*mm, camera_z)
 
 
 def underside(fc, collection, root, base, width, depth, base_height, metal, rubber):

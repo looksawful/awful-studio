@@ -1,0 +1,56 @@
+from pathlib import Path
+import sys
+import unittest
+
+ROOT = Path(__file__).resolve().parents[2]
+DEVICE = ROOT / "assets" / "device_mockups" / "macbook_pro_14"
+sys.path.insert(0, str(DEVICE))
+
+from geometry_contract import (
+    KEYBOARD_LAYOUT_PX,
+    derive_metric_measurements,
+)
+
+
+class MacBookG1ModelContractTests(unittest.TestCase):
+    def test_keyboard_layout_is_complete_78_key_ansi(self):
+        self.assertEqual(len(KEYBOARD_LAYOUT_PX), 78)
+        names = [item["name"] for item in KEYBOARD_LAYOUT_PX]
+        self.assertEqual(len(names), len(set(names)))
+        self.assertIn("TOUCH_ID", names)
+        self.assertEqual(
+            {name for name in names if name.startswith("KEY_ARROW_")},
+            {"KEY_ARROW_0", "KEY_ARROW_1", "KEY_ARROW_2", "KEY_ARROW_3"},
+        )
+
+    def test_keyboard_bounds_and_row_pitch_come_from_rectified_deck(self):
+        keyboard = derive_metric_measurements()["keyboard"]
+        self.assertAlmostEqual(keyboard["bounds_width_mm"], 278.5, delta=0.5)
+        self.assertAlmostEqual(keyboard["bounds_height_mm"], 112.5, delta=0.5)
+        self.assertAlmostEqual(keyboard["bounds_center_x_mm"], -0.3, delta=0.5)
+        self.assertAlmostEqual(keyboard["bounds_center_y_mm"], 37.1, delta=0.5)
+        self.assertAlmostEqual(keyboard["row_pitch_mm"], 19.0285714286, delta=0.02)
+
+    def test_speaker_grid_replaces_legacy_88_by_9_pattern(self):
+        speaker = derive_metric_measurements()["speaker"]
+        self.assertEqual(speaker["grid_columns"], 12)
+        self.assertEqual(speaker["grid_rows"], 109)
+        self.assertAlmostEqual(speaker["pitch_x_mm"], 1.0, delta=0.05)
+        self.assertAlmostEqual(speaker["pitch_y_mm"], 1.0, delta=0.05)
+        self.assertAlmostEqual(speaker["field_center_abs_x_mm"], 149.55, delta=0.25)
+        self.assertAlmostEqual(speaker["field_center_y_mm"], 36.225, delta=0.25)
+
+    def test_generator_consumes_geometry_contract_instead_of_old_magic_layout(self):
+        generate = (DEVICE / "generate_low.py").read_text(encoding="utf-8")
+        deck = (DEVICE / "deck_details.py").read_text(encoding="utf-8")
+        construction = (DEVICE / "construction_details.py").read_text(encoding="utf-8")
+        self.assertIn("derive_metric_measurements", generate)
+        self.assertIn("KEYBOARD_LAYOUT_PX", deck)
+        self.assertNotIn("SPEAKER_ROWS = 88", deck)
+        self.assertNotIn("SPEAKER_COLS = 9", deck)
+        self.assertNotIn("location=(0, -57*mm", deck)
+        self.assertNotIn("32*mm, 8.2*mm", construction)
+
+
+if __name__ == "__main__":
+    unittest.main()

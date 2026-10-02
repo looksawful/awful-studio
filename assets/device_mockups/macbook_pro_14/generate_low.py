@@ -6,12 +6,21 @@ if HERE not in sys.path: sys.path.insert(0,HERE)
 import foundation_common as fc
 import deck_details
 import construction_details as cd
+from geometry_contract import CHASSIS_FACTS, derive_metric_measurements
 MM=fc.MM
-W,D,CLOSED_H=312.6*MM,221.2*MM,15.5*MM
+G1=derive_metric_measurements()
+W=CHASSIS_FACTS['width'].value_mm*MM
+D=CHASSIS_FACTS['depth'].value_mm*MM
+CLOSED_H=CHASSIS_FACTS['closed_height'].value_mm*MM
 LID_T=4.7*MM; BASE_H=8.3*MM; FOOT_BOTTOM=-.655*MM
 GAP=CLOSED_H+FOOT_BOTTOM-LID_T-BASE_H
 LID_W,LID_H=312.0*MM,212.0*MM
-SCREEN_W,SCREEN_H=301.66*MM,195.92*MM
+SCREEN_W=G1['display']['active_width_mm']*MM
+SCREEN_H=G1['display']['active_height_mm']*MM
+SCREEN_RADIUS=G1['display']['opening_corner_radius_mm']*MM
+KEYBOARD=G1['keyboard']
+TRACKPAD=G1['trackpad']
+TRACKPAD_W=TRACKPAD['right_x_mm']-TRACKPAD['left_x_mm']
 OPEN_ANGLE=102.0
 
 def arg(flag,default):
@@ -75,12 +84,20 @@ for poly in base.data.polygons: poly.use_smooth = poly.index >= 2
 bottomcut=fc.rounded_prism('BOTTOM_PANEL_CUT',W-4.2*MM,D-4.2*MM,.75*MM,6.3*MM,None,detail_c,axis='Z',location=(0,0,.03*MM))
 bpy.context.view_layer.update(); fc.boolean_difference(base,bottomcut,name='CUT_BOTTOM_PANEL_SEAT')
 bottom=fc.rounded_prism('BOTTOM_PANEL',W-4.6*MM,D-4.6*MM,.30*MM,6.1*MM,metal2,detail_c,axis='Z',location=(0,0,.17*MM),edge_bevel=.00006); bottom.parent=root
-keycut=fc.rounded_prism('KEYBOARD_CUT',275*MM,95*MM,.85*MM,4.5*MM,None,detail_c,axis='Z',location=(0,35.5*MM,BASE_H-.20*MM))
+keycut=fc.rounded_prism(
+ 'KEYBOARD_CUT',KEYBOARD['well_width_mm']*MM,KEYBOARD['well_height_mm']*MM,.85*MM,4.5*MM,None,detail_c,axis='Z',
+ location=(KEYBOARD['well_center_x_mm']*MM,KEYBOARD['well_center_y_mm']*MM,BASE_H-.20*MM))
 bpy.context.view_layer.update(); fc.boolean_difference(base,keycut,name='CUT_KEYBOARD_DECK')
-keywell=fc.rounded_prism('KEYBOARD_WELL',274.8*MM,94.8*MM,.12*MM,4.4*MM,wellmat,detail_c,axis='Z',location=(0,35.5*MM,BASE_H-.52*MM),edge_bevel=.00004); keywell.parent=root
-trackcut=fc.rounded_prism('TRACKPAD_CUT',133*MM,81*MM,.42*MM,4.7*MM,None,detail_c,axis='Z',location=(0,-57*MM,BASE_H-.08*MM))
+keywell=fc.rounded_prism(
+ 'KEYBOARD_WELL',(KEYBOARD['well_width_mm']-.2)*MM,(KEYBOARD['well_height_mm']-.2)*MM,.12*MM,4.4*MM,wellmat,detail_c,axis='Z',
+ location=(KEYBOARD['well_center_x_mm']*MM,KEYBOARD['well_center_y_mm']*MM,BASE_H-.52*MM),edge_bevel=.00004); keywell.parent=root
+trackcut=fc.rounded_prism(
+ 'TRACKPAD_CUT',(TRACKPAD_W+1.0)*MM,(TRACKPAD['height_mm']+1.0)*MM,.42*MM,4.7*MM,None,detail_c,axis='Z',
+ location=(TRACKPAD['measured_center_x_mm']*MM,TRACKPAD['center_y_mm']*MM,BASE_H-.08*MM))
 bpy.context.view_layer.update(); fc.boolean_difference(base,trackcut,name='CUT_TRACKPAD_SEAT')
-track_gap=fc.rounded_prism('TRACKPAD_GAP',132.9*MM,80.9*MM,.06*MM,4.65*MM,dark,detail_c,axis='Z',location=(0,-57*MM,BASE_H-.25*MM)); track_gap.parent=root
+track_gap=fc.rounded_prism(
+ 'TRACKPAD_GAP',(TRACKPAD_W+.9)*MM,(TRACKPAD['height_mm']+.9)*MM,.06*MM,4.65*MM,dark,detail_c,axis='Z',
+ location=(TRACKPAD['measured_center_x_mm']*MM,TRACKPAD['center_y_mm']*MM,BASE_H-.25*MM)); track_gap.parent=root
 track=deck_details.trackpad(fc,detail_c,root,trackmat,BASE_H)
 
 hinge_y=D*.5-8.5*MM
@@ -119,7 +136,8 @@ for poly in lid.data.polygons: poly.use_smooth = poly.index >= 2
 bezel=fc.rounded_prism('DISPLAY_BEZEL',307.2*MM,204.2*MM,.28*MM,6.6*MM,bezelmat,screen_c,axis='Y',edge_bevel=.00010); bezel.parent=hinge; bezel.location=(0,-.12*MM,LID_H*.5+2.6*MM)
 gasket=fc.rounded_prism('DISPLAY_GASKET',309.3*MM,207*MM,.20*MM,7.1*MM,keymat,screen_c,axis='Y',edge_bevel=.00003); gasket.parent=hinge; gasket.location=(0,-.05*MM,LID_H*.5+2.3*MM)
 lower_rail=fc.rounded_prism('DISPLAY_LOWER_RAIL',307.2*MM,3.4*MM,.20*MM,.7*MM,bezelmat,screen_c,axis='Y',edge_bevel=.00003); lower_rail.parent=hinge; lower_rail.location=(0,-.12*MM,1.7*MM)
-screen=fc.rounded_prism('SCREEN_CONTENT',SCREEN_W,SCREEN_H,.12*MM,5.8*MM,screenmat,screen_c,axis='Y'); screen.parent=hinge; screen.location=(0,-.28*MM,LID_H*.5+2.0*MM)
+SCREEN_CENTER_Z=LID_H*.5+2.0*MM
+screen=fc.rounded_prism('SCREEN_CONTENT',SCREEN_W,SCREEN_H,.12*MM,SCREEN_RADIUS,screenmat,screen_c,axis='Y'); screen.parent=hinge; screen.location=(0,-.28*MM,SCREEN_CENTER_Z)
 screen_path=os.path.join(HERE,'reference','looksawful_home_3024x1964.png')
 img=bpy.data.images.load(screen_path,check_existing=True); img.pack()
 nodes=screenmat.node_tree.nodes; links=screenmat.node_tree.links; sbsdf=nodes.get('Principled BSDF')
@@ -142,7 +160,7 @@ screen_glass=fc.rounded_prism('SCREEN_GLASS',307.6*MM,204.6*MM,.36*MM,6.8*MM,gla
 glow_anchor=fc.empty('SCREEN_GLOW_ANCHOR',ctrl_c,location=(0,-1.2*MM,LID_H*.5+2.0*MM)); glow_anchor.parent=hinge
 glow_anchor['screen_on_energy']=8.0; glow_anchor['glow_type']='rect_area'; glow_anchor['glow_width_m']=SCREEN_W; glow_anchor['glow_height_m']=SCREEN_H
 root['screen_states']='screen_off,screen_on'; root['screen_glow_anchor']='SCREEN_GLOW_ANCHOR'; root['screen_glow_energy']=8.0
-cd.camera_stack(fc,detail_c,hinge,LID_H,bezelmat,dark)
+cd.camera_stack(fc,detail_c,hinge,SCREEN_CENTER_Z,SCREEN_H,G1['display'],bezelmat,dark)
 cd.underside(fc,detail_c,root,base,W,D,BASE_H,metal2,keymat)
 
 deck_details.keyboard(fc,detail_c,root,keymat,BASE_H)

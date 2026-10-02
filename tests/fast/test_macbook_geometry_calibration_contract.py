@@ -107,12 +107,13 @@ class MacBookGeometryCalibrationContractTests(unittest.TestCase):
         self.assertLessEqual(abs(measured_center), trackpad["residual_tolerance_mm"])
         self.assertFalse(trackpad["frozen"])
 
-    def test_speaker_periodicity_is_recorded_without_freezing_count(self):
+    def test_speaker_periodicity_and_observed_grid_are_provisional(self):
         speaker = derive_metric_measurements()["speaker"]
         self.assertAlmostEqual(speaker["pitch_x_mm"], speaker["pitch_y_mm"], delta=0.15)
         self.assertAlmostEqual(speaker["pitch_x_mm"], 1.0, delta=0.15)
-        self.assertIsNone(speaker["column_count"])
-        self.assertIsNone(speaker["row_count"])
+        self.assertEqual(speaker["column_count"], 12)
+        self.assertEqual(speaker["row_count"], 109)
+        self.assertAlmostEqual(speaker["hole_radius_mm"], 0.25, delta=0.05)
         self.assertFalse(speaker["frozen"])
 
     def test_trackpad_y_is_separate_from_front_chassis_edge(self):

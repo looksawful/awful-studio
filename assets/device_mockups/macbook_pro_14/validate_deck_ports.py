@@ -6,6 +6,7 @@ import os,sys
 from mathutils import Vector
 sys.path.insert(0,os.path.dirname(__file__))
 from port_layout import PORTS
+from geometry_contract import derive_metric_measurements
 
 for name in ('TB_LEFT_1','TB_LEFT_2','TB_RIGHT'):
     contacts=[o for o in bpy.data.objects if o.name.startswith(name+'_CONTACT_')]
@@ -38,8 +39,19 @@ for name, (side, y) in ports.items():
     depth = 156.3 - abs((base.matrix_world @ location).x) * 1000
     depths[name] = round(depth, 4)
     assert depth >= 1.5, f'{name}: opening has no depth ({depth:.3f} mm)'
+speaker = derive_metric_measurements()['speaker']
+probe_col = (speaker['grid_columns'] - 1) // 2
+probe_row = (speaker['grid_rows'] - 1) // 2
 for side in (-1, 1):
-    origin = base.matrix_world.inverted() @ Vector((side * .1463, .002, .02))
+    x_mm = side * (
+        speaker['field_center_abs_x_mm']
+        + (probe_col - (speaker['grid_columns'] - 1) / 2) * speaker['pitch_x_mm']
+    )
+    y_mm = (
+        speaker['field_center_y_mm']
+        + (probe_row - (speaker['grid_rows'] - 1) / 2) * speaker['pitch_y_mm']
+    )
+    origin = base.matrix_world.inverted() @ Vector((x_mm / 1000, y_mm / 1000, .02))
     hit, location, _, _ = base.ray_cast(origin, Vector((0, 0, -1)))
     assert hit and .0083 - (base.matrix_world @ location).z >= .0003, 'Speaker perforations must recess into the deck'
 keys = [obj for obj in bpy.data.objects if obj.name.startswith('KEY_') and obj.type == 'MESH']

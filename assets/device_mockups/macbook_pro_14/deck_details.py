@@ -6,16 +6,19 @@ from mathutils import Matrix
 from construction_details import profiled_shell
 import function_legends
 from port_layout import PORTS
+from geometry_contract import DECK_CALIBRATION, KEYBOARD_LAYOUT_PX, deck_px_to_mm, derive_metric_measurements
 
 
-SPEAKER_ROWS = 88
-SPEAKER_COLS = 9
-SPEAKER_ROW_PITCH_MM = .82
-SPEAKER_COL_PITCH_MM = .68
-SPEAKER_HOLE_RADIUS_MM = .20
-SPEAKER_FIELD_WIDTH_MM = 6.2
-SPEAKER_FIELD_HEIGHT_MM = 73.0
-SPEAKER_CENTER_Y_MM = 37.67
+G1 = derive_metric_measurements()
+SPEAKER_ROWS = G1["speaker"]["grid_rows"]
+SPEAKER_COLS = G1["speaker"]["grid_columns"]
+SPEAKER_ROW_PITCH_MM = G1["speaker"]["pitch_y_mm"]
+SPEAKER_COL_PITCH_MM = G1["speaker"]["pitch_x_mm"]
+SPEAKER_HOLE_RADIUS_MM = G1["speaker"]["hole_radius_mm"]
+SPEAKER_FIELD_WIDTH_MM = G1["speaker"]["observed_width_mm"]
+SPEAKER_FIELD_HEIGHT_MM = G1["speaker"]["observed_height_mm"]
+SPEAKER_CENTER_X_ABS_MM = G1["speaker"]["field_center_abs_x_mm"]
+SPEAKER_CENTER_Y_MM = G1["speaker"]["field_center_y_mm"]
 
 
 def _weighted_normals(obj, weight=50):
@@ -71,18 +74,24 @@ def _dish_keycap_top(obj, depth_mm):
 
 def trackpad(fc, collection, root, material, base_height):
     mm = fc.MM
+    spec = G1["trackpad"]
+    width = spec["right_x_mm"] - spec["left_x_mm"]
+    height = spec["height_mm"]
+    radius = min(4.6, height * 0.06)
     obj = profiled_shell(
-        fc, 'TRACKPAD', 132*mm, 80*mm, .20*mm, 4.6*mm,
+        fc, 'TRACKPAD', width*mm, height*mm, .20*mm, radius*mm,
         [(z*mm, inset*mm) for z, inset in (
             (-.10, .42), (-.075, .16), (-.035, .03),
             (.045, 0), (.085, .12), (.10, .38),
         )],
         material, collection, axis='Z',
-        location=(0, -57*mm, base_height-.10*mm),
+        location=(spec["target_center_x_mm"]*mm, spec["center_y_mm"]*mm, base_height-.10*mm),
     )
     obj.parent = root
     obj['surface_family'] = 'glass_trackpad'
     obj['master_runtime_shared'] = True
+    obj['calibration_source'] = spec["source"]
+    obj['calibration_tolerance_mm'] = spec["tolerance_mm"]
     _weighted_normals(obj, 55)
     return obj
 
@@ -131,7 +140,7 @@ def _speaker_proxy_images():
     radius = SPEAKER_HOLE_RADIUS_MM
 
     for row in range(SPEAKER_ROWS):
-        y_mm = 2 + row*SPEAKER_ROW_PITCH_MM - SPEAKER_CENTER_Y_MM
+        y_mm = (row - (SPEAKER_ROWS-1)/2) * SPEAKER_ROW_PITCH_MM
         cy = int(round((y_mm / SPEAKER_FIELD_HEIGHT_MM + .5) * (height_px - 1)))
         for col in range(SPEAKER_COLS):
             x_mm = (col - (SPEAKER_COLS-1)/2) * SPEAKER_COL_PITCH_MM
@@ -197,7 +206,7 @@ def speaker_runtime_proxies(fc, collection, root, width, base_height):
     mm = fc.MM
     material = _speaker_proxy_material()
     for side, suffix in ((-1, 'L'), (1, 'R')):
-        center_x = side*(width/2-10*mm)
+        center_x = side*SPEAKER_CENTER_X_ABS_MM*mm
         mesh = bpy.data.meshes.new(f'SPEAKER_RUNTIME_PROXY_{suffix}_MESH')
         w = SPEAKER_FIELD_WIDTH_MM*mm*.5
         h = SPEAKER_FIELD_HEIGHT_MM*mm*.5
@@ -257,9 +266,14 @@ def keyboard(fc, collection, root, material, base_height):
         stem = fc.rounded_cube('KEYSEAT_'+name, ((width-2)*mm,(height-1.2)*mm,.86*mm), .12*mm,
                                material,collection,(x*mm,y*mm,base_height-.05*mm)); stem.parent=root
         if label == 'Touch ID':
+            touch = G1["touch_id"]
+            sensor_x, sensor_y = deck_px_to_mm(*touch["sensor_center_px"])
             sensor_mat = fc.make_material('MAT_TOUCH_ID_SENSOR', (.003, .004, .005), 0, .22)
-            sensor = fc.cylinder('TOUCH_ID_SENSOR', 4.3 * mm, .06 * mm, sensor_mat, collection,
-                                 (x * mm, y * mm, base_height + 1.18 * mm), axis='Z', vertices=48)
+            sensor = fc.cylinder(
+                'TOUCH_ID_SENSOR', touch["sensor_diameter_mm"]*.5*mm, .06*mm,
+                sensor_mat, collection,
+                (sensor_x*mm, sensor_y*mm, base_height + 1.18*mm),
+                axis='Z', vertices=64)
             sensor.parent = root
             return
         if label == 'space':
@@ -283,17 +297,12 @@ def keyboard(fc, collection, root, material, base_height):
         bpy.context.view_layer.objects.active = legend
         bpy.ops.object.convert(target='MESH')
 
-    for row, labels, units in rows:
-        assert len(labels) == len(units)
-        x = -130.5 if row == 0 else -sum(units) * 18 / 2
-        for index, (label, span) in enumerate(zip(labels, units)):
-            name = 'TOUCH_ID' if label == 'Touch ID' else f'KEY_{row:02d}_{index:02d}'
-            key(name, label, x + span * 9, -2 + row * 15.25, span * 18 - 1.8)
-            x += span * 18
-    # Four half-height arrows occupy an inverted T in the remaining bottom row.
-    for index, (label, x, y) in enumerate((('←', 88.2, -5.5), ('↓', 104.4, -5.5),
-                                         ('→', 120.6, -5.5), ('↑', 104.4, 1.3))):
-        key(f'KEY_ARROW_{index}', label, x, y, 14.4, 6.1)
+    scale = DECK_CALIBRATION["px_per_mm"]
+    for item in KEYBOARD_LAYOUT_PX:
+        x, y = deck_px_to_mm(item["cx_px"], item["cy_px"])
+        width = item["width_px"] / scale
+        height = item["height_px"] / scale
+        key(item["name"], item["label"], x, y, width, height)
 
 
 def ports(fc, collection, root, base, width, base_height, dark):
@@ -362,7 +371,7 @@ def speakers(fc, collection, root, base, width, base_height, dark):
     mm = fc.MM
     bm = bmesh.new()
     for side in (-1, 1):
-        center_x = side*(width/2-10*mm)
+        center_x = side*SPEAKER_CENTER_X_ABS_MM*mm
         backing = fc.rounded_prism(
             f'SPEAKER_BACKING_{side}', SPEAKER_FIELD_WIDTH_MM*mm, SPEAKER_FIELD_HEIGHT_MM*mm,
             .10*mm, .3*mm, dark, collection, axis='Z',
@@ -373,7 +382,7 @@ def speakers(fc, collection, root, base, width, base_height, dark):
         for row in range(SPEAKER_ROWS):
             for col in range(SPEAKER_COLS):
                 x = center_x+(col-(SPEAKER_COLS-1)/2)*SPEAKER_COL_PITCH_MM*mm
-                y = (2+row*SPEAKER_ROW_PITCH_MM)*mm
+                y = (SPEAKER_CENTER_Y_MM + (row-(SPEAKER_ROWS-1)/2)*SPEAKER_ROW_PITCH_MM)*mm
                 bmesh.ops.create_cone(
                     bm, cap_ends=True, cap_tris=False, segments=12,
                     radius1=SPEAKER_HOLE_RADIUS_MM*mm, radius2=SPEAKER_HOLE_RADIUS_MM*mm,
@@ -396,4 +405,4 @@ def speakers(fc, collection, root, base, width, base_height, dark):
     bpy.ops.object.modifier_apply(modifier=modifier.name)
     bpy.data.objects.remove(cutter,do_unlink=True)
     base['speaker_apertures']=SPEAKER_ROWS*SPEAKER_COLS*2
-    base['speaker_pattern']='88x9 per side; shared with runtime alpha+normal proxy'
+    base['speaker_pattern']=f'{SPEAKER_ROWS}x{SPEAKER_COLS} per side @ {SPEAKER_ROW_PITCH_MM:.3f}x{SPEAKER_COL_PITCH_MM:.3f} mm; shared with runtime alpha+normal proxy'

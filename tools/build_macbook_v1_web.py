@@ -17,6 +17,7 @@ LOADER_PATH = ROOT / 'extension/awful_studio/device_asset_loader.py'
 SOURCE_FILES = [
     'assets/device_mockups/common/foundation_common.py',
     'assets/device_mockups/macbook_pro_14/generate_low.py',
+    'assets/device_mockups/macbook_pro_14/geometry_contract.py',
     'assets/device_mockups/macbook_pro_14/deck_details.py',
     'assets/device_mockups/macbook_pro_14/port_layout.py',
     'assets/device_mockups/macbook_pro_14/construction_details.py',

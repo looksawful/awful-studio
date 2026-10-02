@@ -6,14 +6,24 @@ import bpy
 from mathutils import Vector
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-RUNTIME = os.path.join(HERE, 'runtime', 'v1')
-os.makedirs(RUNTIME, exist_ok=True)
 
 
 def cli(flag, default=None):
     argv = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
     return argv[argv.index(flag) + 1] if flag in argv else default
 
+
+RUNTIME_REL = cli('--runtime-dir', 'runtime/v1').replace('\\', '/').strip('/')
+PREFIX = cli('--prefix', 'macbook_pro_14_m5_v1')
+VERSION = cli('--version', 'v1')
+SOURCE_BLEND_LABEL = cli(
+    '--source-blend-label',
+    'extension/awful_studio/assets/devices/macbook_pro_14_m5_low_v1_release.blend',
+).replace('\\', '/')
+RUNTIME = os.path.normpath(os.path.join(HERE, RUNTIME_REL))
+if os.path.commonpath([HERE, RUNTIME]) != HERE:
+    raise RuntimeError('runtime dir must stay inside the MacBook asset directory')
+os.makedirs(RUNTIME, exist_ok=True)
 
 SOURCE_REVISION = cli('--source-revision', '')
 SOURCE_COMMIT = cli('--source-commit', '')
@@ -27,9 +37,8 @@ if root is None or hinge is None:
     raise RuntimeError('MacBook root or hinge control missing')
 owned_objects = [root] + list(root.children_recursive)
 
-# Derive the runtime body from the authoritative master scene. The master keeps
-# physical speaker apertures for evidence; the runtime swaps in the clean
-# pre-speaker body plus alpha+normal speaker proxies.
+# The authoritative master keeps physical speaker apertures. Runtime swaps in
+# the clean pre-speaker body plus the alpha+normal speaker proxies.
 master_base = bpy.data.objects.get('BASE_UNIBODY')
 runtime_base = bpy.data.objects.get('BASE_UNIBODY_RUNTIME_SOURCE')
 if master_base is None or runtime_base is None:
@@ -60,7 +69,8 @@ roles = {
     'BASE_UNIBODY': 'body', 'LID_UNIBODY': 'lid',
     'SCREEN_CONTENT': 'screen', 'SCREEN_GLASS': 'screen_glass',
     'FACETIME_CAMERA': 'front_camera_optic', 'TRACKPAD': 'trackpad',
-    'SPEAKER_RUNTIME_PROXY_L': 'speaker_proxy', 'SPEAKER_RUNTIME_PROXY_R': 'speaker_proxy',
+    'SPEAKER_RUNTIME_PROXY_L': 'speaker_proxy',
+    'SPEAKER_RUNTIME_PROXY_R': 'speaker_proxy',
     'TOUCH_ID': 'control', 'MAGSAFE': 'port', 'TB_LEFT_1': 'port',
     'TB_LEFT_2': 'port', 'TB_RIGHT': 'port', 'HEADPHONE': 'port',
     'HDMI': 'port', 'SDXC': 'port', 'APPLE_LOGO_RELEASE': 'branding',
@@ -82,10 +92,15 @@ def anchor(name, location, parent):
     obj.empty_display_size = 0.01
     return obj
 
+
 screen = bpy.data.objects.get('SCREEN_CONTENT')
 anchor('ANCHOR_CENTER', (0.0, 0.0, 0.0), root)
 anchor('ANCHOR_BOTTOM_CENTER', (0.0, 0.0, 0.0), root)
-anchor('ANCHOR_SCREEN_CENTER', tuple(screen.location) if screen else (0.0, 0.0, 0.106), hinge)
+anchor(
+    'ANCHOR_SCREEN_CENTER',
+    tuple(screen.location) if screen else (0.0, 0.0, 0.106),
+    hinge,
+)
 root['runtime_format'] = 'glTF 2.0 / GLB'
 root['runtime_units'] = 'meters'
 root['source_up_axis'] = '+Z'
@@ -96,7 +111,7 @@ root['runtime_pivot'] = 'ANCHOR_CENTER'
 root['runtime_bottom_anchor'] = 'ANCHOR_BOTTOM_CENTER'
 root['runtime_screen_anchor'] = 'ANCHOR_SCREEN_CENTER'
 root['runtime_lod'] = 'LOD0'
-root['delivery_version'] = 'v1'
+root['delivery_version'] = VERSION
 root['delivery_stage'] = 'RELEASE_CANDIDATE'
 root['delivery_source_revision'] = SOURCE_REVISION
 root['delivery_source_commit'] = SOURCE_COMMIT
@@ -107,13 +122,19 @@ for obj in bpy.context.selected_objects:
     obj.select_set(False)
 exported = []
 for obj in [root] + list(root.children_recursive):
-    if obj.type in {'MESH', 'EMPTY'} and not obj.hide_render and obj.name != 'SCREEN_GLASS':
+    if (
+        obj.type in {'MESH', 'EMPTY'}
+        and not obj.hide_render
+        and obj.name != 'SCREEN_GLASS'
+    ):
         obj.select_set(True)
         exported.append(obj.name)
 bpy.context.view_layer.objects.active = root
 
-prefix = 'macbook_pro_14_m5_v1'
-glb = os.path.join(RUNTIME, prefix + '_web.glb')
+glb_name = PREFIX + '_web.glb'
+delivery_name = PREFIX + '_delivery.blend'
+manifest_name = PREFIX + '.asset.json'
+glb = os.path.join(RUNTIME, glb_name)
 bpy.ops.export_scene.gltf(
     filepath=glb,
     export_format='GLB',
@@ -123,33 +144,49 @@ bpy.ops.export_scene.gltf(
     export_animation_mode='ACTIONS',
 )
 bpy.ops.file.pack_all()
-delivery = os.path.join(RUNTIME, prefix + '_delivery.blend')
+delivery = os.path.join(RUNTIME, delivery_name)
 bpy.ops.wm.save_as_mainfile(filepath=delivery)
 
-mesh_objs = [o for o in bpy.data.objects if o.type == 'MESH' and o.name in exported]
-materials = sorted({m.name for o in mesh_objs for m in o.data.materials if m})
+mesh_objs = [
+    obj for obj in bpy.data.objects
+    if obj.type == 'MESH' and obj.name in exported
+]
+materials = sorted({
+    material.name
+    for obj in mesh_objs
+    for material in obj.data.materials
+    if material
+})
 points = []
 for obj in mesh_objs:
     for corner in obj.bound_box:
         world = obj.matrix_world @ Vector(corner)
         points.append((world.x, world.z, -world.y))
-runtime_min = [min(p[i] for p in points) for i in range(3)]
-runtime_max = [max(p[i] for p in points) for i in range(3)]
-runtime_size_mm = [round((runtime_max[i] - runtime_min[i]) * 1000.0, 3) for i in range(3)]
+runtime_min = [min(point[i] for point in points) for i in range(3)]
+runtime_max = [max(point[i] for point in points) for i in range(3)]
+runtime_size_mm = [
+    round((runtime_max[i] - runtime_min[i]) * 1000.0, 3)
+    for i in range(3)
+]
 
+screen_width_mm = round(abs(screen.dimensions.x) * 1000.0, 4) if screen else 0.0
+screen_height_mm = round(abs(screen.dimensions.z) * 1000.0, 4) if screen else 0.0
+runtime_repo_dir = 'assets/device_mockups/macbook_pro_14/' + RUNTIME_REL
 manifest = {
     'asset_id': 'macbook_pro_14_m5',
-    'version': 'v1',
+    'version': VERSION,
     'stage': 'RELEASE_CANDIDATE',
-    'source_blend': 'extension/awful_studio/assets/devices/macbook_pro_14_m5_low_v1_release.blend',
-    'delivery_blend': 'runtime/v1/macbook_pro_14_m5_v1_delivery.blend',
-    'glb': 'runtime/v1/macbook_pro_14_m5_v1_web.glb',
+    'source_blend': SOURCE_BLEND_LABEL,
+    'delivery_blend': f'{runtime_repo_dir}/{delivery_name}',
+    'glb': f'{runtime_repo_dir}/{glb_name}',
     'body_dimensions_mm': [312.6, 221.2, 15.5],
     'dimension_order': ['width_x', 'depth_y', 'closed_height_z'],
     'runtime_bounds_mm': runtime_size_mm,
     'units': 'meters',
-    'source_up_axis': '+Z', 'source_forward_axis': '-Y',
-    'up_axis': '+Y', 'forward_axis': '+Z',
+    'source_up_axis': '+Z',
+    'source_forward_axis': '-Y',
+    'up_axis': '+Y',
+    'forward_axis': '+Z',
     'root': 'CTRL_MACBOOK_PRO_14',
     'hinge_control': 'CTRL_HINGE',
     'animations': ['lid_open', 'lid_close'],
@@ -157,16 +194,29 @@ manifest = {
         'screen_off': {'emission_strength': 0.0, 'glow_energy': 0.0},
         'screen_on': {'emission_strength': 0.65, 'glow_energy': 8.0},
     },
-    'screen_glow': {'anchor': 'SCREEN_GLOW_ANCHOR', 'type': 'rect_area', 'width_mm': 301.66, 'height_mm': 195.92, 'source_energy_w': 8.0},
+    'screen_glow': {
+        'anchor': 'SCREEN_GLOW_ANCHOR',
+        'type': 'rect_area',
+        'width_mm': screen_width_mm,
+        'height_mm': screen_height_mm,
+        'source_energy_w': 8.0,
+    },
     'screen_object': 'SCREEN_CONTENT',
-    'anchors': ['ANCHOR_CENTER', 'ANCHOR_BOTTOM_CENTER', 'ANCHOR_SCREEN_CENTER', 'SCREEN_GLOW_ANCHOR'],
-    'lods': [{'name': 'LOD0', 'file': 'macbook_pro_14_m5_v1_web.glb'}],
+    'anchors': [
+        'ANCHOR_CENTER',
+        'ANCHOR_BOTTOM_CENTER',
+        'ANCHOR_SCREEN_CENTER',
+        'SCREEN_GLOW_ANCHOR',
+    ],
+    'lods': [{'name': 'LOD0', 'file': glb_name}],
     'materials': materials,
     'exported_objects': exported,
     'runtime_roles': roles,
     'threejs_loader': 'GLTFLoader',
     'requires_meshopt_decoder': False,
-    'web_variants': {'compat': {'file': 'macbook_pro_14_m5_v1_web.glb', 'requires': []}},
+    'web_variants': {
+        'compat': {'file': glb_name, 'requires': []},
+    },
     'camera_fit': 'runtime_bounds',
     'source_revision': SOURCE_REVISION,
     'source_commit': SOURCE_COMMIT,
@@ -181,12 +231,22 @@ manifest = {
     'hybrid_deck': {
         'master_runtime': 'single_authoritative_master_derived_runtime',
         'speaker_runtime': 'derived_alpha_normal_proxy',
-        'speaker_proxy_nodes': ['SPEAKER_RUNTIME_PROXY_L', 'SPEAKER_RUNTIME_PROXY_R'],
+        'speaker_proxy_nodes': [
+            'SPEAKER_RUNTIME_PROXY_L',
+            'SPEAKER_RUNTIME_PROXY_R',
+        ],
         'trackpad_surface': 'profiled_glass',
-        'key_families': ['regular', 'modifier', 'space', 'arrow', 'function', 'touch_id'],
+        'key_families': [
+            'regular',
+            'modifier',
+            'space',
+            'arrow',
+            'function',
+            'touch_id',
+        ],
     },
 }
-manifest_path = os.path.join(RUNTIME, prefix + '.asset.json')
+manifest_path = os.path.join(RUNTIME, manifest_name)
 with open(manifest_path, 'w', encoding='utf-8', newline='\n') as handle:
     json.dump(manifest, handle, indent=2)
     handle.write('\n')
