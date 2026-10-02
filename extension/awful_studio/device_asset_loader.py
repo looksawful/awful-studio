@@ -53,7 +53,7 @@ DEVICE_ASSET_SPECS = {
         'stage': 'RELEASE_CANDIDATE',
         'dimensions_m': (0.3126, 0.2212, 0.0155),
         'default_lod': 'LOW',
-        'lods': {'LOW': {'variant': 'low_v1_release', 'blend_path': 'assets/devices/macbook_pro_14_m5_low_v1_release.blend', 'entry_collection': 'AWFUL_DEVICE_MACBOOK_PRO_14', 'source_revision': 'c6ad2df1b951e55ff40370ed03fc33bea04aff8cdf74096e9216c49d79ab7cfc'}},
+        'lods': {'LOW': {'variant': 'low_v1_release', 'blend_path': 'assets/devices/macbook_pro_14_m5_low_v1_release.blend', 'entry_collection': 'AWFUL_DEVICE_MACBOOK_PRO_14', 'source_revision': '72c2333c659a2a4ad20394062d8c0bbce7fd61f4b85a9b4d9988d56333923234'}},
         'root_name': 'CTRL_MACBOOK_PRO_14',
         'screen_object': 'SCREEN_CONTENT',
         'screen_material': 'MAT_SCREEN_CONTENT',

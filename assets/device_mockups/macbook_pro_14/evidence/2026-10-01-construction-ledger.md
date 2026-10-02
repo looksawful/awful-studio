@@ -60,3 +60,27 @@ Root cause: 58 mm metal pivots were enclosed by only 51 mm reflective sleeves, l
 Repair: retain both mechanical pivots and their controller, replace the exterior sleeves with 60 mm matte shrouds, add a shallow front flat and a separate black lower-display rail. Estimated section: pivot radius 3.3 mm, sleeve bore 3.42 mm, outer radius 3.65 mm, visible face 3.46 mm from the axis; all stay within the existing 3.9 mm chassis relief. Full-angle mechanical clearance, complete-envelope tolerance and delivery fingerprints are unchanged. No object is hidden just to pass the presentation check.
 
 Fresh verification: Blender 5.2.1 LTS build and all 103 hinge positions pass; end probes and authored matte finish pass, as do all prior construction/deck/port checks. Complete closed bounds remain 312.599987 × 221.200004 × 15.503996 mm. All 16 fixed views were rerendered; hero and 30-degree rear macro inspection show the former bright rods concealed by dark exterior sleeves under unchanged lights/cameras. Browser screen-on/off capture and all 11 assets pass; 173 fast and 12 preview tests pass. Compatibility GLB is 8,885,704 bytes; meshopt is 2,224,516 bytes. Decision: `retain_repair` for the exposed-rod defect. Exact hinge construction, calibrated local dimensions and overall photographic fidelity remain unaccepted LOW estimates. No deployment and no Remote Desktop Commander.
+
+## 2026-10-02 — port placement, contacts and wall normals
+
+Primary references: Apple's [left](https://www.apple.com/v/macbook-pro/specs/d/images/specs/14-inch/ports_3_14_inch__dqrs9b6s9wuq_large.jpg) and [right](https://www.apple.com/v/macbook-pro/specs/d/images/specs/14-inch/ports_4_14_inch__dvrty8mprvwy_large.jpg) M5 Pro/Max side images. These images crop the front; their full width cannot be equated to the 221.2 mm chassis depth. `port_layout.py` instead records picked pixel centers/rear endpoints and a local approximate ruler: 24 px assigned an 8.4 mm USB-C visual opening, or 0.35 mm/px. This calibration and image-derived positions are LOW estimates, not factory measurements.
+
+The [USB-IF Type-C specification, Release 2.0](https://www.usb.org/sites/default/files/USB%20Type-C%20Spec%20R2.0%20-%20August%202019.pdf), Figure 3-1 (page 42), provides the nominal 8.34 mm shell opening and +0.06 mm upper tolerance, 24 signal contacts, and 0.5 mm pitch. The chosen 8.4 mm visual opening is rounded; local chassis cut, depth and simplified contact geometry remain estimates, not a compliance model.
+
+| Port | Old Y, mm | Photo-derived Y, mm |
+| --- | ---: | ---: |
+| MagSafe | 62 | 81.725 |
+| Thunderbolt left 1 | 27 | 61.950 |
+| Thunderbolt left 2 | -1 | 46.550 |
+| Headphone | -54 | 32.900 |
+| HDMI | 53 | 81.900 |
+| SDXC | 18 | 36.400 |
+| Thunderbolt right | -22 | 62.650 |
+
+The old layout fails the independent rear-cluster regression; the old asset also fails the two-twelve-contact-row regression. Three USB-C tongues now each carry 24 separate recessed metal contacts at 0.5 mm pitch. Runtime assertions check unique positions, top/bottom placement outside the tongue and inside the cavity, not just object count. Generator and port-depth ray checks share the layout specification, avoiding the prior duplicated coordinate roster.
+
+The first macro exposed flat-shaded socket arcs. A physical ray into the curved wall fails `TB_LEFT_1: faceted rounded socket wall` on that candidate. Smooth cutter side walls preserve smooth arc shading through the Boolean while caps and HDMI straight facets retain their edge treatment. The added `macbook_usbc_macro.png` uses the established light rig and gives the contact/normal repair its own diagnostic view.
+
+Fresh verification on 2026-10-02: Blender 5.2.1 LTS construction validation passes with complete closed bounds 312.599987 × 221.200004 × 15.503996 mm; all seven port depths remain 2.6 mm and the deck validator reports 78 keys. The complete hinge sweep passes all 103 integer angles (0–102°) with zero reported solid intersections. Repository checks pass with 173 fast tests, 12 preview tests, a fresh Storybook build, all 11 canonical Storybook smoke assets, and a fresh headless-Chrome MacBook screen on/off capture. Compatibility GLB is 8,971,360 bytes; meshopt is 2,247,728 bytes.
+
+Visual decision: `retain_repair` for this port-focused increment. The fresh USB-C macro visibly exposes two rows of twelve contacts and the curved socket mouth no longer reads as the earlier flat-shaded Boolean arc; refreshed left/right port views preserve the rear clustering inferred from the Apple references. Screen materials and underside fastener form are unchanged. This retains the existing LOW disclosure: local port positions, socket construction and radii are reference-led estimates, not factory CAD or a USB compliance model, and overall photographic fidelity remains unaccepted.

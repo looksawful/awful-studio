@@ -121,6 +121,7 @@ for label, location, target, scale in (
     ('speaker_macro', (.16,-.030,.120), (.1463,.04,.0083), .060),
     ('front_recess', (0,-.25,.024), (0,-.108,.006), .058),
     ('lid_back', (.03,.40,.23), (0,.11,.115), .34),
+    ('usbc_macro', (-.23,.06195,.00415), (-.155,.06195,.00415), .022),
 ):
     camera.data.ortho_scale=scale; camera.location=location; aim(camera,target)
     scene.render.filepath=os.path.join(OUT,f'macbook_{label}.png')

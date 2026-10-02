@@ -18,6 +18,7 @@ SOURCE_FILES = [
     'assets/device_mockups/common/foundation_common.py',
     'assets/device_mockups/macbook_pro_14/generate_low.py',
     'assets/device_mockups/macbook_pro_14/deck_details.py',
+    'assets/device_mockups/macbook_pro_14/port_layout.py',
     'assets/device_mockups/macbook_pro_14/construction_details.py',
     'assets/device_mockups/macbook_pro_14/function_legends.py',
     'assets/device_mockups/macbook_pro_14/export_runtime_v1.py',

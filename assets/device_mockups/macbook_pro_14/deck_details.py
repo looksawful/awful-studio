@@ -5,6 +5,7 @@ import bmesh
 from mathutils import Matrix
 from construction_details import profiled_shell
 import function_legends
+from port_layout import PORTS
 
 
 def keyboard(fc, collection, root, material, base_height):
@@ -70,10 +71,8 @@ def keyboard(fc, collection, root, material, base_height):
 def ports(fc, collection, root, base, width, base_height, dark):
     mm = fc.MM
     contacts = fc.make_material('MAT_PORT_CONTACTS', (.31, .25, .12), .8, .30)
-    specs = [('MAGSAFE', -1, 62, 14, 3.4), ('TB_LEFT_1', -1, 27, 10, 2.8),
-             ('TB_LEFT_2', -1, -1, 10, 2.8), ('HEADPHONE', -1, -54, 3.6, 3.6),
-             ('HDMI', 1, 53, 15, 4.4), ('SDXC', 1, 18, 25, 2.1), ('TB_RIGHT', 1, -22, 10, 2.8)]
-    for name, side, y, length, height in specs:
+    for spec in PORTS:
+        name,side,y,length,height=spec.name,spec.side,spec.y_mm,spec.width_mm,spec.height_mm
         center = (side * (width / 2 - 1.1 * mm), y * mm, base_height / 2)
         if name == 'HEADPHONE':
             bpy.ops.mesh.primitive_cylinder_add(vertices=64, radius=1.8 * mm, depth=3 * mm,
@@ -97,6 +96,9 @@ def ports(fc, collection, root, base, width, base_height, dark):
             cutter.rotation_euler.z = math.pi / 2
             cutter.location = center
         # X/Z outlines reverse handedness when extruded along Y.
+        if name!='HDMI':
+            for polygon in cutter.data.polygons:
+                polygon.use_smooth=(abs(polygon.normal.z)<.5 if name=='HEADPHONE' else polygon.index>=2)
         bm = bmesh.new()
         bm.from_mesh(cutter.data)
         bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
@@ -112,6 +114,13 @@ def ports(fc, collection, root, base, width, base_height, dark):
             tongue = fc.rounded_cube(name + '_TONGUE', (1.4 * mm, length * .70 * mm, .55 * mm), .12 * mm,
                                      dark, collection, (side * (width / 2 - 1.6 * mm), y * mm, base_height / 2))
             tongue.parent = root
+            if name.startswith('TB_'):
+                for row,sign in (('A',1),('B',-1)):
+                    for index in range(12):
+                        contact=fc.rounded_cube(f'{name}_CONTACT_{row}{index+1:02d}',
+                            (.70*mm,.22*mm,.04*mm),.008*mm,contacts,collection,
+                            (side*(width/2-1.55*mm),(y+(index-5.5)*.5)*mm,base_height/2+sign*.30*mm))
+                        contact.parent=root
         if name == 'MAGSAFE':
             for i in range(5):
                 pin = fc.cylinder(f'{name}_CONTACT_{i}', .35 * mm, .10 * mm, contacts, collection,
