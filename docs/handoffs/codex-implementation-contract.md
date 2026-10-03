@@ -1,27 +1,27 @@
 You are the implementation agent for the complete iPhone 17 v30 topology cleanup.
 
 WORKSPACE
-- Writable implementation worktree: F:\Temp\iphone17-v30-codex-impl
-- Branch: agent/118-camera-productionize
-- Baseline snapshot commit: 117546a
+- Continue in the existing repository worktree; do not create or switch worktrees for this task.
+- Branch: agent/118-topology-rebuild-v2
+- Baseline snapshot commit for the topology rebuild line: 48b271a
 - Shared GitHub ledger: looksawful/awful-studio issue #118
 - Existing PR #119 remains DRAFT/HOLD and must not be merged.
-- Frozen camera prototype (read-only evidence): F:\Temp\iphone17-camera-bake-prototype
+- Frozen camera prototype evidence is retained on branch prototype/iphone17-camera-lowpoly-bake and summarized in issue #118.
 
 READ FIRST
 1. docs/handoffs/iphone17-v30-topology-implementation.md
 2. docs/research/iphone17-v30-workstream-report-2026-10-03.md
-3. F:\Temp\iphone17-camera-bake-prototype\assets\device_mockups\iphone_17\prototypes\camera_lowpoly_bake_2026_10_03\README.md
-4. F:\Temp\iphone17-camera-bake-prototype\assets\device_mockups\iphone_17\prototypes\camera_lowpoly_bake_2026_10_03\out_topofix40\metrics.json
+3. docs/research/iphone17-body-bake-primary-sources-2026-10-04.md
+4. GitHub issue #118 for the frozen camera Human Gate and prototype metrics.
 
 PROCESS SKILLS TO FOLLOW
-- C:\Users\awful\.codex\skills\implement\SKILL.md
-- C:\Users\awful\.codex\skills\tdd\SKILL.md
-- C:\Users\awful\.codex\skills\code-review\SKILL.md
-- C:\Users\awful\.codex\skills\codebase-design\SKILL.md
-- C:\Users\awful\.codex\skills\3d-modeling\SKILL.md
-- C:\Users\awful\.codex\skills\web-3d-asset-pipeline\SKILL.md
-- C:\Users\awful\.codex\skills\verification-before-completion\SKILL.md
+- implement
+- tdd
+- code-review
+- codebase-design
+- 3d-modeling
+- web-3d-asset-pipeline
+- verification-before-completion
 - .skills\awful-tdd\SKILL.md
 - .skills\awful-verification\SKILL.md
 - .skills\blender-runtime-qa\SKILL.md
@@ -129,8 +129,8 @@ FINAL GATES
 - do not ship until owner final whole-device Human Gate
 
 GIT / HANDOFF
-- Work only on agent/118-camera-productionize.
-- Never reset/clean/stash/rebase the original F:\Temp\iphone17-v30-dimfix worktree.
+- Work only on agent/118-topology-rebuild-v2 unless the owner explicitly changes branch strategy.
+- Preserve the original agent/119-iphone17-dimensional-fix worktree; never reset/clean/stash/rebase it as part of this task.
 - Commit every verified slice.
 - Do not squash.
 - Keep the handoff file current after every slice so another ChatGPT/Codex session can resume from Git without chat history.
