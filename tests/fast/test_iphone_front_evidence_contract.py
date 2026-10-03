@@ -144,27 +144,14 @@ class IPhoneFrontEvidenceContractTests(unittest.TestCase):
 
         self.assertGreater(max(image.getpixel((390, 80))), 40, "outer island accidentally covers the full top row")
 
-    def test_physical_aperture_cutters_do_not_expose_screen_wall_gaps(self):
+    def test_screen_artwork_is_clean_and_physical_front_hardware_is_independent(self):
         source = GENERATOR.read_text(encoding="utf-8")
-        sensor_cut = re.search(
-            r'FRONT_SENSOR_SCREEN_CUTTER",\s*([0-9.]+)\*MM,\s*([0-9.]+)\*MM',
-            source,
-        )
-        sensor_mask = re.search(
-            r'FRONT_SENSOR_MASK",\s*([0-9.]+)\*MM,\s*([0-9.]+)\*MM',
-            source,
-        )
-        camera_cut = re.search(r'FRONT_CAMERA_SCREEN_CUTTER",\s*([0-9.]+)\*MM', source)
-        camera_mask = re.search(r'FRONT_CAMERA_MASK",\s*([0-9.]+)\*MM', source)
-        self.assertIsNotNone(sensor_cut)
-        self.assertIsNotNone(sensor_mask)
-        self.assertIsNotNone(camera_cut)
-        self.assertIsNotNone(camera_mask)
-        cut_w, cut_h = map(float, sensor_cut.groups())
-        mask_w, mask_h = map(float, sensor_mask.groups())
-        self.assertLessEqual(cut_w, mask_w)
-        self.assertLessEqual(cut_h, mask_h)
-        self.assertLessEqual(float(camera_cut.group(1)), float(camera_mask.group(1)))
+        self.assertNotIn("FRONT_SENSOR_SCREEN_CUTTER", source)
+        self.assertNotIn("FRONT_CAMERA_SCREEN_CUTTER", source)
+        self.assertNotIn("CUT_FRONT_SENSOR_SCREEN", source)
+        self.assertNotIn("CUT_FRONT_CAMERA_SCREEN", source)
+        self.assertRegex(source, r'FRONT_SENSOR_MASK",\s*7\.10\*MM,\s*2\.30\*MM')
+        self.assertRegex(source, r'FRONT_CAMERA_MASK",\s*1\.15\*MM')
 
     def test_dynamic_state_island_center_matches_official_hardware_datum(self):
         _, _, raster_center_mm = raster_dynamic_island_contract(SCREEN_STATE)
