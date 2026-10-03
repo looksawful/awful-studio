@@ -1,5 +1,8 @@
 from pathlib import Path
 import unittest
+from unittest.mock import patch
+
+import numpy as np
 
 from assets.device_mockups.macbook_pro_14.port_layout import PORTS
 import tools.build_macbook_g2_surface_overlays as overlays
@@ -63,9 +66,36 @@ class MacBookG2OverlayPairingTests(unittest.TestCase):
         )
         self.assertEqual(projected, (42, 25))
 
-        source = (Path(__file__).resolve().parents[2] / "tools" / "build_macbook_g2_surface_overlays.py").read_text(encoding="utf-8")
-        self.assertIn("q = mapper(center[1], center[2])", source)
-        self.assertNotIn("round((top_px + bottom_px) / 2)", source)
+        spec = next(port for port in PORTS if port.name == "MAGSAFE")
+        model = {
+            "closed": {
+                "left_yz": [
+                    [-110.6, 0.0],
+                    [110.6, 0.0],
+                    [110.6, 10.0],
+                    [-110.6, 10.0],
+                ]
+            },
+            "ports": {
+                "MAGSAFE": {
+                    "center_xyz_mm": [-155.0, spec.y_mm, 7.5],
+                }
+            },
+        }
+        markers = []
+
+        def capture_marker(image, point, *_args, **_kwargs):
+            markers.append(point)
+            return image
+
+        with (
+            patch.object(overlays.cv2, "imread", return_value=np.zeros((104, 700, 3), dtype=np.uint8)),
+            patch.object(overlays.cv2, "drawMarker", side_effect=capture_marker),
+            patch.object(overlays, "save", return_value="side.png"),
+        ):
+            overlays.side_overlay(Path("."), Path("."), model, -1)
+
+        self.assertEqual(markers, [(86, 27)])
 
 
 if __name__ == "__main__":
