@@ -43,10 +43,15 @@ def material_uses_normal_map(material):
         and any(node.type == "NORMAL_MAP" for node in material.node_tree.nodes)
     )
 
+TOPOLOGY_AUDIT = {
+    "BODY_ALUMINUM",
+    "ACTION_BUTTON", "VOL_UP", "VOL_DOWN", "SIDE_BUTTON", "CAMERA_CONTROL",
+}
+
 for obj in [root] + list(root.children_recursive):
     if obj.type == "MESH":
         obj.data.name = obj.name
-        if obj.name == 'BODY_ALUMINUM':
+        if obj.name in TOPOLOGY_AUDIT:
             topology = bmesh.new()
             topology.from_mesh(obj.data)
             obj.data.calc_loop_triangles()

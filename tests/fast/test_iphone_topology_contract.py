@@ -7,6 +7,7 @@ from test_iphone_web_shading_contract import accessor_vec3, accessor_indices
 
 CAMERA = ('CAMERA_HOUSING_SEAT', 'CAMERA_HOUSING') + tuple(
     f'CAMERA_{index}_{part}' for index in (1, 2) for part in ('RING', 'BEVEL', 'GLASS'))
+CONTROLS = ('ACTION_BUTTON', 'VOL_UP', 'VOL_DOWN', 'SIDE_BUTTON', 'CAMERA_CONTROL')
 
 
 class IPhoneTopologyContractTests(unittest.TestCase):
@@ -31,6 +32,25 @@ class IPhoneTopologyContractTests(unittest.TestCase):
                 for a, b in ((0, 1), (1, 2), (2, 0)):
                     edges[tuple(sorted((points[a], points[b])))] += 1
         self.assertTrue(all(count == 2 for count in edges.values()), 'BODY_ALUMINUM runtime edge incidence')
+
+    def test_controls_delivery_carries_clean_authored_topology(self):
+        doc, blob = read_glb(GLB)
+        nodes = {node['name']: node for node in doc['nodes']}
+        for name in CONTROLS:
+            node = nodes[name]
+            topology = node.get('extras', {}).get('source_topology', {})
+            self.assertEqual(topology.get('ngons'), 0, f'{name} authored n-gons')
+            self.assertEqual(topology.get('nonmanifold_edges'), 0, f'{name} authored shell')
+            primitives = doc['meshes'][node['mesh']]['primitives']
+            triangles = sum(doc['accessors'][p['indices']]['count'] // 3 for p in primitives)
+            self.assertEqual(topology.get('triangles'), triangles, name)
+            self.assertLessEqual(triangles, 332, name)
+            for primitive in primitives:
+                positions = accessor_vec3(doc, blob, primitive['attributes']['POSITION'])
+                indices = accessor_indices(doc, blob, primitive['indices'])
+                for start in range(0, len(indices), 3):
+                    points = [positions[i] for i in indices[start:start + 3]]
+                    self.assertEqual(len(set(points)), 3, f'{name} degenerate runtime triangle')
 
     def test_camera_reproduces_frozen_1288_triangle_delivery(self):
         doc, _ = read_glb(GLB)

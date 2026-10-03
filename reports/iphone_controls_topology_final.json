@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-03",
+  "slice": "side_controls_camera_control",
+  "source_commit": "e398a5b",
+  "blender": "5.2.1 LTS",
+  "controls": ["ACTION_BUTTON","VOL_UP","VOL_DOWN","SIDE_BUTTON","CAMERA_CONTROL"],
+  "before_per_control": {"source_vertices":168,"source_faces":86,"source_ngons":2,"runtime_triangles":332},
+  "after_per_control": {"source_vertices":164,"source_faces":164,"source_ngons":0,"nonmanifold_edges":0,"runtime_triangles":324},
+  "runtime_triangles_total": {"before":1660,"after":1620,"delta":-40},
+  "geometry_preservation": {"location_equal":true,"bbox_equal":true,"unique_boundary_position_set_equal":true},
+  "visual": {"view":"CAM_RIGHT_SIDE","rms_0_255":0.6016690674005659,"changed_pixels_percent":0.3633,"strong_diff_pixels_percent":0.1291,"decision":"no_material_visual_regression"},
+  "runtime_size_bytes": {"compat_before":5243644,"compat_after":5235276,"meshopt_before":4153364,"meshopt_after":4148280},
+  "verification": {"fast_tests":"210/210 PASS","blender_controls_topology":"PASS","khronos_compat":"0 errors / 0 warnings","khronos_meshopt":"0 errors / 0 warnings","git_diff_check":"PASS"},
+  "decision": "retain_repair"
+}

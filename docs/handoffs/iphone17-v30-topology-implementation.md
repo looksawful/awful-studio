@@ -136,3 +136,22 @@ Long Codex work was stopped to preserve quota. All useful work is being committe
 - Tracked verification summary: `reports/iphone_body_topology_final.json`.
 - Decision: retain repair. Slice 2 closed. Next: Slice 3 side controls + Camera Control.
 
+
+## Slice 3 final verification — side controls + Camera Control — GREEN
+- Root cause: `capsule_prism_x()` authored two giant n-gon caps per control and repeated the top/bottom pole coordinates from `rounded_outline`.
+- RED 1: Blender runtime contract failed immediately on `ACTION_BUTTON: 2 n-gons`.
+- RED 2: exact GLB contract failed because controls had no authored-topology provenance.
+- Fix: remove only coincident consecutive contour points and build planar capsule caps as cross-width quad strips with a triangle only at each capsule pole. No center fan/pole.
+- Affected: `ACTION_BUTTON`, `VOL_UP`, `VOL_DOWN`, `SIDE_BUTTON`, `CAMERA_CONTROL`.
+- Per control source: 168 verts / 86 faces / 2 n-gons -> 164 verts / 164 faces / 0 n-gons / 0 non-manifold.
+- Exact runtime: 332 -> 324 tris per control; five-control total 1660 -> 1620 tris.
+- Preservation: exact object location, bbox and unique boundary-position set unchanged for all five controls.
+- Fixed-condition right-side beauty delta: RMS 0.601669 RGB levels on 0–255; 0.3633% pixels changed, localized to faint button highlight response; no silhouette movement observed.
+- Compat GLB: 5,243,644 -> 5,235,276 bytes. Meshopt: 4,153,364 -> 4,148,280 bytes.
+- Exporter now carries `source_topology` for body and all five controls; exact-GLB fast contract checks clean authored shell and non-degenerate runtime triangles.
+- Fresh full fast: 210/210 PASS.
+- Fresh Blender 5.2.1 controls runtime contract: PASS.
+- Khronos compat + meshopt: 0 errors / 0 warnings.
+- Fresh `git diff --check`: PASS.
+- Tracked evidence: `reports/iphone_controls_topology_final.json`.
+- Source commit: `e398a5b`. Decision: retain repair. Slice 3 closed. Next: Slice 4 bottom I/O + acoustic openings + fasteners.
