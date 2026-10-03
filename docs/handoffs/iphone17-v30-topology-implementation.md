@@ -108,3 +108,17 @@ Long Codex work was stopped to preserve quota. All useful work is being committe
 - PR #119 remains DRAFT/HOLD; do not merge.
 - Implementation contract: `docs/handoffs/codex-implementation-contract.md`
 - Body runtime checkpoint report: `reports/iphone_body_topology_checkpoint.json`
+
+## Slice 2 — body / rail — verified source candidate
+- Baseline: pushed Slice 1 `48b271a`; immutable local snapshot `evidence/topology-v30/slice2/baseline.blend` and `.glb`.
+- `generate_low_v30.py::patch_body_rail_caps`: connect existing boundary rows into strips; irregular junctions use safe interior diagonals, excluding existing edges and near-collinear ears. No boundary vertex, original edge, Apple profile function or modifier setting changed.
+- Source: 4,056 vertices retained; faces 2,830 -> 4,692; n-gons 65 -> 0; non-manifold edges 0 -> 0.
+- Runtime: 8,108 triangles retained. Reduction was not prioritized over exact cut/profile preservation.
+- Evaluated Blender geometry: 24,620 triangles retained; zero n-gons/non-manifold. Source and live modifier output are distinct seams.
+- Preservation: exact original source vertex and edge sets; evaluated normal displacement <= 0.003338 mm; volume delta 2.42e-12 m³. Closest-point distance includes up to 0.045420 mm tangential gaps in old large-cap tessellation; this is recorded, not claimed zero.
+- Fixed EEVEE 1000² / unchanged cameras / KEY-only shadows: rail, right controls and bottom beauty+wire under `evidence/topology-v30/slice2/{before,after}/`. Image RMS differences below 0.15 RGB levels/channel. No material visible regression observed.
+- RED: Blender rejected 65 n-gons; exact-GLB contract rejected missing authored-topology evidence. GREEN checks actual GLB welded edge incidence plus exporter inspection before triangulation.
+- Commands: `python tools/build_iphone17_v30.py --blender <Blender-5.2.1> --skip-previews`; `python -m unittest discover -s tests/fast -v`; Blender factory-startup/reopen `tests/runtime/iphone_v30_body_topology_contract.py -- --baseline <baseline.blend> --report <after.json>`; existing geometry/camera runtime checks; Khronos compat+meshopt 0/0.
+- Build driver now uses `--python-exit-code 1` so failed generation cannot silently export stale artifacts.
+- Evidence tools resolve frozen blend relative textures against canonical generated asset paths.
+- Source commit SHA will be recorded in the separate rebuild commit after source commit. Next: Slice 3 side controls / Camera Control.

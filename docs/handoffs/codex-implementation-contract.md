@@ -15,13 +15,13 @@ READ FIRST
 4. F:\Temp\iphone17-camera-bake-prototype\assets\device_mockups\iphone_17\prototypes\camera_lowpoly_bake_2026_10_03\out_topofix40\metrics.json
 
 PROCESS SKILLS TO FOLLOW
-- C:\Users\awful\.codex\skills\implement\SKILL.md
-- C:\Users\awful\.codex\skills\tdd\SKILL.md
-- C:\Users\awful\.codex\skills\code-review\SKILL.md
-- C:\Users\awful\.codex\skills\codebase-design\SKILL.md
-- C:\Users\awful\.codex\skills\3d-modeling\SKILL.md
-- C:\Users\awful\.codex\skills\web-3d-asset-pipeline\SKILL.md
-- C:\Users\awful\.codex\skills\verification-before-completion\SKILL.md
+- $CODEX_HOME/skills/implement\SKILL.md
+- $CODEX_HOME/skills/tdd\SKILL.md
+- $CODEX_HOME/skills/code-review\SKILL.md
+- $CODEX_HOME/skills/codebase-design\SKILL.md
+- $CODEX_HOME/skills/3d-modeling\SKILL.md
+- $CODEX_HOME/skills/web-3d-asset-pipeline\SKILL.md
+- $CODEX_HOME/skills/verification-before-completion\SKILL.md
 - .skills\awful-tdd\SKILL.md
 - .skills\awful-verification\SKILL.md
 - .skills\blender-runtime-qa\SKILL.md
