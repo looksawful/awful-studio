@@ -121,6 +121,13 @@ def side_x_mapper(side):
     return lambda y: float((y + D / 2) / D * 408)
 
 
+def project_side_point(map_x, y_mm, z_mm, zmin, zmax, top_px, bottom_px):
+    return (
+        round(map_x(y_mm)),
+        round(bottom_px - (z_mm - zmin) / max(zmax - zmin, 1e-9) * (bottom_px - top_px)),
+    )
+
+
 def side_overlay(refs, out, model, side):
     name = "left.jpg" if side < 0 else "right.jpg"
     im = cv2.imread(str(refs / name))
@@ -132,10 +139,7 @@ def side_overlay(refs, out, model, side):
     top_px, bottom_px = 3, im.shape[0] - 4
 
     def mapper(y, z):
-        return (
-            round(map_x(y)),
-            round(bottom_px - (z - zmin) / max(zmax - zmin, 1e-9) * (bottom_px - top_px)),
-        )
+        return project_side_point(map_x, y, z, zmin, zmax, top_px, bottom_px)
 
     draw_poly(im, hull, mapper, GREEN, 1)
     actual_centers = []
@@ -143,7 +147,7 @@ def side_overlay(refs, out, model, side):
         if spec.side != side or spec.name not in model["ports"]:
             continue
         center = model["ports"][spec.name]["center_xyz_mm"]
-        q = (round(map_x(center[1])), round((top_px + bottom_px) / 2))
+        q = mapper(center[1], center[2])
         actual_centers.append((spec.name, q[0], spec.center_pixel))
         cv2.drawMarker(im, q, CYAN, cv2.MARKER_CROSS, 9, 1)
     max_res = max((abs(actual - target) for _, actual, target in actual_centers), default=0.0)
