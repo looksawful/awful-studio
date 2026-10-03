@@ -532,9 +532,17 @@ back_seat = outward_prism("BACK_GLASS_SEAT", COVER_W + 0.12*MM, COVER_H + 0.12*M
                              COVER_R + 0.06*MM, gap_mat, body_c, axis="Y",
                              location=(0, METAL_D*0.5 + 0.012*MM, 0), outline_segments=48)
 back_seat.hide_render = True
-back_glass = outward_prism("BACK_GLASS", COVER_W, COVER_H, GLASS_T, COVER_R,
-                              back_mat, body_c, axis="Y", location=(0, back_y, 0),
-                              edge_bevel=0.0, outline_segments=48)
+back_glass = rounded_rect_strip_prism_y(
+    "BACK_GLASS",
+    COVER_W,
+    COVER_H,
+    GLASS_T,
+    COVER_R,
+    back_mat,
+    body_c,
+    location=(0, back_y, 0),
+    segments=16,
+)
 
 front_seat = outward_prism("DISPLAY_GLASS_SEAT", COVER_W + 0.10*MM, COVER_H + 0.10*MM, 0.07*MM,
                               COVER_R + 0.05*MM, gap_mat, screen_c, axis="Y",
@@ -611,24 +619,102 @@ sbsdf = screen_mat.node_tree.nodes.get("Principled BSDF")
 sbsdf.inputs["Coat Weight"].default_value = 0.0
 sbsdf.inputs["Coat Roughness"].default_value = 0.035
 
+def radial_prism_y(name, radius, depth, material, collection, location, segments):
+    """Build a sparse circular Y-depth prism with tangent-friendly UVs."""
+    points = [
+        (
+            radius * math.cos(2.0 * math.pi * index / segments),
+            radius * math.sin(2.0 * math.pi * index / segments),
+        )
+        for index in range(segments)
+    ]
+    points.append((0.0, 0.0))
+    center = segments
+    count = len(points)
+    verts = [
+        (x, y, z)
+        for y in (-depth * 0.5, depth * 0.5)
+        for x, z in points
+    ]
+    cap = [(center, index, (index + 1) % segments) for index in range(segments)]
+    faces = cap + [tuple(vertex + count for vertex in reversed(face)) for face in cap]
+    for index in range(segments):
+        next_index = (index + 1) % segments
+        faces.append((index, next_index, next_index + count, index + count))
+
+    mesh = bpy.data.meshes.new(f"{name}_MESH")
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    bm = bmesh.new()
+    bm.from_mesh(mesh)
+    bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
+    bm.to_mesh(mesh)
+    bm.free()
+    mesh.update()
+
+    uv = mesh.uv_layers.new(name="UVMap").data
+    for polygon in mesh.polygons:
+        polygon.use_smooth = abs(polygon.normal.y) < 0.72
+        for loop_index in polygon.loop_indices:
+            co = mesh.vertices[mesh.loops[loop_index].vertex_index].co
+            if abs(polygon.normal.y) > 0.72:
+                u0 = 0.04 if polygon.normal.y < 0.0 else 0.54
+                coord = (
+                    u0 + (co.x / (2.0 * radius) + 0.5) * 0.42,
+                    0.04 + (co.z / (2.0 * radius) + 0.5) * 0.42,
+                )
+            else:
+                theta = (math.atan2(co.x, co.z) + math.pi) / (2.0 * math.pi)
+                coord = (
+                    0.04 + 0.92 * theta,
+                    0.62 + 0.34 * (co.y / depth + 0.5),
+                )
+            uv[loop_index].uv = coord
+
+    obj = bpy.data.objects.new(name, mesh)
+    collection.objects.link(obj)
+    obj.location = location
+    if material:
+        mesh.materials.append(material)
+    return obj
+
+
 # The physical masks sit behind the display front plane and are revealed only through
 # the two screen cutouts. The orange privacy indicator remains screen-state artwork.
 screen_front_y = (front_y + 0.010*MM) - (GLASS_T - 0.025*MM) * 0.5
 front_hardware_y = screen_front_y + 0.034*MM
 front_optics_y = front_hardware_y + 0.040*MM
-outward_prism("FRONT_SENSOR_MASK", 7.10*MM, 2.30*MM, 0.008*MM, 1.15*MM,
-              under_glass_mat, detail_c, axis="Y",
-              location=(-4.15*MM, front_hardware_y, front_hardware_z), outline_segments=64)
-fc.cylinder("FRONT_CAMERA_MASK", 1.15*MM, 0.008*MM, under_glass_mat, detail_c,
-            (cam_x, front_hardware_y, front_hardware_z), axis="Y", vertices=128)
-fc.cylinder("FRONT_CAMERA_GLASS", 0.84*MM, 0.006*MM, front_optic, detail_c,
-            (cam_x, front_optics_y, front_hardware_z), axis="Y", vertices=128)
-fc.cylinder("FRONT_CAMERA_INNER", 0.52*MM, 0.005*MM, black, detail_c,
-            (cam_x, front_hardware_y + 0.055*MM, front_hardware_z), axis="Y", vertices=96)
-fc.cylinder("FRONT_CAMERA_IRIS", 0.28*MM, 0.004*MM, front_optic, detail_c,
-            (cam_x, front_hardware_y + 0.070*MM, front_hardware_z), axis="Y", vertices=80)
-fc.cylinder("FRONT_CAMERA_PUPIL", 0.12*MM, 0.003*MM, black, detail_c,
-            (cam_x, front_hardware_y + 0.085*MM, front_hardware_z), axis="Y", vertices=64)
+front_sensor_mask = rounded_rect_strip_prism_y(
+    "FRONT_SENSOR_MASK",
+    7.10*MM,
+    2.30*MM,
+    0.008*MM,
+    1.15*MM,
+    under_glass_mat,
+    detail_c,
+    location=(-4.15*MM, front_hardware_y, front_hardware_z),
+    segments=6,
+)
+front_camera_mask = radial_prism_y(
+    "FRONT_CAMERA_MASK", 1.15*MM, 0.008*MM, under_glass_mat, detail_c,
+    (cam_x, front_hardware_y, front_hardware_z), segments=24,
+)
+front_camera_glass = radial_prism_y(
+    "FRONT_CAMERA_GLASS", 0.84*MM, 0.006*MM, front_optic, detail_c,
+    (cam_x, front_optics_y, front_hardware_z), segments=22,
+)
+front_camera_inner = radial_prism_y(
+    "FRONT_CAMERA_INNER", 0.52*MM, 0.005*MM, black, detail_c,
+    (cam_x, front_hardware_y + 0.055*MM, front_hardware_z), segments=16,
+)
+front_camera_iris = radial_prism_y(
+    "FRONT_CAMERA_IRIS", 0.28*MM, 0.004*MM, front_optic, detail_c,
+    (cam_x, front_hardware_y + 0.070*MM, front_hardware_z), segments=12,
+)
+front_camera_pupil = radial_prism_y(
+    "FRONT_CAMERA_PUPIL", 0.12*MM, 0.003*MM, black, detail_c,
+    (cam_x, front_hardware_y + 0.085*MM, front_hardware_z), segments=8,
+)
 receiver = fc.rounded_cube("FRONT_RECEIVER_MIC", (14.02*MM, 0.020*MM, 0.30*MM), 0.14*MM, black, detail_c, location=(0, front_surface - 0.012*MM, H*0.5 - 0.62*MM))
 
 housing_x = CAM_CENTER_X
