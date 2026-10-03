@@ -2,36 +2,33 @@
 import bpy
 import bmesh
 import math
+from geometry_contract import G2_EXTERNAL_FACTS, G2_PROVISIONAL_FACTS, require_frozen_fact
 
 
 def hinge_shroud(fc, name, material, collection, hinge, x):
-    """Closed sleeve around the pivot, with a shallow flat on its visible face.
-
-    Local radii/length are estimates. The complete cross section remains inside
-    the existing 3.9 mm chassis relief and outside the 3.3 mm pivot.
-    """
-    mm=fc.MM; count=64; vertices=[]
-    for end in (-30*mm,30*mm):
-        for radius in (3.65*mm,3.42*mm):
-            for index in range(count):
-                angle=2*math.pi*index/count
-                y=radius*math.cos(angle)
-                if radius>3.5*mm: y=max(y,-3.46*mm)
-                vertices.append((end,y,radius*math.sin(angle)))
-    faces=[]
-    for index in range(count):
-        j=(index+1)%count
-        faces.extend(((index,j,2*count+j,2*count+index),
-                      (count+index,3*count+index,3*count+j,count+j),
-                      (index,count+index,count+j,j),
-                      (2*count+index,2*count+j,3*count+j,3*count+index)))
-    mesh=bpy.data.meshes.new(name+'_SLEEVE'); mesh.from_pydata(vertices,[],faces); mesh.update()
-    bm=bmesh.new(); bm.from_mesh(mesh); bmesh.ops.recalc_face_normals(bm,faces=list(bm.faces)); bm.to_mesh(mesh); bm.free()
-    mesh.materials.append(material)
-    for polygon in mesh.polygons: polygon.use_smooth=polygon.index%4<2
-    obj=bpy.data.objects.new(name,mesh); collection.objects.link(obj)
-    obj.parent=hinge; obj.location=(x,0,0)
-    bevel=obj.modifiers.new('SHROUD_EDGE','BEVEL'); bevel.width=.025*mm; bevel.segments=2
+    """Fixed top-case display-hinge cover from the Apple repair-view relation."""
+    mm = fc.MM
+    width = require_frozen_fact(G2_EXTERNAL_FACTS, "hinge_cover_width_mm") * mm
+    depth = G2_PROVISIONAL_FACTS["hinge_cover_depth_mm"].value_mm * mm
+    thickness = G2_PROVISIONAL_FACTS["hinge_cover_thickness_mm"].value_mm * mm
+    root = hinge.parent
+    obj = fc.rounded_prism(
+        name,
+        width,
+        depth,
+        thickness,
+        2.2 * mm,
+        material,
+        collection,
+        axis='Z',
+        location=(x, hinge.location.y - depth * .5, hinge.location.z - thickness * .55),
+        edge_bevel=.00008,
+    )
+    obj.parent = root
+    obj['g2_role'] = 'display_hinge_cover'
+    obj['source_relation'] = 'apple_repair_display_hinge_cover'
+    obj['geometry_authority'] = 'UNVERIFIED_VISUAL'
+    obj['unverified_dimensions'] = 'depth,thickness'
     return obj
 
 
@@ -90,14 +87,32 @@ def camera_stack(fc, collection, hinge, screen_center_z, screen_height, display,
 
 def underside(fc, collection, root, base, width, depth, base_height, metal, rubber):
     mm = fc.MM
-    cutter = fc.rounded_cube('OPENING_CUT', (36*mm, 6*mm, 3.1*mm), 1.0*mm, None, collection,
-                             (0, -depth/2+1.0*mm, base_height-.2*mm))
+    recess_width_mm = require_frozen_fact(G2_EXTERNAL_FACTS, "front_finger_recess_width_mm")
+    recess_w = recess_width_mm * mm
+    cutter = fc.rounded_cube(
+        'OPENING_CUT',
+        (recess_w, 6*mm, 3.1*mm),
+        1.0*mm,
+        None,
+        collection,
+        (0, -depth/2+1.0*mm, base_height-.2*mm),
+    )
     bpy.context.view_layer.update(); fc.boolean_difference(base, cutter, name='CUT_FRONT_OPENING')
-    recess = fc.empty('FRONT_FINGER_RECESS', collection, (0, -depth/2, base_height-1.4*mm)); recess.parent = root
-    positions = [(-width/2+15*mm, -depth/2+11*mm), (width/2-15*mm, -depth/2+11*mm),
-                 (-width/2+15*mm, depth/2-11*mm), (width/2-15*mm, depth/2-11*mm),
-                 (-55*mm, -depth/2+11*mm), (55*mm, -depth/2+11*mm),
-                 (-55*mm, depth/2-11*mm), (55*mm, depth/2-11*mm)]
+    recess = fc.empty('FRONT_FINGER_RECESS', collection, (0, -depth/2, base_height-1.4*mm))
+    recess.parent = root
+    recess['width_mm'] = recess_width_mm
+
+    front_y = -depth/2 + require_frozen_fact(G2_EXTERNAL_FACTS, "front_screw_edge_inset_mm")*mm
+    rear_y = depth/2 - require_frozen_fact(G2_EXTERNAL_FACTS, "rear_screw_edge_inset_mm")*mm
+    front_outer_x = width/2 - require_frozen_fact(G2_EXTERNAL_FACTS, "front_outer_screw_side_inset_mm")*mm
+    rear_outer_x = width/2 - require_frozen_fact(G2_EXTERNAL_FACTS, "rear_outer_screw_side_inset_mm")*mm
+    inner_x = require_frozen_fact(G2_EXTERNAL_FACTS, "inner_screw_center_abs_x_mm")*mm
+    positions = [
+        (-front_outer_x, front_y), (front_outer_x, front_y),
+        (-rear_outer_x, rear_y), (rear_outer_x, rear_y),
+        (-inner_x, front_y), (inner_x, front_y),
+        (-inner_x, rear_y), (inner_x, rear_y),
+    ]
     for index, (x, y) in enumerate(positions):
         obj = fc.cylinder(f'BOTTOM_SCREW_{index:02d}', 1.1*mm, .12*mm, metal, collection,
                           (x, y, .035*mm), axis='Z', vertices=40); obj.parent = root

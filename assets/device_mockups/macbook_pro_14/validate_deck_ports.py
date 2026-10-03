@@ -58,7 +58,7 @@ keys = [obj for obj in bpy.data.objects if obj.name.startswith('KEY_') and obj.t
 assert len(keys) + 1 == 78, f'ANSI deck including Touch ID must have 78 keys, got {len(keys) + 1}'
 legends = [obj for obj in bpy.data.objects if obj.name.startswith('LEGEND_')]
 assert len(legends) == 76, f'Expected 76 labelled keys (blank Space and Touch ID), got {len(legends)}'
-for name in ('LID_UNIBODY', 'BASE_UNIBODY', 'SCREEN_GLASS'):
+for name in ('LID_UNIBODY', 'BASE_UNIBODY', 'DISPLAY_SURROUND_VISUAL'):
     bm = bmesh.new(); bm.from_mesh(bpy.data.objects[name].data)
     assert bm.calc_volume(signed=True) > 0, f'{name}: inward shell normals'
     bm.free()

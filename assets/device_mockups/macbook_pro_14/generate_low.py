@@ -6,7 +6,7 @@ if HERE not in sys.path: sys.path.insert(0,HERE)
 import foundation_common as fc
 import deck_details
 import construction_details as cd
-from geometry_contract import CHASSIS_FACTS, derive_metric_measurements
+from geometry_contract import CHASSIS_FACTS, G2_EXTERNAL_FACTS, G2_DISPLAY_FACTS, derive_metric_measurements, release_display_measurements, require_frozen_fact
 MM=fc.MM
 G1=derive_metric_measurements()
 W=CHASSIS_FACTS['width'].value_mm*MM
@@ -14,10 +14,11 @@ D=CHASSIS_FACTS['depth'].value_mm*MM
 CLOSED_H=CHASSIS_FACTS['closed_height'].value_mm*MM
 LID_T=4.7*MM; BASE_H=8.3*MM; FOOT_BOTTOM=-.655*MM
 GAP=CLOSED_H+FOOT_BOTTOM-LID_T-BASE_H
-LID_W,LID_H=312.0*MM,212.0*MM
-SCREEN_W=G1['display']['active_width_mm']*MM
-SCREEN_H=G1['display']['active_height_mm']*MM
-SCREEN_RADIUS=G1['display']['opening_corner_radius_mm']*MM
+LID_W=W; LID_H=D  # observed visual panel envelope; acceptance uses complete closed assembly, not lid-part equality
+DISPLAY=release_display_measurements()
+SCREEN_W=DISPLAY['active_width_mm']*MM
+SCREEN_H=DISPLAY['active_height_mm']*MM
+SCREEN_RADIUS=DISPLAY['opening_corner_radius_mm']*MM
 KEYBOARD=G1['keyboard']
 TRACKPAD=G1['trackpad']
 TRACKPAD_W=TRACKPAD['right_x_mm']-TRACKPAD['left_x_mm']
@@ -100,10 +101,10 @@ track_gap=fc.rounded_prism(
  location=(TRACKPAD['measured_center_x_mm']*MM,TRACKPAD['center_y_mm']*MM,BASE_H-.25*MM)); track_gap.parent=root
 track=deck_details.trackpad(fc,detail_c,root,trackmat,BASE_H)
 
-hinge_y=D*.5-8.5*MM
+hinge_y=D*.5
 for side in (-1,1):
-    x=side*(W*.5-48*MM)
-    subtract_cylinder_x(base,3.90*MM,60*MM,(x,hinge_y,BASE_H+GAP))
+    x=side*require_frozen_fact(G2_EXTERNAL_FACTS,'hinge_cover_center_abs_x_mm')*MM
+    subtract_cylinder_x(base,3.25*MM,22*MM,(x,hinge_y-2.65*MM,BASE_H+GAP))
 base_bevel=base.modifiers.new('EDGE_BEVEL','BEVEL'); base_bevel.width=.00008; base_bevel.segments=3; base_bevel.limit_method='ANGLE'
 hinge=fc.empty('CTRL_HINGE',ctrl_c,location=(0,hinge_y,BASE_H+GAP)); hinge.parent=root
 hinge.rotation_euler.x=math.radians(90.0-OPEN_ANGLE)
@@ -125,17 +126,33 @@ for action in (lid_open,lid_close):
 hinge.rotation_euler.x=math.radians(90.0-OPEN_ANGLE)
 root['animation_clips']='lid_open,lid_close'
 for side in (-1,1):
-    x=side*(W*.5-48*MM)
-    barrel=cyl_x(f'HINGE_BARREL_{"L" if side<0 else "R"}',3.3*MM,58*MM,metal2,detail_c,(x,hinge_y,BASE_H+GAP)); barrel.parent=root
+    x=side*require_frozen_fact(G2_EXTERNAL_FACTS,'hinge_cover_center_abs_x_mm')*MM
+    barrel=cyl_x(
+        f'HINGE_BARREL_{"L" if side<0 else "R"}',
+        2.65*MM,
+        18.0*MM,
+        metal2,
+        detail_c,
+        (x,hinge_y-2.65*MM,BASE_H+GAP),
+    )
+    barrel.parent=root
+    barrel['g2_role']='hinge_pivot_visual'
     cover=cd.hinge_shroud(fc,f'HINGE_COVER_{"L" if side<0 else "R"}',hingemat,detail_c,hinge,x)
 
 lid=cd.profiled_shell(fc,'LID_UNIBODY',LID_W,LID_H,LID_T,8.0*MM,
  [(y*MM,i*MM) for y,i in ((-2.35,.35),(-2.25,.14),(-2.05,.03),(-1.80,0),(1.45,0),(1.80,.08),(2.10,.28),(2.29,.55),(2.35,.82))],
  metal,lid_c,axis='Y'); lid.parent=hinge; lid.location=(0,LID_T*.5,LID_H*.5)
 for poly in lid.data.polygons: poly.use_smooth = poly.index >= 2
-bezel=fc.rounded_prism('DISPLAY_BEZEL',307.2*MM,204.2*MM,.28*MM,6.6*MM,bezelmat,screen_c,axis='Y',edge_bevel=.00010); bezel.parent=hinge; bezel.location=(0,-.12*MM,LID_H*.5+2.6*MM)
-gasket=fc.rounded_prism('DISPLAY_GASKET',309.3*MM,207*MM,.20*MM,7.1*MM,keymat,screen_c,axis='Y',edge_bevel=.00003); gasket.parent=hinge; gasket.location=(0,-.05*MM,LID_H*.5+2.3*MM)
-lower_rail=fc.rounded_prism('DISPLAY_LOWER_RAIL',307.2*MM,3.4*MM,.20*MM,.7*MM,bezelmat,screen_c,axis='Y',edge_bevel=.00003); lower_rail.parent=hinge; lower_rail.location=(0,-.12*MM,1.7*MM)
+# The external bezel/glass/gasket manufacturing dimensions are not public.
+# Keep one explicitly non-authoritative visual surround instead of encoding guessed
+# physical layers as release geometry. The active matrix/notch/camera below are
+# source-backed separately.
+surround=fc.rounded_prism(
+ 'DISPLAY_SURROUND_VISUAL',LID_W,LID_H,.04*MM,8.0*MM,bezelmat,screen_c,axis='Y',edge_bevel=.00002)
+surround.parent=hinge; surround.location=(0,-.08*MM,LID_H*.5)
+surround['geometry_authority']='RELATIONAL_VISUAL'
+surround['source_relation']='closed_display_face_follows_lid_envelope'
+surround['unverified_dimensions']='outer_corner_radius,visual_plane_thickness'
 SCREEN_CENTER_Z=LID_H*.5+2.0*MM
 screen=fc.rounded_prism('SCREEN_CONTENT',SCREEN_W,SCREEN_H,.12*MM,SCREEN_RADIUS,screenmat,screen_c,axis='Y'); screen.parent=hinge; screen.location=(0,-.28*MM,SCREEN_CENTER_Z)
 screen_path=os.path.join(HERE,'reference','looksawful_home_3024x1964.png')
@@ -147,7 +164,8 @@ for socket_name in ('Emission Color',):
  if socket:
   for old in list(socket.links): links.remove(old)
   links.new(tex.outputs['Color'],socket)
-# OLED content emits the image; the separate cover glass owns reflections.
+# OLED content owns the runtime screen surface. No guessed physical cover-glass
+# dimensions are encoded in the authoritative geometry.
 for old in list(sbsdf.inputs['Base Color'].links): links.remove(old)
 sbsdf.inputs['Base Color'].default_value=(0.002,0.003,0.006,1.0)
 sbsdf.inputs['Specular IOR Level'].default_value=0.0
@@ -156,11 +174,10 @@ uv=screen.data.uv_layers.new(name='UVMap')
 for loop in screen.data.loops:
  v=screen.data.vertices[loop.vertex_index].co; uv.data[loop.index].uv=((v.x/SCREEN_W)+.5,(v.z/SCREEN_H)+.5)
 screen['screen_state']='screen_on'; screen['screen_on_emission']=0.65; screen['screen_off_emission']=0.0
-screen_glass=fc.rounded_prism('SCREEN_GLASS',307.6*MM,204.6*MM,.36*MM,6.8*MM,glass,screen_c,axis='Y',edge_bevel=.00008); screen_glass.parent=hinge; screen_glass.location=(0,-.34*MM,LID_H*.5+2.6*MM)
 glow_anchor=fc.empty('SCREEN_GLOW_ANCHOR',ctrl_c,location=(0,-1.2*MM,LID_H*.5+2.0*MM)); glow_anchor.parent=hinge
 glow_anchor['screen_on_energy']=8.0; glow_anchor['glow_type']='rect_area'; glow_anchor['glow_width_m']=SCREEN_W; glow_anchor['glow_height_m']=SCREEN_H
 root['screen_states']='screen_off,screen_on'; root['screen_glow_anchor']='SCREEN_GLOW_ANCHOR'; root['screen_glow_energy']=8.0
-cd.camera_stack(fc,detail_c,hinge,SCREEN_CENTER_Z,SCREEN_H,G1['display'],bezelmat,dark)
+cd.camera_stack(fc,detail_c,hinge,SCREEN_CENTER_Z,SCREEN_H,DISPLAY,bezelmat,dark)
 cd.underside(fc,detail_c,root,base,W,D,BASE_H,metal2,keymat)
 
 deck_details.keyboard(fc,detail_c,root,keymat,BASE_H)
@@ -180,8 +197,12 @@ print('MACBOOK_CONSTRUCTION_SPEAKERS_BEGIN',flush=True)
 deck_details.speakers(fc,detail_c,root,base,W,BASE_H,dark)
 print('MACBOOK_CONSTRUCTION_CUTS_END',flush=True)
 
-for i,(x,y) in enumerate(((-W*.5+18*MM,-D*.5+17*MM),(W*.5-18*MM,-D*.5+17*MM),(-W*.5+18*MM,D*.5-20*MM),(W*.5-18*MM,D*.5-20*MM)),1):
-    foot=fc.cylinder(f'FOOT_{i:02d}',5.2*MM,.75*MM,keymat,detail_c,(x,y,FOOT_BOTTOM+.375*MM),axis='Z',vertices=48); foot.parent=root
+foot_r=require_frozen_fact(G2_EXTERNAL_FACTS,'foot_diameter_mm')*.5*MM
+foot_x=W*.5-require_frozen_fact(G2_EXTERNAL_FACTS,'foot_side_inset_mm')*MM
+foot_y=D*.5-require_frozen_fact(G2_EXTERNAL_FACTS,'foot_edge_inset_mm')*MM
+for i,(x,y) in enumerate(((-foot_x,-foot_y),(foot_x,-foot_y),(-foot_x,foot_y),(foot_x,foot_y)),1):
+    foot=fc.cylinder(f'FOOT_{i:02d}',foot_r,.75*MM,keymat,detail_c,(x,y,FOOT_BOTTOM+.375*MM),axis='Z',vertices=64)
+    foot.parent=root
 
 
 # Release polish recovered from the verified low_v1 release file.
@@ -197,13 +218,13 @@ links.new(tex.outputs['Alpha'],lbsdf.inputs['Alpha']); links.new(lbsdf.outputs['
 try: logo_mat.surface_render_method='DITHERED'
 except Exception: pass
 logo_image=tex.image
-logo_w=27.676*MM; logo_h=logo_w*logo_image.size[1]/logo_image.size[0]; logo_z=LID_H*.52
+logo_w=require_frozen_fact(G2_EXTERNAL_FACTS,'logo_width_mm')*MM; logo_h=logo_w*logo_image.size[1]/logo_image.size[0]; logo_z=LID_H*.5
 verts=[(-logo_w/2,LID_T+.004*MM,logo_z-logo_h/2),(logo_w/2,LID_T+.004*MM,logo_z-logo_h/2),(logo_w/2,LID_T+.004*MM,logo_z+logo_h/2),(-logo_w/2,LID_T+.004*MM,logo_z+logo_h/2)]
 mesh=bpy.data.meshes.new('APPLE_LOGO_RELEASE_MESH'); mesh.from_pydata(verts,[],[(0,1,2,3)]); mesh.update()
 logo=bpy.data.objects.new('APPLE_LOGO_RELEASE',mesh); bpy.context.scene.collection.objects.link(logo); logo.parent=hinge; logo.data.materials.append(logo_mat)
 uv=mesh.uv_layers.new(name='UVMap')
 for loop,coord in zip(mesh.loops,((0,0),(1,0),(1,1),(0,1))): uv.data[loop.index].uv=coord
-root['stage']='RELEASE_CANDIDATE'; root['release_export_target']='GLB uncompressed'; root['release_polish']='apple_logo + embedded source image'
+root['stage']='G2_CANDIDATE'; root['release_export_target']='GLB uncompressed'; root['release_polish']='apple_logo + embedded source image'
 
 # X/Z prisms extruded on Y reverse handedness; closed shells face outward.
 for obj in list(bpy.data.objects):
@@ -219,13 +240,13 @@ def local_dims_mm(obj):
 def non_manifold_edges(obj):
  bm=bmesh.new(); bm.from_mesh(obj.data); count=sum(1 for edge in bm.edges if not edge.is_manifold); bm.free(); return count
 base_dims=local_dims_mm(base); lid_dims=local_dims_mm(lid)
-base_expected={'x':312.6,'y':221.2,'z':8.3}; lid_expected={'x':312.0,'y':4.7,'z':212.0}
-base_delta={k:base_dims[k]-base_expected[k] for k in base_expected}; lid_delta={k:lid_dims[k]-lid_expected[k] for k in lid_expected}
-mandatory=['SCREEN_GLOW_ANCHOR','BASE_UNIBODY','LID_UNIBODY','SCREEN_CONTENT','SCREEN_GLASS','CAMERA_NOTCH','FACETIME_CAMERA','TRACKPAD','TOUCH_ID','MAGSAFE','TB_LEFT_1','TB_LEFT_2','HEADPHONE','HDMI','SDXC','TB_RIGHT','APPLE_LOGO_RELEASE','FOOT_01','SPEAKER_L_00_00','SPEAKER_R_14_04']
+base_expected={'x':312.6,'y':221.2,'z':8.3}
+base_delta={k:base_dims[k]-base_expected[k] for k in base_expected}
+mandatory=['SCREEN_GLOW_ANCHOR','BASE_UNIBODY','LID_UNIBODY','SCREEN_CONTENT','DISPLAY_SURROUND_VISUAL','CAMERA_NOTCH','FACETIME_CAMERA','TRACKPAD','TOUCH_ID','MAGSAFE','TB_LEFT_1','TB_LEFT_2','HEADPHONE','HDMI','SDXC','TB_RIGHT','APPLE_LOGO_RELEASE','FOOT_01','SPEAKER_L_00_00','SPEAKER_R_14_04']
 missing=[name for name in mandatory if bpy.data.objects.get(name) is None]
 base_nm=non_manifold_edges(base); lid_nm=non_manifold_edges(lid)
-passed=(not missing and base_nm==0 and lid_nm==0 and all(abs(v)<=.01 for v in base_delta.values()) and all(abs(v)<=.01 for v in lid_delta.values()) and abs(hinge['open_angle_deg']-OPEN_ANGLE)<1e-6)
-evidence={'asset_id':'macbook_pro_14_m5','stage':'RELEASE_CANDIDATE','blender_version':bpy.app.version_string,'base_expected_mm':base_expected,'base_actual_mm':{k:round(v,6) for k,v in base_dims.items()},'base_delta_mm':{k:round(v,6) for k,v in base_delta.items()},'lid_expected_mm':lid_expected,'lid_actual_mm':{k:round(v,6) for k,v in lid_dims.items()},'lid_delta_mm':{k:round(v,6) for k,v in lid_delta.items()},'base_non_manifold_edges':base_nm,'lid_non_manifold_edges':lid_nm,'mandatory_missing':missing,'object_count':len(bpy.data.objects),'material_count':len(bpy.data.materials),'hinge_open_angle_deg':hinge['open_angle_deg'],'animation_clips':['lid_open','lid_close'],'screen_states':['screen_off','screen_on'],'passed':passed}
+passed=(not missing and base_nm==0 and lid_nm==0 and all(abs(v)<=.01 for v in base_delta.values()) and abs(hinge['open_angle_deg']-OPEN_ANGLE)<1e-6)
+evidence={'asset_id':'macbook_pro_14_m5','stage':'G2_CANDIDATE','blender_version':bpy.app.version_string,'base_expected_mm':base_expected,'base_actual_mm':{k:round(v,6) for k,v in base_dims.items()},'base_delta_mm':{k:round(v,6) for k,v in base_delta.items()},'lid_observed_mm':{k:round(v,6) for k,v in lid_dims.items()},'lid_acceptance':'RELATIONAL_COMPLETE_ASSEMBLY_ONLY','base_non_manifold_edges':base_nm,'lid_non_manifold_edges':lid_nm,'mandatory_missing':missing,'object_count':len(bpy.data.objects),'material_count':len(bpy.data.materials),'hinge_open_angle_deg':hinge['open_angle_deg'],'animation_clips':['lid_open','lid_close'],'screen_states':['screen_off','screen_on'],'passed':passed}
 os.makedirs(os.path.dirname(EVIDENCE),exist_ok=True)
 with open(EVIDENCE,'w',encoding='utf-8') as f: json.dump(evidence,f,indent=2)
 

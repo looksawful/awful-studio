@@ -9,6 +9,7 @@ from tools.calibrate_macbook_m5_geometry import (
     build_report,
     deck_px_to_mm,
     deck_warp_spec,
+    source_deck_px_to_mm,
     derive_metric_measurements,
     verify_sha256,
 )
@@ -16,34 +17,37 @@ from tools.calibrate_macbook_m5_geometry import (
 
 class MacBookCalibrationToolTests(unittest.TestCase):
     def test_deck_transform_uses_chassis_center_as_origin(self):
-        x_mm, y_mm = deck_px_to_mm(625.2, 442.4)
+        x_mm, y_mm = source_deck_px_to_mm(567.5, 348.0)
         self.assertAlmostEqual(x_mm, 0.0, places=6)
         self.assertAlmostEqual(y_mm, 0.0, places=6)
 
-        left, back = deck_px_to_mm(0.0, 0.0)
+        left, back = source_deck_px_to_mm(108.0, 23.0)
         self.assertAlmostEqual(left, -156.3, places=6)
         self.assertAlmostEqual(back, 110.6, places=6)
 
     def test_warp_spec_preserves_exact_physical_span(self):
         spec = deck_warp_spec()
-        self.assertEqual(spec["output_size_px"], [1252, 886])
-        self.assertEqual(spec["physical_span_px"], [1250.4, 884.8])
-        self.assertEqual(spec["destination_quad"][2], [1250.4, 884.8])
+        self.assertEqual(spec["output_size_px"], [920, 651])
+        self.assertEqual(spec["physical_span_px"], [919.0, 650.0])
+        self.assertEqual(spec["destination_quad"][2], [919.0, 650.0])
 
-    def test_report_keeps_unapproved_measurements_provisional(self):
+    def test_report_marks_g2_calibrated_groups_and_keeps_display_outer_provisional(self):
         report = build_report()
-        self.assertEqual(report["gate"], "G1")
-        self.assertEqual(report["status"], "awaiting_human_overlay_approval")
-        self.assertEqual(report["measurements"]["keyboard"]["source_class"], "PROVISIONAL")
-        self.assertFalse(report["measurements"]["trackpad"]["frozen"])
+        self.assertEqual(report["gate"], "G2")
+        self.assertEqual(
+            report["status"],
+            "calibrated_geometry_active_human_model_approval_pending",
+        )
+        self.assertEqual(report["measurements"]["keyboard"]["source_class"], "APPLE_CALIBRATED")
+        self.assertTrue(report["measurements"]["trackpad"]["frozen"])
         self.assertFalse(report["measurements"]["display"]["outer_lid_frozen"])
 
     def test_pixel_measurements_reproduce_metric_contract(self):
         measurements = derive_metric_measurements()
         trackpad = measurements["trackpad"]
-        self.assertAlmostEqual(trackpad["left_x_mm"], -65.3888094731, places=6)
-        self.assertAlmostEqual(trackpad["right_x_mm"], 66.5517725437, places=6)
-        self.assertAlmostEqual(trackpad["measured_center_x_mm"], 0.5814815353, places=6)
+        self.assertAlmostEqual(trackpad["left_x_mm"], -64.7990206746, places=6)
+        self.assertAlmostEqual(trackpad["right_x_mm"], 64.7990206746, places=6)
+        self.assertAlmostEqual(trackpad["measured_center_x_mm"], 0.0, places=6)
 
         display = measurements["display"]
         self.assertAlmostEqual(display["notch_top_width_mm"], 38.6, places=6)

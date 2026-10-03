@@ -5,7 +5,7 @@ import bmesh
 from construction_details import profiled_shell
 import function_legends
 from port_layout import PORTS
-from geometry_contract import DECK_CALIBRATION, KEYBOARD_LAYOUT_PX, deck_px_to_mm, derive_metric_measurements
+from geometry_contract import KEYBOARD_LAYOUT_PX, deck_px_to_mm, derive_metric_measurements, keyboard_item_to_mm
 
 
 G1 = derive_metric_measurements()
@@ -296,12 +296,24 @@ def keyboard(fc, collection, root, material, base_height):
         bpy.context.view_layer.objects.active = legend
         bpy.ops.object.convert(target='MESH')
 
-    scale = DECK_CALIBRATION["px_per_mm"]
     for item in KEYBOARD_LAYOUT_PX:
-        x, y = deck_px_to_mm(item["cx_px"], item["cy_px"])
-        width = item["width_px"] / scale
-        height = item["height_px"] / scale
-        key(item["name"], item["label"], x, y, width, height)
+        metric = keyboard_item_to_mm(item)
+        if item["name"] == "TOUCH_ID":
+            touch = G1["touch_id"]
+            metric = {
+                "center_x_mm": touch["center_x_mm"],
+                "center_y_mm": touch["center_y_mm"],
+                "width_mm": touch["outer_width_mm"],
+                "height_mm": touch["outer_height_mm"],
+            }
+        key(
+            item["name"],
+            item["label"],
+            metric["center_x_mm"],
+            metric["center_y_mm"],
+            metric["width_mm"],
+            metric["height_mm"],
+        )
 
 
 def ports(fc, collection, root, base, width, base_height, dark):

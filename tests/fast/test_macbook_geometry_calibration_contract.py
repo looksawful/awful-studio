@@ -62,29 +62,39 @@ class MacBookGeometryCalibrationContractTests(unittest.TestCase):
             self.assertLessEqual(fact.tolerance_mm, 0.05)
             self.assertTrue(is_freezable(fact))
 
-    def test_deck_calibration_records_provenance_and_uncertainty(self):
-        self.assertEqual(DECK_CALIBRATION["source_class"], SourceClass.PROVISIONAL.value)
+    def test_deck_calibration_records_g2_apple_raster_authority(self):
+        self.assertEqual(DECK_CALIBRATION["source_class"], SourceClass.APPLE_CALIBRATED.value)
         self.assertEqual(DECK_CALIBRATION["source"], "keyboard_image")
-        self.assertEqual(DECK_CALIBRATION["control_point_fit_residual_px"], 0.0)
-        self.assertGreater(DECK_CALIBRATION["corner_pick_tolerance_px"], 0)
+        self.assertEqual(
+            DECK_CALIBRATION["source_edges_px"],
+            {"left": 108.0, "right": 1027.0, "rear": 23.0, "front": 673.0},
+        )
+        sx, sy = DECK_CALIBRATION["mm_per_px"]
+        self.assertAlmostEqual(sx, 312.6 / 919.0, places=9)
+        self.assertAlmostEqual(sy, 221.2 / 650.0, places=9)
         self.assertGreater(DECK_CALIBRATION["tolerance_mm"], 0)
-        self.assertFalse(DECK_CALIBRATION["frozen"])
+        self.assertTrue(DECK_CALIBRATION["frozen"])
 
-    def test_preliminary_groups_carry_g1_provenance_metadata(self):
+    def test_measurement_groups_carry_source_metadata_and_freeze_policy(self):
         payload = json.loads(REGISTER.read_text(encoding="utf-8"))
         source_ids = {entry["id"] for entry in payload["sources"]}
         required = {"source_class", "source", "method", "tolerance_mm", "frame", "confidence", "frozen"}
+        calibrated = {"keyboard", "trackpad", "touch_id", "speaker"}
         for name, group in PRELIMINARY_CALIBRATION.items():
             with self.subTest(group=name):
                 self.assertTrue(required.issubset(group))
-                self.assertEqual(group["source_class"], SourceClass.PROVISIONAL.value)
                 self.assertIn(group["source"], source_ids)
                 self.assertGreater(group["tolerance_mm"], 0)
                 self.assertTrue(group["frame"])
                 self.assertTrue(group["confidence"])
-                self.assertFalse(group["frozen"])
+                if name in calibrated:
+                    self.assertEqual(group["source_class"], SourceClass.APPLE_CALIBRATED.value)
+                    self.assertTrue(group["frozen"])
+                else:
+                    self.assertEqual(group["source_class"], SourceClass.PROVISIONAL.value)
+                    self.assertFalse(group["frozen"])
 
-    def test_preliminary_keyboard_lattice_math_is_explicit_but_not_frozen(self):
+    def test_keyboard_lattice_math_is_explicit_and_g2_frozen(self):
         keyboard = derive_metric_measurements()["keyboard"]
         self.assertAlmostEqual(
             keyboard["pitch_x_mm"],
@@ -96,8 +106,8 @@ class MacBookGeometryCalibrationContractTests(unittest.TestCase):
             keyboard["key_outer_height_mm"] + keyboard["gap_y_mm"],
             places=6,
         )
-        self.assertEqual(keyboard["source_class"], SourceClass.PROVISIONAL.value)
-        self.assertFalse(keyboard["frozen"])
+        self.assertEqual(keyboard["source_class"], SourceClass.APPLE_CALIBRATED.value)
+        self.assertTrue(keyboard["frozen"])
 
     def test_trackpad_center_is_chassis_relation_not_a_shifted_origin(self):
         trackpad = derive_metric_measurements()["trackpad"]
@@ -105,34 +115,36 @@ class MacBookGeometryCalibrationContractTests(unittest.TestCase):
         self.assertAlmostEqual(measured_center, trackpad["measured_center_x_mm"], places=6)
         self.assertEqual(trackpad["target_center_x_mm"], 0.0)
         self.assertLessEqual(abs(measured_center), trackpad["residual_tolerance_mm"])
-        self.assertFalse(trackpad["frozen"])
+        self.assertTrue(trackpad["frozen"])
 
-    def test_speaker_periodicity_and_observed_grid_are_provisional(self):
+    def test_speaker_periodicity_matches_g2_official_raster(self):
         speaker = derive_metric_measurements()["speaker"]
-        self.assertAlmostEqual(speaker["pitch_x_mm"], speaker["pitch_y_mm"], delta=0.15)
-        self.assertAlmostEqual(speaker["pitch_x_mm"], 1.0, delta=0.15)
-        self.assertEqual(speaker["column_count"], 12)
-        self.assertEqual(speaker["row_count"], 109)
-        self.assertAlmostEqual(speaker["hole_radius_mm"], 0.25, delta=0.05)
-        self.assertFalse(speaker["frozen"])
+        self.assertAlmostEqual(speaker["pitch_x_mm"], 0.920997, delta=0.03)
+        self.assertAlmostEqual(speaker["pitch_y_mm"], 0.926393, delta=0.03)
+        self.assertEqual(speaker["column_count"], 15)
+        self.assertEqual(speaker["row_count"], 114)
+        self.assertAlmostEqual(speaker["hole_radius_mm"], 0.2041, delta=0.04)
+        self.assertTrue(speaker["frozen"])
 
-    def test_trackpad_y_is_separate_from_front_chassis_edge(self):
+    def test_trackpad_y_is_calibrated_from_official_source_edges(self):
         trackpad = derive_metric_measurements()["trackpad"]
-        self.assertAlmostEqual(trackpad["physical_front_edge_px"], 884.8, places=6)
-        self.assertAlmostEqual(trackpad["top_y_px"], 542.646847, delta=0.01)
-        self.assertAlmostEqual(trackpad["bottom_y_px"], 873.904620, delta=0.01)
-        self.assertAlmostEqual(trackpad["height_mm"], 82.814439, delta=0.01)
-        self.assertAlmostEqual(trackpad["front_gap_mm"], 2.723846, delta=0.01)
-        self.assertAlmostEqual(trackpad["center_y_mm"], -66.468935, delta=0.01)
-        self.assertFalse(trackpad["frozen"])
+        self.assertAlmostEqual(trackpad["physical_front_edge_px"], 673.0, places=6)
+        self.assertAlmostEqual(trackpad["top_y_px"], 419.0, delta=0.01)
+        self.assertAlmostEqual(trackpad["bottom_y_px"], 657.0, delta=0.01)
+        self.assertAlmostEqual(trackpad["height_mm"], 80.993231, delta=0.01)
+        self.assertAlmostEqual(trackpad["front_gap_mm"], 5.444923, delta=0.01)
+        self.assertAlmostEqual(trackpad["center_y_mm"], -64.658462, delta=0.01)
+        self.assertTrue(trackpad["frozen"])
 
     def test_touch_id_geometry_is_measured_as_distinct_control(self):
         touch = derive_metric_measurements()["touch_id"]
-        self.assertAlmostEqual(touch["outer_width_mm"], 16.75, delta=0.25)
-        self.assertAlmostEqual(touch["outer_height_mm"], 16.75, delta=0.25)
-        self.assertAlmostEqual(touch["sensor_diameter_mm"], 9.0, delta=0.5)
+        self.assertAlmostEqual(touch["outer_width_mm"], 16.532987, delta=0.1)
+        self.assertAlmostEqual(touch["outer_height_mm"], 16.394578, delta=0.1)
+        self.assertAlmostEqual(touch["sensor_diameter_mm"], 8.838610, delta=0.2)
+        self.assertAlmostEqual(touch["center_x_mm"], 128.288088, delta=0.15)
+        self.assertAlmostEqual(touch["center_y_mm"], 82.692443, delta=0.15)
         self.assertEqual(touch["default_appearance"], "black")
-        self.assertFalse(touch["frozen"])
+        self.assertTrue(touch["frozen"])
 
     def test_display_pixel_measurements_reproduce_metric_values(self):
         display = derive_metric_measurements()["display"]

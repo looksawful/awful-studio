@@ -12,7 +12,7 @@ from geometry_contract import (
 )
 
 
-class MacBookG1ModelContractTests(unittest.TestCase):
+class MacBookG2ModelContractTests(unittest.TestCase):
     def test_keyboard_layout_is_complete_78_key_ansi(self):
         self.assertEqual(len(KEYBOARD_LAYOUT_PX), 78)
         names = [item["name"] for item in KEYBOARD_LAYOUT_PX]
@@ -23,22 +23,22 @@ class MacBookG1ModelContractTests(unittest.TestCase):
             {"KEY_ARROW_0", "KEY_ARROW_1", "KEY_ARROW_2", "KEY_ARROW_3"},
         )
 
-    def test_keyboard_bounds_and_row_pitch_come_from_rectified_deck(self):
+    def test_keyboard_bounds_and_row_pitch_come_from_g2_apple_calibration(self):
         keyboard = derive_metric_measurements()["keyboard"]
-        self.assertAlmostEqual(keyboard["bounds_width_mm"], 278.5, delta=0.5)
-        self.assertAlmostEqual(keyboard["bounds_height_mm"], 112.5, delta=0.5)
-        self.assertAlmostEqual(keyboard["bounds_center_x_mm"], -0.3, delta=0.5)
-        self.assertAlmostEqual(keyboard["bounds_center_y_mm"], 37.1, delta=0.5)
-        self.assertAlmostEqual(keyboard["row_pitch_mm"], 19.0285714286, delta=0.02)
+        self.assertAlmostEqual(keyboard["bounds_width_mm"], 274.1241, delta=0.35)
+        self.assertAlmostEqual(keyboard["bounds_height_mm"], 111.0074, delta=0.35)
+        self.assertAlmostEqual(keyboard["bounds_center_x_mm"], -0.2620, delta=0.25)
+        self.assertAlmostEqual(keyboard["bounds_center_y_mm"], 36.5467, delta=0.25)
+        self.assertAlmostEqual(keyboard["row_pitch_mm"], 18.4800, delta=0.03)
 
-    def test_speaker_grid_replaces_legacy_88_by_9_pattern(self):
+    def test_speaker_grid_matches_g2_apple_raster(self):
         speaker = derive_metric_measurements()["speaker"]
-        self.assertEqual(speaker["grid_columns"], 12)
-        self.assertEqual(speaker["grid_rows"], 109)
-        self.assertAlmostEqual(speaker["pitch_x_mm"], 1.0, delta=0.05)
-        self.assertAlmostEqual(speaker["pitch_y_mm"], 1.0, delta=0.05)
-        self.assertAlmostEqual(speaker["field_center_abs_x_mm"], 149.55, delta=0.25)
-        self.assertAlmostEqual(speaker["field_center_y_mm"], 36.225, delta=0.25)
+        self.assertEqual(speaker["grid_columns"], 15)
+        self.assertEqual(speaker["grid_rows"], 114)
+        self.assertAlmostEqual(speaker["pitch_x_mm"], 0.9210, delta=0.03)
+        self.assertAlmostEqual(speaker["pitch_y_mm"], 0.9264, delta=0.03)
+        self.assertAlmostEqual(speaker["field_center_abs_x_mm"], 148.0523, delta=0.25)
+        self.assertAlmostEqual(speaker["field_center_y_mm"], 36.4999, delta=0.25)
 
     def test_generator_consumes_geometry_contract_instead_of_old_magic_layout(self):
         generate = (DEVICE / "generate_low.py").read_text(encoding="utf-8")

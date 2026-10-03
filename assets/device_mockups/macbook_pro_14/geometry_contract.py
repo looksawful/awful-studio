@@ -97,19 +97,215 @@ CHASSIS_FACTS = {
 }
 
 
+APPLE_DISPLAY_REPAIR = "https://support.apple.com/en-us/123164"
+APPLE_BOTTOM_CASE_REPAIR = "https://support.apple.com/en-us/123157"
+APPLE_CLOSED_TOP_IMAGE = "https://www.apple.com/v/macbook-pro/specs/c/images/specs/14-inch/dimensions_1_14_inch__da8sc3fnv0cy_large.jpg"
+APPLE_CLOSED_FRONT_IMAGE = "https://www.apple.com/v/macbook-pro/specs/c/images/specs/14-inch/dimensions_2_14_inch__fllye8os816y_large.jpg"
+
+
+def _g2_fact(
+    fact_id: str,
+    value_mm: float | tuple[float, ...],
+    source_class: SourceClass,
+    source: str,
+    method: str,
+    tolerance_mm: float,
+    confidence: str,
+    *,
+    frozen: bool = True,
+    frame: str = "chassis_center",
+    notes: str = "",
+) -> GeometryFact:
+    fact = GeometryFact(
+        id=fact_id,
+        value_mm=value_mm,
+        source_class=source_class,
+        source=source,
+        method=method,
+        tolerance_mm=tolerance_mm,
+        frame=frame,
+        confidence=confidence,
+        frozen=frozen,
+        notes=notes,
+    )
+    validate_fact(fact)
+    return fact
+
+
+G2_RELATIONS = {
+    "closed_display_assembly": "flush_with_top_case",
+    "hinge_cover_semantics": "small_corner_plate",
+}
+
+
+G2_EXTERNAL_FACTS = {
+    "hinge_cover_width_mm": _g2_fact(
+        "hinge.cover.width", 19.9, SourceClass.APPLE_CALIBRATED,
+        APPLE_DISPLAY_REPAIR,
+        "calibrated Apple display-repair image; approximate corner-cover width",
+        2.0, "MEDIUM_HIGH",
+    ),
+    "hinge_cover_center_abs_x_mm": _g2_fact(
+        "hinge.cover.center_abs_x", 130.1, SourceClass.APPLE_CALIBRATED,
+        APPLE_DISPLAY_REPAIR,
+        "calibrated Apple display-repair image relative to exact chassis width",
+        2.0, "MEDIUM_HIGH",
+    ),
+    "front_finger_recess_width_mm": _g2_fact(
+        "base.front_finger_recess.width", 54.2, SourceClass.APPLE_CALIBRATED,
+        APPLE_CLOSED_FRONT_IMAGE,
+        "calibrated official closed-front orthographic",
+        1.5, "HIGH",
+    ),
+    "foot_diameter_mm": _g2_fact(
+        "bottom.foot.diameter", 17.3, SourceClass.APPLE_CALIBRATED,
+        APPLE_BOTTOM_CASE_REPAIR,
+        "representative value inside calibrated 16.5-18.1 mm repair-image range",
+        0.8, "MEDIUM_HIGH",
+    ),
+    "foot_side_inset_mm": _g2_fact(
+        "bottom.foot.side_inset", 20.8, SourceClass.APPLE_CALIBRATED,
+        APPLE_BOTTOM_CASE_REPAIR,
+        "calibrated bottom-case repair image; target inside 19.5-22.5 mm range",
+        1.5, "MEDIUM_HIGH",
+    ),
+    "foot_edge_inset_mm": _g2_fact(
+        "bottom.foot.edge_inset", 23.0, SourceClass.APPLE_CALIBRATED,
+        APPLE_BOTTOM_CASE_REPAIR,
+        "calibrated bottom-case repair image; target inside 22.0-23.5 mm range",
+        0.75, "MEDIUM_HIGH",
+    ),
+    "rear_outer_screw_side_inset_mm": _g2_fact(
+        "bottom.screw.rear_outer_side_inset", 4.0, SourceClass.APPLE_CALIBRATED,
+        APPLE_BOTTOM_CASE_REPAIR, "calibrated bottom-case repair image", 1.5, "MEDIUM_HIGH",
+    ),
+    "rear_screw_edge_inset_mm": _g2_fact(
+        "bottom.screw.rear_edge_inset", 7.0, SourceClass.APPLE_CALIBRATED,
+        APPLE_BOTTOM_CASE_REPAIR, "calibrated bottom-case repair image", 1.0, "MEDIUM_HIGH",
+    ),
+    "front_outer_screw_side_inset_mm": _g2_fact(
+        "bottom.screw.front_outer_side_inset", 7.0, SourceClass.APPLE_CALIBRATED,
+        APPLE_BOTTOM_CASE_REPAIR, "calibrated bottom-case repair image", 2.0, "MEDIUM_HIGH",
+    ),
+    "front_screw_edge_inset_mm": _g2_fact(
+        "bottom.screw.front_edge_inset", 9.5, SourceClass.APPLE_CALIBRATED,
+        APPLE_BOTTOM_CASE_REPAIR, "calibrated bottom-case repair image", 1.0, "MEDIUM_HIGH",
+    ),
+    "inner_screw_center_abs_x_mm": _g2_fact(
+        "bottom.screw.inner_center_abs_x", 52.0, SourceClass.APPLE_CALIBRATED,
+        APPLE_BOTTOM_CASE_REPAIR, "calibrated bottom-case repair image", 2.75, "MEDIUM_HIGH",
+    ),
+    "logo_width_mm": _g2_fact(
+        "lid.logo.visual_width", 37.2, SourceClass.APPLE_CALIBRATED,
+        APPLE_CLOSED_TOP_IMAGE, "calibrated official closed-top orthographic", 2.0, "MEDIUM",
+    ),
+}
+
+
+G2_PROVISIONAL_FACTS = {
+    "hinge_cover_depth_mm": _g2_fact(
+        "hinge.cover.depth", 11.5, SourceClass.PROVISIONAL,
+        APPLE_DISPLAY_REPAIR, "visual LOW placeholder; public evidence does not freeze depth",
+        0.0, "LOW", frozen=False,
+    ),
+    "hinge_cover_thickness_mm": _g2_fact(
+        "hinge.cover.thickness", 0.8, SourceClass.PROVISIONAL,
+        APPLE_DISPLAY_REPAIR, "visual LOW placeholder; public evidence does not freeze thickness",
+        0.0, "LOW", frozen=False,
+    ),
+}
+
+
+APPLE_PRODUCT_BEZEL_M5 = "https://devimages-cdn.apple.com/design/resources/download/Bezel-MacBook-Pro-M5.dmg"
+
+G2_DISPLAY_FACTS = {
+    "active_width_mm": _g2_fact(
+        "display.active.width", 302.4, SourceClass.DERIVED,
+        APPLE_TECH_SPECS,
+        "3024 px at Apple-published 254 ppi: 3024 / 254 * 25.4",
+        0.05, "VERIFIED", frame="display_active_center",
+    ),
+    "active_height_mm": _g2_fact(
+        "display.active.height", 196.4, SourceClass.DERIVED,
+        APPLE_TECH_SPECS,
+        "1964 px at Apple-published 254 ppi: 1964 / 254 * 25.4",
+        0.05, "VERIFIED", frame="display_active_center",
+    ),
+    "opening_corner_radius_mm": _g2_fact(
+        "display.active.corner_radius", 4.0966, SourceClass.APPLE_CALIBRATED,
+        APPLE_PRODUCT_BEZEL_M5,
+        "official MacBook Pro M5 Product Bezel alpha contour calibrated by the exact active-display scale",
+        0.15, "HIGH", frame="display_active_center",
+    ),
+    "notch_top_width_mm": _g2_fact(
+        "display.notch.top_width", 38.6, SourceClass.APPLE_CALIBRATED,
+        APPLE_PRODUCT_BEZEL_M5,
+        "official Product Bezel notch alpha width at 10 px/mm active-display scale",
+        0.15, "HIGH", frame="display_active_center",
+    ),
+    "notch_height_mm": _g2_fact(
+        "display.notch.height", 6.4, SourceClass.APPLE_CALIBRATED,
+        APPLE_PRODUCT_BEZEL_M5,
+        "official Product Bezel notch alpha height at 10 px/mm active-display scale",
+        0.15, "HIGH", frame="display_active_center",
+    ),
+    "notch_lower_radius_mm": _g2_fact(
+        "display.notch.lower_radius", 2.1911, SourceClass.APPLE_CALIBRATED,
+        APPLE_PRODUCT_BEZEL_M5,
+        "fitted official Product Bezel lower notch corner at 10 px/mm active-display scale",
+        0.20, "HIGH", frame="display_active_center",
+    ),
+    "camera_center_x_mm": _g2_fact(
+        "display.camera.center_x", -0.1, SourceClass.APPLE_CALIBRATED,
+        APPLE_PRODUCT_BEZEL_M5,
+        "official Product Bezel camera center relative to active-display center at 10 px/mm",
+        0.20, "HIGH", frame="display_active_center",
+    ),
+    "camera_from_top_mm": _g2_fact(
+        "display.camera.from_top", 1.65, SourceClass.APPLE_CALIBRATED,
+        APPLE_PRODUCT_BEZEL_M5,
+        "official Product Bezel camera center offset from active-display top at 10 px/mm",
+        0.20, "HIGH", frame="display_active_center",
+    ),
+}
+
+
+def release_display_measurements() -> dict:
+    return {
+        key: require_frozen_fact(G2_DISPLAY_FACTS, key)
+        for key in G2_DISPLAY_FACTS
+    }
+
+
+def require_frozen_fact(facts: dict[str, GeometryFact], key: str) -> float | tuple[float, ...]:
+    fact = facts[key]
+    validate_fact(fact)
+    if not is_freezable(fact):
+        raise ValueError(f"{fact.id}: authoritative geometry requires a frozen non-provisional fact")
+    return fact.value_mm
+
+
 DECK_CALIBRATION = {
-    "source_class": SourceClass.PROVISIONAL.value,
+    "source_class": SourceClass.APPLE_CALIBRATED.value,
     "source": "keyboard_image",
-    "source_quad_px": [[119.0, 28.0], [1020.0, 32.0], [1017.0, 667.0], [113.0, 662.0]],
     "physical_size_mm": [312.6, 221.2],
-    "px_per_mm": 4.0,
-    "method": "manual four-corner deck-plane pick followed by projective homography",
-    "control_point_fit_residual_px": 0.0,
-    "corner_pick_tolerance_px": 1.0,
-    "tolerance_mm": 0.25,
+    "source_edges_px": {
+        "left": 108.0,
+        "right": 1027.0,
+        "rear": 23.0,
+        "front": 673.0,
+    },
+    "mm_per_px": [312.6 / 919.0, 221.2 / 650.0],
+    "legacy_rectified_to_source_matrix": [
+        [0.7190545146860062, -0.007203154014282462, 118.95837442605284],
+        [0.003158238843481908, 0.7138095658027966, 27.990205747306547],
+        [-1.2380761460417667e-06, -3.755154471900609e-06, 0.9996502052609483],
+    ],
+    "method": "official Apple 2x deck raster; straight external chassis edges calibrated to 312.6 x 221.2 mm",
+    "tolerance_mm": 0.35,
     "frame": "chassis_center",
-    "confidence": "MEDIUM",
-    "frozen": False,
+    "confidence": "HIGH",
+    "frozen": True,
 }
 
 
@@ -120,56 +316,59 @@ PRELIMINARY_CALIBRATION = {
         "row_centers_px": [105.38095238095232, 181.49523809523805, 257.6095238095238, 333.7238095238095, 409.8380952380952, 485.95238095238096],
         "bounds_px": [67.0, 69.0, 1181.0, 519.0],
         "well_bbox_px": [54.0, 58.0, 1194.0, 529.0],
-        "source_class": SourceClass.PROVISIONAL.value,
+        "source_class": SourceClass.APPLE_CALIBRATED.value,
         "source": "keyboard_image",
-        "method": "median key contours after chassis-plane homography",
-        "tolerance_mm": 0.25,
+        "method": "G1 key contours reprojected into the official Apple 2x deck raster, then calibrated to the exact chassis envelope",
+        "tolerance_mm": 0.35,
         "frame": "chassis_center",
-        "confidence": "MEDIUM",
-        "frozen": False,
+        "confidence": "HIGH",
+        "frozen": True,
     },
     "trackpad": {
-        "left_x_px": 363.64476210769783,
-        "right_x_px": 891.4070901746444,
-        "top_y_px": 542.6468469608157,
-        "bottom_y_px": 873.9046196782626,
-        "physical_front_edge_px": 884.8,
+        "left_x_px": 377.0,
+        "right_x_px": 758.0,
+        "top_y_px": 419.0,
+        "bottom_y_px": 657.0,
+        "physical_front_edge_px": 673.0,
         "target_center_x_mm": 0.0,
-        "residual_tolerance_mm": 0.75,
-        "source_class": SourceClass.PROVISIONAL.value,
+        "residual_tolerance_mm": 0.25,
+        "coordinate_space": "apple_keyboard_image",
+        "source_class": SourceClass.APPLE_CALIBRATED.value,
         "source": "keyboard_image",
-        "method": "Sobel seam centroids on exact 4 px/mm rectified chassis plane",
-        "tolerance_mm": 0.25,
+        "method": "independent seam-edge measurement in the official Apple 2x deck raster calibrated to the external chassis edges",
+        "tolerance_mm": 0.35,
         "frame": "chassis_center",
-        "confidence": "MEDIUM",
-        "frozen": False,
+        "confidence": "HIGH",
+        "frozen": True,
     },
     "touch_id": {
         "outer_bbox_px": [1113.0, 69.0, 67.0, 67.0],
         "sensor_center_px": [1145.5, 105.5],
         "sensor_diameter_px": 36.0,
         "default_appearance": "black",
-        "source_class": SourceClass.PROVISIONAL.value,
+        "source_class": SourceClass.APPLE_CALIBRATED.value,
         "source": "keyboard_image",
-        "method": "rectified key contour plus circular sensor extent",
+        "method": "G1 Touch ID contour reprojected into the official Apple 2x deck raster and calibrated to the external chassis edges",
         "tolerance_mm": 0.5,
         "frame": "chassis_center",
-        "confidence": "MEDIUM",
-        "frozen": False,
+        "confidence": "HIGH",
+        "frozen": True,
     },
     "speaker": {
-        "pitch_px": [4.0, 4.0],
-        "left_field_bbox_px": [0.0, 80.0, 54.0, 515.0],
-        "column_count": 12,
-        "row_count": 109,
-        "hole_diameter_px": 2.0,
-        "source_class": SourceClass.PROVISIONAL.value,
+        "pitch_px": [2.7076023391812925, 2.7222222222222143],
+        "first_center_px": [113.0, 85.45555555555555],
+        "last_center_px": [151.49415204678363, 396.03333333333336],
+        "column_count": 15,
+        "row_count": 114,
+        "hole_diameter_px": 1.2,
+        "coordinate_space": "apple_keyboard_image",
+        "source_class": SourceClass.APPLE_CALIBRATED.value,
         "source": "keyboard_image",
-        "method": "rectified-raster periodicity plus dark-blob field extent",
-        "tolerance_mm": 0.25,
+        "method": "periodic dark-dot lattice detected directly in the official Apple 2x deck raster and calibrated to external chassis edges",
+        "tolerance_mm": 0.35,
         "frame": "chassis_center",
-        "confidence": "MEDIUM",
-        "frozen": False,
+        "confidence": "HIGH",
+        "frozen": True,
     },
     "display": {
         "opening_origin_px": [418.0, 288.0],
@@ -278,69 +477,162 @@ KEYBOARD_LAYOUT_PX = [
 ]
 
 
+def source_deck_px_to_mm(x_px: float, y_px: float) -> tuple[float, float]:
+    edges = DECK_CALIBRATION["source_edges_px"]
+    sx, sy = DECK_CALIBRATION["mm_per_px"]
+    center_x = (edges["left"] + edges["right"]) / 2
+    center_y = (edges["rear"] + edges["front"]) / 2
+    return (x_px - center_x) * sx, (center_y - y_px) * sy
+
+
+def rectified_deck_px_to_source(x_px: float, y_px: float) -> tuple[float, float]:
+    matrix = DECK_CALIBRATION["legacy_rectified_to_source_matrix"]
+    hx = matrix[0][0] * x_px + matrix[0][1] * y_px + matrix[0][2]
+    hy = matrix[1][0] * x_px + matrix[1][1] * y_px + matrix[1][2]
+    hw = matrix[2][0] * x_px + matrix[2][1] * y_px + matrix[2][2]
+    return hx / hw, hy / hw
+
+
 def deck_px_to_mm(x_px: float, y_px: float) -> tuple[float, float]:
-    width_mm, depth_mm = DECK_CALIBRATION["physical_size_mm"]
-    scale = DECK_CALIBRATION["px_per_mm"]
-    return x_px / scale - width_mm / 2, depth_mm / 2 - y_px / scale
+    """Map legacy G1 rectified deck coordinates through the corrected G2 datum."""
+    return source_deck_px_to_mm(*rectified_deck_px_to_source(x_px, y_px))
+
+
+def rectified_bbox_to_mm(x0: float, y0: float, x1: float, y1: float) -> dict:
+    points = [
+        deck_px_to_mm(x0, y0),
+        deck_px_to_mm(x1, y0),
+        deck_px_to_mm(x0, y1),
+        deck_px_to_mm(x1, y1),
+    ]
+    xs = [point[0] for point in points]
+    ys = [point[1] for point in points]
+    return {
+        "min_x_mm": min(xs),
+        "max_x_mm": max(xs),
+        "min_y_mm": min(ys),
+        "max_y_mm": max(ys),
+        "width_mm": max(xs) - min(xs),
+        "height_mm": max(ys) - min(ys),
+        "center_x_mm": (min(xs) + max(xs)) / 2,
+        "center_y_mm": (min(ys) + max(ys)) / 2,
+    }
+
+
+def _raw_keyboard_item_mm(item: dict) -> dict:
+    half_w = item["width_px"] / 2
+    half_h = item["height_px"] / 2
+    return rectified_bbox_to_mm(
+        item["cx_px"] - half_w,
+        item["cy_px"] - half_h,
+        item["cx_px"] + half_w,
+        item["cy_px"] + half_h,
+    )
+
+
+def _keyboard_layout_affine() -> dict:
+    """Reconcile the 78-key contour layout to the independently measured G2 aggregate."""
+    raw = [_raw_keyboard_item_mm(item) for item in KEYBOARD_LAYOUT_PX]
+    raw_min_x = min(box["min_x_mm"] for box in raw)
+    raw_max_x = max(box["max_x_mm"] for box in raw)
+    raw_min_y = min(box["min_y_mm"] for box in raw)
+    raw_max_y = max(box["max_y_mm"] for box in raw)
+    raw_center_x = (raw_min_x + raw_max_x) / 2
+    raw_center_y = (raw_min_y + raw_max_y) / 2
+
+    x0, y0, x1, y1 = PRELIMINARY_CALIBRATION["keyboard"]["bounds_px"]
+    target = rectified_bbox_to_mm(x0, y0, x1, y1)
+    return {
+        "scale_x": target["width_mm"] / (raw_max_x - raw_min_x),
+        "scale_y": target["height_mm"] / (raw_max_y - raw_min_y),
+        "raw_center_x_mm": raw_center_x,
+        "raw_center_y_mm": raw_center_y,
+        "target_center_x_mm": target["center_x_mm"],
+        "target_center_y_mm": target["center_y_mm"],
+        "source_class": SourceClass.DERIVED.value,
+        "method": "affine reconcile of the reprojected 78-key contour layout to the independently measured G2 keyboard aggregate",
+    }
+
+
+def keyboard_item_to_mm(item: dict) -> dict:
+    raw = _raw_keyboard_item_mm(item)
+    correction = _keyboard_layout_affine()
+    sx, sy = correction["scale_x"], correction["scale_y"]
+    cx0, cy0 = correction["raw_center_x_mm"], correction["raw_center_y_mm"]
+    cx1, cy1 = correction["target_center_x_mm"], correction["target_center_y_mm"]
+
+    min_x = cx1 + (raw["min_x_mm"] - cx0) * sx
+    max_x = cx1 + (raw["max_x_mm"] - cx0) * sx
+    min_y = cy1 + (raw["min_y_mm"] - cy0) * sy
+    max_y = cy1 + (raw["max_y_mm"] - cy0) * sy
+    return {
+        "min_x_mm": min_x,
+        "max_x_mm": max_x,
+        "min_y_mm": min_y,
+        "max_y_mm": max_y,
+        "width_mm": max_x - min_x,
+        "height_mm": max_y - min_y,
+        "center_x_mm": (min_x + max_x) / 2,
+        "center_y_mm": (min_y + max_y) / 2,
+    }
 
 
 def deck_warp_spec() -> dict:
-    width_mm, depth_mm = DECK_CALIBRATION["physical_size_mm"]
-    scale = DECK_CALIBRATION["px_per_mm"]
-    physical_width_px = width_mm * scale
-    physical_height_px = depth_mm * scale
+    edges = DECK_CALIBRATION["source_edges_px"]
+    width = edges["right"] - edges["left"]
+    height = edges["front"] - edges["rear"]
     return {
-        "physical_span_px": [physical_width_px, physical_height_px],
-        "output_size_px": [
-            math.ceil(physical_width_px) + 1,
-            math.ceil(physical_height_px) + 1,
-        ],
-        "destination_quad": [
-            [0.0, 0.0],
-            [physical_width_px, 0.0],
-            [physical_width_px, physical_height_px],
-            [0.0, physical_height_px],
-        ],
+        "source_rect_px": [edges["left"], edges["rear"], edges["right"], edges["front"]],
+        "physical_span_px": [width, height],
+        "output_size_px": [math.ceil(width) + 1, math.ceil(height) + 1],
+        "destination_quad": [[0.0, 0.0], [width, 0.0], [width, height], [0.0, height]],
     }
 
 
 def derive_metric_measurements() -> dict:
     measurements = deepcopy(PRELIMINARY_CALIBRATION)
-    scale = DECK_CALIBRATION["px_per_mm"]
-    _, depth_mm = DECK_CALIBRATION["physical_size_mm"]
+    sx, sy = DECK_CALIBRATION["mm_per_px"]
 
     keyboard = measurements["keyboard"]
-    keyboard["key_outer_width_mm"] = keyboard["key_outer_px"][0] / scale
-    keyboard["key_outer_height_mm"] = keyboard["key_outer_px"][1] / scale
-    keyboard["pitch_x_mm"] = keyboard["pitch_px"][0] / scale
-    keyboard["pitch_y_mm"] = keyboard["pitch_px"][1] / scale
+    regular = keyboard_item_to_mm(KEYBOARD_LAYOUT_PX[1])
+    keyboard["key_outer_width_mm"] = regular["width_mm"]
+    keyboard["key_outer_height_mm"] = regular["height_mm"]
+    f1 = deck_px_to_mm(KEYBOARD_LAYOUT_PX[1]["cx_px"], KEYBOARD_LAYOUT_PX[1]["cy_px"])
+    f2 = deck_px_to_mm(KEYBOARD_LAYOUT_PX[2]["cx_px"], KEYBOARD_LAYOUT_PX[2]["cy_px"])
+    row2 = deck_px_to_mm(KEYBOARD_LAYOUT_PX[15]["cx_px"], KEYBOARD_LAYOUT_PX[15]["cy_px"])
+    keyboard["pitch_x_mm"] = abs(f2[0] - f1[0])
+    keyboard["pitch_y_mm"] = abs(row2[1] - f1[1])
     keyboard["gap_x_mm"] = keyboard["pitch_x_mm"] - keyboard["key_outer_width_mm"]
     keyboard["gap_y_mm"] = keyboard["pitch_y_mm"] - keyboard["key_outer_height_mm"]
     bx0, by0, bx1, by1 = keyboard["bounds_px"]
-    keyboard["bounds_width_mm"] = (bx1 - bx0) / scale
-    keyboard["bounds_height_mm"] = (by1 - by0) / scale
-    keyboard["bounds_center_x_mm"], keyboard["bounds_center_y_mm"] = deck_px_to_mm(
-        (bx0 + bx1) / 2, (by0 + by1) / 2
-    )
+    bounds = rectified_bbox_to_mm(bx0, by0, bx1, by1)
     wx0, wy0, wx1, wy1 = keyboard["well_bbox_px"]
-    keyboard["well_width_mm"] = (wx1 - wx0) / scale
-    keyboard["well_height_mm"] = (wy1 - wy0) / scale
-    keyboard["well_center_x_mm"], keyboard["well_center_y_mm"] = deck_px_to_mm(
-        (wx0 + wx1) / 2, (wy0 + wy1) / 2
-    )
-    keyboard["row_pitch_mm"] = keyboard["pitch_px"][1] / scale
+    well = rectified_bbox_to_mm(wx0, wy0, wx1, wy1)
+    for key, value in bounds.items():
+        keyboard["bounds_" + key.replace("_mm", "") + "_mm"] = value
+    keyboard["bounds_width_mm"] = bounds["width_mm"]
+    keyboard["bounds_height_mm"] = bounds["height_mm"]
+    keyboard["bounds_center_x_mm"] = bounds["center_x_mm"]
+    keyboard["bounds_center_y_mm"] = bounds["center_y_mm"]
+    keyboard["well_width_mm"] = well["width_mm"]
+    keyboard["well_height_mm"] = well["height_mm"]
+    keyboard["well_center_x_mm"] = well["center_x_mm"]
+    keyboard["well_center_y_mm"] = well["center_y_mm"]
+    keyboard["row_pitch_mm"] = keyboard["pitch_y_mm"]
 
     trackpad = measurements["trackpad"]
-    trackpad["left_x_mm"], _ = deck_px_to_mm(trackpad["left_x_px"], 0.0)
-    trackpad["right_x_mm"], _ = deck_px_to_mm(trackpad["right_x_px"], 0.0)
-    trackpad["measured_center_x_mm"] = (trackpad["left_x_mm"] + trackpad["right_x_mm"]) / 2
-    trackpad["height_mm"] = (trackpad["bottom_y_px"] - trackpad["top_y_px"]) / scale
-    trackpad["front_gap_mm"] = (
-        trackpad["physical_front_edge_px"] - trackpad["bottom_y_px"]
-    ) / scale
-    trackpad["center_y_mm"] = depth_mm / 2 - (
-        (trackpad["top_y_px"] + trackpad["bottom_y_px"]) / 2
-    ) / scale
+    left_x, _ = source_deck_px_to_mm(trackpad["left_x_px"], trackpad["top_y_px"])
+    right_x, _ = source_deck_px_to_mm(trackpad["right_x_px"], trackpad["top_y_px"])
+    _, top_y = source_deck_px_to_mm(trackpad["left_x_px"], trackpad["top_y_px"])
+    _, bottom_y = source_deck_px_to_mm(trackpad["left_x_px"], trackpad["bottom_y_px"])
+    trackpad["left_x_mm"] = left_x
+    trackpad["right_x_mm"] = right_x
+    trackpad["width_mm"] = right_x - left_x
+    trackpad["center_x_mm"] = (left_x + right_x) / 2
+    trackpad["measured_center_x_mm"] = trackpad["center_x_mm"]
+    trackpad["height_mm"] = top_y - bottom_y
+    trackpad["center_y_mm"] = (top_y + bottom_y) / 2
+    trackpad["front_gap_mm"] = (trackpad["physical_front_edge_px"] - trackpad["bottom_y_px"]) * sy
     keyboard["trackpad_gap_mm"] = (
         keyboard["well_center_y_mm"] - keyboard["well_height_mm"] / 2
         - (trackpad["center_y_mm"] + trackpad["height_mm"] / 2)
@@ -348,24 +640,31 @@ def derive_metric_measurements() -> dict:
 
     touch = measurements["touch_id"]
     x, y, w, h = touch["outer_bbox_px"]
-    touch["outer_width_mm"] = w / scale
-    touch["outer_height_mm"] = h / scale
-    touch["center_x_mm"], touch["center_y_mm"] = deck_px_to_mm(x + w / 2, y + h / 2)
-    touch["sensor_diameter_mm"] = touch["sensor_diameter_px"] / scale
+    touch_box = rectified_bbox_to_mm(x, y, x + w, y + h)
+    touch["outer_width_mm"] = touch_box["width_mm"]
+    touch["outer_height_mm"] = touch_box["height_mm"]
+    touch["center_x_mm"] = touch_box["center_x_mm"]
+    touch["center_y_mm"] = touch_box["center_y_mm"]
+    sensor_x, sensor_y = touch["sensor_center_px"]
+    sensor_left = deck_px_to_mm(sensor_x - touch["sensor_diameter_px"] / 2, sensor_y)
+    sensor_right = deck_px_to_mm(sensor_x + touch["sensor_diameter_px"] / 2, sensor_y)
+    touch["sensor_diameter_mm"] = abs(sensor_right[0] - sensor_left[0])
 
     speaker = measurements["speaker"]
-    speaker["pitch_x_mm"] = speaker["pitch_px"][0] / scale
-    speaker["pitch_y_mm"] = speaker["pitch_px"][1] / scale
-    sx0, sy0, sx1, sy1 = speaker["left_field_bbox_px"]
-    speaker["observed_width_mm"] = (sx1 - sx0) / scale
-    speaker["observed_height_mm"] = (sy1 - sy0) / scale
-    speaker_center_x_mm, speaker["field_center_y_mm"] = deck_px_to_mm(
-        (sx0 + sx1) / 2, (sy0 + sy1) / 2
-    )
-    speaker["field_center_abs_x_mm"] = abs(speaker_center_x_mm)
+    speaker["pitch_x_mm"] = speaker["pitch_px"][0] * sx
+    speaker["pitch_y_mm"] = speaker["pitch_px"][1] * sy
+    first_x, first_y = speaker["first_center_px"]
+    last_x, last_y = speaker["last_center_px"]
+    center_x_mm, center_y_mm = source_deck_px_to_mm((first_x + last_x) / 2, (first_y + last_y) / 2)
+    hole_diameter_mm = speaker["hole_diameter_px"] * (sx + sy) / 2
+    speaker["hole_radius_mm"] = hole_diameter_mm / 2
+    speaker["observed_width_mm"] = (last_x - first_x) * sx + hole_diameter_mm
+    speaker["observed_height_mm"] = (last_y - first_y) * sy + hole_diameter_mm
+    speaker["field_center_abs_x_mm"] = abs(center_x_mm)
+    speaker["field_center_y_mm"] = center_y_mm
+    speaker["first_hole_center_side_inset_mm"] = (first_x - DECK_CALIBRATION["source_edges_px"]["left"]) * sx
     speaker["grid_columns"] = speaker["column_count"]
     speaker["grid_rows"] = speaker["row_count"]
-    speaker["hole_radius_mm"] = speaker["hole_diameter_px"] / scale / 2
 
     display = measurements["display"]
     display_scale = display["px_per_mm"]

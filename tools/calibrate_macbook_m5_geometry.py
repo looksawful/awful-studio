@@ -1,4 +1,4 @@
-"""Generate G1 MacBook Pro 14 M5 calibration evidence from pinned Apple assets."""
+"""Generate G2 MacBook Pro 14 M5 calibration evidence from pinned Apple assets."""
 
 from __future__ import annotations
 
@@ -19,6 +19,8 @@ from assets.device_mockups.macbook_pro_14.geometry_contract import (
     deck_px_to_mm,
     deck_warp_spec,
     derive_metric_measurements,
+    rectified_deck_px_to_source,
+    source_deck_px_to_mm,
 )
 
 ASSET_DIR = ROOT / "assets" / "device_mockups" / "macbook_pro_14"
@@ -48,8 +50,8 @@ def _fact_dict(fact) -> dict:
 
 def build_report() -> dict:
     return {
-        "gate": "G1",
-        "status": "awaiting_human_overlay_approval",
+        "gate": "G2",
+        "status": "calibrated_geometry_active_human_model_approval_pending",
         "coordinate_frame": {
             "origin": "chassis plan center",
             "x": "positive right",
@@ -108,54 +110,80 @@ def _rectified_deck(cache_root: Path):
     image = cv2.imread(str(source), cv2.IMREAD_COLOR)
     if image is None:
         raise FileNotFoundError(source)
-    spec = deck_warp_spec()
-    width, height = spec["output_size_px"]
-    src = np.array(DECK_CALIBRATION["source_quad_px"], dtype=np.float32)
-    dst = np.array(spec["destination_quad"], dtype=np.float32)
-    matrix = cv2.getPerspectiveTransform(src, dst)
-    return cv2.warpPerspective(image, matrix, (width, height)), matrix
+    edges = DECK_CALIBRATION["source_edges_px"]
+    left, right = round(edges["left"]), round(edges["right"])
+    rear, front = round(edges["rear"]), round(edges["front"])
+    crop = image[rear : front + 1, left : right + 1].copy()
+    matrix = np.array([[1.0, 0.0, -left], [0.0, 1.0, -rear], [0.0, 0.0, 1.0]])
+    return crop, matrix
 
 
 def render_deck_overlay(cache_root: Path, out_dir: Path) -> dict:
     import cv2
 
     image, matrix = _rectified_deck(cache_root)
-    h, _ = image.shape[:2]
-    physical_width_px = deck_warp_spec()["physical_span_px"][0]
+    h, w = image.shape[:2]
+    edges = DECK_CALIBRATION["source_edges_px"]
+    left, rear = edges["left"], edges["rear"]
     measurements = derive_metric_measurements()
     track = measurements["trackpad"]
     touch = measurements["touch_id"]
     speaker = measurements["speaker"]
 
+    def local_source(x, y):
+        return round(x - left), round(y - rear)
+
     cv2.rectangle(
         image,
-        (round(track["left_x_px"]), round(track["top_y_px"])),
-        (round(track["right_x_px"]), round(track["bottom_y_px"])),
+        local_source(track["left_x_px"], track["top_y_px"]),
+        local_source(track["right_x_px"], track["bottom_y_px"]),
         (0, 255, 255),
         3,
     )
 
-    x, y, bw, bh = map(round, touch["outer_bbox_px"])
-    cv2.rectangle(image, (x, y), (x + bw, y + bh), (0, 180, 255), 3)
-    cx, cy = map(round, touch["sensor_center_px"])
-    cv2.circle(image, (cx, cy), round(touch["sensor_diameter_px"] / 2), (255, 180, 0), 3)
-
-    sx0, sy0, sx1, sy1 = speaker["left_field_bbox_px"]
-    cv2.rectangle(image, tuple(map(round, (sx0, sy0))), tuple(map(round, (sx1, sy1))), (255, 0, 255), 3)
+    tx, ty, tw, th = touch["outer_bbox_px"]
+    corners = [
+        rectified_deck_px_to_source(tx, ty),
+        rectified_deck_px_to_source(tx + tw, ty + th),
+    ]
     cv2.rectangle(
         image,
-        tuple(map(round, (physical_width_px - sx1, sy0))),
-        tuple(map(round, (physical_width_px - sx0, sy1))),
+        local_source(*corners[0]),
+        local_source(*corners[1]),
+        (0, 180, 255),
+        3,
+    )
+    sensor_source = rectified_deck_px_to_source(*touch["sensor_center_px"])
+    sensor_radius_px = round(touch["sensor_diameter_mm"] / DECK_CALIBRATION["mm_per_px"][0] / 2)
+    cv2.circle(image, local_source(*sensor_source), sensor_radius_px, (255, 180, 0), 3)
+
+    first_x, first_y = speaker["first_center_px"]
+    last_x, last_y = speaker["last_center_px"]
+    half_hole = speaker["hole_diameter_px"] / 2
+    cv2.rectangle(
+        image,
+        local_source(first_x - half_hole, first_y - half_hole),
+        local_source(last_x + half_hole, last_y + half_hole),
+        (255, 0, 255),
+        3,
+    )
+    center = (edges["left"] + edges["right"]) / 2
+    mirror_first = 2 * center - last_x
+    mirror_last = 2 * center - first_x
+    cv2.rectangle(
+        image,
+        local_source(mirror_first - half_hole, first_y - half_hole),
+        local_source(mirror_last + half_hole, last_y + half_hole),
         (255, 0, 255),
         3,
     )
 
     cv2.putText(
         image,
-        "G1 PROVISIONAL - geometry not frozen",
-        (32, h - 28),
+        "G2 APPLE-CALIBRATED chassis plane",
+        (24, h - 24),
         cv2.FONT_HERSHEY_SIMPLEX,
-        0.85,
+        0.75,
         (0, 0, 255),
         2,
         cv2.LINE_AA,
@@ -164,9 +192,10 @@ def render_deck_overlay(cache_root: Path, out_dir: Path) -> dict:
     cv2.imwrite(str(path), image)
     return {
         "path": str(path.relative_to(ROOT)),
-        "size_px": list(image.shape[1::-1]),
-        "homography": matrix.tolist(),
-        "corner_pick_tolerance_px": DECK_CALIBRATION["corner_pick_tolerance_px"],
+        "size_px": [w, h],
+        "source_crop_px": [edges["left"], edges["rear"], edges["right"], edges["front"]],
+        "source_to_crop_matrix": matrix.tolist(),
+        "scale_mm_per_px": DECK_CALIBRATION["mm_per_px"],
     }
 
 
@@ -244,7 +273,7 @@ def render_display_overlay(cache_root: Path, out_dir: Path) -> dict:
     )
     cv2.putText(
         comp,
-        "G1 PROVISIONAL - approve overlay before geometry rebuild",
+        "G2 display: active matrix exact; outer assembly still provisional",
         (460, 2480),
         cv2.FONT_HERSHEY_SIMPLEX,
         0.9,
@@ -264,7 +293,7 @@ def main() -> int:
     parser.add_argument(
         "--out-dir",
         type=Path,
-        default=ASSET_DIR / "evidence" / "g1_calibration",
+        default=ASSET_DIR / "evidence" / "g2_calibration",
     )
     args = parser.parse_args()
     args.out_dir.mkdir(parents=True, exist_ok=True)

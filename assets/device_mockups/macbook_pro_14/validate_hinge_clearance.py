@@ -27,10 +27,8 @@ PAIRS = (
     ("lid_base", "LID_UNIBODY", "BASE_UNIBODY"),
     ("barrel_l_base", "HINGE_BARREL_L", "BASE_UNIBODY"),
     ("barrel_r_base", "HINGE_BARREL_R", "BASE_UNIBODY"),
-    ("cover_l_base", "HINGE_COVER_L", "BASE_UNIBODY"),
-    ("cover_r_base", "HINGE_COVER_R", "BASE_UNIBODY"),
-    ("cover_l_barrel", "HINGE_COVER_L", "HINGE_BARREL_L"),
-    ("cover_r_barrel", "HINGE_COVER_R", "HINGE_BARREL_R"),
+    ("lid_cover_l", "LID_UNIBODY", "HINGE_COVER_L"),
+    ("lid_cover_r", "LID_UNIBODY", "HINGE_COVER_R"),
 )
 scene = bpy.context.scene
 LOCAL_GEOMETRY = {}

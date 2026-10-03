@@ -16,6 +16,7 @@ def cli(flag, default=None):
 RUNTIME_REL = cli('--runtime-dir', 'runtime/v1').replace('\\', '/').strip('/')
 PREFIX = cli('--prefix', 'macbook_pro_14_m5_v1')
 VERSION = cli('--version', 'v1')
+STAGE = cli('--stage', 'RELEASE_CANDIDATE')
 SOURCE_BLEND_LABEL = cli(
     '--source-blend-label',
     'extension/awful_studio/assets/devices/macbook_pro_14_m5_low_v1_release.blend',
@@ -118,7 +119,7 @@ root['runtime_bottom_anchor'] = 'ANCHOR_BOTTOM_CENTER'
 root['runtime_screen_anchor'] = 'ANCHOR_SCREEN_CENTER'
 root['runtime_lod'] = 'LOD0'
 root['delivery_version'] = VERSION
-root['delivery_stage'] = 'RELEASE_CANDIDATE'
+root['delivery_stage'] = STAGE
 root['delivery_source_revision'] = SOURCE_REVISION
 root['delivery_source_commit'] = SOURCE_COMMIT
 root['plugin_source_revision'] = PLUGIN_SOURCE_REVISION
@@ -181,7 +182,7 @@ runtime_repo_dir = 'assets/device_mockups/macbook_pro_14/' + RUNTIME_REL
 manifest = {
     'asset_id': 'macbook_pro_14_m5',
     'version': VERSION,
-    'stage': 'RELEASE_CANDIDATE',
+    'stage': STAGE,
     'source_blend': SOURCE_BLEND_LABEL,
     'delivery_blend': f'{runtime_repo_dir}/{delivery_name}',
     'glb': f'{runtime_repo_dir}/{glb_name}',
