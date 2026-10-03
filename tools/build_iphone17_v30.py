@@ -15,6 +15,12 @@ GENERATOR_VERSION = 'web_delivery_camera_logo_normals_v30'
 SOURCE_FILES = [
     'assets/device_mockups/common/foundation_common.py',
     'assets/device_mockups/iphone_17/generate_low_v30.py',
+    'assets/device_mockups/iphone_17/camera_topology_v30.py',
+    'assets/device_mockups/iphone_17/reference/camera_bake_v30/provenance.json',
+    'assets/device_mockups/iphone_17/reference/camera_bake_v30/seat_40_normal.png',
+    'assets/device_mockups/iphone_17/reference/camera_bake_v30/housing_40_normal.png',
+    'assets/device_mockups/iphone_17/reference/camera_bake_v30/ring_40_normal.png',
+    'assets/device_mockups/iphone_17/reference/camera_bake_v30/bevel_40_normal.png',
     'assets/device_mockups/iphone_17/export_runtime_v30.py',
     'assets/device_mockups/iphone_17/reference/apple_logo_glb_mask.png',
     'assets/device_mockups/iphone_17/reference/ios26_home_screen_1206x2622.png',
@@ -46,6 +52,7 @@ def update_iphone_loader_revision(path: Path, revision: str) -> None:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--blender', type=Path, required=True)
+    parser.add_argument('--skip-previews', action='store_true', help='Retain previews during structural iteration')
     args = parser.parse_args()
     blender = args.blender.resolve()
     revision, source_hashes = source_fingerprint(ROOT, SOURCE_FILES)
@@ -56,7 +63,8 @@ def main():
     evidence = DEVICE / 'evidence/low_v30_validation.json'
     previews = DEVICE / 'previews/low_v30'
     run(blender, '--factory-startup', '--background', '--python', DEVICE / 'generate_low_v30.py', '--',
-        '--out', generated, '--evidence', evidence, '--previews', previews)
+        '--out', generated, '--evidence', evidence, '--previews', previews,
+        *(['--skip-previews'] if args.skip_previews else []))
     run(blender, '--factory-startup', '--background', generated, '--python', DEVICE / 'export_runtime_v30.py', '--',
         '--source-revision', revision, '--source-commit', source_commit)
     run(sys.executable, DEVICE / 'optimize_runtime_v30.py')

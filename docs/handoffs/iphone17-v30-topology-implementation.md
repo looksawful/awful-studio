@@ -56,3 +56,19 @@ Finish topology cleanup for the entire canonical iPhone 17 v30 model, not only t
 F:\Temp\iphone17-v30-codex-impl
 Original dirty WIP remains preserved at:
 F:\Temp\iphone17-v30-dimfix
+
+## Slice 1 — camera productionization — GREEN
+- Frozen 8-mesh camera policy migrated into canonical v30 source.
+- New durable topology module: `assets/device_mockups/iphone_17/camera_topology_v30.py`.
+- Production bake inputs committed under `reference/camera_bake_v30/`; glass normal remains intentionally absent.
+- Exact exported camera scope: 1,288 tris.
+- Housing/seat: 164 tris each; rings/bevels/glass: 160 tris each.
+- Blender 5.2.1: 0 source/evaluated n-gons and 0 non-manifold edges for all eight meshes.
+- Apple dimensional contracts: 4/4 PASS.
+- Web shading contracts: 17/17 PASS after migrating the obsolete dense depth-plane assertion to the accepted low-poly + tangent-normal representation.
+- Full fast suite: 208/208 PASS.
+- Khronos glTF Validator 2.0.0-dev.3.10: 0 errors / 0 warnings.
+- Compat GLB: 5,243,192 bytes; meshopt GLB: 4,154,140 bytes.
+- Previous compat GLB baseline: 6,192,648 bytes.
+- Human camera gate remains frozen PASS.
+- Next slice: BODY_ALUMINUM / rail source topology while preserving Apple Detail A and all cutout datums.

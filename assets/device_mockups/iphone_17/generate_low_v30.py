@@ -10,6 +10,8 @@ COMMON = os.path.normpath(os.path.join(HERE, "..", "common"))
 if COMMON not in sys.path:
     sys.path.insert(0, COMMON)
 import foundation_common as fc
+sys.path.insert(0, HERE)
+from camera_topology_v30 import camera_mesh, attach_camera_normal
 
 MM = fc.MM
 
@@ -582,21 +584,24 @@ housing_z = CAM_CENTER_Z
 # back glass to camera glass = 3.45 mm. Keep those external surfaces authoritative.
 CAMERA_PLATEAU_PROTRUSION = 1.78 * MM
 CAMERA_GLASS_PROTRUSION = 3.45 * MM
-housing_seat = outward_prism("CAMERA_HOUSING_SEAT", CAM_OUTER_W, CAM_OUTER_H, 0.30*MM, CAM_OUTER_W*0.5, camera_seat_mat, detail_c, axis="Y", location=(housing_x, D*0.5 + 0.15*MM, housing_z), edge_bevel=0.00010, outline_segments=128)
-apply_runtime_bevel(housing_seat, 0.11*MM, segments=4)
-housing_seat_wn = housing_seat.modifiers.new("WEIGHTED_NORMAL", "WEIGHTED_NORMAL")
-housing_seat_wn.keep_sharp = True
-housing_seat_wn.weight = 50
-housing = outward_prism("CAMERA_HOUSING", CAM_INNER_W, CAM_INNER_H, CAMERA_PLATEAU_PROTRUSION, CAM_INNER_W*0.5, camera_housing_mat, detail_c, axis="Y", location=(housing_x, D*0.5 + CAMERA_PLATEAU_PROTRUSION*0.5, housing_z), edge_bevel=0.00018, outline_segments=128)
-apply_runtime_bevel(housing, 0.24*MM, segments=4)
+housing_seat = camera_mesh("CAMERA_HOUSING_SEAT", CAM_OUTER_W, CAM_OUTER_H, 0.30*MM,
+                          camera_seat_mat, detail_c, (housing_x, D*0.5 + 0.15*MM, housing_z), capsule=True)
+housing = camera_mesh("CAMERA_HOUSING", CAM_INNER_W, CAM_INNER_H, CAMERA_PLATEAU_PROTRUSION,
+                     camera_housing_mat, detail_c, (housing_x, D*0.5 + CAMERA_PLATEAU_PROTRUSION*0.5, housing_z), capsule=True)
+attach_camera_normal(camera_seat_mat, 'seat')
+attach_camera_normal(camera_housing_mat, 'housing')
+# Keep shared rail/inner-optics material response independent of camera bakes.
+camera_ring_mat = metal_dark.copy()
+camera_ring_mat.name = 'MAT_CAMERA_RING'
+camera_bevel_mat = metal.copy()
+camera_bevel_mat.name = 'MAT_CAMERA_BEVEL'
+for material, part in ((camera_ring_mat, 'ring'), (camera_bevel_mat, 'bevel')):
+    attach_camera_normal(material, part)
 for idx,(x_mm,z_mm) in enumerate((((W*0.5-CAM_CENTER_X_REF)/MM,(H*0.5-13.62*MM)/MM),((W*0.5-CAM_CENTER_X_REF)/MM,(H*0.5-31.34*MM)/MM)),1):
     seat=fc.cylinder(f"CAMERA_{idx}_SEAT",8.18*MM,0.14*MM,gap_mat,detail_c,(x_mm*MM,D*0.5+1.70*MM,z_mm*MM),axis="Y",vertices=192); seat.hide_render=True
-    ring = fc.cylinder(f"CAMERA_{idx}_RING",8.00*MM,1.10*MM,metal_dark,detail_c,(x_mm*MM,D*0.5+2.20*MM,z_mm*MM),axis="Y",vertices=192)
-    ring_bevel = fc.cylinder(f"CAMERA_{idx}_BEVEL",7.44*MM,0.70*MM,metal,detail_c,(x_mm*MM,D*0.5+2.75*MM,z_mm*MM),axis="Y",vertices=192)
-    camera_glass = fc.cylinder(f"CAMERA_{idx}_GLASS",6.81*MM,0.70*MM,lens_glass,detail_c,(x_mm*MM,D*0.5+CAMERA_GLASS_PROTRUSION-0.35*MM,z_mm*MM),axis="Y",vertices=192)
-    apply_runtime_bevel(ring, 0.13*MM, segments=4)
-    apply_runtime_bevel(ring_bevel, 0.07*MM, segments=3)
-    apply_runtime_bevel(camera_glass, 0.06*MM, segments=3)
+    ring = camera_mesh(f"CAMERA_{idx}_RING",16.00*MM,16.00*MM,1.10*MM,camera_ring_mat,detail_c,(x_mm*MM,D*0.5+2.20*MM,z_mm*MM))
+    ring_bevel = camera_mesh(f"CAMERA_{idx}_BEVEL",14.88*MM,14.88*MM,0.70*MM,camera_bevel_mat,detail_c,(x_mm*MM,D*0.5+2.75*MM,z_mm*MM))
+    camera_glass = camera_mesh(f"CAMERA_{idx}_GLASS",13.62*MM,13.62*MM,0.70*MM,lens_glass,detail_c,(x_mm*MM,D*0.5+CAMERA_GLASS_PROTRUSION-0.35*MM,z_mm*MM))
     fc.cylinder(f"CAMERA_{idx}_INNER",5.20*MM,0.09*MM,black,detail_c,(x_mm*MM,D*0.5+3.22*MM,z_mm*MM),axis="Y",vertices=160)
     fc.cylinder(f"CAMERA_{idx}_IRIS",3.00*MM,0.070*MM,lens_glass,detail_c,(x_mm*MM,D*0.5+3.26*MM,z_mm*MM),axis="Y",vertices=128)
     fc.cylinder(f"CAMERA_{idx}_PUPIL",1.18*MM,0.045*MM,black,detail_c,(x_mm*MM,D*0.5+3.30*MM,z_mm*MM),axis="Y",vertices=96)
@@ -727,13 +732,6 @@ smooth_sharp_boundaries(body)
 body_wn = body.modifiers.new("WEIGHTED_NORMAL", "WEIGHTED_NORMAL")
 body_wn.keep_sharp = True
 body_wn.weight = 50
-housing_bevel = housing.modifiers.get("EDGE_BEVEL")
-if housing_bevel:
-    housing_bevel.harden_normals = True
-smooth_sharp_boundaries(housing)
-housing_wn = housing.modifiers.new("WEIGHTED_NORMAL", "WEIGHTED_NORMAL")
-housing_wn.keep_sharp = True
-housing_wn.weight = 50
 root = fc.empty("CTRL_IPHONE_17", ctrl_c)
 glow_anchor.parent = root
 for collection in (body_c, detail_c, screen_c):
@@ -810,10 +808,6 @@ cam_back_three = persp("CAM_BACK_THREE_QUARTER", (0.18, 0.30, 0.13), (0.010,0.00
 for name, tile_mm in (
     ("BODY_ALUMINUM", 4.0),
     ("BACK_GLASS", 6.0),
-    ("CAMERA_HOUSING_SEAT", 3.0),
-    ("CAMERA_HOUSING", 3.0),
-    ("CAMERA_1_RING", 2.0),
-    ("CAMERA_2_RING", 2.0),
     ("ACTION_BUTTON", 2.0),
     ("VOL_UP", 2.0),
     ("VOL_DOWN", 2.0),
@@ -943,8 +937,9 @@ def render_profile(cam, filename):
         set_light(light_name, energy)
     fc.render_camera(cam, os.path.join(PREVIEWS, filename))
 
-for cam, filename in renders:
-    render_profile(cam, filename)
+if '--skip-previews' not in sys.argv:
+    for cam, filename in renders:
+        render_profile(cam, filename)
 print("AWFUL_IPHONE17_V30_VALIDATION", json.dumps(evidence, sort_keys=True))
 if not passed:
     raise RuntimeError("iPhone 17 LOW v30 validation failed")

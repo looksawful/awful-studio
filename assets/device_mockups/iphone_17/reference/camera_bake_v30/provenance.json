@@ -1,0 +1,17 @@
+{
+  "source": "Frozen camera Human PASS, out_topofix40, 2026-10-03",
+  "prototype_baseline_commit": "b355e24495e6a7c9d4fcbf2ff927842ff75c5680",
+  "maps": {
+    "bevel_40_normal.png": "a54b123c5906cdd052f4522c2796a07f7b875cd022295bb9cd697507a2074f48",
+    "housing_40_normal.png": "a0457f23a8724f15af301de73754877f3c149449bb31ba6c6f2695d764a0ea8d",
+    "ring_40_normal.png": "74aa90209440c69cf161cbfb6c861b5c7e502180984132d344ac2a31a5c96647",
+    "seat_40_normal.png": "a1a7a5bb95bbe015b75431a186c48eeace3ff47bc06a714d9f574b5a7c3c54ec"
+  },
+  "size_px": 512,
+  "margin_px": 24,
+  "cage_mm": 0.18,
+  "max_ray_mm": 0.3,
+  "normal_space": "TANGENT",
+  "glass_normal": "omitted",
+  "policy": "40-class silhouette, horizontal quad-strip housing caps, 1288 triangles total"
+}

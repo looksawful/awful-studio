@@ -338,33 +338,39 @@ class IPhoneWebShadingContractTests(unittest.TestCase):
             f'screen front still overlaps physical front hardware: {covered}',
         )
 
-    def test_rear_camera_protrusions_export_rounded_depth_profiles(self):
+    def test_rear_camera_protrusions_preserve_depth_and_baked_edge_response(self):
+        # Human-PASS representation: physical silhouette/depth plus tangent bakes.
+        # Counting bevel depth planes would force the rejected dense delivery.
+        from test_iphone_dimensional_drawing_contract import node_world_bounds_mm
+        from test_iphone_topology_contract import CAMERA
         doc, blob = read_glb(GLB)
-
-        for name in (
-            'CAMERA_HOUSING',
-            'CAMERA_HOUSING_SEAT',
-            'CAMERA_1_RING',
-            'CAMERA_2_RING',
-        ):
-            node = next(node for node in doc['nodes'] if node.get('name') == name)
-            mesh = doc['meshes'][node['mesh']]
-            positions = []
-            for primitive in mesh['primitives']:
-                positions.extend(accessor_vec3(doc, blob, primitive['attributes']['POSITION']))
-
-            extents = [
-                max(position[axis] for position in positions) - min(position[axis] for position in positions)
-                for axis in range(3)
-            ]
-            depth_axis = min(range(3), key=extents.__getitem__)
-            levels = sorted({round(position[depth_axis], 7) for position in positions})
-
-            self.assertGreaterEqual(
-                len(levels),
-                6,
-                f'{name} exports a square depth profile instead of a rounded protruding edge: {levels}',
-            )
+        nodes = {node['name']: node for node in doc['nodes']}
+        back_min, _ = node_world_bounds_mm(doc, blob, 'BACK_GLASS')
+        total = 0
+        for name in CAMERA:
+            primitives = doc['meshes'][nodes[name]['mesh']]['primitives']
+            total += sum(doc['accessors'][p['indices']]['count'] // 3 for p in primitives)
+            mins, maxs = node_world_bounds_mm(doc, blob, name)
+            expected_depth = (.30 if name.endswith('SEAT') else 1.78) if 'HOUSING' in name else (1.10 if name.endswith('RING') else .70)
+            self.assertAlmostEqual(maxs[2] - mins[2], expected_depth, delta=.001, msg=name)
+            if name == 'CAMERA_HOUSING' or name.endswith('GLASS'):
+                self.assertAlmostEqual(back_min[2] - mins[2], 1.78 if name == 'CAMERA_HOUSING' else 3.45, delta=.001, msg=name)
+            part = ('seat' if name.endswith('SEAT') else 'housing') if 'HOUSING' in name else name.rsplit('_', 1)[1].lower()
+            for primitive in primitives:
+                material = doc['materials'][primitive['material']]
+                self.assertIn('TEXCOORD_0', primitive['attributes'], name)
+                if part == 'glass':
+                    self.assertNotIn('normalTexture', material, name)
+                else:
+                    self.assertIn('normalTexture', material, name)
+                    texture = doc['textures'][material['normalTexture']['index']]
+                    image = doc['images'][texture['source']]
+                    self.assertEqual(image['name'], f'{part}_40_normal', name)
+                    view = doc['bufferViews'][image['bufferView']]
+                    png = blob[view.get('byteOffset', 0):view.get('byteOffset', 0) + view['byteLength']]
+                    self.assertEqual(struct.unpack_from('>II', png, 16), (512, 512), name)
+                    self.assertIn('TANGENT', primitive['attributes'], name)
+        self.assertEqual(total, 1288, 'frozen eight-mesh camera scope')
 
     def test_camera_control_is_separate_dark_glass_and_recessed(self):
         doc, _ = read_glb(GLB)
