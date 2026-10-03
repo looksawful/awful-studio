@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-03",
+  "slice": "body_rail",
+  "fixed_point": "48b271a",
+  "candidate": "8f918e2",
+  "blender": "5.2.1 LTS",
+  "source_vertices": 4056,
+  "source_faces": 4692,
+  "source_ngons": 0,
+  "evaluated_ngons": 0,
+  "nonmanifold_edges": 0,
+  "runtime_triangles": 8108,
+  "surface_max_normal_displacement_mm": 0.003337156897487148,
+  "source_boundary_vertices_unchanged": true,
+  "original_edges_preserved": true,
+  "visual_rms_0_255": {
+    "rail": 0.062062,
+    "controls": 0.130266,
+    "bottom": 0.148897
+  },
+  "fast_tests": {
+    "passed": 209,
+    "failed": 0
+  },
+  "git_diff_check": "pass",
+  "decision": "retain_repair"
+}
