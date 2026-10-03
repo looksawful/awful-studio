@@ -72,3 +72,39 @@ F:\Temp\iphone17-v30-dimfix
 - Previous compat GLB baseline: 6,192,648 bytes.
 - Human camera gate remains frozen PASS.
 - Next slice: BODY_ALUMINUM / rail source topology while preserving Apple Detail A and all cutout datums.
+
+## Checkpoint — Codex quota stop, 2026-10-03
+
+Long Codex work was stopped to preserve quota. All useful work is being committed/pushed for chat handoff.
+
+### Completed and committed before checkpoint
+- `8c3e610` — productionized frozen low-poly camera topology in canonical v30.
+- `48b271a` — regenerated v30 delivery/runtime artifacts after camera migration.
+- Camera eight-mesh runtime scope: 1288 tris; frozen Human Gate remains PASS.
+- Camera bake assets/provenance, topology fast/runtime contracts, and topology evidence tooling are in Git.
+
+### Body/rail checkpoint
+- `BODY_ALUMINUM` cap/rail patching implemented as interior strip/diagonal cleanup without moving original physical boundary vertices.
+- Current Blender 5.2.1 check: 4056 source verts, 4692 source faces, 0 source n-gons, 0 evaluated n-gons, 0 non-manifold edges.
+- Baseline comparison: original boundary vertices unchanged; original edges preserved; max normal displacement 0.003337 mm; volume delta 2.42e-12.
+- Fast topology contract: 2/2 PASS, including frozen camera 1288 tris and body exported source-topology metadata.
+- This body work is a WIP checkpoint, not a visual PASS. Rail fixed-condition render / Human Gate is still pending.
+
+### Remaining work, in order
+1. Finish body/rail visual evidence and either retain this checkpoint or revise it.
+2. Side controls + Camera Control topology cleanup.
+3. Bottom I/O + acoustic openings + screw carrier cleanup.
+4. Back glass / display / front hardware cleanup.
+5. Flash / rear mic / inner optics / remaining runtime meshes.
+6. Full fast suite, Blender reopen, exact GLB Khronos 0/0, meshopt, five finishes, whole-device Human Gate.
+7. Two-axis code review against baseline `117546a`.
+
+### Resume point
+- Branch: `agent/118-camera-productionize`
+- Worktree: `F:\Temp\iphone17-v30-codex-impl`
+- Baseline snapshot: `117546a`
+- Original dirty WIP remains untouched: `F:\Temp\iphone17-v30-dimfix`
+- Issue ledger: GitHub #118
+- PR #119 remains DRAFT/HOLD; do not merge.
+- Implementation contract: `docs/handoffs/codex-implementation-contract.md`
+- Body runtime checkpoint report: `reports/iphone_body_topology_checkpoint.json`

@@ -12,6 +12,15 @@ import bpy
 args = sys.argv[sys.argv.index('--') + 1:]
 output = Path(args[args.index('--output') + 1]).resolve()
 output.mkdir(parents=True, exist_ok=True)
+# Frozen blends copied to evidence retain relative image paths authored under
+# generated/. Resolve those against the canonical asset directory in both runs.
+generated = Path(__file__).resolve().parents[1] / 'assets/device_mockups/iphone_17/generated'
+for image in bpy.data.images:
+    if image.filepath.startswith('//') and not image.packed_file:
+        path = (generated / image.filepath[2:]).resolve()
+        if path.is_file():
+            image.filepath = str(path)
+            image.reload()
 views = args[args.index('--views') + 1].split(',') if '--views' in args else ['camera', 'rail', 'controls', 'bottom', 'front', 'back']
 cameras = {'camera': 'CAM_CAMERA_MACRO', 'rail': 'CAM_BACK_THREE_QUARTER',
            'controls': 'CAM_RIGHT_SIDE', 'bottom': 'CAM_BOTTOM_MACRO',

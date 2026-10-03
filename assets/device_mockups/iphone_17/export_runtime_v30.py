@@ -46,6 +46,16 @@ def material_uses_normal_map(material):
 for obj in [root] + list(root.children_recursive):
     if obj.type == "MESH":
         obj.data.name = obj.name
+        if obj.name == 'BODY_ALUMINUM':
+            topology = bmesh.new()
+            topology.from_mesh(obj.data)
+            obj.data.calc_loop_triangles()
+            obj['source_topology'] = {
+                'ngons': sum(len(face.verts) > 4 for face in topology.faces),
+                'nonmanifold_edges': sum(not edge.is_manifold for edge in topology.edges),
+                'triangles': len(obj.data.loop_triangles),
+            }
+            topology.free()
         if any(material_uses_normal_map(material) for material in obj.data.materials):
             # Tangent-space normal maps need stable triangular faces in glTF.
             # Triangulate only the runtime copy; authored source geometry is unchanged.

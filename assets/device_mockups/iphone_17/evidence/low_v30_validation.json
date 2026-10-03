@@ -20,7 +20,7 @@
   },
   "body_non_manifold_edges": 0,
   "body_vertices": 4056,
-  "body_faces": 2830,
+  "body_faces": 4692,
   "boolean_cuts": [
     "DISPLAY_POCKET",
     "SCREEN_ACTIVE",

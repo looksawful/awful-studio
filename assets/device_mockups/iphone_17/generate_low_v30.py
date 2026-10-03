@@ -40,6 +40,85 @@ def smooth_sharp_boundaries(obj):
     obj.data.set_sharp_from_angle(angle=math.radians(30.0))
 
 
+def patch_body_rail_caps(obj):
+    """Connect existing boundary rows into cap/rail strips after physical cuts.
+
+    Never split silhouette, mouth or bevel edges: added boundary vertices alter
+    Blender's bevel overlap clamp. Interior support edges alone preserve them.
+    """
+    mesh = bmesh.new()
+    mesh.from_mesh(obj.data)
+    patch = mesh.faces.layers.int.new('body_patch')
+    strips = []
+    for index, face in enumerate(mesh.faces, 1):
+        if len(face.verts) <= 4:
+            continue
+        face[patch] = index
+        spans = [max(v.co[i] for v in face.verts) - min(v.co[i] for v in face.verts) for i in range(3)]
+        axis = max(range(3), key=spans.__getitem__)
+        rows = {}
+        for vertex in face.verts:
+            rows.setdefault(round(vertex.co[axis], 8), []).append(vertex)
+        # Matched contour pairs form strips without introducing center poles.
+        strips.extend((index, row) for row in rows.values() if len(row) == 2)
+    for index, row in strips:
+        shared = [f for f in row[0].link_faces if f[patch] == index and row[1] in f.verts]
+        if not shared or any(row[1] in edge.verts for edge in row[0].link_edges):
+            continue
+        bmesh.ops.connect_verts(mesh, verts=row,
+                                faces_exclude=[f for f in mesh.faces if f not in shared],
+                                check_degenerate=True)
+    # Irregular cut intersections remain small concave junction patches.
+    junctions = [f for f in mesh.faces if f[patch] and len(f.verts) > 3]
+    for face in junctions:
+        def clean_quad(patch_face):
+            corners = list(patch_face.verts)
+            return len(corners) == 4 and all(
+                (corners[i].co - corners[i - 1].co).cross(
+                    corners[(i + 1) % 4].co - corners[i].co).dot(patch_face.normal) > max(
+                        1e-16, 1e-4 * (corners[i].co - corners[i - 1].co).length *
+                        (corners[(i + 1) % 4].co - corners[i].co).length)
+                for i in range(4))
+        while len(face.verts) > 3 and not clean_quad(face):
+            vertices = list(face.verts)
+            face.normal_update()
+            normal = face.normal.copy()
+            def inside_triangle(point, a, b, c):
+                return all((end - start).cross(point - start).dot(normal) >= -1e-16
+                           for start, end in ((a, b), (b, c), (c, a)))
+            for i, tip in enumerate(vertices):
+                left, right = vertices[i - 1], vertices[(i + 1) % len(vertices)]
+                if any(right in edge.verts for edge in left.link_edges):
+                    continue
+                if (tip.co - left.co).cross(right.co - tip.co).dot(normal) <= max(
+                        1e-16, 1e-4 * (tip.co - left.co).length * (right.co - tip.co).length):
+                    continue
+                if any(inside_triangle(v.co, left.co, tip.co, right.co)
+                       for v in vertices if v not in (left, tip, right)):
+                    continue
+                if len(vertices) == 4:
+                    remainder = [v for v in vertices if v != tip]
+                    if (remainder[1].co - remainder[0].co).cross(
+                            remainder[2].co - remainder[0].co).length <= max(
+                                1e-16, 1e-4 * (remainder[1].co - remainder[0].co).length *
+                                (remainder[2].co - remainder[0].co).length):
+                        continue
+                new_face, _ = bmesh.utils.face_split(face, left, right)
+                face = max((face, new_face), key=lambda f: len(f.verts))
+                break
+            else:
+                mesh.free()
+                raise RuntimeError('BODY_ALUMINUM junction has no safe interior diagonal')
+    mesh.faces.layers.int.remove(patch)
+    mesh.normal_update()
+    if any(not edge.is_manifold for edge in mesh.edges):
+        mesh.free()
+        raise RuntimeError('BODY_ALUMINUM strip patches did not preserve the closed shell')
+    mesh.to_mesh(obj.data)
+    mesh.free()
+    obj.data.update()
+
+
 def apply_runtime_bevel(obj, width, segments=4):
     bevel = obj.modifiers.get("EDGE_BEVEL")
     if bevel is None:
@@ -726,6 +805,7 @@ for side, from_left_mm in (("L", 28.80), ("R", 42.65)):
     screw = fc.cylinder(f"BOTTOM_SCREW_{side}", 0.75*MM, 0.24*MM, screw_mat, detail_c, vertices=48)
     fc.place_on_rounded_edge(screw, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.15*MM, local_normal=(0,0,1))
 
+patch_body_rail_caps(body)
 bev = fc.add_bevel(body, 0.00022, segments=4)
 bev.harden_normals = True
 smooth_sharp_boundaries(body)

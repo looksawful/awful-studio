@@ -1,0 +1,17 @@
+{
+  "blender": "5.2.1 LTS",
+  "source_vertices": 4056,
+  "source_faces": 4692,
+  "source_ngons": 0,
+  "evaluated_vertices": 12312,
+  "evaluated_faces": 12948,
+  "triangles": 24620,
+  "ngons": 0,
+  "nonmanifold_edges": 0,
+  "volume": 7.093716466771142e-05,
+  "surface_max_distance_mm": 0.04541938324109651,
+  "surface_max_normal_displacement_mm": 0.003337156897487148,
+  "volume_delta": 2.415828049217271e-12,
+  "source_boundary_vertices_unchanged": true,
+  "original_edges_preserved": true
+}

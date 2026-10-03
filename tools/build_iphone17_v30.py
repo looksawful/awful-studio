@@ -62,14 +62,14 @@ def main():
     generated = DEVICE / 'generated/iphone_17_low_v30.blend'
     evidence = DEVICE / 'evidence/low_v30_validation.json'
     previews = DEVICE / 'previews/low_v30'
-    run(blender, '--factory-startup', '--background', '--python', DEVICE / 'generate_low_v30.py', '--',
+    run(blender, '--factory-startup', '--background', '--python-exit-code', '1', '--python', DEVICE / 'generate_low_v30.py', '--',
         '--out', generated, '--evidence', evidence, '--previews', previews,
         *(['--skip-previews'] if args.skip_previews else []))
-    run(blender, '--factory-startup', '--background', generated, '--python', DEVICE / 'export_runtime_v30.py', '--',
+    run(blender, '--factory-startup', '--background', generated, '--python-exit-code', '1', '--python', DEVICE / 'export_runtime_v30.py', '--',
         '--source-revision', revision, '--source-commit', source_commit)
     run(sys.executable, DEVICE / 'optimize_runtime_v30.py')
     bundle = ROOT / 'extension/awful_studio/assets/devices/iphone_17_low_v30.blend'
-    run(blender, '--factory-startup', '--background', generated, '--python', ROOT / 'tools/package_device_asset.py', '--',
+    run(blender, '--factory-startup', '--background', generated, '--python-exit-code', '1', '--python', ROOT / 'tools/package_device_asset.py', '--',
         '--output', bundle, '--entry', 'AWFUL_DEVICE_IPHONE_17', '--root', 'CTRL_IPHONE_17',
         '--key', 'IPHONE_17', '--stage', 'LOW_DRAFT', '--variant', 'low_v30', '--revision', revision)
     update_iphone_loader_revision(ROOT / 'extension/awful_studio/device_asset_loader.py', revision)
