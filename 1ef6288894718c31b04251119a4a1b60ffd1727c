@@ -1,0 +1,1 @@
+CI fix + accepted-overlay continuation: fold the canonical v1 rebuild into the same stack commit so it is independently coherent; lazy-load cv2/numpy for fast CI and move Storybook from temporary g2_candidate to exact canonical v1 artifacts.
