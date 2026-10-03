@@ -1,6 +1,8 @@
+from pathlib import Path
 import unittest
 
 from assets.device_mockups.macbook_pro_14.port_layout import PORTS
+import tools.build_macbook_g2_surface_overlays as overlays
 from tools.build_macbook_g2_surface_overlays import D, pair_points_by_metric_cost, side_x_mapper
 
 
@@ -44,6 +46,26 @@ class MacBookG2OverlayPairingTests(unittest.TestCase):
                 delta=0.51,
                 msg=f"side {side} rear chassis datum must stay in Apple source-image pixels",
             )
+
+    def test_side_marker_projection_uses_actual_model_z(self):
+        self.assertTrue(
+            hasattr(overlays, "project_side_point"),
+            "side overlay needs a testable 2D projection seam",
+        )
+        projected = overlays.project_side_point(
+            lambda _y: 42.0,
+            y_mm=10.0,
+            z_mm=7.5,
+            zmin=0.0,
+            zmax=10.0,
+            top_px=0,
+            bottom_px=100,
+        )
+        self.assertEqual(projected, (42, 25))
+
+        source = (Path(__file__).resolve().parents[2] / "tools" / "build_macbook_g2_surface_overlays.py").read_text(encoding="utf-8")
+        self.assertIn("q = mapper(center[1], center[2])", source)
+        self.assertNotIn("round((top_px + bottom_px) / 2)", source)
 
 
 if __name__ == "__main__":
