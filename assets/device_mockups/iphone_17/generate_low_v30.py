@@ -12,6 +12,7 @@ if COMMON not in sys.path:
 import foundation_common as fc
 sys.path.insert(0, HERE)
 from camera_topology_v30 import camera_mesh, attach_camera_normal
+from body_topology_v30 import build_body_mesh, apple_bottom_surface
 
 MM = fc.MM
 
@@ -276,6 +277,14 @@ CAM_OUTER_W, CAM_OUTER_H = CAM_OUTER_X1 - CAM_OUTER_X0, CAM_OUTER_Z1 - CAM_OUTER
 CAM_INNER_W, CAM_INNER_H = CAM_INNER_X1 - CAM_INNER_X0, CAM_INNER_Z1 - CAM_INNER_Z0
 CAM_CENTER_X = W * 0.5 - CAM_CENTER_X_REF
 CAM_CENTER_Z = H * 0.5 - CAM_CENTER_Z_REF
+
+def place_on_apple_bottom(obj, x, *, outward=0.0):
+    """Place local +Z on the actual Apple Detail A bottom normal."""
+    z, normal = apple_bottom_surface(x, W, H, iphone17_corner_profile)
+    obj.location = fc.Vector((x, 0.0, z)) + normal * outward
+    obj.rotation_euler = fc.Vector((0, 0, 1)).rotation_difference(normal).to_euler()
+    return obj
+
 
 def cli(flag, default):
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
@@ -930,8 +939,11 @@ def physical_side_button(name, edge, z_mm, length_mm, face_width_mm=2.56, protru
     fc.place_on_rounded_edge(cutter,W,H,BODY_R,edge,z_mm*MM,outward=-0.30*MM,local_normal=(1,0,0))
     fc.boolean_difference(body,cutter,name=f"CUT_{name}"); boolean_cuts.append(name)
     thickness=0.40*MM; fw=face_width_mm*MM
-    button_material=material.copy()
-    button_material.name=f"{material.name}_{name}"
+    if name == "CAMERA_CONTROL":
+        button_material = material
+    else:
+        button_material = material.copy()
+        button_material.name=f"{material.name}_{name}"
     button=capsule_prism_x(name,fw,length_mm*MM,thickness,fw*0.5,button_material,detail_c,steps=5)
     attach_control_normal(button_material,name)
     fc.place_on_rounded_edge(button,W,H,BODY_R,edge,z_mm*MM,outward=protrusion_mm*MM-thickness*0.5,local_normal=(1,0,0))
@@ -952,13 +964,13 @@ for side, edge in (("L", "LEFT"), ("R", "RIGHT")):
         fc.place_on_rounded_edge(strip, W, H, BODY_R, edge, z_mm*MM, outward=-0.018*MM, local_normal=(1,0,0))
 
 usb_cutter = fc.rounded_cube("USB_C_CUTTER", (8.99*MM, 3.00*MM, 1.82*MM), 0.91*MM, None, detail_c)
-fc.place_on_rounded_edge(usb_cutter, W, H, BODY_R, "BOTTOM", 0.0, outward=-0.70*MM, local_normal=(0,0,1))
+place_on_apple_bottom(usb_cutter, 0.0, outward=-0.70*MM)
 fc.boolean_difference(body, usb_cutter, name="CUT_USB_C")
 boolean_cuts.append("USB_C")
 usb_cavity = fc.rounded_cube("USB_C_CAVITY", (8.45*MM, 2.38*MM, 0.12*MM), 0.04*MM, grille_mat, detail_c)
-fc.place_on_rounded_edge(usb_cavity, W, H, BODY_R, "BOTTOM", 0.0, outward=-1.40*MM, local_normal=(0,0,1))
+place_on_apple_bottom(usb_cavity, 0.0, outward=-1.40*MM)
 usb_tongue = fc.rounded_cube("USB_C_TONGUE", (5.25*MM, 0.48*MM, 0.18*MM), 0.08*MM, metal_dark, detail_c)
-fc.place_on_rounded_edge(usb_tongue, W, H, BODY_R, "BOTTOM", 0.0, outward=-0.80*MM, local_normal=(0,0,1))
+place_on_apple_bottom(usb_tongue, 0.0, outward=-0.80*MM)
 
 def radial_prism_z(name, radius, depth, material, collection, segments):
     """Build a sparse circular prism with triangle cap fans and a quad side wall."""
@@ -1005,11 +1017,11 @@ def radial_prism_z(name, radius, depth, material, collection, segments):
 
 def bottom_aperture(name, x_mm):
     cutter = fc.cylinder(f"{name}_CUTTER", 0.675*MM, 1.80*MM, None, detail_c, vertices=40)
-    fc.place_on_rounded_edge(cutter, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.52*MM, local_normal=(0,0,1))
+    place_on_apple_bottom(cutter, x_mm*MM, outward=-0.52*MM)
     fc.boolean_difference(body, cutter, name=f"CUT_{name}")
     boolean_cuts.append(name)
     cavity = radial_prism_z(name, 0.675*MM, 0.12*MM, grille_mat, detail_c, segments=16)
-    fc.place_on_rounded_edge(cavity, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.98*MM, local_normal=(0,0,1))
+    place_on_apple_bottom(cavity, x_mm*MM, outward=-0.98*MM)
     ensure_box_uv(cavity, tile_mm=1.35, replace=True)
 
 # Apple Detail C: 8 x Ø1.35 acoustic ports total = 3 microphone + 5 speaker.
@@ -1022,18 +1034,41 @@ for idx, from_left_mm in enumerate((47.23, 49.485, 51.74, 53.995, 56.25), 1):
 for side, from_left_mm in (("L", 28.80), ("R", 42.65)):
     x_mm = from_left_mm - 71.45*0.5
     recess = fc.cylinder(f"BOTTOM_SCREW_{side}_RECESS", 0.78*MM, 0.90*MM, None, detail_c, vertices=48)
-    fc.place_on_rounded_edge(recess, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.38*MM, local_normal=(0,0,1))
+    place_on_apple_bottom(recess, x_mm*MM, outward=-0.38*MM)
     fc.boolean_difference(body, recess, name=f"CUT_SCREW_{side}")
     boolean_cuts.append(f"SCREW_{side}")
     screw = radial_prism_z(f"BOTTOM_SCREW_{side}", 0.75*MM, 0.24*MM, screw_mat, detail_c, segments=20)
-    fc.place_on_rounded_edge(screw, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.15*MM, local_normal=(0,0,1))
+    place_on_apple_bottom(screw, x_mm*MM, outward=-0.15*MM)
 
+# Keep the detailed boolean body as hidden dimensional/reference evidence.
 bev = fc.add_bevel(body, 0.00022, segments=4)
 bev.harden_normals = True
 smooth_sharp_boundaries(body)
 body_wn = body.modifiers.new("WEIGHTED_NORMAL", "WEIGHTED_NORMAL")
 body_wn.keep_sharp = True
 body_wn.weight = 50
+body_high = body
+body_high.name = "BODY_ALUMINUM_HIGH"
+body_high.hide_render = True
+
+# Runtime body is authored directly: Apple silhouette + localized manifold cells.
+body_runtime_mat = metal
+body = build_body_mesh(
+    "BODY_ALUMINUM",
+    W,
+    H,
+    METAL_D,
+    COVER_W + 0.12*MM,
+    COVER_H + 0.12*MM,
+    COVER_R + 0.06*MM,
+    body_runtime_mat,
+    under_glass_mat,
+    body_c,
+    iphone17_corner_profile,
+    segments=28,
+)
+smooth_sharp_boundaries(body)
+
 root = fc.empty("CTRL_IPHONE_17", ctrl_c)
 glow_anchor.parent = root
 for collection in (body_c, detail_c, screen_c):
@@ -1176,7 +1211,7 @@ passed = (
 evidence = {
     "asset_id": "iphone_17",
     "stage": "LOW_DRAFT",
-    "revision": "production_camera_controls_v30",
+    "revision": "production_topology_v30",
     "blender_version": bpy.app.version_string,
     "expected_mm": expected_mm,
     "actual_mm": {k: round(v, 6) for k, v in actual_mm.items()},

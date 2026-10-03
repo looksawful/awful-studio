@@ -122,6 +122,11 @@ class DeviceDeliveryContractTests(unittest.TestCase):
         self.assertEqual(manifest['screen_states']['screen_off']['emission_strength'], 0.0)
         self.assertGreater(manifest['screen_states']['screen_on']['emission_strength'], 0.0)
         self.assertEqual(manifest['screen_glow']['anchor'], 'SCREEN_GLOW_ANCHOR')
+        self.assertIn(
+            'assets/device_mockups/iphone_17/body_topology_v30.py',
+            manifest['source_files'],
+            'runtime body topology must participate in the v30 source fingerprint',
+        )
 
     def test_all_provenance_text_sources_are_pinned_to_lf(self):
         text_suffixes = {'.py', '.json', '.mjs', '.js', '.ts'}
@@ -142,6 +147,7 @@ class DeviceDeliveryContractTests(unittest.TestCase):
     def test_v30_tracked_delivery_text_is_lf_only(self):
         paths = [
             ROOT / 'assets/device_mockups/iphone_17/generate_low_v30.py',
+            ROOT / 'assets/device_mockups/iphone_17/body_topology_v30.py',
             ROOT / 'assets/device_mockups/iphone_17/export_runtime_v30.py',
             ROOT / 'assets/device_mockups/iphone_17/evidence/low_v30_validation.json',
             ROOT / 'assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30.asset.json',

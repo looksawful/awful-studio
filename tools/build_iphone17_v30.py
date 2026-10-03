@@ -16,6 +16,7 @@ SOURCE_FILES = [
     'assets/device_mockups/common/foundation_common.py',
     'assets/device_mockups/iphone_17/generate_low_v30.py',
     'assets/device_mockups/iphone_17/camera_topology_v30.py',
+    'assets/device_mockups/iphone_17/body_topology_v30.py',
     'assets/device_mockups/iphone_17/reference/camera_bake_v30/provenance.json',
     'assets/device_mockups/iphone_17/reference/camera_bake_v30/seat_40_normal.png',
     'assets/device_mockups/iphone_17/reference/camera_bake_v30/housing_40_normal.png',

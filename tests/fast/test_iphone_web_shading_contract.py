@@ -84,7 +84,7 @@ class IPhoneWebShadingContractTests(unittest.TestCase):
             'MAT_ANODIZED_ALUMINUM': ('anodized_aluminum_normal', 'anodized_aluminum_roughness'),
             'MAT_ALUMINUM_EDGE': ('anodized_aluminum_normal', 'anodized_aluminum_roughness'),
             'MAT_BACK_GLASS': ('back_glass_micro_normal', 'back_glass_micro_roughness'),
-            'MAT_CAMERA_CONTROL_GLASS': ('back_glass_micro_normal', 'camera_control_roughness'),
+            'MAT_CAMERA_CONTROL_GLASS': ('camera_control_normal', 'camera_control_roughness'),
         }
         for material_name, (normal_name, roughness_name) in expected.items():
             material = materials[material_name]
@@ -307,7 +307,7 @@ class IPhoneWebShadingContractTests(unittest.TestCase):
             'front camera optic needs a visible recess behind the camera aperture',
         )
 
-    def test_screen_front_has_openings_under_physical_front_hardware(self):
+    def test_screen_front_stays_clean_under_independent_front_hardware(self):
         doc, blob = read_glb(GLB)
         mesh = next(mesh for mesh in doc['meshes'] if mesh.get('name') == 'SCREEN_CONTENT')
         targets = {}
@@ -332,10 +332,9 @@ class IPhoneWebShadingContractTests(unittest.TestCase):
                     if point_in_triangle_2d(target, *points):
                         covered[name] += 1
 
-        self.assertEqual(
-            covered,
-            {'FRONT_SENSOR_MASK': 0, 'FRONT_CAMERA_MASK': 0},
-            f'screen front still overlaps physical front hardware: {covered}',
+        self.assertTrue(
+            all(count > 0 for count in covered.values()),
+            f'clean SCREEN_CONTENT must remain continuous under independent front hardware: {covered}',
         )
 
     def test_rear_camera_protrusions_preserve_depth_and_baked_edge_response(self):
