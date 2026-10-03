@@ -708,6 +708,7 @@ for loop, coord in zip(mesh.loops, ((1,0),(1,1),(0,1),(0,0))):
 boolean_cuts = ["DISPLAY_POCKET", "SCREEN_ACTIVE"]
 
 def capsule_prism_x(name, face_width, length, depth, radius, material, collection, steps=5):
+    """Build an intentional capsule mesh: paired cap rows, sparse silhouette, deterministic bake UVs."""
     straight = length - 2.0 * radius
     rows = []
     for step in range(steps + 1):
@@ -744,27 +745,92 @@ def capsule_prism_x(name, face_width, length, depth, radius, material, collectio
     verts += [(depth * 0.5, y, z) for y, z in points]
     faces = [tuple(reversed(face)) for face in cap_faces]
     faces += [tuple(index + count for index in face) for face in cap_faces]
-    for index, left in enumerate(boundary):
-        right = boundary[(index + 1) % len(boundary)]
-        faces.append((left, right, right + count, left + count))
+    for index, a in enumerate(boundary):
+        b = boundary[(index + 1) % len(boundary)]
+        faces.append((a, b, b + count, a + count))
 
     mesh = bpy.data.meshes.new(f"{name}_MESH")
     mesh.from_pydata(verts, [], faces)
     mesh.update()
+    bm = bmesh.new()
+    bm.from_mesh(mesh)
+    bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
+    bm.to_mesh(mesh)
+    bm.free()
+    mesh.update()
+
+    perimeter = [0.0]
+    boundary_points = [points[index] for index in boundary]
+    for index in range(1, len(boundary_points)):
+        ay, az = boundary_points[index - 1]
+        by, bz = boundary_points[index]
+        perimeter.append(perimeter[-1] + math.hypot(by - ay, bz - az))
+    ay, az = boundary_points[-1]
+    by, bz = boundary_points[0]
+    perimeter_total = perimeter[-1] + math.hypot(by - ay, bz - az)
+    boundary_u = {
+        vertex_index: perimeter[index] / perimeter_total
+        for index, vertex_index in enumerate(boundary)
+    }
+
+    uv = mesh.uv_layers.new(name="UVMap").data
+    for polygon in mesh.polygons:
+        polygon.use_smooth = abs(polygon.normal.x) < 0.72
+        for loop_index in polygon.loop_indices:
+            vertex_index = mesh.loops[loop_index].vertex_index
+            co = mesh.vertices[vertex_index].co
+            local_index = vertex_index % count
+            if abs(polygon.normal.x) > 0.72:
+                u0 = 0.04 if polygon.normal.x < 0.0 else 0.54
+                coord = (
+                    u0 + (co.y / face_width + 0.5) * 0.42,
+                    0.04 + (co.z / length + 0.5) * 0.42,
+                )
+            else:
+                coord = (
+                    0.04 + 0.92 * boundary_u.get(local_index, 0.0),
+                    0.62 + 0.34 * (co.x / depth + 0.5),
+                )
+            uv[loop_index].uv = coord
+
     obj = bpy.data.objects.new(name, mesh)
     collection.objects.link(obj)
     if material:
         mesh.materials.append(material)
     return obj
+
+
+def attach_control_normal(material, part):
+    """Attach the immutable high-to-low control bake produced by the accepted prototype."""
+    image_path = os.path.join(HERE, "reference", "control_bake_v30", f"{part.lower()}_normal.png")
+    image = bpy.data.images.load(image_path, check_existing=True)
+    image.colorspace_settings.name = "Non-Color"
+    image.pack()
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    bsdf = nodes.get("Principled BSDF")
+    for link in list(bsdf.inputs["Normal"].links):
+        links.remove(link)
+    texture = nodes.new("ShaderNodeTexImage")
+    texture.image = image
+    normal = nodes.new("ShaderNodeNormalMap")
+    normal.inputs["Strength"].default_value = 1.0
+    links.new(texture.outputs["Color"], normal.inputs["Color"])
+    links.new(normal.outputs["Normal"], bsdf.inputs["Normal"])
+
+
 def physical_side_button(name, edge, z_mm, length_mm, face_width_mm=2.56, protrusion_mm=0.45, material=metal):
     cw=(face_width_mm+0.38)*MM; cl=(length_mm+0.56)*MM
-    cutter=capsule_prism_x(f"{name}_CUTTER",cw,cl,0.92*MM,cw*0.5,None,detail_c)
+    # Cutter can stay denser because it is a transient boolean operand, not runtime topology.
+    cutter=capsule_prism_x(f"{name}_CUTTER",cw,cl,0.92*MM,cw*0.5,None,detail_c,steps=10)
     fc.place_on_rounded_edge(cutter,W,H,BODY_R,edge,z_mm*MM,outward=-0.30*MM,local_normal=(1,0,0))
     fc.boolean_difference(body,cutter,name=f"CUT_{name}"); boolean_cuts.append(name)
     thickness=0.40*MM; fw=face_width_mm*MM
-    button=capsule_prism_x(name,fw,length_mm*MM,thickness,fw*0.5,material,detail_c)
+    button_material=material.copy()
+    button_material.name=f"{material.name}_{name}"
+    button=capsule_prism_x(name,fw,length_mm*MM,thickness,fw*0.5,button_material,detail_c,steps=5)
+    attach_control_normal(button_material,name)
     fc.place_on_rounded_edge(button,W,H,BODY_R,edge,z_mm*MM,outward=protrusion_mm*MM-thickness*0.5,local_normal=(1,0,0))
-    fc.add_bevel(button,0.025*MM,segments=3)
     return button
 
 def camera_control(edge,z_mm,length_mm=17.10,face_width_mm=3.03,recess_mm=0.10):
@@ -897,11 +963,6 @@ cam_back_three = persp("CAM_BACK_THREE_QUARTER", (0.18, 0.30, 0.13), (0.010,0.00
 for name, tile_mm in (
     ("BODY_ALUMINUM", 4.0),
     ("BACK_GLASS", 6.0),
-    ("ACTION_BUTTON", 2.0),
-    ("VOL_UP", 2.0),
-    ("VOL_DOWN", 2.0),
-    ("SIDE_BUTTON", 2.0),
-    ("CAMERA_CONTROL", 2.0),
     ("USB_C_TONGUE", 2.0),
     ("BOTTOM_SCREW_L", 1.50),
     ("BOTTOM_SCREW_R", 1.50),

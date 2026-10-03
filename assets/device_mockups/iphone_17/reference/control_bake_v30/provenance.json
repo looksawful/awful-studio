@@ -1,0 +1,29 @@
+{
+  "source": "controls_lowpoly_bake_2026_10_03",
+  "high_source": "canonical v30 side controls before low-poly replacement, with geometric edge bevel",
+  "low_policy": {
+    "topology": "paired capsule rows, no n-gon caps, no central fan",
+    "steps_per_half": 5,
+    "source_vertices_per_control": 44,
+    "source_faces_per_control": 44,
+    "source_triangles_per_control": 84
+  },
+  "bake": {
+    "type": "tangent-space normal",
+    "resolution_px": [
+      256,
+      256
+    ],
+    "margin_px": 16,
+    "cage_extrusion_mm": 0.06,
+    "max_ray_distance_mm": 0.1
+  },
+  "parts": [
+    "ACTION_BUTTON",
+    "VOL_UP",
+    "VOL_DOWN",
+    "SIDE_BUTTON",
+    "CAMERA_CONTROL"
+  ],
+  "note": "Immutable production bake inputs. Generator consumes these maps; it does not rebake."
+}
