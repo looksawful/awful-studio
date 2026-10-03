@@ -1,6 +1,6 @@
 {
   "asset_id": "macbook_pro_14_m5",
-  "stage": "RELEASE_CANDIDATE",
+  "stage": "G2_CANDIDATE",
   "blender_version": "5.2.1 LTS",
   "base_expected_mm": {
     "x": 312.6,
@@ -17,26 +17,17 @@
     "y": 4e-06,
     "z": -0.0
   },
-  "lid_expected_mm": {
-    "x": 312.0,
+  "lid_observed_mm": {
+    "x": 312.599987,
     "y": 4.7,
-    "z": 212.0
+    "z": 221.200004
   },
-  "lid_actual_mm": {
-    "x": 312.000006,
-    "y": 4.7,
-    "z": 211.999997
-  },
-  "lid_delta_mm": {
-    "x": 6e-06,
-    "y": -0.0,
-    "z": -3e-06
-  },
+  "lid_acceptance": "RELATIONAL_COMPLETE_ASSEMBLY_ONLY",
   "base_non_manifold_edges": 0,
   "lid_non_manifold_edges": 0,
   "mandatory_missing": [],
-  "object_count": 399,
-  "material_count": 17,
+  "object_count": 396,
+  "material_count": 16,
   "hinge_open_angle_deg": 102.0,
   "animation_clips": [
     "lid_open",
