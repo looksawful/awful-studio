@@ -173,6 +173,64 @@ def iphone17_body_outline(width, height, segments=48):
         + [(half_w - dx, -half_h + dy) for dx, dy in reversed(quarter)]
     )
 
+def rounded_rect_strip_prism_y(name, width, height, depth, radius, material, collection, location=(0, 0, 0), segments=16):
+    """Build a clean rounded-rectangle prism with quad-strip planar caps."""
+    half_w, half_h = width * 0.5, height * 0.5
+    cx, cz = half_w - radius, half_h - radius
+    top_rows = []
+    for step in range(segments + 1):
+        angle = (math.pi * 0.5) * (step / segments)
+        x = cx + radius * math.sin(angle)
+        z = cz + radius * math.cos(angle)
+        top_rows.append((x, z))
+    rows = top_rows + [(x, -z) for x, z in reversed(top_rows)]
+
+    points = []
+    row_indices = []
+    for x, z in rows:
+        left = len(points)
+        points.extend(((-x, z), (x, z)))
+        row_indices.append((left, left + 1))
+
+    count = len(points)
+    verts = (
+        [(x, -depth * 0.5, z) for x, z in points]
+        + [(x, depth * 0.5, z) for x, z in points]
+    )
+    front = [
+        (a_left, b_left, b_right, a_right)
+        for (a_left, a_right), (b_left, b_right) in zip(row_indices, row_indices[1:])
+    ]
+    faces = front + [tuple(index + count for index in reversed(face)) for face in front]
+
+    boundary = (
+        [row_indices[0][0]]
+        + [right for _, right in row_indices]
+        + [row_indices[-1][0]]
+        + [row_indices[index][0] for index in reversed(range(1, len(row_indices) - 1))]
+    )
+    for index, a in enumerate(boundary):
+        b = boundary[(index + 1) % len(boundary)]
+        faces.append((a, b, b + count, a + count))
+
+    mesh = bpy.data.meshes.new(f"{name}_MESH")
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    collection.objects.link(obj)
+    obj.location = location
+    if material:
+        mesh.materials.append(material)
+
+    bm = bmesh.new()
+    bm.from_mesh(mesh)
+    bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
+    bm.to_mesh(mesh)
+    bm.free()
+    mesh.update()
+    return obj
+
+
 def iphone17_body_prism(name, width, height, depth, material, collection, segments=48):
     outline = iphone17_body_outline(width, height, segments)
     count = len(outline)
@@ -496,24 +554,20 @@ fc.boolean_difference(screen_glass, active_cut, name="CUT_ACTIVE_AREA")
 front_hardware_z = H*0.5 - 7.79*MM
 cam_x = 6.72*MM
 
-screen_content = outward_prism("SCREEN_CONTENT", SCREEN_W, SCREEN_H, GLASS_T - 0.025*MM,
-                                  SCREEN_R, screen_mat, screen_c, axis="Y",
-                                  location=(0, front_y + 0.010*MM, 0), edge_bevel=0.00004,
-                                  outline_segments=48)
+screen_content = rounded_rect_strip_prism_y(
+    "SCREEN_CONTENT",
+    SCREEN_W,
+    SCREEN_H,
+    GLASS_T - 0.025*MM,
+    SCREEN_R,
+    screen_mat,
+    screen_c,
+    location=(0, front_y + 0.010*MM, 0),
+    segments=16,
+)
 
-# Physical front hardware occupies real holes in the emissive display instead of
-# competing with near-coplanar screen fragments in the depth buffer.
-sensor_screen_cut = outward_prism("FRONT_SENSOR_SCREEN_CUTTER", 7.08*MM, 2.28*MM,
-                                  GLASS_T + 0.25*MM, 1.14*MM, None, detail_c, axis="Y",
-                                  location=(-4.15*MM, front_y + 0.010*MM, front_hardware_z),
-                                  outline_segments=64)
-fc.boolean_difference(screen_content, sensor_screen_cut, name="CUT_FRONT_SENSOR_SCREEN")
-
-camera_screen_cut = fc.cylinder("FRONT_CAMERA_SCREEN_CUTTER", 1.14*MM,
-                                GLASS_T + 0.25*MM, None, detail_c,
-                                (cam_x, front_y + 0.010*MM, front_hardware_z),
-                                axis="Y", vertices=128)
-fc.boolean_difference(screen_content, camera_screen_cut, name="CUT_FRONT_CAMERA_SCREEN")
+# SCREEN_CONTENT stays clean replaceable artwork. Physical front hardware is
+# independent geometry above it at the official Apple datum.
 
 # Planar UVs map the real raster screen image to the active display surface.
 # Boolean cutters can leave empty material slots behind; normalize the screen to exactly
