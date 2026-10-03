@@ -856,14 +856,57 @@ fc.place_on_rounded_edge(usb_cavity, W, H, BODY_R, "BOTTOM", 0.0, outward=-1.40*
 usb_tongue = fc.rounded_cube("USB_C_TONGUE", (5.25*MM, 0.48*MM, 0.18*MM), 0.08*MM, metal_dark, detail_c)
 fc.place_on_rounded_edge(usb_tongue, W, H, BODY_R, "BOTTOM", 0.0, outward=-0.80*MM, local_normal=(0,0,1))
 
+def radial_prism_z(name, radius, depth, material, collection, segments):
+    """Build a sparse circular prism with triangle cap fans and a quad side wall."""
+    verts = []
+    for z in (-depth * 0.5, depth * 0.5):
+        verts.extend(
+            (
+                radius * math.cos(2.0 * math.pi * index / segments),
+                radius * math.sin(2.0 * math.pi * index / segments),
+                z,
+            )
+            for index in range(segments)
+        )
+        verts.append((0.0, 0.0, z))
+
+    lower_center = segments
+    upper_start = segments + 1
+    upper_center = upper_start + segments
+    faces = []
+    for index in range(segments):
+        next_index = (index + 1) % segments
+        faces.append((lower_center, next_index, index))
+        faces.append((upper_center, upper_start + index, upper_start + next_index))
+        faces.append((index, next_index, upper_start + next_index, upper_start + index))
+
+    mesh = bpy.data.meshes.new(f"{name}_MESH")
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    bm = bmesh.new()
+    bm.from_mesh(mesh)
+    bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
+    bm.to_mesh(mesh)
+    bm.free()
+    mesh.update()
+    for polygon in mesh.polygons:
+        polygon.use_smooth = abs(polygon.normal.z) < 0.72
+
+    obj = bpy.data.objects.new(name, mesh)
+    collection.objects.link(obj)
+    if material:
+        mesh.materials.append(material)
+    return obj
+
+
 def bottom_aperture(name, x_mm):
     cutter = fc.cylinder(f"{name}_CUTTER", 0.675*MM, 1.80*MM, None, detail_c, vertices=40)
     fc.place_on_rounded_edge(cutter, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.52*MM, local_normal=(0,0,1))
     fc.boolean_difference(body, cutter, name=f"CUT_{name}")
     boolean_cuts.append(name)
-    cavity = fc.cylinder(name, 0.675*MM, 0.12*MM, grille_mat, detail_c, vertices=40)
+    cavity = radial_prism_z(name, 0.675*MM, 0.12*MM, grille_mat, detail_c, segments=16)
     fc.place_on_rounded_edge(cavity, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.98*MM, local_normal=(0,0,1))
-    smooth_sharp_boundaries(cavity)
+    ensure_box_uv(cavity, tile_mm=1.35, replace=True)
 
 # Apple Detail C: 8 x Ø1.35 acoustic ports total = 3 microphone + 5 speaker.
 # Drawing X datums are measured from product left; convert to centered model coordinates.
@@ -878,7 +921,7 @@ for side, from_left_mm in (("L", 28.80), ("R", 42.65)):
     fc.place_on_rounded_edge(recess, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.38*MM, local_normal=(0,0,1))
     fc.boolean_difference(body, recess, name=f"CUT_SCREW_{side}")
     boolean_cuts.append(f"SCREW_{side}")
-    screw = fc.cylinder(f"BOTTOM_SCREW_{side}", 0.75*MM, 0.24*MM, screw_mat, detail_c, vertices=48)
+    screw = radial_prism_z(f"BOTTOM_SCREW_{side}", 0.75*MM, 0.24*MM, screw_mat, detail_c, segments=20)
     fc.place_on_rounded_edge(screw, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.15*MM, local_normal=(0,0,1))
 
 bev = fc.add_bevel(body, 0.00022, segments=4)
