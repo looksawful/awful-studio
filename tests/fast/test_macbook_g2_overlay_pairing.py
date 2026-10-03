@@ -1,12 +1,8 @@
-from pathlib import Path
 import unittest
-from unittest.mock import patch
-
-import numpy as np
 
 from assets.device_mockups.macbook_pro_14.port_layout import PORTS
 import tools.build_macbook_g2_surface_overlays as overlays
-from tools.build_macbook_g2_surface_overlays import D, pair_points_by_metric_cost, side_x_mapper
+from tools.build_macbook_g2_surface_overlays import D, H, pair_points_by_metric_cost, side_x_mapper
 
 
 class MacBookG2OverlayPairingTests(unittest.TestCase):
@@ -23,8 +19,10 @@ class MacBookG2OverlayPairingTests(unittest.TestCase):
         _, reversed_residuals = pair_points_by_metric_cost(
             list(reversed(actual)), list(reversed(targets)), sx, sy
         )
-        self.assertEqual(sorted(round(v, 6) for v in residuals),
-                         sorted(round(v, 6) for v in reversed_residuals))
+        self.assertEqual(
+            sorted(round(v, 6) for v in residuals),
+            sorted(round(v, 6) for v in reversed_residuals),
+        )
 
     def test_pairing_stays_red_for_real_geometry_shift(self):
         actual = [(97, 524), (789, 524), (197, 78), (789, 78)]
@@ -50,7 +48,7 @@ class MacBookG2OverlayPairingTests(unittest.TestCase):
                 msg=f"side {side} rear chassis datum must stay in Apple source-image pixels",
             )
 
-    def test_side_marker_projection_uses_actual_model_z(self):
+    def test_side_marker_projection_uses_fixed_apple_height_scale(self):
         self.assertTrue(
             hasattr(overlays, "project_side_point"),
             "side overlay needs a testable 2D projection seam",
@@ -59,43 +57,24 @@ class MacBookG2OverlayPairingTests(unittest.TestCase):
             lambda _y: 42.0,
             y_mm=10.0,
             z_mm=7.5,
-            zmin=0.0,
-            zmax=10.0,
-            top_px=0,
-            bottom_px=100,
+            model_center_z_mm=5.0,
+            reference_top_px=0.0,
+            reference_bottom_px=100.0,
+            exact_height_mm=10.0,
         )
         self.assertEqual(projected, (42, 25))
 
         spec = next(port for port in PORTS if port.name == "MAGSAFE")
-        model = {
-            "closed": {
-                "left_yz": [
-                    [-110.6, 0.0],
-                    [110.6, 0.0],
-                    [110.6, 10.0],
-                    [-110.6, 10.0],
-                ]
-            },
-            "ports": {
-                "MAGSAFE": {
-                    "center_xyz_mm": [-155.0, spec.y_mm, 7.5],
-                }
-            },
-        }
-        markers = []
-
-        def capture_marker(image, point, *_args, **_kwargs):
-            markers.append(point)
-            return image
-
-        with (
-            patch.object(overlays.cv2, "imread", return_value=np.zeros((104, 700, 3), dtype=np.uint8)),
-            patch.object(overlays.cv2, "drawMarker", side_effect=capture_marker),
-            patch.object(overlays, "save", return_value="side.png"),
-        ):
-            overlays.side_overlay(Path("."), Path("."), model, -1)
-
-        self.assertEqual(markers, [(86, 27)])
+        production_projection = overlays.project_side_point(
+            side_x_mapper(-1),
+            y_mm=spec.y_mm,
+            z_mm=7.5,
+            model_center_z_mm=5.0,
+            reference_top_px=7.0,
+            reference_bottom_px=53.0,
+            exact_height_mm=H,
+        )
+        self.assertEqual(production_projection, (86, 23))
 
 
 if __name__ == "__main__":

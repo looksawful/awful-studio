@@ -1,24 +1,24 @@
 import { createModelViewer } from '../src/model-viewer.mjs';
 
 const asset = {
-  id: 'macbook-pro-14-m5-g2-live',
-  label: 'MacBook Pro 14 M5 - G2 candidate',
+  id: 'macbook-pro-14-m5-v1-live',
+  label: 'MacBook Pro 14 M5 - canonical v1',
   group: 'Review',
-  version: 'g2-candidate',
-  sourceBlend: 'assets/device_mockups/macbook_pro_14/runtime/g2_candidate/macbook_pro_14_m5_g2_delivery.blend',
-  previewGlb: 'assets/device_mockups/macbook_pro_14/runtime/g2_candidate/macbook_pro_14_m5_g2_web_meshopt.glb',
+  version: 'v1',
+  sourceBlend: 'extension/awful_studio/assets/devices/macbook_pro_14_m5_low_v1_release.blend',
+  previewGlb: 'assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web_meshopt.glb',
   lods: [
     {
       name: 'Meshopt',
-      path: 'assets/device_mockups/macbook_pro_14/runtime/g2_candidate/macbook_pro_14_m5_g2_web_meshopt.glb',
+      path: 'assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web_meshopt.glb',
     },
     {
       name: 'Compat',
-      path: 'assets/device_mockups/macbook_pro_14/runtime/g2_candidate/macbook_pro_14_m5_g2_web.glb',
+      path: 'assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web.glb',
     },
   ],
-  sourceRevision: 'ada4bc70f13fcbb6b7704fa31acb006e59be6dfaf7cfc5df74c584f1c1b41da2',
-  sourceCommit: '518bb25ee580de5e65f330737583adc9bbe0cd8d',
+  sourceRevision: 'e0a105f4c83fa6695437e7bfb2c8f917b61d102da4bda4a9084a63a683693840',
+  sourceCommit: '0d25c1ffba30dbc53c75b4879dffb8e348638613',
   animations: ['lid_open', 'lid_close'],
   screenStates: {
     screen_off: { emission_strength: 0, glow_energy: 0 },
@@ -34,7 +34,7 @@ const asset = {
 };
 
 export default {
-  title: 'Review/MacBook G2 Model',
+  title: 'Review/MacBook G2 Canonical',
   parameters: { layout: 'fullscreen', controls: { disable: true } },
 };
 

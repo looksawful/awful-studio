@@ -4,7 +4,6 @@ export default {
     { from: '../../assets/device_mockups/iphone_17/runtime/v30', to: '/assets/device_mockups/iphone_17/runtime/v30' },
     { from: '../../assets/device_mockups/ipad_pro/runtime/v6', to: '/assets/device_mockups/ipad_pro/runtime/v6' },
     { from: '../../assets/device_mockups/macbook_pro_14/runtime/v1', to: '/assets/device_mockups/macbook_pro_14/runtime/v1' },
-    { from: '../../assets/device_mockups/macbook_pro_14/runtime/g2_candidate', to: '/assets/device_mockups/macbook_pro_14/runtime/g2_candidate' },
     { from: '../../assets/device_mockups/macbook_pro_14/evidence/g1_calibration', to: '/g1/macbook' },
     { from: '../../assets/studio_equipment/studio_rig_v01/runtime/glb', to: '/assets/studio_equipment/studio_rig_v01/runtime/glb' },
     { from: '../../assets/studio_equipment/studio_rig_v01/runtime/lod', to: '/assets/studio_equipment/studio_rig_v01/runtime/lod' },
