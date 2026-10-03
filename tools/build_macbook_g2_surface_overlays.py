@@ -114,7 +114,7 @@ def front_overlay(refs, out, model):
 def side_x_mapper(side):
     specs = [p for p in PORTS if p.side == side]
     ys = np.array([p.y_mm for p in specs], dtype=float)
-    px = np.array([p.center_pixel / 2 for p in specs], dtype=float)
+    px = np.array([p.center_pixel for p in specs], dtype=float)
     if len(specs) >= 2:
         a, b = np.polyfit(ys, px, 1)
         return lambda y: float(a * y + b)
@@ -144,7 +144,7 @@ def side_overlay(refs, out, model, side):
             continue
         center = model["ports"][spec.name]["center_xyz_mm"]
         q = (round(map_x(center[1])), round((top_px + bottom_px) / 2))
-        actual_centers.append((spec.name, q[0], spec.center_pixel / 2))
+        actual_centers.append((spec.name, q[0], spec.center_pixel))
         cv2.drawMarker(im, q, CYAN, cv2.MARKER_CROSS, 9, 1)
     max_res = max((abs(actual - target) for _, actual, target in actual_centers), default=0.0)
     label(
