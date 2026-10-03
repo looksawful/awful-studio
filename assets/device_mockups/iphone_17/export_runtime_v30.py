@@ -1,5 +1,6 @@
 import json
 import os
+import struct
 import bpy
 import bmesh
 from mathutils import Vector
@@ -51,7 +52,56 @@ TOPOLOGY_AUDIT = {
     "BOTTOM_SPEAKER_APERTURE_01", "BOTTOM_SPEAKER_APERTURE_02",
     "BOTTOM_SPEAKER_APERTURE_03", "BOTTOM_SPEAKER_APERTURE_04",
     "BOTTOM_SPEAKER_APERTURE_05", "BOTTOM_SCREW_L", "BOTTOM_SCREW_R",
+    "BACK_GLASS", "SCREEN_CONTENT", "FRONT_SENSOR_MASK",
+    "FRONT_CAMERA_MASK", "FRONT_CAMERA_GLASS",
 }
+
+
+def strip_unused_tangent_attributes(glb_path):
+    """Remove exported tangents from primitives whose material has no normal texture."""
+    path = os.fspath(glb_path)
+    data = open(path, "rb").read()
+    if data[:4] != b"glTF":
+        raise RuntimeError(f"Not a GLB: {path}")
+    version, _ = struct.unpack_from("<II", data, 4)
+    offset = 12
+    chunks = []
+    while offset < len(data):
+        length, chunk_type = struct.unpack_from("<II", data, offset)
+        offset += 8
+        chunks.append([chunk_type, data[offset:offset + length]])
+        offset += length
+    json_index = next(
+        index for index, (chunk_type, _) in enumerate(chunks)
+        if chunk_type == 0x4E4F534A
+    )
+    doc = json.loads(chunks[json_index][1].decode("utf-8").rstrip(" \t\r\n\x00"))
+    materials = doc.get("materials", [])
+    removed = 0
+    for mesh in doc.get("meshes", []):
+        for primitive in mesh.get("primitives", []):
+            attrs = primitive.get("attributes", {})
+            material_index = primitive.get("material")
+            material = (
+                materials[material_index]
+                if isinstance(material_index, int) and 0 <= material_index < len(materials)
+                else {}
+            )
+            if "TANGENT" in attrs and "normalTexture" not in material:
+                attrs.pop("TANGENT")
+                removed += 1
+    encoded = json.dumps(doc, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    encoded += b" " * ((4 - len(encoded) % 4) % 4)
+    chunks[json_index][1] = encoded
+    output = bytearray(b"glTF" + struct.pack("<II", version, 0))
+    for chunk_type, chunk in chunks:
+        output.extend(struct.pack("<II", len(chunk), chunk_type))
+        output.extend(chunk)
+    struct.pack_into("<I", output, 8, len(output))
+    with open(path, "wb") as handle:
+        handle.write(output)
+    return removed
+
 
 for obj in [root] + list(root.children_recursive):
     if obj.type == "MESH":
@@ -143,6 +193,7 @@ bpy.ops.export_scene.gltf(
     export_extras=True,
     export_tangents=True,
 )
+stripped_tangents = strip_unused_tangent_attributes(glb)
 bpy.ops.file.pack_all()
 delivery = os.path.join(RUNTIME, "iphone_17_v30_delivery.blend")
 bpy.ops.wm.save_as_mainfile(filepath=delivery)
@@ -212,4 +263,5 @@ print("AWFUL_IPHONE17_V30_RUNTIME_EXPORT", json.dumps({
     "objects": len(exported),
     "materials": len(materials),
     "glb_bytes": os.path.getsize(glb),
+    "stripped_unused_tangents": stripped_tangents,
 }, sort_keys=True))

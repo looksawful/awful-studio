@@ -15,6 +15,10 @@ BOTTOM = (
     'BOTTOM_SPEAKER_APERTURE_03', 'BOTTOM_SPEAKER_APERTURE_04',
     'BOTTOM_SPEAKER_APERTURE_05', 'BOTTOM_SCREW_L', 'BOTTOM_SCREW_R',
 )
+SURFACES = (
+    'BACK_GLASS', 'SCREEN_CONTENT', 'FRONT_SENSOR_MASK',
+    'FRONT_CAMERA_MASK', 'FRONT_CAMERA_GLASS',
+)
 
 
 class IPhoneTopologyContractTests(unittest.TestCase):
@@ -73,6 +77,32 @@ class IPhoneTopologyContractTests(unittest.TestCase):
             self.assertEqual(topology.get('triangles'), triangles, name)
             limit = limits.get(name, 156)
             self.assertLessEqual(triangles, limit, name)
+            for primitive in primitives:
+                positions = accessor_vec3(doc, blob, primitive['attributes']['POSITION'])
+                indices = accessor_indices(doc, blob, primitive['indices'])
+                for start in range(0, len(indices), 3):
+                    points = [positions[i] for i in indices[start:start + 3]]
+                    self.assertEqual(len(set(points)), 3, f'{name} degenerate runtime triangle')
+
+    def test_back_and_front_surfaces_carry_clean_authored_topology(self):
+        doc, blob = read_glb(GLB)
+        nodes = {node['name']: node for node in doc['nodes']}
+        limits = {
+            'BACK_GLASS': 780,
+            'SCREEN_CONTENT': 2332,
+            'FRONT_SENSOR_MASK': 1036,
+            'FRONT_CAMERA_MASK': 508,
+            'FRONT_CAMERA_GLASS': 508,
+        }
+        for name in SURFACES:
+            node = nodes[name]
+            topology = node.get('extras', {}).get('source_topology', {})
+            self.assertEqual(topology.get('ngons'), 0, f'{name} authored n-gons')
+            self.assertEqual(topology.get('nonmanifold_edges'), 0, f'{name} authored shell')
+            primitives = doc['meshes'][node['mesh']]['primitives']
+            triangles = sum(doc['accessors'][p['indices']]['count'] // 3 for p in primitives)
+            self.assertEqual(topology.get('triangles'), triangles, name)
+            self.assertLessEqual(triangles, limits[name], name)
             for primitive in primitives:
                 positions = accessor_vec3(doc, blob, primitive['attributes']['POSITION'])
                 indices = accessor_indices(doc, blob, primitive['indices'])
