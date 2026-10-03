@@ -155,3 +155,23 @@ Long Codex work was stopped to preserve quota. All useful work is being committe
 - Fresh `git diff --check`: PASS.
 - Tracked evidence: `reports/iphone_controls_topology_final.json`.
 - Source commit: `e398a5b`. Decision: retain repair. Slice 3 closed. Next: Slice 4 bottom I/O + acoustic openings + fasteners.
+
+## Slice 4 final verification — bottom I/O + acoustics + fasteners — GREEN
+- Inventory split: `USB_C_CAVITY` and `USB_C_TONGUE` were already clean (0 n-gons) and were intentionally not remodeled.
+- Root cause on the remaining bottom hardware: eight acoustic aperture meshes and two screw meshes used Blender cylinder n-gon caps.
+- RED 1: Blender runtime contract failed on `BOTTOM_MIC_APERTURE_01: 2 n-gons` while USB-C stayed GREEN.
+- RED 2: exact GLB contract failed because bottom objects had no authored-topology provenance.
+- Fix: circular cap n-gons are split into cross-width strips using existing boundary vertices only; no center fan, no new vertices, no silhouette changes.
+- Eight apertures each: 80 verts / 42 faces / 2 n-gons -> 80 verts / 80 faces / 0 n-gons / 0 non-manifold; runtime remains 156 tris.
+- Two screws each: 96 verts / 50 faces / 2 n-gons -> 96 verts / 96 faces / 0 n-gons / 0 non-manifold; runtime remains 188 tris.
+- USB-C remains 8 verts / 6 faces / 0 n-gons / 12 runtime tris for both cavity and tongue.
+- Exact location, bbox and unique boundary-position set preserved for all 12 bottom objects.
+- Fixed bottom macro beauty delta: RMS 0.364809 RGB levels on 0–255; 0.0642% pixels changed; strong diff 0.0198%, localized to bottom hardware.
+- Runtime triangle total stays 1,648; compat/meshopt files grow only by topology provenance metadata.
+- Exact GLB now carries `source_topology` for all audited bottom objects and checks non-degenerate runtime triangles.
+- Fresh full fast: 211/211 PASS.
+- Fresh Blender 5.2.1 bottom topology contract: PASS.
+- Khronos compat + meshopt: 0 errors / 0 warnings.
+- Fresh `git diff --check`: PASS.
+- Tracked evidence: `reports/iphone_bottom_topology_final.json`.
+- Source commit: `5049963`. Decision: retain repair. Slice 4 closed. Next: Slice 5 back glass / display / front hardware.

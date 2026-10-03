@@ -8,6 +8,13 @@ from test_iphone_web_shading_contract import accessor_vec3, accessor_indices
 CAMERA = ('CAMERA_HOUSING_SEAT', 'CAMERA_HOUSING') + tuple(
     f'CAMERA_{index}_{part}' for index in (1, 2) for part in ('RING', 'BEVEL', 'GLASS'))
 CONTROLS = ('ACTION_BUTTON', 'VOL_UP', 'VOL_DOWN', 'SIDE_BUTTON', 'CAMERA_CONTROL')
+BOTTOM = (
+    'USB_C_CAVITY', 'USB_C_TONGUE',
+    'BOTTOM_MIC_APERTURE_01', 'BOTTOM_MIC_APERTURE_02', 'BOTTOM_MIC_APERTURE_03',
+    'BOTTOM_SPEAKER_APERTURE_01', 'BOTTOM_SPEAKER_APERTURE_02',
+    'BOTTOM_SPEAKER_APERTURE_03', 'BOTTOM_SPEAKER_APERTURE_04',
+    'BOTTOM_SPEAKER_APERTURE_05', 'BOTTOM_SCREW_L', 'BOTTOM_SCREW_R',
+)
 
 
 class IPhoneTopologyContractTests(unittest.TestCase):
@@ -45,6 +52,27 @@ class IPhoneTopologyContractTests(unittest.TestCase):
             triangles = sum(doc['accessors'][p['indices']]['count'] // 3 for p in primitives)
             self.assertEqual(topology.get('triangles'), triangles, name)
             self.assertLessEqual(triangles, 332, name)
+            for primitive in primitives:
+                positions = accessor_vec3(doc, blob, primitive['attributes']['POSITION'])
+                indices = accessor_indices(doc, blob, primitive['indices'])
+                for start in range(0, len(indices), 3):
+                    points = [positions[i] for i in indices[start:start + 3]]
+                    self.assertEqual(len(set(points)), 3, f'{name} degenerate runtime triangle')
+
+    def test_bottom_delivery_carries_clean_authored_topology(self):
+        doc, blob = read_glb(GLB)
+        nodes = {node['name']: node for node in doc['nodes']}
+        limits = {'USB_C_CAVITY': 12, 'USB_C_TONGUE': 12, 'BOTTOM_SCREW_L': 188, 'BOTTOM_SCREW_R': 188}
+        for name in BOTTOM:
+            node = nodes[name]
+            topology = node.get('extras', {}).get('source_topology', {})
+            self.assertEqual(topology.get('ngons'), 0, f'{name} authored n-gons')
+            self.assertEqual(topology.get('nonmanifold_edges'), 0, f'{name} authored shell')
+            primitives = doc['meshes'][node['mesh']]['primitives']
+            triangles = sum(doc['accessors'][p['indices']]['count'] // 3 for p in primitives)
+            self.assertEqual(topology.get('triangles'), triangles, name)
+            limit = limits.get(name, 156)
+            self.assertLessEqual(triangles, limit, name)
             for primitive in primitives:
                 positions = accessor_vec3(doc, blob, primitive['attributes']['POSITION'])
                 indices = accessor_indices(doc, blob, primitive['indices'])

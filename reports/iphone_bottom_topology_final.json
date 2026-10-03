@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-03",
+  "slice": "bottom_io_acoustics_fasteners",
+  "source_commit": "5049963",
+  "blender": "5.2.1 LTS",
+  "usb": {"objects":2,"source_ngons":0,"runtime_triangles_each":12,"changed":false},
+  "acoustic_apertures": {
+    "objects":8,
+    "before_each":{"source_vertices":80,"source_faces":42,"source_ngons":2,"runtime_triangles":156},
+    "after_each":{"source_vertices":80,"source_faces":80,"source_ngons":0,"nonmanifold_edges":0,"runtime_triangles":156}
+  },
+  "fasteners": {
+    "objects":2,
+    "before_each":{"source_vertices":96,"source_faces":50,"source_ngons":2,"runtime_triangles":188},
+    "after_each":{"source_vertices":96,"source_faces":96,"source_ngons":0,"nonmanifold_edges":0,"runtime_triangles":188}
+  },
+  "runtime_triangles_total": {"before":1648,"after":1648,"delta":0},
+  "geometry_preservation":{"location_equal":true,"bbox_equal":true,"unique_boundary_position_set_equal":true},
+  "visual":{"view":"CAM_BOTTOM_MACRO","rms_0_255":0.3648086256290185,"changed_pixels_percent":0.0642,"strong_diff_pixels_percent":0.0198,"decision":"no_material_visual_regression"},
+  "runtime_size_bytes":{"compat_before":5235276,"compat_after":5236212,"meshopt_before":4148280,"meshopt_after":4148996},
+  "verification":{"fast_tests":"211/211 PASS","blender_bottom_topology":"PASS","khronos_compat":"0 errors / 0 warnings","khronos_meshopt":"0 errors / 0 warnings","git_diff_check":"PASS"},
+  "decision":"retain_repair"
+}
