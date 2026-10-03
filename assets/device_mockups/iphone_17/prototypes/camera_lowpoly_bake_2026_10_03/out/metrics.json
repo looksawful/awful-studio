@@ -1,0 +1,50 @@
+﻿{
+    "16":  {
+               "verts":  272,
+               "faces":  384,
+               "tris":  512,
+               "silhouette_error_mm":  0.23903111178381342,
+               "texture_bytes":  187154,
+               "glb_bytes":  227548,
+               "estimated_macro_error_px":  5.163409174363791,
+               "ngons":  0,
+               "max_face":  4,
+               "runtime_tris":  512
+           },
+    "24":  {
+               "verts":  400,
+               "faces":  576,
+               "tris":  768,
+               "silhouette_error_mm":  0.10642592450979885,
+               "texture_bytes":  240823,
+               "glb_bytes":  294524,
+               "estimated_macro_error_px":  2.2989500860500773,
+               "ngons":  0,
+               "max_face":  4,
+               "runtime_tris":  768
+           },
+    "32":  {
+               "verts":  528,
+               "faces":  768,
+               "tris":  1024,
+               "silhouette_error_mm":  0.0599020001978702,
+               "texture_bytes":  265446,
+               "glb_bytes":  332888,
+               "estimated_macro_error_px":  1.2939676976617298,
+               "ngons":  0,
+               "max_face":  4,
+               "runtime_tris":  1024
+           },
+    "40":  {
+               "verts":  656,
+               "faces":  960,
+               "tris":  1280,
+               "silhouette_error_mm":  0.03834836835988813,
+               "texture_bytes":  261938,
+               "glb_bytes":  342532,
+               "estimated_macro_error_px":  0.828378847981985,
+               "ngons":  0,
+               "max_face":  4,
+               "runtime_tris":  1280
+           }
+}
