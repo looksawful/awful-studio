@@ -28,14 +28,20 @@ def _point_in_polygon(px, py, polygon):
 def _matched_annulus_loops(xa, xb, ya, yb, hole, base_segments=16):
     cx = sum(x for x, _ in hole) / len(hole)
     cy = sum(y for _, y in hole) / len(hole)
+    period = round(2 * math.pi, 12)
+
+    def angle_key(x, y):
+        angle = round(math.atan2(y - cy, x - cx) % (2 * math.pi), 12)
+        return 0.0 if angle >= period else angle
+
     angles = {round(2 * math.pi * i / base_segments, 12) for i in range(base_segments)}
     # Preserve every authored hole vertex direction. Without these angles,
     # elongated capsules collapse into pointed/diamond-like openings even
     # though the resulting shell remains manifold.
     for x, y in hole:
-        angles.add(round(math.atan2(y - cy, x - cx) % (2 * math.pi), 12))
+        angles.add(angle_key(x, y))
     for x, y in ((xa, ya), (xb, ya), (xb, yb), (xa, yb)):
-        angles.add(round(math.atan2(y - cy, x - cx) % (2 * math.pi), 12))
+        angles.add(angle_key(x, y))
 
     outer, inner = [], []
     for angle in sorted(angles):
