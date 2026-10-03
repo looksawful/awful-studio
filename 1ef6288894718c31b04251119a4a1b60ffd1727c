@@ -1,1 +1,6 @@
-CI fix + accepted-overlay continuation: fold the canonical v1 rebuild into the same stack commit so it is independently coherent; lazy-load cv2/numpy for fast CI and move Storybook from temporary g2_candidate to exact canonical v1 artifacts.
+Revision history for #132:
+
+rev 2 (content) 2026-10-03 14:59 UTC — CI fix + accepted-overlay continuation: fold the canonical v1 rebuild into the same stack commit so it is independently coherent; lazy-load cv2/numpy for fast CI and move Storybook from temporary g2_candidate to exact canonical v1 artifacts.
+rev 1 (initial) 2026-10-03 14:59 UTC
+
+<!-- mergify-revision-data: {"schema_version":1,"pull_number":132,"entries":[{"number":1,"change_type":"initial","old_sha":null,"new_sha":"0d25c1ffba30dbc53c75b4879dffb8e348638613","timestamp_iso":"2026-10-03T14:59:57Z","reason":"","replay_sha":null,"compare_url":null},{"number":2,"change_type":"content","old_sha":"0d25c1ffba30dbc53c75b4879dffb8e348638613","new_sha":"1ef6288894718c31b04251119a4a1b60ffd1727c","timestamp_iso":"2026-10-03T14:59:57Z","reason":"CI fix + accepted-overlay continuation: fold the canonical v1 rebuild into the same stack commit so it is independently coherent; lazy-load cv2/numpy for fast CI and move Storybook from temporary g2_candidate to exact canonical v1 artifacts.","replay_sha":null,"compare_url":"https://github.com/looksawful/awful-studio/compare/0d25c1ffba30dbc53c75b4879dffb8e348638613...1ef6288894718c31b04251119a4a1b60ffd1727c"}]} -->
