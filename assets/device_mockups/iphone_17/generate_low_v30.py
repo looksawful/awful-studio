@@ -707,20 +707,55 @@ for loop, coord in zip(mesh.loops, ((1,0),(1,1),(0,1),(0,0))):
 
 boolean_cuts = ["DISPLAY_POCKET", "SCREEN_ACTIVE"]
 
-def capsule_prism_x(name, face_width, length, depth, radius, material, collection):
-    outline = fc.rounded_outline(face_width, length, radius, segments=20)
-    n = len(outline)
-    verts = [(-depth*0.5,y,z) for y,z in outline] + [(depth*0.5,y,z) for y,z in outline]
-    faces = [tuple(reversed(range(n))), tuple(range(n,2*n))]
-    for i in range(n):
-        j=(i+1)%n
-        faces.append((i,j,j+n,i+n))
-    mesh=bpy.data.meshes.new(f"{name}_MESH")
-    mesh.from_pydata(verts,[],faces); mesh.update()
-    obj=bpy.data.objects.new(name,mesh); collection.objects.link(obj)
-    if material: obj.data.materials.append(material)
-    return obj
+def capsule_prism_x(name, face_width, length, depth, radius, material, collection, steps=5):
+    straight = length - 2.0 * radius
+    rows = []
+    for step in range(steps + 1):
+        angle = math.pi * 0.5 * (1.0 - step / steps)
+        y = radius * math.cos(angle)
+        z = straight * 0.5 + radius * math.sin(angle)
+        rows.append([(0.0, z)] if step == 0 else [(-y, z), (y, z)])
+    for step in range(steps + 1):
+        angle = math.pi * 0.5 * (step / steps)
+        y = radius * math.cos(angle)
+        z = -straight * 0.5 - radius * math.sin(angle)
+        rows.append([(0.0, z)] if step == steps else [(-y, z), (y, z)])
 
+    points = [point for row in rows for point in row]
+    row_indices = []
+    offset = 0
+    for row in rows:
+        row_indices.append(list(range(offset, offset + len(row))))
+        offset += len(row)
+
+    cap_faces = []
+    for upper, lower in zip(row_indices[:-1], row_indices[1:]):
+        if len(upper) == 1:
+            cap_faces.append((upper[0], lower[0], lower[1]))
+        elif len(lower) == 1:
+            cap_faces.append((upper[0], lower[0], upper[1]))
+        else:
+            cap_faces.append((upper[0], lower[0], lower[1], upper[1]))
+
+    boundary = [row[-1] for row in row_indices]
+    boundary += [row[0] for row in reversed(row_indices[1:-1])]
+    count = len(points)
+    verts = [(-depth * 0.5, y, z) for y, z in points]
+    verts += [(depth * 0.5, y, z) for y, z in points]
+    faces = [tuple(reversed(face)) for face in cap_faces]
+    faces += [tuple(index + count for index in face) for face in cap_faces]
+    for index, left in enumerate(boundary):
+        right = boundary[(index + 1) % len(boundary)]
+        faces.append((left, right, right + count, left + count))
+
+    mesh = bpy.data.meshes.new(f"{name}_MESH")
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    collection.objects.link(obj)
+    if material:
+        mesh.materials.append(material)
+    return obj
 def physical_side_button(name, edge, z_mm, length_mm, face_width_mm=2.56, protrusion_mm=0.45, material=metal):
     cw=(face_width_mm+0.38)*MM; cl=(length_mm+0.56)*MM
     cutter=capsule_prism_x(f"{name}_CUTTER",cw,cl,0.92*MM,cw*0.5,None,detail_c)
