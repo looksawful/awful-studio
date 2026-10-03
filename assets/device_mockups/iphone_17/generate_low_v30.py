@@ -734,9 +734,46 @@ boolean_cuts = ["DISPLAY_POCKET", "SCREEN_ACTIVE"]
 
 def capsule_prism_x(name, face_width, length, depth, radius, material, collection):
     outline = fc.rounded_outline(face_width, length, radius, segments=20)
+
+    # rounded_outline repeats the top/bottom pole at adjacent arc seams.
+    # Remove only coincident consecutive points; the authored silhouette stays exact.
+    clean_outline = []
+    for point in outline:
+        if not clean_outline or any(abs(point[axis] - clean_outline[-1][axis]) > 1e-12 for axis in (0, 1)):
+            clean_outline.append(point)
+    if len(clean_outline) > 1 and all(
+            abs(clean_outline[0][axis] - clean_outline[-1][axis]) <= 1e-12 for axis in (0, 1)):
+        clean_outline.pop()
+    outline = clean_outline
     n = len(outline)
+
     verts = [(-depth*0.5,y,z) for y,z in outline] + [(depth*0.5,y,z) for y,z in outline]
-    faces = [tuple(reversed(range(n))), tuple(range(n,2*n))]
+
+    # Build each planar cap as cross-width strips. This preserves the perimeter
+    # while avoiding the previous giant n-gon and any central fan/pole.
+    rows = {}
+    for index, (y, z) in enumerate(outline):
+        rows.setdefault(round(z, 12), []).append((y, index))
+    cap_rows = []
+    for _, row in sorted(rows.items(), reverse=True):
+        ordered = [index for _, index in sorted(row)]
+        if len(ordered) not in (1, 2):
+            raise RuntimeError(f"{name} capsule row is not a pole or paired contour")
+        cap_rows.append(ordered)
+
+    cap_faces = []
+    for upper, lower in zip(cap_rows[:-1], cap_rows[1:]):
+        if len(upper) == 1 and len(lower) == 2:
+            cap_faces.append((upper[0], lower[0], lower[1]))
+        elif len(upper) == 2 and len(lower) == 1:
+            cap_faces.append((upper[0], lower[0], upper[1]))
+        elif len(upper) == len(lower) == 2:
+            cap_faces.append((upper[0], lower[0], lower[1], upper[1]))
+        else:
+            raise RuntimeError(f"{name} capsule cap has invalid adjacent rows")
+
+    faces = [tuple(reversed(face)) for face in cap_faces]
+    faces += [tuple(index + n for index in face) for face in cap_faces]
     for i in range(n):
         j=(i+1)%n
         faces.append((i,j,j+n,i+n))
