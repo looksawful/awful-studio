@@ -122,3 +122,17 @@ Long Codex work was stopped to preserve quota. All useful work is being committe
 - Build driver now uses `--python-exit-code 1` so failed generation cannot silently export stale artifacts.
 - Evidence tools resolve frozen blend relative textures against canonical generated asset paths.
 - Source commit SHA will be recorded in the separate rebuild commit after source commit. Next: Slice 3 side controls / Camera Control.
+
+## Slice 2 final verification — BODY_ALUMINUM / rail — GREEN
+- Fresh verification performed after Codex handoff, without Codex.
+- Blender 5.2.1 source/evaluated topology: 0 n-gons, 0 non-manifold edges.
+- Original source boundary vertices unchanged; all original edges preserved.
+- Max evaluated normal displacement vs frozen Slice 1 baseline: 0.003337 mm.
+- Runtime BODY_ALUMINUM remains 8,108 tris; this slice fixes authored topology, not triangle count.
+- Fresh fixed-condition EEVEE visual deltas (0–255 RGB RMS): rail 0.062062; controls 0.130266; bottom 0.148897.
+- Fresh full fast suite: 209/209 PASS.
+- Fresh git diff --check: PASS.
+- Local before/after images are intentionally ignored evidence under `evidence/topology-v30/slice2/fresh/`; they are reproducible from baseline commit `48b271a` using `tools/iphone_topology_evidence.py`.
+- Tracked verification summary: `reports/iphone_body_topology_final.json`.
+- Decision: retain repair. Slice 2 closed. Next: Slice 3 side controls + Camera Control.
+
