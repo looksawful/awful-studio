@@ -817,12 +817,63 @@ fc.place_on_rounded_edge(usb_cavity, W, H, BODY_R, "BOTTOM", 0.0, outward=-1.40*
 usb_tongue = fc.rounded_cube("USB_C_TONGUE", (5.25*MM, 0.48*MM, 0.18*MM), 0.08*MM, metal_dark, detail_c)
 fc.place_on_rounded_edge(usb_tongue, W, H, BODY_R, "BOTTOM", 0.0, outward=-0.80*MM, local_normal=(0,0,1))
 
+def strip_round_caps(obj):
+    """Split circular planar caps into cross-width strips without new vertices."""
+    mesh = bmesh.new()
+    mesh.from_mesh(obj.data)
+    patch = mesh.faces.layers.int.new("round_cap_patch")
+    caps = [face for face in mesh.faces if len(face.verts) > 4 and abs(face.normal.z) > 0.9]
+    if len(caps) != 2:
+        mesh.free()
+        raise RuntimeError(f"{obj.name} expected exactly two circular n-gon caps")
+
+    for patch_id, cap in enumerate(caps, 1):
+        cap[patch] = patch_id
+        rows = {}
+        for vertex in cap.verts:
+            rows.setdefault(round(vertex.co.y, 12), []).append(vertex)
+        for _, row in sorted(rows.items(), reverse=True):
+            if len(row) == 1:
+                continue
+            if len(row) != 2:
+                mesh.free()
+                raise RuntimeError(f"{obj.name} circular cap row is not a pole or pair")
+            pair = sorted(row, key=lambda vertex: vertex.co.x)
+            if any(pair[1] in edge.verts for edge in pair[0].link_edges):
+                continue
+            shared = [
+                face for face in pair[0].link_faces
+                if face[patch] == patch_id and pair[1] in face.verts and len(face.verts) > 4
+            ]
+            if not shared:
+                continue
+            bmesh.ops.connect_verts(
+                mesh,
+                verts=pair,
+                faces_exclude=[face for face in mesh.faces if face not in shared],
+                check_degenerate=True,
+            )
+        if any(face[patch] == patch_id and len(face.verts) > 4 for face in mesh.faces):
+            mesh.free()
+            raise RuntimeError(f"{obj.name} circular cap strip patch left an n-gon")
+
+    mesh.faces.layers.int.remove(patch)
+    mesh.normal_update()
+    if any(not edge.is_manifold for edge in mesh.edges):
+        mesh.free()
+        raise RuntimeError(f"{obj.name} circular cap patch broke manifold shell")
+    mesh.to_mesh(obj.data)
+    mesh.free()
+    obj.data.update()
+
+
 def bottom_aperture(name, x_mm):
     cutter = fc.cylinder(f"{name}_CUTTER", 0.675*MM, 1.80*MM, None, detail_c, vertices=40)
     fc.place_on_rounded_edge(cutter, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.52*MM, local_normal=(0,0,1))
     fc.boolean_difference(body, cutter, name=f"CUT_{name}")
     boolean_cuts.append(name)
     cavity = fc.cylinder(name, 0.675*MM, 0.12*MM, grille_mat, detail_c, vertices=40)
+    strip_round_caps(cavity)
     fc.place_on_rounded_edge(cavity, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.98*MM, local_normal=(0,0,1))
     smooth_sharp_boundaries(cavity)
 
@@ -840,6 +891,7 @@ for side, from_left_mm in (("L", 28.80), ("R", 42.65)):
     fc.boolean_difference(body, recess, name=f"CUT_SCREW_{side}")
     boolean_cuts.append(f"SCREW_{side}")
     screw = fc.cylinder(f"BOTTOM_SCREW_{side}", 0.75*MM, 0.24*MM, screw_mat, detail_c, vertices=48)
+    strip_round_caps(screw)
     fc.place_on_rounded_edge(screw, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.15*MM, local_normal=(0,0,1))
 
 patch_body_rail_caps(body)
