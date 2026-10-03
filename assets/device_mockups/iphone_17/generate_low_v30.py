@@ -742,17 +742,35 @@ for idx,(x_mm,z_mm) in enumerate((((W*0.5-CAM_CENTER_X_REF)/MM,(H*0.5-13.62*MM)/
     ring = camera_mesh(f"CAMERA_{idx}_RING",16.00*MM,16.00*MM,1.10*MM,camera_ring_mat,detail_c,(x_mm*MM,D*0.5+2.20*MM,z_mm*MM))
     ring_bevel = camera_mesh(f"CAMERA_{idx}_BEVEL",14.88*MM,14.88*MM,0.70*MM,camera_bevel_mat,detail_c,(x_mm*MM,D*0.5+2.75*MM,z_mm*MM))
     camera_glass = camera_mesh(f"CAMERA_{idx}_GLASS",13.62*MM,13.62*MM,0.70*MM,lens_glass,detail_c,(x_mm*MM,D*0.5+CAMERA_GLASS_PROTRUSION-0.35*MM,z_mm*MM))
-    fc.cylinder(f"CAMERA_{idx}_INNER",5.20*MM,0.09*MM,black,detail_c,(x_mm*MM,D*0.5+3.22*MM,z_mm*MM),axis="Y",vertices=160)
-    fc.cylinder(f"CAMERA_{idx}_IRIS",3.00*MM,0.070*MM,lens_glass,detail_c,(x_mm*MM,D*0.5+3.26*MM,z_mm*MM),axis="Y",vertices=128)
-    fc.cylinder(f"CAMERA_{idx}_PUPIL",1.18*MM,0.045*MM,black,detail_c,(x_mm*MM,D*0.5+3.30*MM,z_mm*MM),axis="Y",vertices=96)
-fc.cylinder("REAR_MIC",0.50*MM,0.14*MM,black,detail_c,((W*0.5-20.54*MM),D*0.5+1.02*MM,(H*0.5-22.48*MM)),axis="Y",vertices=80)
-fc.cylinder("FLASH_RING",3.30*MM,0.12*MM,metal_dark,detail_c,((W*0.5-30.41*MM),D*0.5+0.30*MM,CAM_CENTER_Z),axis="Y",vertices=128)
-flash = fc.cylinder("FLASH",3.14*MM,0.14*MM,flash_mat,detail_c,((W*0.5-30.41*MM),D*0.5+0.43*MM,CAM_CENTER_Z),axis="Y",vertices=128)
-# Cylinder mesh stays in local XY; object rotation puts its face on the rear Y plane.
+    radial_prism_y(
+        f"CAMERA_{idx}_INNER", 5.20*MM, 0.09*MM, black, detail_c,
+        (x_mm*MM,D*0.5+3.22*MM,z_mm*MM), segments=32,
+    )
+    radial_prism_y(
+        f"CAMERA_{idx}_IRIS", 3.00*MM, 0.070*MM, lens_glass, detail_c,
+        (x_mm*MM,D*0.5+3.26*MM,z_mm*MM), segments=24,
+    )
+    radial_prism_y(
+        f"CAMERA_{idx}_PUPIL", 1.18*MM, 0.045*MM, black, detail_c,
+        (x_mm*MM,D*0.5+3.30*MM,z_mm*MM), segments=16,
+    )
+radial_prism_y(
+    "REAR_MIC", 0.50*MM, 0.14*MM, black, detail_c,
+    ((W*0.5-20.54*MM),D*0.5+1.02*MM,(H*0.5-22.48*MM)), segments=16,
+)
+radial_prism_y(
+    "FLASH_RING", 3.30*MM, 0.12*MM, metal_dark, detail_c,
+    ((W*0.5-30.41*MM),D*0.5+0.30*MM,CAM_CENTER_Z), segments=32,
+)
+flash = radial_prism_y(
+    "FLASH", 3.14*MM, 0.14*MM, flash_mat, detail_c,
+    ((W*0.5-30.41*MM),D*0.5+0.43*MM,CAM_CENTER_Z), segments=32,
+)
+# Explicit planar flash UV preserves the prior material scale on the Y-facing cap.
 flash_uv = flash.data.uv_layers.active or flash.data.uv_layers.new(name="UVMap")
 for loop in flash.data.loops:
     co = flash.data.vertices[loop.vertex_index].co
-    flash_uv.data[loop.index].uv = (co.x / (6.28*MM) + 0.5, co.y / (6.28*MM) + 0.5)
+    flash_uv.data[loop.index].uv = (co.x / (6.28*MM) + 0.5, co.z / (6.28*MM) + 0.5)
 
 # Apple mark decal. Bounding box and vertical datum follow the Apple dimensional drawing.
 logo_img_path = os.path.join(HERE, "reference", "apple_logo_glb_mask.png")
