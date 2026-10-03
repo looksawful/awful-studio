@@ -15,13 +15,13 @@ test('viewer uses Three GLTF runtime and orbit controls', () => {
   assert.match(source, /MeshoptDecoder/); assert.match(source, /requestFullscreen/); assert.match(source, /availableLods/);
   assert.match(source, /NeutralToneMapping/); assert.match(source, /toneMappingExposure = 0\.7/);
   assert.doesNotMatch(source, /HemisphereLight/); assert.match(source, /new THREE\.DirectionalLight\(0xffffff, 0\.65\)/);
-  assert.match(source, /data-control="screen-state"/); assert.match(source, /data-control="animation-clip"/);
-  assert.match(source, /#applyScreenState/); assert.match(source, /new THREE\.RectAreaLight/);
+  assert.match(source, /data-control="screen-state"/); assert.match(source, /data-control="colorway"/); assert.match(source, /data-control="animation-clip"/);
+  assert.match(source, /applyIphoneColorway/); assert.match(source, /#applyScreenState/); assert.match(source, /new THREE\.RectAreaLight/);
 });
 
 test('storybook exposes every canonical model as a first-class story', () => {
   const expected = {
-    'devices.stories.mjs': ['IPhone17', 'IPadPro11', 'IPadPro13', 'MacBookPro14'],
+    'devices.stories.mjs': ['IPhone17', 'IPhone17Black', 'IPhone17White', 'IPhone17MistBlue', 'IPhone17Sage', 'IPhone17Lavender', 'IPadPro11', 'IPadPro13', 'MacBookPro14'],
     'studio-equipment.stories.mjs': ['CStand', 'ProfotoD1', 'ProfotoMagnum', 'StudioSandbag'],
     'scenes.stories.mjs': ['WhiteStudio', 'DarkNeon', 'LoftDaylight'],
   };

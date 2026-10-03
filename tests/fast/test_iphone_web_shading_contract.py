@@ -7,6 +7,7 @@ from PIL import Image
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 GLB = ROOT / 'assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb'
+MANIFEST = ROOT / 'assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30.asset.json'
 EVIDENCE = ROOT / 'assets/device_mockups/iphone_17/evidence/low_v30_validation.json'
 SCREEN_STATE = ROOT / 'assets/device_mockups/iphone_17/reference/ios26_home_screen_dynamic_state_1206x2622.png'
 SCREEN_W_MM = 66.57
@@ -56,6 +57,71 @@ def point_in_triangle_2d(point, a, b, c):
 
 
 class IPhoneWebShadingContractTests(unittest.TestCase):
+    def test_manifest_exposes_official_iphone17_colorway_variants(self):
+        manifest = json.loads(MANIFEST.read_text(encoding='utf-8'))
+        self.assertEqual(manifest['default_colorway'], 'black')
+        self.assertEqual(
+            [variant['id'] for variant in manifest['colorways']],
+            ['black', 'white', 'mist_blue', 'sage', 'lavender'],
+        )
+        self.assertEqual(
+            [variant['label'] for variant in manifest['colorways']],
+            ['Black', 'White', 'Mist Blue', 'Sage', 'Lavender'],
+        )
+
+    def test_visible_finish_materials_export_real_pbr_maps(self):
+        doc, _ = read_glb(GLB)
+        materials = {material.get('name'): material for material in doc['materials']}
+        images = doc.get('images', [])
+        textures = doc.get('textures', [])
+
+        def image_name(texture_ref):
+            texture = textures[texture_ref['index']]
+            return images[texture['source']].get('name', '')
+
+        expected = {
+            'MAT_FASTENER': ('pentalobe_fastener_normal', 'pentalobe_fastener_roughness'),
+            'MAT_ANODIZED_ALUMINUM': ('anodized_aluminum_normal', 'anodized_aluminum_roughness'),
+            'MAT_ALUMINUM_EDGE': ('anodized_aluminum_normal', 'anodized_aluminum_roughness'),
+            'MAT_BACK_GLASS': ('back_glass_micro_normal', 'back_glass_micro_roughness'),
+            'MAT_CAMERA_CONTROL_GLASS': ('back_glass_micro_normal', 'camera_control_roughness'),
+        }
+        for material_name, (normal_name, roughness_name) in expected.items():
+            material = materials[material_name]
+            if material_name == 'MAT_FASTENER':
+                pbr = material['pbrMetallicRoughness']
+                self.assertIn('baseColorTexture', pbr, material_name)
+                self.assertIn('pentalobe_fastener_basecolor', image_name(pbr['baseColorTexture']), material_name)
+            self.assertIn('normalTexture', material, material_name)
+            self.assertIn(normal_name, image_name(material['normalTexture']), material_name)
+            pbr = material['pbrMetallicRoughness']
+            self.assertIn('metallicRoughnessTexture', pbr, material_name)
+            self.assertIn(roughness_name, image_name(pbr['metallicRoughnessTexture']), material_name)
+
+        camera_housing = materials['MAT_CAMERA_HOUSING']['pbrMetallicRoughness']
+        self.assertIn('metallicRoughnessTexture', camera_housing)
+        self.assertIn(
+            'anodized_aluminum_roughness',
+            image_name(camera_housing['metallicRoughnessTexture']),
+        )
+
+        nodes = {node.get('name'): node for node in doc['nodes']}
+        for node_name in ('BODY_ALUMINUM', 'BACK_GLASS', 'CAMERA_HOUSING', 'CAMERA_1_RING',
+                          'ACTION_BUTTON', 'VOL_UP', 'VOL_DOWN', 'SIDE_BUTTON', 'CAMERA_CONTROL',
+                          'BOTTOM_SCREW_L'):
+            mesh = doc['meshes'][nodes[node_name]['mesh']]
+            self.assertTrue(
+                all('TEXCOORD_0' in primitive['attributes'] for primitive in mesh['primitives']),
+                f'{node_name} must export UVs for PBR maps',
+            )
+            if node_name in ('BODY_ALUMINUM', 'BACK_GLASS', 'CAMERA_1_RING',
+                             'ACTION_BUTTON', 'VOL_UP', 'VOL_DOWN', 'SIDE_BUTTON', 'CAMERA_CONTROL',
+                             'BOTTOM_SCREW_L'):
+                self.assertTrue(
+                    all('TANGENT' in primitive['attributes'] for primitive in mesh['primitives']),
+                    f'{node_name} must export tangents for normal mapping',
+                )
+
     def test_closed_shells_have_outward_winding(self):
         doc, blob = read_glb(GLB)
         for name in ('BODY_ALUMINUM', 'BACK_GLASS', 'CAMERA_HOUSING', 'CAMERA_HOUSING_SEAT'):
@@ -313,8 +379,10 @@ class IPhoneWebShadingContractTests(unittest.TestCase):
         color = pbr.get('baseColorFactor', [1, 1, 1, 1])
         self.assertLess(max(color[:3]), 0.003, 'Camera Control glass is too light')
         self.assertEqual(pbr.get('metallicFactor', 0), 0, 'Camera Control must remain dielectric')
-        self.assertGreaterEqual(pbr.get('roughnessFactor', 0), 0.10, 'Camera Control is too mirror-like')
-        self.assertLessEqual(pbr.get('roughnessFactor', 1), 0.24, 'Camera Control is too matte')
+        roughness_texture = pbr.get('metallicRoughnessTexture')
+        self.assertIsNotNone(roughness_texture, 'Camera Control lost its roughness texture')
+        image_index = doc['textures'][roughness_texture['index']]['source']
+        self.assertIn('camera_control_roughness', doc['images'][image_index].get('name', ''))
 
         evidence = json.loads(EVIDENCE.read_text(encoding='utf-8'))
         self.assertAlmostEqual(evidence['camera_control_recess_mm'], 0.10, delta=0.025)

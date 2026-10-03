@@ -495,6 +495,12 @@ def install(legacy):
     ]
     annotations['device_orientation_preset'] = legacy.EnumProperty(
         name='Orientation', items=orientation_items, default='PORTRAIT')
+    annotations['device_colorway'] = legacy.EnumProperty(
+        name='Finish',
+        items=[(key, device_asset_loader.colorway_spec('DEVICE_IPHONE_17', key)['label'],
+                f"Use iPhone 17 {device_asset_loader.colorway_spec('DEVICE_IPHONE_17', key)['label']} finish")
+               for key in device_asset_loader.colorway_keys('DEVICE_IPHONE_17')],
+        default='black')
     annotations['device_screen_path'] = legacy.StringProperty(
         name='Screen Artwork', subtype='FILE_PATH', default='')
     annotations['device_hinge_preset'] = legacy.EnumProperty(
@@ -523,6 +529,9 @@ def install(legacy):
             if spec.get('orientation_axis') == 'Y':
                 box.prop(settings, 'device_orientation_preset', text='Orientation')
                 box.operator('awful.apply_device_orientation', text='Set Orientation')
+            if spec.get('colorways'):
+                box.prop(settings, 'device_colorway', text='Finish')
+                box.operator('awful.apply_device_colorway', text='Set Finish')
             box.prop(settings, 'device_screen_path', text='Screen')
             screen_row = box.row()
             screen_row.enabled = bool(settings.device_screen_path)
@@ -554,6 +563,10 @@ def install(legacy):
         if key != 'NONE':
             root = create_mockup(legacy, scene, key)
             if device_asset_loader.is_device_asset_key(key):
+                spec = device_asset_loader.device_asset_spec(key)
+                if spec.get('colorways'):
+                    device_asset_loader.apply_device_colorway(
+                        legacy, scene, settings.device_colorway)
                 screen_path = getattr(settings, 'device_screen_path', '')
                 if screen_path:
                     device_asset_loader.apply_screen_image(

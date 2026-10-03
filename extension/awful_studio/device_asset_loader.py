@@ -14,12 +14,14 @@ DEVICE_ASSET_SPECS = {
         'stage': 'LOW_DRAFT',
         'dimensions_m': (0.07145, 0.00795, 0.14961),
         'default_lod': 'LOW',
-        'lods': {'LOW': {'variant': 'low_v30', 'blend_path': 'assets/devices/iphone_17_low_v30.blend', 'entry_collection': 'AWFUL_DEVICE_IPHONE_17', 'source_revision': '07a2a0befde9e6f7c3a209db1635a5dda1d375ea92342c4d81a38a1f8ed2368f'}},
+        'lods': {'LOW': {'variant': 'low_v30', 'blend_path': 'assets/devices/iphone_17_low_v30.blend', 'entry_collection': 'AWFUL_DEVICE_IPHONE_17', 'source_revision': '9ce24d6e6e292cd734d9e8be2993a2a37c1e9e24848e32ec27fe0f39752c5a65'}},
         'root_name': 'CTRL_IPHONE_17',
         'orientation_axis': 'Y',
         'screen_object': 'SCREEN_CONTENT',
         'screen_material': 'MAT_SCREEN_CONTENT',
         'screen_states': ('OFF', 'ON'),
+        'default_colorway': 'black',
+        'colorways': ('black', 'white', 'mist_blue', 'sage', 'lavender'),
     },
     'DEVICE_IPAD_PRO_11': {
         'label': 'iPad Pro 11 M5',
@@ -82,6 +84,53 @@ SCREEN_STATE_SPECS = {
     'ON': {'emission_strength': 0.85, 'glow_intensity': 1.0},
 }
 
+# Apple publishes these five iPhone 17 finish names. Numeric material colors
+# are render-calibrated approximations from official product imagery.
+IPHONE17_COLORWAY_SPECS = {
+    'black': {
+        'label': 'Black',
+        'aluminum': '#292a2c',
+        'edge': '#232426',
+        'camera_housing': '#6c6c6c',
+        'back_glass': '#6c6c6c',
+    },
+    'white': {
+        'label': 'White',
+        'aluminum': '#b8b8b6',
+        'edge': '#a2a3a1',
+        'camera_housing': '#f7f7f5',
+        'back_glass': '#f7f7f5',
+    },
+    'mist_blue': {
+        'label': 'Mist Blue',
+        'aluminum': '#687c95',
+        'edge': '#566a82',
+        'camera_housing': '#bdcde4',
+        'back_glass': '#bdcde4',
+    },
+    'sage': {
+        'label': 'Sage',
+        'aluminum': '#737e5e',
+        'edge': '#5f6b4d',
+        'camera_housing': '#c8d2af',
+        'back_glass': '#c8d2af',
+    },
+    'lavender': {
+        'label': 'Lavender',
+        'aluminum': '#998fa8',
+        'edge': '#81758f',
+        'camera_housing': '#efe4f4',
+        'back_glass': '#efe4f4',
+    },
+}
+
+COLORWAY_MATERIAL_ROLES = {
+    'MAT_ANODIZED_ALUMINUM': 'aluminum',
+    'MAT_ALUMINUM_EDGE': 'edge',
+    'MAT_CAMERA_HOUSING': 'camera_housing',
+    'MAT_BACK_GLASS': 'back_glass',
+}
+
 
 def device_asset_keys() -> tuple[str, ...]:
     return tuple(DEVICE_ASSET_SPECS)
@@ -92,6 +141,22 @@ def device_asset_spec(key: str) -> dict:
         return deepcopy(DEVICE_ASSET_SPECS[key])
     except KeyError as exc:
         raise ValueError(f'Unknown AWFUL device asset: {key}') from exc
+
+
+def colorway_keys(key: str) -> tuple[str, ...]:
+    spec = device_asset_spec(key)
+    colorways = tuple(spec.get('colorways', ()))
+    if not colorways:
+        raise ValueError(f'AWFUL device asset has no colorway variants: {key}')
+    return colorways
+
+
+def colorway_spec(key: str, colorway: str) -> dict:
+    if colorway not in colorway_keys(key):
+        raise ValueError(f'Unknown AWFUL device colorway {colorway}: {key}')
+    if key != 'DEVICE_IPHONE_17':
+        raise ValueError(f'No material colorway contract for AWFUL device asset: {key}')
+    return deepcopy(IPHONE17_COLORWAY_SPECS[colorway])
 
 
 
@@ -181,6 +246,52 @@ def _principled(material):
         if node.bl_idname == 'ShaderNodeBsdfPrincipled':
             return node
     raise RuntimeError(f'{material.name} is missing Principled BSDF')
+
+
+def _srgb_hex_to_linear_rgba(value: str) -> tuple[float, float, float, float]:
+    value = value.lstrip('#')
+    if len(value) != 6:
+        raise ValueError(f'Expected #RRGGBB color, got {value!r}')
+
+    def convert(channel):
+        srgb = int(channel, 16) / 255.0
+        return srgb / 12.92 if srgb <= 0.04045 else ((srgb + 0.055) / 1.055) ** 2.4
+
+    return tuple(convert(value[index:index + 2]) for index in (0, 2, 4)) + (1.0,)
+
+
+def apply_device_colorway(legacy, scene, colorway: str):
+    root = _active_device_root(legacy, scene)
+    key = str(root['awful_mockup_key'])
+    spec = colorway_spec(key, colorway)
+    seen = set()
+
+    for obj in [root] + legacy.descendants(root):
+        data = getattr(obj, 'data', None)
+        if getattr(data, 'materials', None) is None:
+            continue
+        for material in data.materials:
+            if material is None or material in seen:
+                continue
+            seen.add(material)
+            role = next(
+                (role for material_name, role in COLORWAY_MATERIAL_ROLES.items()
+                 if material.name == material_name or material.name.startswith(material_name + '.')),
+                None,
+            )
+            if role is None:
+                continue
+            color = _srgb_hex_to_linear_rgba(spec[role])
+            shader = _principled(material)
+            base_color = shader.inputs.get('Base Color')
+            if base_color is not None:
+                base_color.default_value = color
+            material.diffuse_color = color
+            material['awful_colorway'] = colorway
+
+    root['awful_colorway'] = colorway
+    root['awful_colorway_label'] = spec['label']
+    return root
 
 
 def apply_screen_image(legacy, scene, filepath):
@@ -379,6 +490,9 @@ def create_device_asset(legacy, scene, key, lod=None):
     root['awful_asset_lod'] = selected_lod
     root['awful_asset_variant'] = lod_item['variant']
     root['awful_asset_source_revision'] = lod_item['source_revision']
+    if spec.get('default_colorway'):
+        root['awful_colorway'] = spec['default_colorway']
+        root['awful_colorway_variants'] = ','.join(spec.get('colorways', ()))
     if spec.get('orientation_axis') == 'Y':
         preset = getattr(scene.awful_studio, 'device_orientation_preset', 'PORTRAIT') or 'PORTRAIT'
         apply_orientation_preset_to_root(root, key, preset)

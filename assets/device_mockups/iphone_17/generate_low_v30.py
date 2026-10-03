@@ -53,6 +53,89 @@ def apply_runtime_bevel(obj, width, segments=4):
     smooth_sharp_boundaries(obj)
 
 
+def ensure_box_uv(obj, tile_mm=4.0, *, replace=False):
+    """Create deterministic UVs for exported PBR maps without changing geometry."""
+    mesh = obj.data
+    if mesh.uv_layers.active and not replace:
+        return mesh.uv_layers.active
+    if replace:
+        while mesh.uv_layers:
+            mesh.uv_layers.remove(mesh.uv_layers[0])
+    uv_layer = mesh.uv_layers.new(name="UVMap")
+    scale = tile_mm * MM
+    for polygon in mesh.polygons:
+        normal = polygon.normal
+        axis = max(range(3), key=lambda index: abs(normal[index]))
+        for loop_index in polygon.loop_indices:
+            vertex = mesh.vertices[mesh.loops[loop_index].vertex_index].co
+            if axis == 0:
+                uv = (vertex.y / scale + 0.5, vertex.z / scale + 0.5)
+            elif axis == 1:
+                uv = (vertex.x / scale + 0.5, vertex.z / scale + 0.5)
+            else:
+                uv = (vertex.x / scale + 0.5, vertex.y / scale + 0.5)
+            uv_layer.data[loop_index].uv = uv
+    return uv_layer
+
+
+def packed_image(name, size, pixel_fn, *, non_color=True):
+    image = bpy.data.images.new(name, width=size, height=size)
+    if non_color:
+        image.colorspace_settings.name = "Non-Color"
+    pixels = []
+    for row in range(size):
+        for column in range(size):
+            pixels.extend(pixel_fn(column, row, size))
+    image.pixels.foreach_set(pixels)
+    image.pack()
+    return image
+
+
+def height_normal_image(name, size, height_fn, strength=1.0):
+    heights = [[height_fn(column, row, size) for column in range(size)] for row in range(size)]
+    pixels = []
+    for row in range(size):
+        for column in range(size):
+            left = heights[row][(column - 1) % size]
+            right = heights[row][(column + 1) % size]
+            down = heights[(row - 1) % size][column]
+            up = heights[(row + 1) % size][column]
+            dx = (right - left) * strength
+            dy = (up - down) * strength
+            length = math.sqrt(dx * dx + dy * dy + 1.0)
+            nx, ny, nz = -dx / length, -dy / length, 1.0 / length
+            pixels.extend((0.5 + 0.5 * nx, 0.5 + 0.5 * ny, 0.5 + 0.5 * nz, 1.0))
+    image = bpy.data.images.new(name, width=size, height=size)
+    image.colorspace_settings.name = "Non-Color"
+    image.pixels.foreach_set(pixels)
+    image.pack()
+    return image
+
+
+def attach_roughness_map(material, roughness_image):
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    bsdf = nodes.get("Principled BSDF")
+    rough_tex = nodes.new("ShaderNodeTexImage")
+    rough_tex.image = roughness_image
+    rough_tex.interpolation = "Linear"
+    links.new(rough_tex.outputs["Color"], bsdf.inputs["Roughness"])
+
+
+def attach_pbr_maps(material, normal_image, roughness_image, normal_strength):
+    nodes = material.node_tree.nodes
+    links = material.node_tree.links
+    bsdf = nodes.get("Principled BSDF")
+    normal_tex = nodes.new("ShaderNodeTexImage")
+    normal_tex.image = normal_image
+    normal_tex.interpolation = "Linear"
+    normal_map = nodes.new("ShaderNodeNormalMap")
+    normal_map.inputs["Strength"].default_value = normal_strength
+    links.new(normal_tex.outputs["Color"], normal_map.inputs["Color"])
+    links.new(normal_map.outputs["Normal"], bsdf.inputs["Normal"])
+    attach_roughness_map(material, roughness_image)
+
+
 APPLE_CORNER_EXTENT = 19.23 * MM
 APPLE_CORNER_BEZIER = (
     (0.00 * MM, 19.23 * MM),
@@ -162,6 +245,7 @@ metal = fc.make_material("MAT_ANODIZED_ALUMINUM", (0.006, 0.007, 0.010), 1.0, 0.
 metal_dark = fc.make_material("MAT_ALUMINUM_EDGE", (0.012, 0.014, 0.020), 1.0, 0.24)
 camera_housing_mat = fc.make_material("MAT_CAMERA_HOUSING", (0.010, 0.013, 0.020), 1.0, 0.27)
 back_mat = fc.make_material("MAT_BACK_GLASS", (0.00008, 0.00010, 0.00014), 0.0, 0.38)
+camera_seat_mat = fc.make_material("MAT_CAMERA_HOUSING_SEAT", (0.00008, 0.00010, 0.00014), 0.0, 0.38)
 back_bsdf = back_mat.node_tree.nodes.get("Principled BSDF")
 back_bsdf.inputs["Coat Weight"].default_value = 0.22
 back_bsdf.inputs["Coat Roughness"].default_value = 0.09
@@ -246,6 +330,117 @@ flash_mat.node_tree.links.new(flash_tex.outputs["Color"], flash_bsdf.inputs["Bas
 flash_bsdf.inputs["Coat Weight"].default_value = 0.25
 flash_bsdf.inputs["Coat Roughness"].default_value = 0.10
 screw_mat = fc.make_material("MAT_FASTENER", (0.10, 0.11, 0.13), 0.92, 0.24)
+
+# Embedded product-surface maps: these survive Blender -> GLB -> Three.js.
+# Keep amplitudes subtle; silhouette/detail-critical forms remain geometry.
+def aluminum_height(column, row, size):
+    u = column / size
+    v = row / size
+    return (
+        0.020 * math.sin(2.0 * math.pi * (u * 31.0 + v * 2.0))
+        + 0.010 * math.sin(2.0 * math.pi * (u * 71.0 - v * 5.0))
+        + 0.006 * math.sin(2.0 * math.pi * (u * 13.0 + v * 47.0))
+    )
+
+def aluminum_roughness(column, row, size):
+    u = column / size
+    v = row / size
+    value = 0.29 + 0.025 * math.sin(2.0 * math.pi * (u * 19.0 + v * 3.0))
+    value += 0.015 * math.sin(2.0 * math.pi * (u * 7.0 - v * 29.0))
+    value = max(0.22, min(0.36, value))
+    return (value, value, value, 1.0)
+
+def glass_height(column, row, size):
+    u = column / size
+    v = row / size
+    return (
+        0.012 * math.sin(2.0 * math.pi * (u * 17.0 + v * 23.0))
+        + 0.008 * math.sin(2.0 * math.pi * (u * 43.0 - v * 11.0))
+    )
+
+def glass_roughness(column, row, size):
+    u = column / size
+    v = row / size
+    value = 0.38 + 0.018 * math.sin(2.0 * math.pi * (u * 11.0 + v * 17.0))
+    value += 0.010 * math.sin(2.0 * math.pi * (u * 37.0 - v * 5.0))
+    value = max(0.34, min(0.43, value))
+    return (value, value, value, 1.0)
+
+def camera_control_roughness(column, row, size):
+    u = column / size
+    v = row / size
+    value = 0.16 + 0.018 * math.sin(2.0 * math.pi * (u * 13.0 + v * 7.0))
+    value += 0.010 * math.sin(2.0 * math.pi * (u * 31.0 - v * 11.0))
+    value = max(0.13, min(0.20, value))
+    return (value, value, value, 1.0)
+
+def pentalobe_height(column, row, size):
+    x = ((column + 0.5) / size) * 2.0 - 1.0
+    y = ((row + 0.5) / size) * 2.0 - 1.0
+    radius = math.sqrt(x*x + y*y)
+    angle = math.atan2(y, x)
+    socket_radius = 0.42 * (1.0 + 0.14 * math.cos(5.0 * angle))
+    edge = 0.035
+    signed = radius - socket_radius
+    if signed <= -edge:
+        return -0.55
+    if signed >= edge:
+        return 0.0
+    t = (signed + edge) / (2.0 * edge)
+    return -0.55 * 0.5 * (1.0 + math.cos(math.pi * t))
+
+def pentalobe_roughness(column, row, size):
+    x = ((column + 0.5) / size) * 2.0 - 1.0
+    y = ((row + 0.5) / size) * 2.0 - 1.0
+    radius = math.sqrt(x*x + y*y)
+    angle = math.atan2(y, x)
+    socket_radius = 0.42 * (1.0 + 0.14 * math.cos(5.0 * angle))
+    value = 0.62 if radius <= socket_radius else 0.20
+    return (value, value, value, 1.0)
+
+def pentalobe_basecolor(column, row, size):
+    x = ((column + 0.5) / size) * 2.0 - 1.0
+    y = ((row + 0.5) / size) * 2.0 - 1.0
+    radius = math.sqrt(x*x + y*y)
+    angle = math.atan2(y, x)
+    socket_radius = 0.42 * (1.0 + 0.14 * math.cos(5.0 * angle))
+    edge = 0.025
+    if radius <= socket_radius - edge:
+        value = 0.025
+    elif radius >= socket_radius + edge:
+        value = 0.58
+    else:
+        t = (radius - (socket_radius - edge)) / (2.0 * edge)
+        value = 0.025 * (1.0 - t) + 0.58 * t
+    return (value, value * 1.005, value * 1.015, 1.0)
+
+aluminum_normal = height_normal_image("anodized_aluminum_normal_128", 128, aluminum_height, strength=8.0)
+aluminum_rough = packed_image("anodized_aluminum_roughness_128", 128, aluminum_roughness)
+back_glass_normal = height_normal_image("back_glass_micro_normal_128", 128, glass_height, strength=6.0)
+back_glass_rough = packed_image("back_glass_micro_roughness_128", 128, glass_roughness)
+camera_control_rough = packed_image("camera_control_roughness_128", 128, camera_control_roughness)
+pentalobe_normal = height_normal_image("pentalobe_fastener_normal_256", 256, pentalobe_height, strength=6.0)
+pentalobe_rough = packed_image("pentalobe_fastener_roughness_256", 256, pentalobe_roughness)
+pentalobe_color = packed_image("pentalobe_fastener_basecolor_256", 256, pentalobe_basecolor, non_color=False)
+
+for material, strength in (
+    (metal, 0.22),
+    (metal_dark, 0.18),
+):
+    attach_pbr_maps(material, aluminum_normal, aluminum_rough, strength)
+# The rounded camera plateau already carries real bevel geometry. Its bevel topology
+# produces degenerate tangent vertices in glTF, so keep micro-variation in roughness only.
+attach_roughness_map(camera_housing_mat, aluminum_rough)
+attach_roughness_map(camera_seat_mat, back_glass_rough)
+attach_pbr_maps(back_mat, back_glass_normal, back_glass_rough, 0.18)
+attach_pbr_maps(camera_control_mat, back_glass_normal, camera_control_rough, 0.14)
+attach_pbr_maps(screw_mat, pentalobe_normal, pentalobe_rough, 0.95)
+screw_bsdf = screw_mat.node_tree.nodes.get("Principled BSDF")
+screw_color_tex = screw_mat.node_tree.nodes.new("ShaderNodeTexImage")
+screw_color_tex.image = pentalobe_color
+screw_mat.node_tree.links.new(screw_color_tex.outputs["Color"], screw_bsdf.inputs["Base Color"])
+screw_bsdf.inputs["Base Color"].default_value = (1.0, 1.0, 1.0, 1.0)
+screw_mat.diffuse_color = (1.0, 1.0, 1.0, 1.0)
 
 glass = fc.make_material("MAT_DISPLAY_GLASS", (0.0015, 0.0020, 0.0030), 0.0, 0.045)
 gbsdf = glass.node_tree.nodes.get("Principled BSDF")
@@ -383,25 +578,29 @@ receiver = fc.rounded_cube("FRONT_RECEIVER_MIC", (14.02*MM, 0.020*MM, 0.30*MM), 
 housing_x = CAM_CENTER_X
 housing_z = CAM_CENTER_Z
 # Detail D is a pair of concentric vertical capsules, not a small-radius rounded rectangle.
-housing_seat = outward_prism("CAMERA_HOUSING_SEAT", CAM_OUTER_W, CAM_OUTER_H, 0.30*MM, CAM_OUTER_W*0.5, back_mat, detail_c, axis="Y", location=(housing_x, back_y + GLASS_T*0.5 + 0.11*MM, housing_z), edge_bevel=0.00010, outline_segments=128)
+# Apple iPhone 17 Dimensional Drawings, side view: back glass to camera plateau = 1.78 mm,
+# back glass to camera glass = 3.45 mm. Keep those external surfaces authoritative.
+CAMERA_PLATEAU_PROTRUSION = 1.78 * MM
+CAMERA_GLASS_PROTRUSION = 3.45 * MM
+housing_seat = outward_prism("CAMERA_HOUSING_SEAT", CAM_OUTER_W, CAM_OUTER_H, 0.30*MM, CAM_OUTER_W*0.5, camera_seat_mat, detail_c, axis="Y", location=(housing_x, D*0.5 + 0.15*MM, housing_z), edge_bevel=0.00010, outline_segments=128)
 apply_runtime_bevel(housing_seat, 0.11*MM, segments=4)
 housing_seat_wn = housing_seat.modifiers.new("WEIGHTED_NORMAL", "WEIGHTED_NORMAL")
 housing_seat_wn.keep_sharp = True
 housing_seat_wn.weight = 50
-housing = outward_prism("CAMERA_HOUSING", CAM_INNER_W, CAM_INNER_H, 0.72*MM, CAM_INNER_W*0.5, camera_housing_mat, detail_c, axis="Y", location=(housing_x, back_y + GLASS_T*0.5 + 0.36*MM, housing_z), edge_bevel=0.00018, outline_segments=128)
+housing = outward_prism("CAMERA_HOUSING", CAM_INNER_W, CAM_INNER_H, CAMERA_PLATEAU_PROTRUSION, CAM_INNER_W*0.5, camera_housing_mat, detail_c, axis="Y", location=(housing_x, D*0.5 + CAMERA_PLATEAU_PROTRUSION*0.5, housing_z), edge_bevel=0.00018, outline_segments=128)
 apply_runtime_bevel(housing, 0.24*MM, segments=4)
 for idx,(x_mm,z_mm) in enumerate((((W*0.5-CAM_CENTER_X_REF)/MM,(H*0.5-13.62*MM)/MM),((W*0.5-CAM_CENTER_X_REF)/MM,(H*0.5-31.34*MM)/MM)),1):
-    seat=fc.cylinder(f"CAMERA_{idx}_SEAT",8.18*MM,0.14*MM,gap_mat,detail_c,(x_mm*MM,D*0.5+0.88*MM,z_mm*MM),axis="Y",vertices=192); seat.hide_render=True
-    ring = fc.cylinder(f"CAMERA_{idx}_RING",8.00*MM,0.36*MM,metal_dark,detail_c,(x_mm*MM,D*0.5+1.09*MM,z_mm*MM),axis="Y",vertices=192)
-    ring_bevel = fc.cylinder(f"CAMERA_{idx}_BEVEL",7.44*MM,0.18*MM,metal,detail_c,(x_mm*MM,D*0.5+1.36*MM,z_mm*MM),axis="Y",vertices=192)
-    camera_glass = fc.cylinder(f"CAMERA_{idx}_GLASS",6.81*MM,0.16*MM,lens_glass,detail_c,(x_mm*MM,D*0.5+1.53*MM,z_mm*MM),axis="Y",vertices=192)
+    seat=fc.cylinder(f"CAMERA_{idx}_SEAT",8.18*MM,0.14*MM,gap_mat,detail_c,(x_mm*MM,D*0.5+1.70*MM,z_mm*MM),axis="Y",vertices=192); seat.hide_render=True
+    ring = fc.cylinder(f"CAMERA_{idx}_RING",8.00*MM,1.10*MM,metal_dark,detail_c,(x_mm*MM,D*0.5+2.20*MM,z_mm*MM),axis="Y",vertices=192)
+    ring_bevel = fc.cylinder(f"CAMERA_{idx}_BEVEL",7.44*MM,0.70*MM,metal,detail_c,(x_mm*MM,D*0.5+2.75*MM,z_mm*MM),axis="Y",vertices=192)
+    camera_glass = fc.cylinder(f"CAMERA_{idx}_GLASS",6.81*MM,0.70*MM,lens_glass,detail_c,(x_mm*MM,D*0.5+CAMERA_GLASS_PROTRUSION-0.35*MM,z_mm*MM),axis="Y",vertices=192)
     apply_runtime_bevel(ring, 0.13*MM, segments=4)
     apply_runtime_bevel(ring_bevel, 0.07*MM, segments=3)
     apply_runtime_bevel(camera_glass, 0.06*MM, segments=3)
-    fc.cylinder(f"CAMERA_{idx}_INNER",5.20*MM,0.09*MM,black,detail_c,(x_mm*MM,D*0.5+1.65*MM,z_mm*MM),axis="Y",vertices=160)
-    fc.cylinder(f"CAMERA_{idx}_IRIS",3.00*MM,0.070*MM,lens_glass,detail_c,(x_mm*MM,D*0.5+1.73*MM,z_mm*MM),axis="Y",vertices=128)
-    fc.cylinder(f"CAMERA_{idx}_PUPIL",1.18*MM,0.045*MM,black,detail_c,(x_mm*MM,D*0.5+1.79*MM,z_mm*MM),axis="Y",vertices=96)
-fc.cylinder("REAR_MIC",0.50*MM,0.14*MM,black,detail_c,(13.05*MM,D*0.5+1.02*MM,52.30*MM),axis="Y",vertices=80)
+    fc.cylinder(f"CAMERA_{idx}_INNER",5.20*MM,0.09*MM,black,detail_c,(x_mm*MM,D*0.5+3.22*MM,z_mm*MM),axis="Y",vertices=160)
+    fc.cylinder(f"CAMERA_{idx}_IRIS",3.00*MM,0.070*MM,lens_glass,detail_c,(x_mm*MM,D*0.5+3.26*MM,z_mm*MM),axis="Y",vertices=128)
+    fc.cylinder(f"CAMERA_{idx}_PUPIL",1.18*MM,0.045*MM,black,detail_c,(x_mm*MM,D*0.5+3.30*MM,z_mm*MM),axis="Y",vertices=96)
+fc.cylinder("REAR_MIC",0.50*MM,0.14*MM,black,detail_c,((W*0.5-20.54*MM),D*0.5+1.02*MM,(H*0.5-22.48*MM)),axis="Y",vertices=80)
 fc.cylinder("FLASH_RING",3.30*MM,0.12*MM,metal_dark,detail_c,((W*0.5-30.41*MM),D*0.5+0.30*MM,CAM_CENTER_Z),axis="Y",vertices=128)
 flash = fc.cylinder("FLASH",3.14*MM,0.14*MM,flash_mat,detail_c,((W*0.5-30.41*MM),D*0.5+0.43*MM,CAM_CENTER_Z),axis="Y",vertices=128)
 # Cylinder mesh stays in local XY; object rotation puts its face on the rear Y plane.
@@ -474,21 +673,21 @@ def physical_side_button(name, edge, z_mm, length_mm, face_width_mm=2.56, protru
     fc.add_bevel(button,0.025*MM,segments=3)
     return button
 
-def camera_control(edge,z_mm,length_mm=17.5,face_width_mm=3.00,recess_mm=0.10):
+def camera_control(edge,z_mm,length_mm=17.10,face_width_mm=3.03,recess_mm=0.10):
     return physical_side_button("CAMERA_CONTROL",edge,z_mm,length_mm,face_width_mm,-recess_mm,camera_control_mat)
 
-physical_side_button("ACTION_BUTTON","LEFT",40.72,11.6,2.56,0.45)
-physical_side_button("VOL_UP","LEFT",26.57,9.2,2.56,0.45)
-physical_side_button("VOL_DOWN","LEFT",12.37,9.2,2.56,0.45)
-physical_side_button("SIDE_BUTTON","RIGHT",19.48,17.7,2.56,0.45)
-camera_control("RIGHT",-23.40,17.5,3.00,0.10)
+physical_side_button("ACTION_BUTTON","LEFT",40.72,6.90,2.66,0.45)
+physical_side_button("VOL_UP","LEFT",26.57,11.20,2.66,0.45)
+physical_side_button("VOL_DOWN","LEFT",12.37,11.20,2.66,0.45)
+physical_side_button("SIDE_BUTTON","RIGHT",19.48,17.70,2.66,0.45)
+camera_control("RIGHT",-23.40,17.10,3.03,0.10)
 for side, edge in (("L", "LEFT"), ("R", "RIGHT")):
     for z_mm in (55.0, -55.0):
         strip = fc.rounded_cube(f"ANTENNA_SIDE_{side}_{int(z_mm)}", (0.10*MM, 1.02*MM, 4.3*MM),
                                 0.06*MM, black, detail_c)
         fc.place_on_rounded_edge(strip, W, H, BODY_R, edge, z_mm*MM, outward=-0.018*MM, local_normal=(1,0,0))
 
-usb_cutter = fc.rounded_cube("USB_C_CUTTER", (9.05*MM, 3.00*MM, 1.82*MM), 0.91*MM, None, detail_c)
+usb_cutter = fc.rounded_cube("USB_C_CUTTER", (8.99*MM, 3.00*MM, 1.82*MM), 0.91*MM, None, detail_c)
 fc.place_on_rounded_edge(usb_cutter, W, H, BODY_R, "BOTTOM", 0.0, outward=-0.70*MM, local_normal=(0,0,1))
 fc.boolean_difference(body, usb_cutter, name="CUT_USB_C")
 boolean_cuts.append("USB_C")
@@ -502,22 +701,24 @@ def bottom_aperture(name, x_mm):
     fc.place_on_rounded_edge(cutter, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.52*MM, local_normal=(0,0,1))
     fc.boolean_difference(body, cutter, name=f"CUT_{name}")
     boolean_cuts.append(name)
-    cavity = fc.cylinder(name, 0.64*MM, 0.12*MM, grille_mat, detail_c, vertices=40)
+    cavity = fc.cylinder(name, 0.675*MM, 0.12*MM, grille_mat, detail_c, vertices=40)
     fc.place_on_rounded_edge(cavity, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.98*MM, local_normal=(0,0,1))
     smooth_sharp_boundaries(cavity)
 
-# Apple drawing: 3 microphone ports on the left and 6 speaker ports on the right, each 1.35 mm diameter.
-for idx, x_mm in enumerate((-18.2, -15.1, -12.0), 1):
-    bottom_aperture(f"BOTTOM_MIC_APERTURE_{idx:02d}", x_mm)
-for idx, x_mm in enumerate((12.0, 15.1, 18.2, 21.3, 24.4, 27.5), 1):
-    bottom_aperture(f"BOTTOM_SPEAKER_APERTURE_{idx:02d}", x_mm)
+# Apple Detail C: 8 x Ø1.35 acoustic ports total = 3 microphone + 5 speaker.
+# Drawing X datums are measured from product left; convert to centered model coordinates.
+for idx, from_left_mm in enumerate((19.71, 21.965, 24.22), 1):
+    bottom_aperture(f"BOTTOM_MIC_APERTURE_{idx:02d}", from_left_mm - 71.45*0.5)
+for idx, from_left_mm in enumerate((47.23, 49.485, 51.74, 53.995, 56.25), 1):
+    bottom_aperture(f"BOTTOM_SPEAKER_APERTURE_{idx:02d}", from_left_mm - 71.45*0.5)
 
-for side, x_mm in (("L", -7.15), ("R", 7.15)):
-    recess = fc.cylinder(f"BOTTOM_SCREW_{side}_RECESS", 0.75*MM, 0.90*MM, None, detail_c, vertices=48)
+for side, from_left_mm in (("L", 28.80), ("R", 42.65)):
+    x_mm = from_left_mm - 71.45*0.5
+    recess = fc.cylinder(f"BOTTOM_SCREW_{side}_RECESS", 0.78*MM, 0.90*MM, None, detail_c, vertices=48)
     fc.place_on_rounded_edge(recess, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.38*MM, local_normal=(0,0,1))
     fc.boolean_difference(body, recess, name=f"CUT_SCREW_{side}")
     boolean_cuts.append(f"SCREW_{side}")
-    screw = fc.cylinder(f"BOTTOM_SCREW_{side}", 0.66*MM, 0.24*MM, screw_mat, detail_c, vertices=48)
+    screw = fc.cylinder(f"BOTTOM_SCREW_{side}", 0.75*MM, 0.24*MM, screw_mat, detail_c, vertices=48)
     fc.place_on_rounded_edge(screw, W, H, BODY_R, "BOTTOM", x_mm*MM, outward=-0.15*MM, local_normal=(0,0,1))
 
 bev = fc.add_bevel(body, 0.00022, segments=4)
@@ -562,11 +763,17 @@ root["apple_logo_decal"] = True
 root["rear_camera_outer_diameter_mm"] = 16.0
 root["rear_camera_optical_diameter_mm"] = 13.62
 root["publish_preview_material"] = "black_anodized"
+root["default_colorway"] = "black"
+root["colorway_variants"] = "black,white,mist_blue,sage,lavender"
+root["colorway_reference"] = "Apple iPhone 17 official finishes: Black, White, Mist Blue, Sage, Lavender"
+root["colorway_tints"] = "render-calibrated approximations from official Apple product imagery; names are authoritative, RGB values are not factory colorimetry"
+root["pbr_surface_maps"] = "anodized_aluminum normal+roughness; back_glass normal+roughness; pentalobe_fastener normal+roughness"
+root["fastener_head_detail"] = "pentalobe tangent-space normal map"
 root["source_drawing"] = "Apple iPhone 17 Dimensional Drawings 2025-09-09"
 root["cover_glass_mm"] = "69.45 x 147.61"
 root["display_active_area_mm"] = "66.57 x 144.79"
 root["button_top_datums_mm"] = "34.08, 48.23, 62.43, 55.32, 98.20"
-root["bottom_layout"] = "3_mic + usb_c + 6_speaker"
+root["bottom_layout"] = "3_mic + usb_c + 5_speaker"
 root["apple_logo_decal"] = "reference/apple_logo_glb_mask.png"
 
 studio = fc.make_collection("_STUDIO_RIG")
@@ -598,6 +805,26 @@ cam_camera = persp("CAM_CAMERA_MACRO", (0.070, 0.18, 0.100), (0.020,0.004,0.052)
 cam_front_sensor = persp("CAM_FRONT_SENSOR_MACRO", (0.0, -0.125, 0.082), (0, front_surface, front_hardware_z), 120)
 cam_back_three = persp("CAM_BACK_THREE_QUARTER", (0.18, 0.30, 0.13), (0.010,0.002,0.020), 84)
 
+# Deterministic UVs for exported finish maps. Use local-space box projection so
+# material variants can change color without invalidating surface detail.
+for name, tile_mm in (
+    ("BODY_ALUMINUM", 4.0),
+    ("BACK_GLASS", 6.0),
+    ("CAMERA_HOUSING_SEAT", 3.0),
+    ("CAMERA_HOUSING", 3.0),
+    ("CAMERA_1_RING", 2.0),
+    ("CAMERA_2_RING", 2.0),
+    ("ACTION_BUTTON", 2.0),
+    ("VOL_UP", 2.0),
+    ("VOL_DOWN", 2.0),
+    ("SIDE_BUTTON", 2.0),
+    ("CAMERA_CONTROL", 2.0),
+    ("USB_C_TONGUE", 2.0),
+    ("BOTTOM_SCREW_L", 1.50),
+    ("BOTTOM_SCREW_R", 1.50),
+):
+    ensure_box_uv(bpy.data.objects[name], tile_mm, replace=True)
+
 bpy.context.view_layer.update()
 
 assembly = (body, back_glass, screen_glass)
@@ -623,12 +850,12 @@ mandatory = [
     "BODY_ALUMINUM", "SCREEN_GLASS", "SCREEN_CONTENT", "DISPLAY_BEZEL", "DISPLAY_GLASS_SEAT",
     "FRONT_SENSOR_MASK", "FRONT_CAMERA_MASK", "FRONT_CAMERA_GLASS", "FRONT_CAMERA_IRIS", "FRONT_CAMERA_PUPIL", "FRONT_RECEIVER_MIC", "APPLE_LOGO_DECAL",
     "ACTION_BUTTON", "VOL_UP", "VOL_DOWN", "SIDE_BUTTON", "CAMERA_CONTROL",
-    "USB_C_CAVITY", "BOTTOM_MIC_APERTURE_03", "BOTTOM_SPEAKER_APERTURE_05", "BOTTOM_SPEAKER_APERTURE_06",
+    "USB_C_CAVITY", "BOTTOM_MIC_APERTURE_03", "BOTTOM_SPEAKER_APERTURE_05",
     "CAMERA_HOUSING_SEAT", "CAMERA_HOUSING", "CAMERA_1_GLASS", "CAMERA_2_GLASS", "FLASH", "REAR_MIC"
 ]
 missing = [name for name in mandatory if bpy.data.objects.get(name) is None]
 forbidden = [name for name in ("FRONT_SENSOR_L", "FRONT_SENSOR_R", "FRONT_SENSOR_DOT") if bpy.data.objects.get(name) is not None]
-expected_boolean_cuts = 2 + 5 + 1 + 9 + 2
+expected_boolean_cuts = 2 + 5 + 1 + 8 + 2
 back_outer_y = back_glass.location.y + max(v.co.y for v in back_glass.data.vertices)
 backing_outer_y = housing_seat.location.y + max(v.co.y for v in housing_seat.data.vertices)
 camera_backing_protrusion_mm = (backing_outer_y - back_outer_y) / MM

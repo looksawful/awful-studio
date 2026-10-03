@@ -9,11 +9,11 @@ export function groupOptions(group) {
   return assetsForGroup(group).map((asset) => asset.id);
 }
 
-export function renderGroup(group, assetId) {
+export function renderGroup(group, assetId, options = {}) {
   const assets = assetsForGroup(group);
   if (!assets.length) throw new Error(`No preview assets in group: ${group}`);
   const asset = assets.find((entry) => entry.id === assetId) ?? assets[0];
-  return createModelViewer(asset);
+  return createModelViewer(asset, options);
 }
 
 export { catalog };

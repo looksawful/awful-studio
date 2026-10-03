@@ -13,6 +13,73 @@ export const iphoneScreenStates = {
   screen_resume: { label: 'Resume', texture: 'screens/iphone-resume.png', emission_strength: 1, dynamic_island_state: 'idle' },
 };
 
+// Apple publishes the five finish names, but not numeric material RGB values.
+// These display tints are calibrated approximations from Apple's official product renders.
+export const iphoneColorways = {
+  black: {
+    label: 'Black',
+    aluminum: '#292a2c',
+    edge: '#232426',
+    cameraHousing: '#6c6c6c',
+    backGlass: '#6c6c6c',
+  },
+  white: {
+    label: 'White',
+    aluminum: '#b8b8b6',
+    edge: '#a2a3a1',
+    cameraHousing: '#f7f7f5',
+    backGlass: '#f7f7f5',
+  },
+  mist_blue: {
+    label: 'Mist Blue',
+    aluminum: '#687c95',
+    edge: '#566a82',
+    cameraHousing: '#bdcde4',
+    backGlass: '#bdcde4',
+  },
+  sage: {
+    label: 'Sage',
+    aluminum: '#737e5e',
+    edge: '#5f6b4d',
+    cameraHousing: '#c8d2af',
+    backGlass: '#c8d2af',
+  },
+  lavender: {
+    label: 'Lavender',
+    aluminum: '#998fa8',
+    edge: '#81758f',
+    cameraHousing: '#efe4f4',
+    backGlass: '#efe4f4',
+  },
+};
+
+const iphoneColorwayMaterialKeys = {
+  MAT_ANODIZED_ALUMINUM: 'aluminum',
+  MAT_ALUMINUM_EDGE: 'edge',
+  MAT_CAMERA_HOUSING: 'cameraHousing',
+  MAT_BACK_GLASS: 'backGlass',
+};
+
+export function applyIphoneColorway(model, colorway = 'black') {
+  const spec = iphoneColorways[colorway];
+  if (!spec) throw new Error(`Unknown iPhone 17 colorway: ${colorway}`);
+  const seen = new Set();
+  model?.traverse?.(object => {
+    if (!object.isMesh) return;
+    const materials = Array.isArray(object.material) ? object.material : [object.material];
+    for (const material of materials) {
+      if (!material || seen.has(material)) continue;
+      seen.add(material);
+      const key = iphoneColorwayMaterialKeys[material.name];
+      if (!key || !material.color) continue;
+      material.color.set(spec[key]);
+      material.needsUpdate = true;
+    }
+  });
+  model?.userData && (model.userData.iphoneColorway = colorway);
+  return spec;
+}
+
 // Derived from the accepted clean/dynamic 1206x2622 reference pair. Apple does not publish idle-mask pixels.
 const idleDynamicIslandRaster = Object.freeze({ x: 405, y: 37, width: 394, height: 121, radius: 60.5 });
 

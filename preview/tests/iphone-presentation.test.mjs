@@ -1,7 +1,38 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import { composeIphoneScreenTexture, prepareIphonePresentation, displayMetrics, iphoneScreenStates } from '../src/iphone-presentation.mjs';
+import { applyIphoneColorway, composeIphoneScreenTexture, prepareIphonePresentation, displayMetrics, iphoneColorways, iphoneScreenStates } from '../src/iphone-presentation.mjs';
+
+test('official iPhone 17 colorways are exposed as material variants', () => {
+  assert.deepEqual(
+    Object.values(iphoneColorways).map(item => item.label),
+    ['Black', 'White', 'Mist Blue', 'Sage', 'Lavender'],
+  );
+});
+
+test('colorway changes tint without replacing PBR maps', () => {
+  const model = new THREE.Group();
+  const materials = {};
+  for (const name of ['MAT_ANODIZED_ALUMINUM', 'MAT_ALUMINUM_EDGE', 'MAT_CAMERA_HOUSING', 'MAT_BACK_GLASS']) {
+    const material = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: .3, metalness: name === 'MAT_BACK_GLASS' ? 0 : 1 });
+    material.name = name;
+    material.normalMap = new THREE.Texture();
+    material.roughnessMap = new THREE.Texture();
+    materials[name] = material;
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(1,1,1), material);
+    model.add(mesh);
+  }
+  const maps = Object.fromEntries(Object.entries(materials).map(([name, material]) => [name, [material.normalMap, material.roughnessMap]]));
+
+  applyIphoneColorway(model, 'mist_blue');
+
+  assert.equal(materials.MAT_ANODIZED_ALUMINUM.color.getHexString(), iphoneColorways.mist_blue.aluminum.slice(1).toLowerCase());
+  assert.equal(materials.MAT_BACK_GLASS.color.getHexString(), iphoneColorways.mist_blue.backGlass.slice(1).toLowerCase());
+  for (const [name, material] of Object.entries(materials)) {
+    assert.equal(material.normalMap, maps[name][0], name);
+    assert.equal(material.roughnessMap, maps[name][1], name);
+  }
+});
 
 test('active screen states keep the baseline Dynamic Island independent of raster artwork', () => {
   for (const state of ['screen_on', 'screen_lock', 'screen_website', 'screen_resume']) {

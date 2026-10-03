@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { availableLods, cameraDirection, previewMaterialPolicy, resolveAssetUrl, validateModelProvenance } from './viewer-core.mjs';
-import { composeIphoneScreenTexture, iphoneScreenStates, prepareIphonePresentation } from './iphone-presentation.mjs';
+import { applyIphoneColorway, composeIphoneScreenTexture, iphoneColorways, iphoneScreenStates, prepareIphonePresentation } from './iphone-presentation.mjs';
 
 const tagName = 'awful-model-viewer';
 
@@ -53,6 +53,7 @@ class AwfulModelViewer extends HTMLElement {
           <button data-action="fit">fit</button>
           <label><input data-control="autorotate" type="checkbox"> rotate</label>
           <label>screen <select data-control="screen-state"></select></label>
+          <label>finish <select data-control="colorway"></select></label>
           <label>clip <select data-control="animation-clip"></select></label>
           <label><input data-control="animation" type="checkbox"> animation</label>
           <label><input data-control="clip" type="checkbox"> section</label>
@@ -148,6 +149,20 @@ class AwfulModelViewer extends HTMLElement {
       screenState.value = states.includes('screen_on') ? 'screen_on' : states[0];
       screenState.addEventListener('change', () => this.#applyScreenState(screenState.value));
     }
+    const colorway = this.shadowRoot.querySelector('[data-control="colorway"]');
+    if (asset.id === 'iphone-17-v30') {
+      for (const [key, spec] of Object.entries(iphoneColorways)) colorway.append(new Option(spec.label, key));
+      colorway.value = iphoneColorways[this.initialColorway] ? this.initialColorway : 'black';
+      colorway.addEventListener('change', () => {
+        if (!this._model) return;
+        applyIphoneColorway(this._model, colorway.value);
+        this.dataset.colorway = colorway.value;
+      });
+    } else {
+      colorway.disabled = true;
+      colorway.append(new Option('n/a', ''));
+    }
+
     const animationClip = this.shadowRoot.querySelector('[data-control="animation-clip"]');
     animationClip.disabled = true;
     animationClip.append(new Option('n/a', ''));
@@ -264,6 +279,9 @@ class AwfulModelViewer extends HTMLElement {
     if (this._asset.id === 'iphone-17-v30') {
       this._iphonePresentation = prepareIphonePresentation(this._model);
       this._screenGlow = this._iphonePresentation.glow;
+      const colorway = this.shadowRoot.querySelector('[data-control="colorway"]')?.value || 'black';
+      applyIphoneColorway(this._model, colorway);
+      this.dataset.colorway = colorway;
       this._model.traverse(object => { if (object.isMesh) object.userData.previewOriginalMaterial = object.material; });
     } else this.#setupScreenGlow();
     const screenState = this.shadowRoot.querySelector('[data-control="screen-state"]');
@@ -545,8 +563,9 @@ const styles = `
 
 if (!customElements.get(tagName)) customElements.define(tagName, AwfulModelViewer);
 
-export function createModelViewer(asset) {
+export function createModelViewer(asset, { colorway = 'black' } = {}) {
   const element = document.createElement(tagName);
+  element.initialColorway = colorway;
   element.asset = asset;
   return element;
 }

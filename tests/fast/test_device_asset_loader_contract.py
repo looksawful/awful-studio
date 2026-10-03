@@ -80,6 +80,27 @@ class DeviceAssetLoaderContractTests(unittest.TestCase):
             self.assertEqual(item['screen_object'], 'SCREEN_CONTENT')
             self.assertEqual(item['screen_material'], 'MAT_SCREEN_CONTENT')
 
+    def test_iphone_colorways_are_first_class_asset_variants(self):
+        loader = load_module()
+        self.assertEqual(
+            loader.colorway_keys('DEVICE_IPHONE_17'),
+            ('black', 'white', 'mist_blue', 'sage', 'lavender'),
+        )
+        self.assertEqual(loader.device_asset_spec('DEVICE_IPHONE_17')['default_colorway'], 'black')
+        self.assertEqual(
+            [loader.colorway_spec('DEVICE_IPHONE_17', key)['label']
+             for key in loader.colorway_keys('DEVICE_IPHONE_17')],
+            ['Black', 'White', 'Mist Blue', 'Sage', 'Lavender'],
+        )
+        for key in loader.colorway_keys('DEVICE_IPHONE_17'):
+            spec = loader.colorway_spec('DEVICE_IPHONE_17', key)
+            for role in ('aluminum', 'edge', 'camera_housing', 'back_glass'):
+                self.assertRegex(spec[role], r'^#[0-9a-fA-F]{6}$')
+        with self.assertRaises(ValueError):
+            loader.colorway_keys('DEVICE_IPAD_PRO_11')
+        with self.assertRaises(ValueError):
+            loader.colorway_spec('DEVICE_IPHONE_17', 'imaginary')
+
     def test_macbook_hinge_presets_match_asset_contract(self):
         loader = load_module()
         self.assertEqual(loader.hinge_preset_keys('DEVICE_MACBOOK_PRO_14'),
@@ -143,8 +164,12 @@ class DeviceAssetLoaderContractTests(unittest.TestCase):
         self.assertIn("annotations['device_lod']", source)
         self.assertIn("annotations['device_orientation_preset']", source)
         self.assertIn("device_orientation_preset", source)
+        self.assertIn("annotations['device_colorway']", source)
+        self.assertIn("device_colorway", source)
+        self.assertIn("awful.apply_device_colorway", source)
         init_source = INIT_PATH.read_text(encoding='utf-8')
         self.assertIn("awful.apply_device_orientation", init_source)
+        self.assertIn("awful.apply_device_colorway", init_source)
 
 
 class BinaryAssetAttributesTests(unittest.TestCase):

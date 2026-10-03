@@ -559,3 +559,77 @@ Execution evidence:
 Source revision: `07a2a0befde9e6f7c3a209db1635a5dda1d375ea92342c4d81a38a1f8ed2368f`.
 Compat SHA-256: `2db54b01ca3ac2b043d1600963f6f49cb9647f76fe99194d0532e3565e1cf544`.
 Meshopt SHA-256: `a30f455fcd515ed5a7029e32bfe04316ae949d53889c007329ddf1412aa5a65f`.
+
+## 2026-10-02 post-ship Apple dimensional audit correction
+
+Authority: `docs/research/iphone-17-post-ship-dimensional-audit-2026-10-02.md` and Apple iPhone 17 Dimensional Drawings dated 2025-09-09.
+
+Scope remains the existing v30 line. No v31/v32 fork.
+
+TDD / implementation:
+- [100%] Rear camera depth RED: exported plateau 0.72 mm vs Apple 1.78 mm.
+- [100%] Rear camera depth GREEN: plateau 1.78 mm, camera glass 3.45 mm from back glass.
+- [100%] Bottom RED: exported sixth speaker port present.
+- [100%] Bottom GREEN: 3 mic + 5 speaker, Ø1.35, Apple spacing; screws Ø1.50 at Apple datums.
+- [100%] Side-control RED: Action 11.60 mm vs Apple 6.90 mm.
+- [100%] Side-control GREEN: Action 6.90, Volume ± 11.20, Side 17.70, Camera Control 17.10 mm; center datums preserved.
+- [100%] Rear-mic RED: X datum 22.675 mm from left vs Apple 20.54 mm.
+- [100%] Rear-mic GREEN: 20.54 × 22.48 mm center, Ø1.00.
+- [100%] Focused iPhone regression: 28/28.
+- [100%] Code review: no Spec blocker; two minor maintainability findings fixed (unused import; stale Camera Control helper defaults).
+
+Full verification:
+- [100%] Full fast: 204/204.
+- [100%] Blender 5.2.1 `--factory-startup` geometry: GREEN.
+- [100%] Khronos compat: 0 errors / 0 warnings.
+- [100%] Khronos Meshopt: 0 errors / 0 warnings.
+- [100%] Preview tests: 19/19.
+- [100%] Storybook production build: GREEN.
+- [100%] Browser smoke: 11/11 canonical assets.
+- [100%] Targeted `screen_website`: correct state, console errors [], failed responses [].
+- [100%] `git diff --check`: clean.
+- [0%] Owner Human Gate on corrected rear / bottom / left side / right side / front.
+- [0%] PR #119 update / commit / push / main landing remain HOLD until Human PASS.
+
+Manifest source revision: `6357d9fdeac268e8506b6e999a69eed1e957a476de8144b82d6e47d959a82347`.
+Compat SHA-256: `7a10c91495d016899bb84837a08d31a89baa8c3b2e071cc4831ec7462f702893`.
+Meshopt SHA-256: `664ac9f08a29be042575dcac6639d63502b5b6f9f2738a58981547b371cceff3`.
+
+
+## 2026-10-03 PBR realism and official finish variants
+
+Authority:
+- `docs/research/iphone-17-finish-pbr-reference-2026-10-03.md`
+- Apple iPhone 17 Technical Specifications / official product viewer.
+
+Scope remains the same canonical v30 geometry. Finish variants do not duplicate GLB assets.
+
+PBR / fasteners:
+- [100%] RED exported-GLB contract: `MAT_FASTENER` had no normal texture.
+- [100%] GREEN exported-GLB contract: fastener, anodized aluminum, edge/camera housing and back glass carry embedded normal + roughness maps.
+- [100%] Bottom screw heads remain Apple Ø1.50 geometry; pentalobe socket is tangent-space normal + roughness detail.
+- [100%] Acoustic opening silhouette remains geometry; grille weave remains normal-map microdetail.
+- [100%] Required visible PBR meshes export `TEXCOORD_0`; runtime exporter triangulates normal-mapped runtime copies for stable tangent generation without changing authored source geometry.
+
+Finish variants:
+- [100%] Official Apple finish names: Black, White, Mist Blue, Sage, Lavender.
+- [100%] Display tints calibrated from official Apple product-viewer renders; Apple does not publish canonical material RGB values.
+- [100%] One GLB, one geometry, shared PBR maps; finish changes base material colors only.
+- [100%] Storybook viewer exposes a finish selector.
+- [100%] Storybook exposes generic + five first-class iPhone 17 finish stories.
+- [100%] Blender extension exposes Finish + Set Finish and preserves the same five variants.
+- [100%] Preview unit/contracts after variant UI: 21/21.
+
+Final gate:
+- [100%] Final canonical rebuild after PBR/provenance metadata. Source revision: `9ce24d6e6e292cd734d9e8be2993a2a37c1e9e24848e32ec27fe0f39752c5a65`.
+- [100%] Full fast exact current WIP: 207/207.
+- [100%] Blender 5.2.1 `--factory-startup` geometry: GREEN.
+- [100%] Khronos compat: 0 errors / 0 warnings; SHA-256 `da2a08021a5e02f2af8d9131ed8617cb03d0979346e12893008011a875fa703f`.
+- [100%] Khronos Meshopt: 0 errors / 0 warnings; SHA-256 `02f55142da9a718cc69814c9f2343277d2d9847e9d453f4fad665add768c0a6c`.
+- [100%] Preview unit/contracts: 21/21; Storybook production build GREEN.
+- [100%] Canonical Storybook smoke: all 11 canonical assets passed.
+- [100%] Browser finish sweep: Black / White / Mist Blue / Sage / Lavender all load from the same GLB, preserve required PBR maps, correct runtime colorway state, console errors [], failed responses [].
+- [100%] Combined Mist Blue + `screen_website` + Dynamic Island compositor gate: GREEN, console errors [], failed responses [].
+- [100%] `git diff --check 394951d`: clean; CRLF notices informational only.
+- [0%] Owner Human Gate: bottom pentalobe fasteners, back/camera materials, all five finishes.
+- [0%] PR #119 remains HOLD/draft until Human PASS.
