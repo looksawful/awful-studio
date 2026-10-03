@@ -1,6 +1,7 @@
 import unittest
 
-from tools.build_macbook_g2_surface_overlays import pair_points_by_metric_cost
+from assets.device_mockups.macbook_pro_14.port_layout import PORTS
+from tools.build_macbook_g2_surface_overlays import D, pair_points_by_metric_cost, side_x_mapper
 
 
 class MacBookG2OverlayPairingTests(unittest.TestCase):
@@ -27,6 +28,22 @@ class MacBookG2OverlayPairingTests(unittest.TestCase):
         sy = 221.2 / 562.0
         _, residuals = pair_points_by_metric_cost(actual, targets, sx, sy)
         self.assertGreater(max(residuals), 20.0)
+
+    def test_side_mapper_roundtrips_apple_reference_pixels(self):
+        for side in (-1, 1):
+            specs = [port for port in PORTS if port.side == side]
+            mapper = side_x_mapper(side)
+
+            for spec in specs:
+                with self.subTest(side=side, port=spec.name):
+                    self.assertAlmostEqual(mapper(spec.y_mm), spec.center_pixel, delta=0.51)
+
+            self.assertAlmostEqual(
+                mapper(D / 2),
+                specs[0].rear_pixel,
+                delta=0.51,
+                msg=f"side {side} rear chassis datum must stay in Apple source-image pixels",
+            )
 
 
 if __name__ == "__main__":
