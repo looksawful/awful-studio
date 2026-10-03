@@ -1,7 +1,7 @@
 {
   "asset_id": "iphone_17",
   "stage": "LOW_DRAFT",
-  "revision": "production_camera_controls_v30",
+  "revision": "production_topology_v30",
   "blender_version": "5.2.1 LTS",
   "expected_mm": {
     "width": 71.45,
@@ -19,8 +19,8 @@
     "height": -2e-06
   },
   "body_non_manifold_edges": 0,
-  "body_vertices": 4056,
-  "body_faces": 2830,
+  "body_vertices": 2832,
+  "body_faces": 2822,
   "boolean_cuts": [
     "DISPLAY_POCKET",
     "SCREEN_ACTIVE",
@@ -44,8 +44,8 @@
   "boolean_cut_count": 18,
   "mandatory_missing": [],
   "forbidden_front_nodes": [],
-  "object_count": 71,
-  "material_count": 24,
+  "object_count": 72,
+  "material_count": 28,
   "official_reference": "Apple iPhone 17 Dimensional Drawings 2025-09-09",
   "cover_glass_mm": [
     69.45,
