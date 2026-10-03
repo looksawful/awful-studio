@@ -175,3 +175,18 @@ Long Codex work was stopped to preserve quota. All useful work is being committe
 - Fresh `git diff --check`: PASS.
 - Tracked evidence: `reports/iphone_bottom_topology_final.json`.
 - Source commit: `5049963`. Decision: retain repair. Slice 4 closed. Next: Slice 5 back glass / display / front hardware.
+
+
+## Slice 5 final verification — back/front surfaces — GREEN
+- Cleaned authored topology for BACK_GLASS, SCREEN_CONTENT, FRONT_SENSOR_MASK, FRONT_CAMERA_MASK and FRONT_CAMERA_GLASS.
+- All five are now 0 n-gons / 0 non-manifold edges.
+- Locations, bounding boxes and unique vertex-position sets are unchanged from the pre-slice generated source.
+- Fixed-condition preview deltas remain small (0–255 RGB RMS): front 0.257237; back 0.132498; three-quarter 0.245883; screen-edge macro 0.779045; front-sensor macro 1.0445; back three-quarter 0.087287.
+- SCREEN_CONTENT authored n-gons are triangulated after its two physical hardware cutouts; display raster UV mapping remains unchanged.
+- Blender may emit tangents on primitives whose materials have no normal texture. The runtime exporter now strips only those semantically-unused TANGENT attributes. Prototype validation proved this removes Khronos zero-length-tangent errors without changing POSITION/NORMAL/TEXCOORD/material data.
+- Exact delivery: compat 5,330,136 bytes; meshopt 4,151,984 bytes (ratio 0.779).
+- Khronos glTF Validator 2.0.0-dev.3.10: compat 0 errors / 0 warnings; meshopt 0 errors / 0 warnings.
+- Full fast suite: 212/212 PASS.
+- Tracked report: reports/iphone_surface_topology_final.json.
+- Slice 5 closed. Next: Slice 6 residual round/detail meshes and final runtime topology sweep.
+

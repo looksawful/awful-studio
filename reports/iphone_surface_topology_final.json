@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-03",
+  "slice": "back_front_surfaces",
+  "source_commit": "56449d7",
+  "delivery_contract_commit": "f45b231",
+  "objects": {
+    "BACK_GLASS": {"verts": 392, "faces": 390, "ngons": 0, "nonmanifold_edges": 0, "runtime_triangle_limit": 780},
+    "SCREEN_CONTENT": {"verts": 1164, "faces": 1750, "ngons": 0, "nonmanifold_edges": 0, "runtime_triangle_limit": 2332},
+    "FRONT_SENSOR_MASK": {"verts": 516, "faces": 514, "ngons": 0, "nonmanifold_edges": 0, "runtime_triangle_limit": 1036},
+    "FRONT_CAMERA_MASK": {"verts": 256, "faces": 256, "ngons": 0, "nonmanifold_edges": 0, "runtime_triangle_limit": 508},
+    "FRONT_CAMERA_GLASS": {"verts": 256, "faces": 256, "ngons": 0, "nonmanifold_edges": 0, "runtime_triangle_limit": 508}
+  },
+  "geometry_equivalence": {
+    "locations_unchanged": true,
+    "bounding_boxes_unchanged": true,
+    "unique_position_sets_unchanged": true
+  },
+  "visual_rms_0_255": {
+    "front": 0.257237,
+    "back": 0.132498,
+    "three_quarter": 0.245883,
+    "screen_edge_macro": 0.779045,
+    "front_sensor_macro": 1.0445,
+    "back_three_quarter": 0.087287
+  },
+  "delivery": {
+    "compat_bytes": 5330136,
+    "meshopt_bytes": 4151984,
+    "meshopt_ratio": 0.779,
+    "unused_tangent_attributes_removed": 12,
+    "khronos_compat": {"errors": 0, "warnings": 0},
+    "khronos_meshopt": {"errors": 0, "warnings": 0}
+  },
+  "full_fast": {"passed": 212, "failed": 0},
+  "git_diff_check": "pass",
+  "decision": "green"
+}
