@@ -40,6 +40,89 @@ def smooth_sharp_boundaries(obj):
     obj.data.set_sharp_from_angle(angle=math.radians(30.0))
 
 
+
+def strip_symmetric_caps(obj, normal_axis, row_axis, pair_axis, *, allow_poles):
+    """Replace regular symmetric n-gon caps with interior strip edges only."""
+    mesh = bmesh.new()
+    mesh.from_mesh(obj.data)
+    bmesh.ops.remove_doubles(mesh, verts=list(mesh.verts), dist=1e-12)
+    patch = mesh.faces.layers.int.new("symmetric_cap_patch")
+    caps = [
+        face for face in mesh.faces
+        if len(face.verts) > 4 and abs(face.normal[normal_axis]) > 0.9
+    ]
+    if len(caps) != 2:
+        mesh.free()
+        raise RuntimeError(f"{obj.name} expected exactly two symmetric n-gon caps")
+
+    for patch_id, cap in enumerate(caps, 1):
+        cap[patch] = patch_id
+        rows = {}
+        for vertex in cap.verts:
+            rows.setdefault(round(vertex.co[row_axis], 12), []).append(vertex)
+        for row in rows.values():
+            if allow_poles and len(row) == 1:
+                continue
+            if len(row) != 2:
+                mesh.free()
+                raise RuntimeError(f"{obj.name} cap row is not a pole or paired contour")
+            pair = sorted(row, key=lambda vertex: vertex.co[pair_axis])
+            if any(pair[1] in edge.verts for edge in pair[0].link_edges):
+                continue
+            shared = [
+                face for face in pair[0].link_faces
+                if face[patch] == patch_id and pair[1] in face.verts
+            ]
+            if not shared:
+                mesh.free()
+                raise RuntimeError(f"{obj.name} has no shared cap patch for a contour pair")
+            bmesh.ops.connect_verts(
+                mesh,
+                verts=pair,
+                faces_exclude=[face for face in mesh.faces if face not in shared],
+                check_degenerate=True,
+            )
+        if any(face[patch] == patch_id and len(face.verts) > 4 for face in mesh.faces):
+            mesh.free()
+            raise RuntimeError(f"{obj.name} symmetric cap cleanup left an n-gon")
+
+    mesh.faces.layers.int.remove(patch)
+    mesh.normal_update()
+    if any(not edge.is_manifold for edge in mesh.edges):
+        mesh.free()
+        raise RuntimeError(f"{obj.name} symmetric cap cleanup broke manifold shell")
+    mesh.to_mesh(obj.data)
+    mesh.free()
+    obj.data.update()
+
+
+def strip_y_caps(obj):
+    strip_symmetric_caps(obj, 1, 2, 0, allow_poles=False)
+
+
+def strip_round_caps(obj):
+    strip_symmetric_caps(obj, 2, 1, 0, allow_poles=True)
+
+
+def triangulate_authored_ngons(obj):
+    """Triangulate only existing authored n-gon patches without adding vertices."""
+    mesh = bmesh.new()
+    mesh.from_mesh(obj.data)
+    patches = [face for face in mesh.faces if len(face.verts) > 4]
+    if patches:
+        bmesh.ops.triangulate(mesh, faces=patches, quad_method="BEAUTY", ngon_method="BEAUTY")
+    mesh.normal_update()
+    if any(len(face.verts) > 4 for face in mesh.faces):
+        mesh.free()
+        raise RuntimeError(f"{obj.name} authored n-gon triangulation was incomplete")
+    if any(not edge.is_manifold for edge in mesh.edges):
+        mesh.free()
+        raise RuntimeError(f"{obj.name} authored n-gon triangulation broke manifold shell")
+    mesh.to_mesh(obj.data)
+    mesh.free()
+    obj.data.update()
+
+
 def patch_body_rail_caps(obj):
     """Connect existing boundary rows into cap/rail strips after physical cuts.
 
@@ -556,6 +639,7 @@ back_seat.hide_render = True
 back_glass = outward_prism("BACK_GLASS", COVER_W, COVER_H, GLASS_T, COVER_R,
                               back_mat, body_c, axis="Y", location=(0, back_y, 0),
                               edge_bevel=0.0, outline_segments=48)
+strip_y_caps(back_glass)
 
 front_seat = outward_prism("DISPLAY_GLASS_SEAT", COVER_W + 0.10*MM, COVER_H + 0.10*MM, 0.07*MM,
                               COVER_R + 0.05*MM, gap_mat, screen_c, axis="Y",
@@ -593,6 +677,7 @@ camera_screen_cut = fc.cylinder("FRONT_CAMERA_SCREEN_CUTTER", 1.14*MM,
                                 (cam_x, front_y + 0.010*MM, front_hardware_z),
                                 axis="Y", vertices=128)
 fc.boolean_difference(screen_content, camera_screen_cut, name="CUT_FRONT_CAMERA_SCREEN")
+triangulate_authored_ngons(screen_content)
 
 # Planar UVs map the real raster screen image to the active display surface.
 # Boolean cutters can leave empty material slots behind; normalize the screen to exactly
@@ -641,13 +726,16 @@ sbsdf.inputs["Coat Roughness"].default_value = 0.035
 screen_front_y = (front_y + 0.010*MM) - (GLASS_T - 0.025*MM) * 0.5
 front_hardware_y = screen_front_y + 0.034*MM
 front_optics_y = front_hardware_y + 0.040*MM
-outward_prism("FRONT_SENSOR_MASK", 7.10*MM, 2.30*MM, 0.008*MM, 1.15*MM,
+front_sensor_mask = outward_prism("FRONT_SENSOR_MASK", 7.10*MM, 2.30*MM, 0.008*MM, 1.15*MM,
               under_glass_mat, detail_c, axis="Y",
               location=(-4.15*MM, front_hardware_y, front_hardware_z), outline_segments=64)
-fc.cylinder("FRONT_CAMERA_MASK", 1.15*MM, 0.008*MM, under_glass_mat, detail_c,
+strip_y_caps(front_sensor_mask)
+front_camera_mask = fc.cylinder("FRONT_CAMERA_MASK", 1.15*MM, 0.008*MM, under_glass_mat, detail_c,
             (cam_x, front_hardware_y, front_hardware_z), axis="Y", vertices=128)
-fc.cylinder("FRONT_CAMERA_GLASS", 0.84*MM, 0.006*MM, front_optic, detail_c,
+strip_round_caps(front_camera_mask)
+front_camera_glass = fc.cylinder("FRONT_CAMERA_GLASS", 0.84*MM, 0.006*MM, front_optic, detail_c,
             (cam_x, front_optics_y, front_hardware_z), axis="Y", vertices=128)
+strip_round_caps(front_camera_glass)
 fc.cylinder("FRONT_CAMERA_INNER", 0.52*MM, 0.005*MM, black, detail_c,
             (cam_x, front_hardware_y + 0.055*MM, front_hardware_z), axis="Y", vertices=96)
 fc.cylinder("FRONT_CAMERA_IRIS", 0.28*MM, 0.004*MM, front_optic, detail_c,
@@ -816,56 +904,6 @@ usb_cavity = fc.rounded_cube("USB_C_CAVITY", (8.45*MM, 2.38*MM, 0.12*MM), 0.04*M
 fc.place_on_rounded_edge(usb_cavity, W, H, BODY_R, "BOTTOM", 0.0, outward=-1.40*MM, local_normal=(0,0,1))
 usb_tongue = fc.rounded_cube("USB_C_TONGUE", (5.25*MM, 0.48*MM, 0.18*MM), 0.08*MM, metal_dark, detail_c)
 fc.place_on_rounded_edge(usb_tongue, W, H, BODY_R, "BOTTOM", 0.0, outward=-0.80*MM, local_normal=(0,0,1))
-
-def strip_round_caps(obj):
-    """Split circular planar caps into cross-width strips without new vertices."""
-    mesh = bmesh.new()
-    mesh.from_mesh(obj.data)
-    patch = mesh.faces.layers.int.new("round_cap_patch")
-    caps = [face for face in mesh.faces if len(face.verts) > 4 and abs(face.normal.z) > 0.9]
-    if len(caps) != 2:
-        mesh.free()
-        raise RuntimeError(f"{obj.name} expected exactly two circular n-gon caps")
-
-    for patch_id, cap in enumerate(caps, 1):
-        cap[patch] = patch_id
-        rows = {}
-        for vertex in cap.verts:
-            rows.setdefault(round(vertex.co.y, 12), []).append(vertex)
-        for _, row in sorted(rows.items(), reverse=True):
-            if len(row) == 1:
-                continue
-            if len(row) != 2:
-                mesh.free()
-                raise RuntimeError(f"{obj.name} circular cap row is not a pole or pair")
-            pair = sorted(row, key=lambda vertex: vertex.co.x)
-            if any(pair[1] in edge.verts for edge in pair[0].link_edges):
-                continue
-            shared = [
-                face for face in pair[0].link_faces
-                if face[patch] == patch_id and pair[1] in face.verts and len(face.verts) > 4
-            ]
-            if not shared:
-                continue
-            bmesh.ops.connect_verts(
-                mesh,
-                verts=pair,
-                faces_exclude=[face for face in mesh.faces if face not in shared],
-                check_degenerate=True,
-            )
-        if any(face[patch] == patch_id and len(face.verts) > 4 for face in mesh.faces):
-            mesh.free()
-            raise RuntimeError(f"{obj.name} circular cap strip patch left an n-gon")
-
-    mesh.faces.layers.int.remove(patch)
-    mesh.normal_update()
-    if any(not edge.is_manifold for edge in mesh.edges):
-        mesh.free()
-        raise RuntimeError(f"{obj.name} circular cap patch broke manifold shell")
-    mesh.to_mesh(obj.data)
-    mesh.free()
-    obj.data.update()
-
 
 def bottom_aperture(name, x_mm):
     cutter = fc.cylinder(f"{name}_CUTTER", 0.675*MM, 1.80*MM, None, detail_c, vertices=40)
