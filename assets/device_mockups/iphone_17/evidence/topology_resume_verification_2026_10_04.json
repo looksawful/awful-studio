@@ -1,0 +1,15 @@
+{
+  "blender": "5.2.1 LTS",
+  "candidate": "F:\\Temp\\iphone17-v30-topology-rebuild\\assets\\device_mockups\\iphone_17\\generated\\iphone_17_low_v30.blend",
+  "contracts": {
+    "body_topology": "PASS",
+    "body_visible_material": "PASS",
+    "body_cell_shape": "PASS",
+    "topology": "PASS",
+    "screen_topology": "PASS",
+    "controls_topology": "PASS",
+    "bottom_topology": "PASS",
+    "surface_topology": "PASS",
+    "rear_optics_topology": "PASS"
+  }
+}

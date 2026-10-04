@@ -1,0 +1,25 @@
+{
+  "khronos": {
+    "iphone_17_v30_web.glb": {
+      "validator_version": "2.0.0-dev.3.10",
+      "errors": 0,
+      "warnings": 0,
+      "infos": 49,
+      "hints": 0,
+      "pass": true,
+      "file": "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb",
+      "sha256": "68bcd22831e427a077ddfd48662e41bbe8ef46ebda0359c7153b9e3579afeae0"
+    },
+    "iphone_17_v30_web_meshopt.glb": {
+      "validator_version": "2.0.0-dev.3.10",
+      "errors": 0,
+      "warnings": 0,
+      "infos": 50,
+      "hints": 0,
+      "pass": true,
+      "file": "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web_meshopt.glb",
+      "sha256": "01f74d55b97103846123fd4125fa66f32dfc57a6d1b9c84eb6a490ddde33305f"
+    }
+  },
+  "delivery_errors": []
+}

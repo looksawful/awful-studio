@@ -1,0 +1,64 @@
+{
+  "contour_red_green_loss_m": {
+    "missing_authored_angles": 0.0021496046148076374,
+    "current": 1.6518036938251157e-14
+  },
+  "bake_ab_rgb_rms": {
+    "0.15": {
+      "left": {
+        "rgb_rms_0_255": 0.11662332528272379,
+        "bake_sha256": "fa7e748934dd9463c344b818dbaf49c28e0b84160e1aa1231fe87a2df16e6745"
+      },
+      "right": {
+        "rgb_rms_0_255": 0.18484768504546292,
+        "bake_sha256": "11c715aa70be3214867f08e8e2dc3699d1eb86318da34796fbe60f1f89b827c7"
+      },
+      "bottom": {
+        "rgb_rms_0_255": 8.508415030623114,
+        "bake_sha256": "f2591c83516e598ee12db864574f6f50abbcbb9e08d9deb85a8acd0382b44705"
+      },
+      "threeq": {
+        "rgb_rms_0_255": 3.280736909090192,
+        "bake_sha256": "6efdfe0fc93d4f02fa52dc00dc97213c287e65e7380067c9e3b414a9e45a30e2"
+      }
+    },
+    "0.25": {
+      "left": {
+        "rgb_rms_0_255": 0.11662332528272379,
+        "bake_sha256": "2c03ac0a6e19032c8c2294c735f2e7ac41801aaf6aca2c987b7b07f0ed7a7d05"
+      },
+      "right": {
+        "rgb_rms_0_255": 0.18484768504546292,
+        "bake_sha256": "adfddb8ef58c52b0c1e302d11044ff0f720e4711337b43a9338f66833ab848b1"
+      },
+      "bottom": {
+        "rgb_rms_0_255": 8.508415030623114,
+        "bake_sha256": "e374c5c25c417ba593187aff8cfe792cac6713c1c475b446f33f28d2ed4c21ee"
+      },
+      "threeq": {
+        "rgb_rms_0_255": 3.280736909090192,
+        "bake_sha256": "dbf2055d6d7ab6cee9fca3402903badae0199e3dce9998db056d6788f8ca1aee"
+      }
+    },
+    "0.35": {
+      "left": {
+        "rgb_rms_0_255": 0.11662332528272379,
+        "bake_sha256": "803e208982157b37b4326e50551c7dd2bfd5320f9042b1451b6322e1ab2ef540"
+      },
+      "right": {
+        "rgb_rms_0_255": 0.18484768504546292,
+        "bake_sha256": "374f149b4c0d9d215bab42dd76dc163675e0bc221db3cc154213d77ea92a388b"
+      },
+      "bottom": {
+        "rgb_rms_0_255": 8.508415030623114,
+        "bake_sha256": "99ea8178a992b3df2b507682746d6d03ad59fe771006708e2d31815b365e3752"
+      },
+      "threeq": {
+        "rgb_rms_0_255": 3.280736909090192,
+        "bake_sha256": "dd27f6bf296b880ac5bc534a20b8f51c3a6e5f63c430dd6f777c4f77c31af41c"
+      }
+    }
+  },
+  "bake_scope": "Existing metal-only prototype experiment; not a fresh bake of the final candidate. Nonmanifold bake targets are isolated from production.",
+  "decision": "Reject macro-normal: side gain is unproven, map has a magenta artifact, bottom/three-quarter differences require qualification; retain accepted production micro-normal."
+}

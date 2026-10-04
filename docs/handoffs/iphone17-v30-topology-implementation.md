@@ -129,6 +129,50 @@ Do not use the untracked `assets/device_mockups/iphone_17/prototypes/` directory
 
 ## Next work
 
+### Resume verification on 2026-10-04
+
+The requested rebuild had already reached `ad0d8b2` before this continuation.
+This session retained the exact delivery rather than regenerating unchanged binaries.
+Fresh checks: Blender 5.2.1 (9e2066aef7ef), nine topology/material contracts
+plus `iphone_v30_geometry_contract.py` PASS; full fast suite 209/209 PASS;
+compat and meshopt Khronos 2.0.0-dev.3.10 both 0 errors/0 warnings;
+manifest hashes, GLB provenance and structural round-trip checks PASS.
+These round-trip checks are structural; they are not a browser visual test.
+
+Added pure fast regression `test_iphone_body_cell_contour.py`, exercising
+8/12/16 capsule arc samples. Removing authored hole angle insertion in an
+isolated function copy reproduces RED (2.1496046 mm contour loss); current
+function is GREEN (about 1.65e-14 m loss). Production geometry is unchanged.
+
+Durable evidence in `assets/device_mockups/iphone_17/evidence/`:
+- `topology_resume_verification_2026_10_04.json` (nine contracts).
+- `topology_resume_delivery_2026_10_04.json` (exact GLB hashes and Khronos).
+- `body_bake_ab_2026_10_04/` (prototype A/B images, rejected map, measured deltas).
+- `topology_resume_clay_wire/` (fresh left/right/bottom diagnostic renders).
+
+Bake qualification: existing metal-only prototype renders were remeasured,
+not rebaked on the final candidate. Side RMS on 0-255 RGB is 0.1166 left /
+0.1848 right; bottom 8.5084 and three-quarter 3.2807. Thus the earlier
+"no material visual gain" statement must not be read as zero delta everywhere.
+The retained map is mostly flat but has a conspicuous magenta artifact.
+No evidence justifies promoting that macro-normal to production. Keep the
+accepted micro-normal/roughness and clean geometry. Experimental target
+nonmanifold counts do not describe the production body.
+
+Review: focused contour test/evidence diff has no blocking Standards finding;
+it tests observable vertex preservation and changes no runtime behavior.
+Spec/#118: body remains 2,832 verts / 2,822 faces / 5,644 tris, clean topology,
+no runtime modifiers. Latest material side previews show rounded recesses.
+The dark bottom material preview and orthographic diagnostic sheets are
+insufficient to approve whole-device appearance. Human Gate remains pending.
+No fresh browser interaction or five-finish visual gate was executed in this
+continuation. Do not claim release/ship approval. PR #119 remains draft/HOLD.
+
+Resume from this Git branch and issue #118. Inspect the whole-device candidate
+in material/clay/wire and record the owner's decision; fix any exact reported
+defect before final acceptance. ArtifactBridge room instrumentation was
+unavailable (`agent_connector_required`); Git/issue remain the handoff source.
+
 Technical implementation is at release-candidate quality. The remaining owner-facing gate is a whole-device Human Gate using render / clay / wire views from the latest generated model.
 
 If that Human Gate passes:
