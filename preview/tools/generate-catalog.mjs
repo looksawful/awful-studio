@@ -6,11 +6,11 @@ const previewRoot = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
 const repoRoot = path.resolve(previewRoot, '..');
 const output = path.join(previewRoot, 'generated', 'asset-catalog.json');
 
-const canonicalDevices = [
-  'assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30.asset.json',
-  'assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6.asset.json',
-  'assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6.asset.json',
-  'assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1.asset.json',
+const reviewDevices = [
+  'preview/generated/iphone-review/frozen-current-2026-10-05/asset.json',
+  'preview/generated/device-review/current-2026-10-05/ipad_pro_11_m5_v6/asset.json',
+  'preview/generated/device-review/current-2026-10-05/ipad_pro_13_m5_v6/asset.json',
+  'preview/generated/device-review/current-2026-10-05/macbook_pro_14_m5_v1/asset.json',
 ];
 
 const sceneConfigs = [
@@ -20,39 +20,6 @@ const sceneConfigs = [
 ];
 
 const readJson = (relative) => JSON.parse(fs.readFileSync(path.join(repoRoot, relative), 'utf8'));
-const posix = (value) => value.replaceAll('\\', '/');
-const labelFromDevice = (assetId) => ({
-  iphone_17: 'iPhone 17',
-  ipad_pro_11_m5: 'iPad Pro 11 M5',
-  ipad_pro_13_m5: 'iPad Pro 13 M5',
-  macbook_pro_14_m5: 'MacBook Pro 14 M5',
-}[assetId] ?? assetId);
-
-function deviceEntry(manifestPath) {
-  const data = readJson(manifestPath);
-  const manifestDir = path.posix.dirname(posix(manifestPath));
-  const baseDir = manifestDir.replace(/\/runtime\/v[^/]+$/, '');
-  const compat = data.artifacts?.compat_glb?.path ?? path.posix.join(baseDir, data.glb);
-  return {
-    id: `${data.asset_id.replaceAll('_', '-')}-${data.version}`,
-    label: labelFromDevice(data.asset_id),
-    group: 'Devices',
-    version: data.version,
-    stage: data.stage,
-    root: data.root,
-    sourceBlend: data.artifacts?.generated_blend?.path ?? data.source_blend,
-    previewGlb: posix(compat),
-    lods: (data.lods ?? []).map((lod) => ({ name: lod.name, path: posix(path.posix.join(manifestDir, lod.file)) })),
-    collision: null,
-    sourceRevision: data.source_revision ?? null,
-    sourceCommit: data.source_commit ?? null,
-    triangleCount: data.glb_qa?.triangle_count ?? null,
-    materialCount: data.glb_qa?.material_count ?? null,
-    animations: data.animations ?? [],
-    screenStates: data.screen_states ?? null,
-    screenGlow: data.screen_glow ?? null,
-  };
-}
 const studioLabels = {
   studio_support_cstand_01: 'C-Stand',
   profoto_d1_500_air: 'Profoto D1 500 Air',
@@ -96,7 +63,7 @@ function sceneEntry([id, label, metadataPath, sourceBlend]) {
   };
 }
 const assets = [
-  ...canonicalDevices.map(deviceEntry),
+  ...reviewDevices.map(readJson),
   ...studioEntries(),
   ...sceneConfigs.map(sceneEntry),
 ];
@@ -110,7 +77,7 @@ for (const asset of assets) {
 
 const catalog = {
   schemaVersion: 1,
-  generatedFrom: 'canonical repository manifests',
+  generatedFrom: 'pinned device review snapshots; canonical studio and scene manifests',
   assets,
 };
 const serialized = `${JSON.stringify(catalog, null, 2)}\n`;

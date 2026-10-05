@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
-import { availableLods, cameraDirection, previewMaterialPolicy, resolveAssetUrl, validateModelProvenance } from './viewer-core.mjs';
+import { availableLods, cameraDirection, previewMaterialPolicy, resolveAssetUrl, validateModelProvenance, verifySnapshotBytes } from './viewer-core.mjs';
 import { applyIphoneColorway, composeIphoneScreenTexture, iphoneColorways, iphoneScreenStates, prepareIphonePresentation } from './iphone-presentation.mjs';
 
 const tagName = 'awful-model-viewer';
@@ -47,7 +47,8 @@ class AwfulModelViewer extends HTMLElement {
       <section class="shell">
         <div class="toolbar">
           <label>LOD <select data-control="lod"></select></label>
-          <label>mode <select data-control="mode"><option>texture</option><option>wireframe</option><option>clay</option><option>normals</option></select></label>
+          <label>mode <select data-control="mode"><option value="texture">render</option><option>wireframe</option><option>clay</option><option>normals</option></select></label>
+          <label>part <select data-control="part" disabled><option value="all">Whole assembly</option></select></label>
           <label>projection <select data-control="projection"><option value="perspective">perspective</option><option value="orthographic">orthographic</option></select></label>
           <button data-camera="front">front</button><button data-camera="side">side</button><button data-camera="top">top</button>
           <button data-action="fit">fit</button>
@@ -68,7 +69,10 @@ class AwfulModelViewer extends HTMLElement {
 
     this.#initThree(asset);
     this.#bindControls(asset);
-    this.#loadModel(availableLods(asset)[0].path);
+    this.#loadModel(availableLods(asset)[0].path).catch(error => {
+      this.dataset.modelError = error.message;
+      this.shadowRoot.querySelector('[data-meta]').textContent += `\nLOAD FAILED: ${error.message}`;
+    });
   }
   #initThree(asset) {
     const stage = this.shadowRoot.querySelector('[data-stage]');
@@ -76,8 +80,9 @@ class AwfulModelViewer extends HTMLElement {
     const height = Math.max(stage.clientHeight, 480);
 
     this._scene = new THREE.Scene();
-    this._scene.background = new THREE.Color('#111111');
-    this._perspective = new THREE.PerspectiveCamera(35, width / height, 0.001, 1000);
+    const presentation = asset.reviewPresentation ?? {};
+    this._scene.background = new THREE.Color(presentation.background ?? '#111111');
+    this._perspective = new THREE.PerspectiveCamera(presentation.perspectiveFov ?? 35, width / height, 0.001, 1000);
     this._ortho = new THREE.OrthographicCamera(-2, 2, 2, -2, 0.001, 1000);
     this._camera = this._perspective;
 
@@ -86,17 +91,17 @@ class AwfulModelViewer extends HTMLElement {
     this._renderer.setSize(width, height, false);
     this._renderer.outputColorSpace = THREE.SRGBColorSpace;
     this._renderer.toneMapping = THREE.NeutralToneMapping;
-    this._renderer.toneMappingExposure = 0.7;
+    this._renderer.toneMappingExposure = presentation.exposure ?? 0.7;
     this._renderer.localClippingEnabled = true;
     stage.append(this._renderer.domElement);
 
     const pmrem = new THREE.PMREMGenerator(this._renderer);
     this._environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
     this._scene.environment = this._environment;
-    this._scene.environmentIntensity = 1.0;
+    this._scene.environmentIntensity = presentation.environmentIntensity ?? 1.0;
     pmrem.dispose();
 
-    this._viewLight = new THREE.DirectionalLight(0xffffff, 0.65);
+    this._viewLight = new THREE.DirectionalLight(0xffffff, presentation.viewLightIntensity ?? 0.65);
     this._scene.add(this._viewLight);
     this._scene.add(this._viewLight.target);
 
@@ -121,6 +126,10 @@ class AwfulModelViewer extends HTMLElement {
     if (asset.triangleCount != null) lines.push(`triangles: ${asset.triangleCount}`);
     if (asset.materialCount != null) lines.push(`materials: ${asset.materialCount}`);
     if (asset.sourceCommit) lines.push(`source commit: ${asset.sourceCommit}`);
+    if (asset.sourceRevision) lines.push(`source revision: ${asset.sourceRevision}`);
+    if (asset.reviewOnly) lines.push(`${asset.reviewStatus ?? (asset.frozenReview ? 'FROZEN LOOK — TOPOLOGY NOT ACCEPTED' : 'ARCHIVED REVIEW REFERENCE')} — snapshot: ${asset.snapshotCommit}`, `GLB SHA-256: ${asset.sha256}`);
+    if (asset.snapshotBranch) lines.push(`snapshot branch: ${asset.snapshotBranch}${asset.snapshotSourceDirty ? ' (includes uncommitted source/runtime)' : ''}`);
+    if (asset.evidenceArchive) lines.push(`frozen source / render evidence: ${asset.evidenceArchive}`);
     return lines.join('\n');
   }
   #bindControls(asset) {
@@ -134,7 +143,7 @@ class AwfulModelViewer extends HTMLElement {
     lod.addEventListener('change', () => this.#loadModel(lod.value));
 
     const screenState = this.shadowRoot.querySelector('[data-control="screen-state"]');
-    this._screenStates = asset.id === 'iphone-17-v30' ? iphoneScreenStates : (asset.screenStates ?? {});
+    this._screenStates = asset.reviewScreenStates ?? (asset.id === 'iphone-17-v30' ? iphoneScreenStates : (asset.screenStates ?? {}));
     const states = Object.keys(this._screenStates);
     for (const state of states) {
       const option = document.createElement('option');
@@ -146,16 +155,17 @@ class AwfulModelViewer extends HTMLElement {
       screenState.disabled = true;
       screenState.append(new Option('n/a', ''));
     } else {
-      screenState.value = states.includes('screen_on') ? 'screen_on' : states[0];
+      screenState.value = states.includes(this.initialScreenState) ? this.initialScreenState : (states.includes('screen_on') ? 'screen_on' : states[0]);
       screenState.addEventListener('change', () => this.#applyScreenState(screenState.value));
     }
     const colorway = this.shadowRoot.querySelector('[data-control="colorway"]');
     if (asset.id === 'iphone-17-v30') {
-      for (const [key, spec] of Object.entries(iphoneColorways)) colorway.append(new Option(spec.label, key));
-      colorway.value = iphoneColorways[this.initialColorway] ? this.initialColorway : 'black';
+      this._colorways = asset.reviewColorways ?? iphoneColorways;
+      for (const [key, spec] of Object.entries(this._colorways)) colorway.append(new Option(spec.label, key));
+      colorway.value = this._colorways[this.initialColorway] ? this.initialColorway : 'black';
       colorway.addEventListener('change', () => {
         if (!this._model) return;
-        applyIphoneColorway(this._model, colorway.value);
+        applyIphoneColorway(this._model, colorway.value, this._colorways);
         this.dataset.colorway = colorway.value;
       });
     } else {
@@ -179,6 +189,10 @@ class AwfulModelViewer extends HTMLElement {
     this.shadowRoot.querySelector('[data-control="mode"]').addEventListener('change', (event) => {
       this.#applyRenderMode(event.currentTarget.value);
     });
+    this.shadowRoot.querySelector('[data-control="part"]').addEventListener('change', event => {
+      this.#selectReviewPart(event.currentTarget.value);
+      this.#fitModel();
+    });
     this.shadowRoot.querySelector('[data-control="projection"]').addEventListener('change', (event) => {
       this.#setProjection(event.currentTarget.value);
     });
@@ -201,6 +215,9 @@ class AwfulModelViewer extends HTMLElement {
   }
 
   async #loadModel(repoPath) {
+    delete this.dataset.modelLoaded;
+    delete this.dataset.snapshotVerified;
+    delete this.dataset.modelError;
     this._screenRequest++;
     this._iphonePresentation?.dispose();
     this._iphonePresentation = null;
@@ -216,7 +233,18 @@ class AwfulModelViewer extends HTMLElement {
     const loader = new GLTFLoader();
     loader.setMeshoptDecoder(MeshoptDecoder);
     const basePath = new URL('.', document.baseURI).pathname;
-    const gltf = await loader.loadAsync(resolveAssetUrl(repoPath, basePath));
+    const url = resolveAssetUrl(repoPath, basePath);
+    let gltf;
+    if (this._asset.frozenReview) {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Frozen snapshot HTTP ${response.status}`);
+      const bytes = await response.arrayBuffer();
+      await verifySnapshotBytes(bytes, this._asset.sha256);
+      gltf = await loader.parseAsync(bytes, new URL('.', new URL(url, document.baseURI)).href);
+      this.dataset.snapshotVerified = this._asset.sha256;
+    } else {
+      gltf = await loader.loadAsync(url);
+    }
     if (this._disposed) return;
     if (this._asset.group === 'Devices') {
       const root = gltf.scene.getObjectByName(this._asset.root);
@@ -233,7 +261,7 @@ class AwfulModelViewer extends HTMLElement {
       if (!object.isMesh) return;
       const materials = Array.isArray(object.material) ? object.material : [object.material];
       for (const material of materials) {
-        const policy = previewMaterialPolicy(material.name, { hasTexture: Boolean(material.map || material.emissiveMap) });
+        const policy = this._asset.reviewMaterialPolicies?.[material.name] ?? previewMaterialPolicy(material.name, { hasTexture: Boolean(material.map || material.emissiveMap) });
         if (policy.alphaTest != null) material.alphaTest = policy.alphaTest;
         if (policy.transparent != null) material.transparent = policy.transparent;
         if (policy.opacity != null) material.opacity = policy.opacity;
@@ -280,15 +308,49 @@ class AwfulModelViewer extends HTMLElement {
       this._iphonePresentation = prepareIphonePresentation(this._model);
       this._screenGlow = this._iphonePresentation.glow;
       const colorway = this.shadowRoot.querySelector('[data-control="colorway"]')?.value || 'black';
-      applyIphoneColorway(this._model, colorway);
+      applyIphoneColorway(this._model, colorway, this._colorways);
       this.dataset.colorway = colorway;
       this._model.traverse(object => { if (object.isMesh) object.userData.previewOriginalMaterial = object.material; });
     } else this.#setupScreenGlow();
     const screenState = this.shadowRoot.querySelector('[data-control="screen-state"]');
     if (!screenState.disabled) this.#applyScreenState(screenState.value);
+    this.#setupReviewParts();
     this.#fitModel();
     this.#applyRenderMode(this.shadowRoot.querySelector('[data-control="mode"]').value);
     this.#applyClipping();
+  }
+
+  #setupReviewParts() {
+    const select = this.shadowRoot.querySelector('[data-control="part"]');
+    select.replaceChildren(new Option('Whole assembly', 'all'));
+    this._reviewNodes = new Map();
+    for (const group of this._asset.reviewParts ?? []) {
+      select.append(new Option(`Assembly: ${group.label}`, `group:${group.id}`));
+      const options = document.createElement('optgroup');
+      options.label = group.label;
+      for (const name of group.meshes) {
+        const node = this._model.getObjectByName(name);
+        if (!node || this._reviewNodes.has(name)) throw new Error(`Invalid review part: ${name}`);
+        this._reviewNodes.set(name, { node, visible: node.visible });
+        options.append(new Option(name, `mesh:${name}`));
+      }
+      select.append(options);
+    }
+    select.disabled = this._reviewNodes.size === 0;
+    this.#selectReviewPart('all');
+  }
+
+  #selectReviewPart(selection) {
+    let names;
+    if (selection.startsWith('group:')) {
+      names = this._asset.reviewParts.find(group => group.id === selection.slice(6))?.meshes;
+    } else if (selection.startsWith('mesh:')) {
+      names = [selection.slice(5)];
+    }
+    if (selection !== 'all' && (!names?.length || names.some(name => !this._reviewNodes.has(name)))) throw new Error(`Unknown review selection: ${selection}`);
+    const selected = names && new Set(names);
+    for (const [name, original] of this._reviewNodes ?? []) original.node.visible = original.visible && (!selected || selected.has(name));
+    this.dataset.reviewPart = selection;
   }
 
   #selectAnimationClip(name) {
@@ -359,7 +421,8 @@ class AwfulModelViewer extends HTMLElement {
     this._screenCompositeTexture = null;
     this._model.traverse((object) => {
       if (!object.isMesh) return;
-      const materials = Array.isArray(object.material) ? object.material : [object.material];
+      const original = object.userData.previewOriginalMaterial ?? object.material;
+      const materials = Array.isArray(original) ? original : [original];
       for (const material of materials) {
         if (material.name !== 'MAT_SCREEN_CONTENT') continue;
         const saved = material.userData.previewScreenOn;
@@ -393,7 +456,12 @@ class AwfulModelViewer extends HTMLElement {
 
   #bounds() {
     if (!this._model) return null;
-    const box = new THREE.Box3().setFromObject(this._model);
+    const box = new THREE.Box3();
+    if (this.dataset.reviewPart && this.dataset.reviewPart !== 'all') {
+      for (const { node } of this._reviewNodes.values()) if (node.visible) box.union(new THREE.Box3().setFromObject(node));
+    } else {
+      box.setFromObject(this._model);
+    }
     if (box.isEmpty()) return null;
     const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
@@ -456,14 +524,18 @@ class AwfulModelViewer extends HTMLElement {
         object.userData.previewTempMaterial.dispose();
         object.userData.previewTempMaterial = null;
       }
-      if (mode === 'texture' || mode === 'wireframe') {
+      if (mode === 'texture') {
         object.material = original;
         const materials = Array.isArray(object.material) ? object.material : [object.material];
-        for (const material of materials) material.wireframe = mode === 'wireframe';
+        for (const material of materials) material.wireframe = false;
       } else {
-        const temp = mode === 'normals'
+        const source = Array.isArray(original) ? original[0] : original;
+        const temp = mode === 'wireframe'
+          ? new THREE.MeshBasicMaterial({ color: 0xececec, wireframe: true, side: source.side })
+          : mode === 'normals'
           ? new THREE.MeshNormalMaterial()
           : new THREE.MeshStandardMaterial({ color: 0xb9b7b2, roughness: 0.58, metalness: 0.05 });
+        temp.name = source.name;
         object.userData.previewTempMaterial = temp;
         object.material = temp;
       }
@@ -563,9 +635,10 @@ const styles = `
 
 if (!customElements.get(tagName)) customElements.define(tagName, AwfulModelViewer);
 
-export function createModelViewer(asset, { colorway = 'black' } = {}) {
+export function createModelViewer(asset, { colorway = 'black', screenState } = {}) {
   const element = document.createElement(tagName);
   element.initialColorway = colorway;
+  element.initialScreenState = screenState;
   element.asset = asset;
   return element;
 }

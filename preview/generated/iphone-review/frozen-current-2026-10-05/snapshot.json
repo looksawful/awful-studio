@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 1,
+  "frozenAt": "2026-10-05",
+  "kind": "appearance-evidence-not-topology-approval",
+  "snapshotCommit": "fcc2c47ef729b990a15d55efe17b603a7f369d9e",
+  "compatSha256": "68bcd22831e427a077ddfd48662e41bbe8ef46ebda0359c7153b9e3579afeae0",
+  "triangleCount": 11538,
+  "materialCount": 24,
+  "render": {
+    "renderer": "existing awful-model-viewer",
+    "three": "0.185.1",
+    "toneMapping": "NeutralToneMapping",
+    "exposure": 0.7,
+    "environment": "RoomEnvironment",
+    "environmentIntensity": 1.0,
+    "viewLightIntensity": 0.65,
+    "background": "#111111",
+    "perspectiveFov": 35,
+    "pixelRatioCap": 2,
+    "captureFinish": "white",
+    "captureScreen": "screen_off",
+    "captureViewport": [
+      1440,
+      1100
+    ],
+    "captureCameraEvidence": "captures/browser-evidence.json"
+  },
+  "acceptance": {
+    "topology": "NOT ACCEPTED",
+    "wholeDeviceHumanPass": false
+  },
+  "notes": [
+    "GLB embeds current PBR maps. Archive includes saved Blender/native snapshots, source scripts and viewer/presentation inputs.",
+    "This snapshot preserves bytes and rendering evidence, not a claim of complete production provenance or accepted native bundle.",
+    "Do not overwrite this baseline when editing topology; working candidate is a separate clearly labelled story."
+  ],
+  "files": {
+    "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb": {
+      "sha256": "68bcd22831e427a077ddfd48662e41bbe8ef46ebda0359c7153b9e3579afeae0",
+      "bytes": 4748960
+    },
+    "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web_meshopt.glb": {
+      "sha256": "01f74d55b97103846123fd4125fa66f32dfc57a6d1b9c84eb6a490ddde33305f",
+      "bytes": 4224172
+    },
+    "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_delivery.blend": {
+      "sha256": "797532088434971f39fd290e74cb17d383bd8dfdf1bcfbbe243c599eded9fded",
+      "bytes": 4357747
+    },
+    "assets/device_mockups/iphone_17/generated/iphone_17_low_v30.blend": {
+      "sha256": "cd61230a109e6fad918af420a4041fc9b8be05f1834a0fc527f0228eb728c485",
+      "bytes": 4416513
+    },
+    "extension/awful_studio/assets/devices/iphone_17_low_v30.blend": {
+      "sha256": "96c555c69246a08c5f2f0db70e2214e2698057bc5fa0db89fb42f353f96ab802",
+      "bytes": 4417156
+    },
+    "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30.asset.json": {
+      "sha256": "99ca967963ad1d5e4e4d70776b30d731f2d7f0548ff64d96dcd69df64b0a578b",
+      "bytes": 9185
+    },
+    "assets/device_mockups/iphone_17/generate_low_v30.py": {
+      "sha256": "6c0c058840253ae803c23bf28e7ddf8573b0adf43c97f8178178ed7fcdcddebc",
+      "bytes": 56589
+    },
+    "assets/device_mockups/iphone_17/body_topology_v30.py": {
+      "sha256": "6289fd4e08fe53baab5d84f4b54cecab08f5a9e031d0fddb00ac0d861cf456e3",
+      "bytes": 14762
+    },
+    "assets/device_mockups/iphone_17/camera_topology_v30.py": {
+      "sha256": "e7ce8292122c1041524449edd4d350a0d6168ec61475bbec654ee903eefe58d7",
+      "bytes": 3946
+    },
+    "assets/device_mockups/iphone_17/export_runtime_v30.py": {
+      "sha256": "f8f5d3a8f037c37045c6f51edb2dfbc124274ae84baa4d4d5d76056898fd6a48",
+      "bytes": 7985
+    },
+    "assets/device_mockups/common/foundation_common.py": {
+      "sha256": "1d68c3fff908b7ae149f74c31a19064eb6d2384234d33bd71071fea70d651d12",
+      "bytes": 12097
+    },
+    "preview/src/model-viewer.mjs": {
+      "sha256": "55bc58dd51ffba7e221cfa0d5c191787aee7fb1cace8ac1139e41e25d929c408",
+      "bytes": 27162
+    },
+    "preview/src/viewer-core.mjs": {
+      "sha256": "5d0ef32f374355a5bc0897774c25c4cebdf3b1d215f2928880f0cedf5bf45228",
+      "bytes": 3158
+    },
+    "preview/src/iphone-presentation.mjs": {
+      "sha256": "75052609e0ce03be2af52a65b22e73b346412d855b75d85ac299e1693dbf6254",
+      "bytes": 8076
+    },
+    "preview/package-lock.json": {
+      "sha256": "c3f08a26bdc47a8d6e85fcca1b1f7f6395c51c328aba877572442608e6b1bca8",
+      "bytes": 103248
+    },
+    "preview/public/screens/iphone-lock.png": {
+      "sha256": "390b014062d085d879458f42db6ecf324ff5249a5fe4a6d1c5f62c47fec657d0",
+      "bytes": 250136
+    },
+    "preview/public/screens/iphone-resume.png": {
+      "sha256": "de9386bb868c16fe5959bd6b6f01ce7be0bcc6013e75326158e2d76ca61fbf43",
+      "bytes": 228052
+    },
+    "preview/public/screens/iphone-website.png": {
+      "sha256": "55e9517258427fb4ef53999bdaa83a1d9b1f92c3e7435b427dcbaabff875d6dc",
+      "bytes": 1661542
+    },
+    "preview/public/screens/provenance.json": {
+      "sha256": "5e33333a1c7866d423693cc01324d2fcea05b4eb8a0014eb7caa9993b5115bc1",
+      "bytes": 1574
+    },
+    "captures/current-bottom-clay.png": {
+      "sha256": "0a1d80c9555b37f43d09f388ea166c3dc68155c0fdee9c47315e287437a42043",
+      "bytes": 15087
+    },
+    "captures/current-bottom-render.png": {
+      "sha256": "a2a71218f09430d8cf75050ec33d03260ece07612b4e825aab839fdfad46aee2",
+      "bytes": 22627
+    },
+    "captures/current-bottom-wireframe.png": {
+      "sha256": "16c8d0b96b5195cfc29c0821c37c45895ef3e9cc5a58897a83ade3dc3700ea17",
+      "bytes": 58005
+    },
+    "captures/current-front-clay.png": {
+      "sha256": "db9d14b5173f62e6549a89356ea3dd0d81bbbc2913210fdec056900f2e37d63f",
+      "bytes": 11332
+    },
+    "captures/current-front-render.png": {
+      "sha256": "d7446145cb510f6954026cd440747a56a49b7685c8be1ecad879447f3019ed8c",
+      "bytes": 14565
+    },
+    "captures/current-front-wireframe.png": {
+      "sha256": "663a24aceef50da86f8a83cba8093be8c8aa8ba6e1c9e98760bbe9d3b50a84d6",
+      "bytes": 72449
+    },
+    "captures/current-rear-clay.png": {
+      "sha256": "28d7e5164d51e12ac3742bd239d0c353d6714fdff2ccf011c1b281f02accd458",
+      "bytes": 13571
+    },
+    "captures/current-rear-render.png": {
+      "sha256": "1a4e9bb1b25a86ba9db6358f7d96599fc2a71dc70d4a001c83414a721d922640",
+      "bytes": 30160
+    },
+    "captures/current-rear-wireframe.png": {
+      "sha256": "385e826d390f1edf8eee53efcf784fe5b04cdce418f54620ddc6cfb5f76b814d",
+      "bytes": 85671
+    },
+    "captures/current-three-quarter-clay.png": {
+      "sha256": "a3a949e6e5103043b44fed7c1c3d4b642cae6453ce0d69375cc7cc3056fe4a8c",
+      "bytes": 13386
+    },
+    "captures/current-three-quarter-render.png": {
+      "sha256": "130364115bdc6ac119574bbb4f0a152db0f3cde45f1778183f74b1c382213b33",
+      "bytes": 18397
+    },
+    "captures/current-three-quarter-wireframe.png": {
+      "sha256": "59830385656d540810f71423cb963e636e43c7caceb8bf84289eeeceaf4eecf2",
+      "bytes": 83030
+    }
+  },
+  "evidenceArchive": {
+    "file": "iphone17-frozen-look-2026-10-05.zip",
+    "sha256": "f192a0ca772e934f516ffbab0d347bbd019e4c751abbfedebb733698d472f84a",
+    "bytes": 23886111
+  }
+}

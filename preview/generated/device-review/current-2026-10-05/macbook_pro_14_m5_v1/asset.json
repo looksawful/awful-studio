@@ -1,0 +1,45 @@
+{
+  "id": "macbook-pro-14-m5-v1",
+  "label": "MacBook Pro 14 M5 \u2014 WIP REVIEW 05.10.2026",
+  "group": "Devices",
+  "version": "v1",
+  "stage": "RELEASE_CANDIDATE",
+  "root": "CTRL_MACBOOK_PRO_14",
+  "sourceBlend": "extension/awful_studio/assets/devices/macbook_pro_14_m5_low_v1_release.blend",
+  "previewGlb": "assets/device-review/current-2026-10-05/macbook_pro_14_m5_v1/model.glb",
+  "lods": [],
+  "collision": null,
+  "sourceRevision": "c2ca4638454f7051adf76ca00db231c7464b23bb64eade954f64579ea81e186d",
+  "sourceCommit": "b3b29a3c45aed0f42b7426ebe3d13d6c1da2f18a",
+  "triangleCount": 74023,
+  "materialCount": 16,
+  "animations": [
+    "lid_open",
+    "lid_close"
+  ],
+  "screenStates": {
+    "screen_off": {
+      "emission_strength": 0.0,
+      "glow_energy": 0.0
+    },
+    "screen_on": {
+      "emission_strength": 0.65,
+      "glow_energy": 8.0
+    }
+  },
+  "screenGlow": {
+    "anchor": "SCREEN_GLOW_ANCHOR",
+    "type": "rect_area",
+    "width_mm": 302.4,
+    "height_mm": 196.4,
+    "source_energy_w": 8.0
+  },
+  "reviewOnly": true,
+  "frozenReview": true,
+  "topologyAccepted": false,
+  "reviewStatus": "WIP REVIEW SNAPSHOT \u2014 HUMAN NEEDED",
+  "snapshotCommit": "e39d8d10f4c8cf97222d50e9a35fb0285da470c0",
+  "snapshotBranch": "fix/macbook-g2-overlay-calibration",
+  "snapshotSourceDirty": true,
+  "sha256": "bc4a4c03f51167a1e7bf789c4ac79cedc446142ecc15fefa7320531c920808d8"
+}

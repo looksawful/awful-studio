@@ -16,7 +16,7 @@ const runGenerator = (...args) => spawnSync(process.execPath, [generator, ...arg
 });
 
 test('catalog generator produces only canonical model inventory', () => {
-  const result = runGenerator();
+  const result = runGenerator('--check');
   assert.equal(result.status, 0, result.stderr || result.stdout || 'catalog generation failed');
   assert.equal(existsSync(catalogPath), true);
 
@@ -51,13 +51,12 @@ test('catalog generator produces only canonical model inventory', () => {
   ]);
 
   for (const asset of catalog.assets.filter((entry) => entry.group !== 'Scenes')) {
-    assert.equal(existsSync(path.join(repoRoot, asset.previewGlb)), true, asset.previewGlb);
+    const relative = asset.previewGlb.replace(/^assets\/(iphone-review|device-review)\//, 'preview/generated/$1/');
+    assert.equal(existsSync(path.join(repoRoot, relative)), true, asset.previewGlb);
   }
 });
 
 test('catalog check mode rejects no committed drift', () => {
-  const generated = runGenerator();
-  assert.equal(generated.status, 0, generated.stderr || generated.stdout);
   const checked = runGenerator('--check');
   assert.equal(checked.status, 0, checked.stderr || checked.stdout || 'catalog check failed');
 });

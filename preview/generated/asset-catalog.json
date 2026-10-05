@@ -1,27 +1,22 @@
 {
   "schemaVersion": 1,
-  "generatedFrom": "canonical repository manifests",
+  "generatedFrom": "pinned device review snapshots; canonical studio and scene manifests",
   "assets": [
     {
       "id": "iphone-17-v30",
-      "label": "iPhone 17",
+      "label": "iPhone 17 — FROZEN LOOK 05.10.2026 (68bcd228)",
       "group": "Devices",
       "version": "v30",
       "stage": "LOW_DRAFT",
       "root": "CTRL_IPHONE_17",
       "sourceBlend": "assets/device_mockups/iphone_17/generated/iphone_17_low_v30.blend",
-      "previewGlb": "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb",
-      "lods": [
-        {
-          "name": "LOD0",
-          "path": "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb"
-        }
-      ],
+      "previewGlb": "assets/iphone-review/frozen-current-2026-10-05/model.glb",
+      "lods": [],
       "collision": null,
-      "sourceRevision": "9ce24d6e6e292cd734d9e8be2993a2a37c1e9e24848e32ec27fe0f39752c5a65",
-      "sourceCommit": "394951d61e21868cafe448d1543b82c10db14e39",
-      "triangleCount": 64554,
-      "materialCount": 18,
+      "sourceRevision": "5d109d5dc0cbf5665b74a456945b5bcc6ad675e815bc7a3b4c926c7b8d99d30f",
+      "sourceCommit": "48fa7986be33b1387fe2ccbdf577919e99313792",
+      "triangleCount": 11538,
+      "materialCount": 24,
       "animations": [],
       "screenStates": {
         "screen_off": {
@@ -39,28 +34,305 @@
         "width_mm": 66.57,
         "height_mm": 144.79,
         "source_energy_w": 8
+      },
+      "reviewOnly": true,
+      "frozenReview": true,
+      "topologyAccepted": false,
+      "snapshotCommit": "fcc2c47ef729b990a15d55efe17b603a7f369d9e",
+      "sha256": "68bcd22831e427a077ddfd48662e41bbe8ef46ebda0359c7153b9e3579afeae0",
+      "reviewParts": [
+        {
+          "id": "panels_and_display",
+          "label": "panels and display",
+          "meshes": [
+            "BACK_GLASS",
+            "SCREEN_CONTENT",
+            "DISPLAY_BEZEL",
+            "DISPLAY_GLASS_SEAT",
+            "APPLE_LOGO_DECAL"
+          ]
+        },
+        {
+          "id": "body",
+          "label": "body",
+          "meshes": [
+            "BODY_ALUMINUM"
+          ]
+        },
+        {
+          "id": "side_controls",
+          "label": "side controls",
+          "meshes": [
+            "ACTION_BUTTON",
+            "ANTENNA_SIDE_L_55",
+            "ANTENNA_SIDE_L_-55",
+            "ANTENNA_SIDE_R_55",
+            "ANTENNA_SIDE_R_-55",
+            "CAMERA_CONTROL",
+            "SIDE_BUTTON",
+            "VOL_DOWN",
+            "VOL_UP"
+          ]
+        },
+        {
+          "id": "bottom",
+          "label": "bottom",
+          "meshes": [
+            "BOTTOM_MIC_APERTURE_01",
+            "BOTTOM_MIC_APERTURE_02",
+            "BOTTOM_MIC_APERTURE_03",
+            "BOTTOM_SCREW_L",
+            "BOTTOM_SCREW_R",
+            "BOTTOM_SPEAKER_APERTURE_01",
+            "BOTTOM_SPEAKER_APERTURE_02",
+            "BOTTOM_SPEAKER_APERTURE_03",
+            "BOTTOM_SPEAKER_APERTURE_04",
+            "BOTTOM_SPEAKER_APERTURE_05",
+            "USB_C_CAVITY",
+            "USB_C_TONGUE"
+          ]
+        },
+        {
+          "id": "front_hardware",
+          "label": "front hardware",
+          "meshes": [
+            "FRONT_CAMERA_GLASS",
+            "FRONT_CAMERA_INNER",
+            "FRONT_CAMERA_IRIS",
+            "FRONT_CAMERA_MASK",
+            "FRONT_CAMERA_PUPIL",
+            "FRONT_RECEIVER_MIC",
+            "FRONT_SENSOR_MASK"
+          ]
+        },
+        {
+          "id": "rear_camera_housing",
+          "label": "rear camera housing",
+          "meshes": [
+            "CAMERA_HOUSING",
+            "CAMERA_HOUSING_SEAT"
+          ]
+        },
+        {
+          "id": "rear_camera_1",
+          "label": "rear camera 1",
+          "meshes": [
+            "CAMERA_1_BEVEL",
+            "CAMERA_1_GLASS",
+            "CAMERA_1_INNER",
+            "CAMERA_1_IRIS",
+            "CAMERA_1_PUPIL",
+            "CAMERA_1_RING"
+          ]
+        },
+        {
+          "id": "rear_camera_2",
+          "label": "rear camera 2",
+          "meshes": [
+            "CAMERA_2_BEVEL",
+            "CAMERA_2_GLASS",
+            "CAMERA_2_INNER",
+            "CAMERA_2_IRIS",
+            "CAMERA_2_PUPIL",
+            "CAMERA_2_RING"
+          ]
+        },
+        {
+          "id": "rear_flash_and_mic",
+          "label": "rear flash and mic",
+          "meshes": [
+            "FLASH",
+            "FLASH_RING",
+            "REAR_MIC"
+          ]
+        }
+      ],
+      "evidenceArchive": "iphone17-frozen-look-2026-10-05.zip",
+      "reviewMaterialPolicies": {
+        "MAT_ANODIZED_ALUMINUM_ACTION_BUTTON": {
+          "frontSide": true,
+          "envMapIntensity": 0.55,
+          "minRoughness": 0.28
+        },
+        "MAT_OPTICS_BLACK": {
+          "frontSide": true
+        },
+        "MAT_APPLE_LOGO_DECAL": {
+          "alphaTest": 0.5,
+          "transparent": false,
+          "depthWrite": true,
+          "frontSide": true
+        },
+        "MAT_BACK_GLASS": {
+          "frontSide": true,
+          "envMapIntensity": 0.32,
+          "minRoughness": 0.38
+        },
+        "MAT_ANODIZED_ALUMINUM": {
+          "frontSide": true,
+          "envMapIntensity": 0.55,
+          "minRoughness": 0.28
+        },
+        "MAT_UNDER_GLASS_BLACK": {
+          "frontSide": true
+        },
+        "MAT_APERTURE_GRILLE": {
+          "frontSide": true
+        },
+        "MAT_FASTENER": {
+          "frontSide": true
+        },
+        "MAT_CAMERA_BEVEL": {
+          "frontSide": true
+        },
+        "MAT_LENS_GLASS": {
+          "frontSide": true
+        },
+        "MAT_CAMERA_RING": {
+          "frontSide": true
+        },
+        "MAT_CAMERA_CONTROL_GLASS": {
+          "frontSide": true
+        },
+        "MAT_CAMERA_HOUSING": {
+          "frontSide": true,
+          "envMapIntensity": 0.45,
+          "minRoughness": 0.3
+        },
+        "MAT_CAMERA_HOUSING_SEAT": {
+          "frontSide": true
+        },
+        "MAT_DISPLAY_BEZEL": {
+          "frontSide": true
+        },
+        "MAT_ASSEMBLY_GAP": {
+          "frontSide": true
+        },
+        "MAT_FLASH": {
+          "frontSide": true
+        },
+        "MAT_ALUMINUM_EDGE": {
+          "frontSide": true
+        },
+        "MAT_FRONT_OPTIC": {
+          "frontSide": true
+        },
+        "MAT_SCREEN_CONTENT": {
+          "emissiveIntensity": 2,
+          "envMapIntensity": 0,
+          "minRoughness": 0.12,
+          "maxClearcoat": 0
+        },
+        "MAT_SCREEN_EDGE": {
+          "frontSide": true
+        },
+        "MAT_ANODIZED_ALUMINUM_SIDE_BUTTON": {
+          "frontSide": true,
+          "envMapIntensity": 0.55,
+          "minRoughness": 0.28
+        },
+        "MAT_ANODIZED_ALUMINUM_VOL_DOWN": {
+          "frontSide": true,
+          "envMapIntensity": 0.55,
+          "minRoughness": 0.28
+        },
+        "MAT_ANODIZED_ALUMINUM_VOL_UP": {
+          "frontSide": true,
+          "envMapIntensity": 0.55,
+          "minRoughness": 0.28
+        }
+      },
+      "reviewColorways": {
+        "black": {
+          "label": "Black",
+          "aluminum": "#292a2c",
+          "edge": "#232426",
+          "cameraHousing": "#6c6c6c",
+          "backGlass": "#6c6c6c"
+        },
+        "white": {
+          "label": "White",
+          "aluminum": "#b8b8b6",
+          "edge": "#a2a3a1",
+          "cameraHousing": "#f7f7f5",
+          "backGlass": "#f7f7f5"
+        },
+        "mist_blue": {
+          "label": "Mist Blue",
+          "aluminum": "#687c95",
+          "edge": "#566a82",
+          "cameraHousing": "#bdcde4",
+          "backGlass": "#bdcde4"
+        },
+        "sage": {
+          "label": "Sage",
+          "aluminum": "#737e5e",
+          "edge": "#5f6b4d",
+          "cameraHousing": "#c8d2af",
+          "backGlass": "#c8d2af"
+        },
+        "lavender": {
+          "label": "Lavender",
+          "aluminum": "#998fa8",
+          "edge": "#81758f",
+          "cameraHousing": "#efe4f4",
+          "backGlass": "#efe4f4"
+        }
+      },
+      "reviewScreenStates": {
+        "screen_on": {
+          "label": "Home screen",
+          "emission_strength": 1,
+          "dynamic_island_state": "idle"
+        },
+        "screen_off": {
+          "label": "Off",
+          "emission_strength": 0,
+          "glow_intensity": 0,
+          "dynamic_island_state": "off"
+        },
+        "screen_lock": {
+          "label": "Lock screen",
+          "texture": "assets/iphone-review/frozen-current-2026-10-05/screens/iphone-lock.png",
+          "emission_strength": 1,
+          "dynamic_island_state": "idle"
+        },
+        "screen_website": {
+          "label": "looksawful.ru",
+          "texture": "assets/iphone-review/frozen-current-2026-10-05/screens/iphone-website.png",
+          "emission_strength": 1,
+          "dynamic_island_state": "idle"
+        },
+        "screen_resume": {
+          "label": "Resume",
+          "texture": "assets/iphone-review/frozen-current-2026-10-05/screens/iphone-resume.png",
+          "emission_strength": 1,
+          "dynamic_island_state": "idle"
+        }
+      },
+      "reviewPresentation": {
+        "exposure": 0.7,
+        "environmentIntensity": 1,
+        "viewLightIntensity": 0.65,
+        "background": "#111111",
+        "perspectiveFov": 35
       }
     },
     {
       "id": "ipad-pro-11-m5-v6",
-      "label": "iPad Pro 11 M5",
+      "label": "iPad Pro 11 M5 — WIP REVIEW 05.10.2026",
       "group": "Devices",
       "version": "v6",
       "stage": "LOW_DRAFT",
       "root": "CTRL_IPAD_PRO_11",
-      "sourceBlend": "generated/ipad_pro_11_m5_low_v6.blend",
-      "previewGlb": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_web.glb",
-      "lods": [
-        {
-          "name": "LOD0",
-          "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_web.glb"
-        }
-      ],
+      "sourceBlend": "assets/device_mockups/ipad_pro/generated/ipad_pro_11_m5_low_v6.blend",
+      "previewGlb": "assets/device-review/current-2026-10-05/ipad_pro_11_m5_v6/model.glb",
+      "lods": [],
       "collision": null,
-      "sourceRevision": "8c945793614e5b932579f1ae47e03c28780e7217aeafc553f9f31050cc84eb86",
-      "sourceCommit": "2c659b2754654827c23d62dfc269d2719754a223",
-      "triangleCount": 20696,
-      "materialCount": 11,
+      "sourceRevision": "e1778c8b8089a10e9b36c666c5afbbf270903206cfdc6ac5efa3af848abebc26",
+      "sourceCommit": "c6c9457e238c65f32e521d8b7234c82d788fc175",
+      "triangleCount": 20674,
+      "materialCount": 10,
       "animations": [],
       "screenStates": {
         "screen_off": {
@@ -78,28 +350,31 @@
         "width_mm": 160.13,
         "height_mm": 232.32,
         "source_energy_w": 8
-      }
+      },
+      "reviewOnly": true,
+      "frozenReview": true,
+      "topologyAccepted": false,
+      "reviewStatus": "WIP REVIEW SNAPSHOT — HUMAN NEEDED",
+      "snapshotCommit": "c6c9457e238c65f32e521d8b7234c82d788fc175",
+      "snapshotBranch": "agent/51-ipad-control-geometry",
+      "snapshotSourceDirty": true,
+      "sha256": "3640fec046ababec08ef22481705743dbf8a6a60cb0397872020e7daeb83a3dc"
     },
     {
       "id": "ipad-pro-13-m5-v6",
-      "label": "iPad Pro 13 M5",
+      "label": "iPad Pro 13 M5 — WIP REVIEW 05.10.2026",
       "group": "Devices",
       "version": "v6",
       "stage": "LOW_DRAFT",
       "root": "CTRL_IPAD_PRO_13",
-      "sourceBlend": "generated/ipad_pro_13_m5_low_v6.blend",
-      "previewGlb": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_web.glb",
-      "lods": [
-        {
-          "name": "LOD0",
-          "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_web.glb"
-        }
-      ],
+      "sourceBlend": "assets/device_mockups/ipad_pro/generated/ipad_pro_13_m5_low_v6.blend",
+      "previewGlb": "assets/device-review/current-2026-10-05/ipad_pro_13_m5_v6/model.glb",
+      "lods": [],
       "collision": null,
-      "sourceRevision": "fab88ffb8004423c55851571de446dde3369bef97e8f7908373dcf7b994779dc",
-      "sourceCommit": "2c659b2754654827c23d62dfc269d2719754a223",
-      "triangleCount": 20704,
-      "materialCount": 11,
+      "sourceRevision": "06e46e261a6aa7dbd31db47cbf6550481ca51e718b7cee2d979a6dffeecc9bca",
+      "sourceCommit": "c6c9457e238c65f32e521d8b7234c82d788fc175",
+      "triangleCount": 20682,
+      "materialCount": 10,
       "animations": [],
       "screenStates": {
         "screen_off": {
@@ -117,28 +392,31 @@
         "width_mm": 199.14,
         "height_mm": 265.19,
         "source_energy_w": 8
-      }
+      },
+      "reviewOnly": true,
+      "frozenReview": true,
+      "topologyAccepted": false,
+      "reviewStatus": "WIP REVIEW SNAPSHOT — HUMAN NEEDED",
+      "snapshotCommit": "c6c9457e238c65f32e521d8b7234c82d788fc175",
+      "snapshotBranch": "agent/51-ipad-control-geometry",
+      "snapshotSourceDirty": true,
+      "sha256": "7003ee11422a106b379bed8586b94d20d041d20e6d00edf84747048ad2d4a5c0"
     },
     {
       "id": "macbook-pro-14-m5-v1",
-      "label": "MacBook Pro 14 M5",
+      "label": "MacBook Pro 14 M5 — WIP REVIEW 05.10.2026",
       "group": "Devices",
       "version": "v1",
       "stage": "RELEASE_CANDIDATE",
       "root": "CTRL_MACBOOK_PRO_14",
       "sourceBlend": "extension/awful_studio/assets/devices/macbook_pro_14_m5_low_v1_release.blend",
-      "previewGlb": "assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web.glb",
-      "lods": [
-        {
-          "name": "LOD0",
-          "path": "assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web.glb"
-        }
-      ],
+      "previewGlb": "assets/device-review/current-2026-10-05/macbook_pro_14_m5_v1/model.glb",
+      "lods": [],
       "collision": null,
-      "sourceRevision": "aa57065a4fa9abf3744e2db69cca9be8ae713f04b59f384c13b7518352088261",
-      "sourceCommit": "83d43fa96514372929d48d8798b4dd5526f04c2e",
-      "triangleCount": 16722,
-      "materialCount": 9,
+      "sourceRevision": "c2ca4638454f7051adf76ca00db231c7464b23bb64eade954f64579ea81e186d",
+      "sourceCommit": "b3b29a3c45aed0f42b7426ebe3d13d6c1da2f18a",
+      "triangleCount": 74023,
+      "materialCount": 16,
       "animations": [
         "lid_open",
         "lid_close"
@@ -156,10 +434,18 @@
       "screenGlow": {
         "anchor": "SCREEN_GLOW_ANCHOR",
         "type": "rect_area",
-        "width_mm": 301.66,
-        "height_mm": 195.92,
+        "width_mm": 302.4,
+        "height_mm": 196.4,
         "source_energy_w": 8
-      }
+      },
+      "reviewOnly": true,
+      "frozenReview": true,
+      "topologyAccepted": false,
+      "reviewStatus": "WIP REVIEW SNAPSHOT — HUMAN NEEDED",
+      "snapshotCommit": "e39d8d10f4c8cf97222d50e9a35fb0285da470c0",
+      "snapshotBranch": "fix/macbook-g2-overlay-calibration",
+      "snapshotSourceDirty": true,
+      "sha256": "bc4a4c03f51167a1e7bf789c4ac79cedc446142ecc15fefa7320531c920808d8"
     },
     {
       "id": "studio-support-cstand-01",

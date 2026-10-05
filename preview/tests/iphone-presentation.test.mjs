@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
+import { readFileSync } from 'node:fs';
 import { applyIphoneColorway, composeIphoneScreenTexture, prepareIphonePresentation, displayMetrics, iphoneColorways, iphoneScreenStates } from '../src/iphone-presentation.mjs';
 
 test('official iPhone 17 colorways are exposed as material variants', () => {
@@ -8,6 +9,35 @@ test('official iPhone 17 colorways are exposed as material variants', () => {
     Object.values(iphoneColorways).map(item => item.label),
     ['Black', 'White', 'Mist Blue', 'Sage', 'Lavender'],
   );
+});
+
+test('exported aluminum controls follow all finishes and retain their bake maps', () => {
+  const bytes = readFileSync(new URL('../../assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb', import.meta.url));
+  const gltf = JSON.parse(bytes.subarray(20, 20 + bytes.readUInt32LE(12)).toString('utf8'));
+  const model = new THREE.Group();
+  const controls = ['ACTION_BUTTON', 'SIDE_BUTTON', 'VOL_UP', 'VOL_DOWN'];
+  const materials = new Map();
+  for (const name of ['MAT_ANODIZED_ALUMINUM', ...controls.map(part => `MAT_ANODIZED_ALUMINUM_${part}`)]) {
+    const exported = gltf.materials.find(material => material.name === name);
+    assert.ok(exported, `delivery material missing: ${name}`);
+    assert.ok(exported.normalTexture, `${name} must retain its production normal map`);
+    const material = new THREE.MeshStandardMaterial();
+    material.name = name;
+    material.color.fromArray(exported.pbrMetallicRoughness.baseColorFactor);
+    material.normalMap = new THREE.Texture();
+    material.roughnessMap = new THREE.Texture();
+    materials.set(name, material);
+    model.add(new THREE.Mesh(new THREE.BufferGeometry(), material));
+  }
+  const maps = [...materials.values()].map(material => [material, material.normalMap, material.roughnessMap]);
+  for (const [finish, expected] of [['black', '292a2c'], ['white', 'b8b8b6'], ['mist_blue', '687c95'], ['sage', '737e5e'], ['lavender', '998fa8']]) {
+    applyIphoneColorway(model, finish);
+    for (const [name, material] of materials) assert.equal(material.color.getHexString(), expected, `${finish}: ${name}`);
+    for (const [material, normal, roughness] of maps) {
+      assert.equal(material.normalMap, normal);
+      assert.equal(material.roughnessMap, roughness);
+    }
+  }
 });
 
 test('colorway changes tint without replacing PBR maps', () => {

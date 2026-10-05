@@ -1,5 +1,7 @@
 # AWFUL STUDIO Storybook Model Preview Design
 
+> 2026-10-05 owner amendment: use the existing Storybook to review pinned current device candidates from their active writers, preserving frozen iPhone appearance as evidence. Device snapshots may be copied byte-exactly with manifests and checksum verification; they are review evidence, not independently maintained production models. This supersedes the no-binary-copy rule below for explicit device review snapshots only. One primary story per device and one shared generated catalog remain required. See `preview/README.md` for verified review identities and the distinction between the older published build and local current candidates. The original September design below is historical context where this amendment conflicts.
+
 ## Goal
 Give `awful-studio` its own lightweight internal Storybook for inspecting canonical 3D assets without depending on `looksawful.ru` for day-to-day model review.
 

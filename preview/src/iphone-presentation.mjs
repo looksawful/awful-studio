@@ -55,18 +55,23 @@ export const iphoneColorways = {
 
 const iphoneColorwayMaterialKeys = {
   MAT_ANODIZED_ALUMINUM: 'aluminum',
+  MAT_ANODIZED_ALUMINUM_ACTION_BUTTON: 'aluminum',
+  MAT_ANODIZED_ALUMINUM_SIDE_BUTTON: 'aluminum',
+  MAT_ANODIZED_ALUMINUM_VOL_UP: 'aluminum',
+  MAT_ANODIZED_ALUMINUM_VOL_DOWN: 'aluminum',
   MAT_ALUMINUM_EDGE: 'edge',
   MAT_CAMERA_HOUSING: 'cameraHousing',
   MAT_BACK_GLASS: 'backGlass',
 };
 
-export function applyIphoneColorway(model, colorway = 'black') {
-  const spec = iphoneColorways[colorway];
+export function applyIphoneColorway(model, colorway = 'black', palette = iphoneColorways) {
+  const spec = palette[colorway];
   if (!spec) throw new Error(`Unknown iPhone 17 colorway: ${colorway}`);
   const seen = new Set();
   model?.traverse?.(object => {
     if (!object.isMesh) return;
-    const materials = Array.isArray(object.material) ? object.material : [object.material];
+    const original = object.userData.previewOriginalMaterial ?? object.material;
+    const materials = Array.isArray(original) ? original : [original];
     for (const material of materials) {
       if (!material || seen.has(material)) continue;
       seen.add(material);

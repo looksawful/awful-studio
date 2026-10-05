@@ -1,0 +1,18 @@
+{
+  "id": "iphone-17-v30",
+  "label": "iPhone 17 — reference before topology optimization (117546a)",
+  "group": "Devices",
+  "version": "v30",
+  "stage": "LOW_DRAFT",
+  "root": "CTRL_IPHONE_17",
+  "sourceBlend": "assets/device_mockups/iphone_17/generated/iphone_17_low_v30.blend",
+  "previewGlb": "assets/iphone-review/before-topology.glb",
+  "lods": [],
+  "sourceRevision": "9ce24d6e6e292cd734d9e8be2993a2a37c1e9e24848e32ec27fe0f39752c5a65",
+  "sourceCommit": "394951d61e21868cafe448d1543b82c10db14e39",
+  "triangleCount": 64554,
+  "materialCount": 18,
+  "reviewOnly": true,
+  "snapshotCommit": "117546ae95356730a255a16782d5f21ced68e14c",
+  "sha256": "da2a08021a5e02f2af8d9131ed8617cb03d0979346e12893008011a875fa703f"
+}

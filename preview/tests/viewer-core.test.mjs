@@ -79,3 +79,10 @@ test('binary Apple decal uses crisp preview alpha policy', () => {
   assert.deepEqual(previewMaterialPolicy('MAT_BACK_GLASS'), { frontSide: true, envMapIntensity: 0.32, minRoughness: 0.38 });
   assert.deepEqual(previewMaterialPolicy('MAT_OPTICS_BLACK'), { frontSide: true });
 });
+test('baked aluminum control materials use the established metal lighting policy', () => {
+  for (const part of ['ACTION_BUTTON', 'SIDE_BUTTON', 'VOL_UP', 'VOL_DOWN']) {
+    assert.deepEqual(previewMaterialPolicy(`MAT_ANODIZED_ALUMINUM_${part}`), {
+      frontSide: true, envMapIntensity: 0.55, minRoughness: 0.28,
+    });
+  }
+});

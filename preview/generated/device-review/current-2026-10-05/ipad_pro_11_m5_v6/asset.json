@@ -1,0 +1,42 @@
+{
+  "id": "ipad-pro-11-m5-v6",
+  "label": "iPad Pro 11 M5 \u2014 WIP REVIEW 05.10.2026",
+  "group": "Devices",
+  "version": "v6",
+  "stage": "LOW_DRAFT",
+  "root": "CTRL_IPAD_PRO_11",
+  "sourceBlend": "assets/device_mockups/ipad_pro/generated/ipad_pro_11_m5_low_v6.blend",
+  "previewGlb": "assets/device-review/current-2026-10-05/ipad_pro_11_m5_v6/model.glb",
+  "lods": [],
+  "collision": null,
+  "sourceRevision": "e1778c8b8089a10e9b36c666c5afbbf270903206cfdc6ac5efa3af848abebc26",
+  "sourceCommit": "c6c9457e238c65f32e521d8b7234c82d788fc175",
+  "triangleCount": 20674,
+  "materialCount": 10,
+  "animations": [],
+  "screenStates": {
+    "screen_off": {
+      "emission_strength": 0.0,
+      "glow_intensity": 0.0
+    },
+    "screen_on": {
+      "emission_strength": 0.85,
+      "glow_intensity": 1.0
+    }
+  },
+  "screenGlow": {
+    "anchor": "SCREEN_GLOW_ANCHOR",
+    "type": "rect_area",
+    "width_mm": 160.13,
+    "height_mm": 232.32,
+    "source_energy_w": 8.0
+  },
+  "reviewOnly": true,
+  "frozenReview": true,
+  "topologyAccepted": false,
+  "reviewStatus": "WIP REVIEW SNAPSHOT \u2014 HUMAN NEEDED",
+  "snapshotCommit": "c6c9457e238c65f32e521d8b7234c82d788fc175",
+  "snapshotBranch": "agent/51-ipad-control-geometry",
+  "snapshotSourceDirty": true,
+  "sha256": "3640fec046ababec08ef22481705743dbf8a6a60cb0397872020e7daeb83a3dc"
+}

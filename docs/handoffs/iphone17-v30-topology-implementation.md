@@ -1,12 +1,272 @@
 # iPhone 17 v30 topology rebuild — implementation handoff
 
-Date: 2026-10-04
+Latest owner decision: 2026-10-05. Earlier dated sections are historical evidence.
 Repository: looksawful/awful-studio
 Branch: `agent/118-topology-rebuild-v2`
 Shared ledger: GitHub issue #118
 PR #119 remains DRAFT/HOLD. Do not merge it.
 
+Preview consolidation checkpoint — 2026-10-05: all four selected devices now
+use the same Storybook catalog and viewer. See `preview/README.md` for exact
+hashes, writer branches, archive policy and publication contract. The common
+local Titan landing is http://127.0.0.1:6006/?path=/story/models-catalog--catalog.
+GitHub Pages is still the older Sep28 build; its four device GLB hashes were
+fetched and differ from these review snapshots. Independent iPad/MacBook
+writer checkouts retain production ownership; their current coherent GLBs
+are copied as immutable WIP review evidence, not rebuilt or promoted here.
+Catalog and primary stories now select the same pinned files. Older checkout
+device runtimes are retained for consumers and excluded from review serving.
+Preview25/25, fast209/209 (this checkout), static build and all11 browser
+stories PASS. Existing native/human gates and the display-frame RED remain.
+No commit/push/merge/deploy. This updates viewing context, not the model backlog.
+
 ## Goal
+
+### Owner decision and closeout plan — 2026-10-05
+
+Execution remains in issue #118 and Asana task 1219036864546294. This section
+records requirements and order, not a second backlog. Continue the existing
+`agent/118-topology-rebuild-v2` writer; starting HEAD is `fcc2c47`.
+
+The owner requires an interactive **existing Storybook / Three.js viewer at
+every meaningful stage**, with orbit/zoom, full materials and the actual GLB
+triangle wireframe. Static Blender sheets do not replace this review surface.
+Reuse the viewer, stories, catalog generator, exporter, Meshopt and runtime
+contracts. No new viewer, generic topology framework, model-version fork or
+parallel production pipeline.
+
+Active appearance reference: exact current GLB SHA-256 `68bcd22831e427a077ddfd48662e41bbe8ef46ebda0359c7153b9e3579afeae0`,
+frozen on Oct05 with saved Blender/native/export files, source/viewer inputs,
+render profile and control captures. The single primary Storybook entry loads
+`preview/generated/iphone-review/frozen-current-2026-10-05/model.glb`, verifies
+its checksum before parsing, and pins its material policy, finish palette,
+screen images, exposure, environment/light intensity and FOV. Freeze means
+appearance evidence, not accepted topology or whole-device HUMAN PASS.
+
+Historical `117546a` (64,554 triangles) is archived under
+`preview/generated/iphone-review/archive/117546a-before-topology`, excluded from
+active stories/static publication. It may inform a diagnosed regression; it is
+not the current review target. Camera accepted appearance remains frozen; use
+`48b271a` only when isolating a demonstrated camera regression. Compare each
+new working candidate against the frozen current look with matched settings.
+
+#### Requirements and Definition of Done
+
+Owner clarification after inspecting two wireframes (Oct05): current whole-device
+topology is **NOT ACCEPTED**. The primary task is an intentional, optimized mesh
+with segments chosen for each feature, inspectable in both Blender and actual
+exported GLB, while preserving high-quality render. Low triangle count, manifold
+status and a good shaded image alone do not meet this requirement. This decision
+supersedes older claims that implementation is finished and only approval remains.
+
+Inspect each component separately as well as the full assembly: the existing
+wireframe draws all mesh triangles, so front/rear/glass/seat layers overlap.
+Keep the full exported triangle view honest; do not hide triangulation or replace
+it with an aesthetically simplified line proxy to claim a topology fix. Sparse
+triangles on a truly planar panel are valid; uniform dense quads are not a goal.
+Choose curved-edge/bevel/lens/aperture segmentation from silhouette error and
+highlight continuity at the agreed closest review zoom, then document the local
+choice. Require deliberate edge flow, controlled triangulation and no unnecessary
+layers/segments, slivers or fans in changed feature regions. Recheck UV/tangents,
+normal/roughness compatibility, dimensions and exports after each actual repair.
+
+Next Stage 3 slice: attribute the supplied wireframe observations to individual
+actual GLB meshes, compare their authored Blender faces and exported triangles,
+and select the first failing panel/edge region. Source and exported mesh quality
+are separate gates; all existing functional contracts remain required. Preserve
+the accepted camera appearance; topology acceptance for the whole assembly is
+still open. USB-C shading observation remains a separate diagnostic question.
+
+- Silhouette, glass/metal highlights, contact edges, openings, buttons and rear
+  optics must have no owner-visible quality loss against the reference under
+  matched views. Triangle count is secondary; increase only a failing local
+  region when evidence demonstrates the need. RMS is diagnostic, not approval.
+- Production-visible geometry is materialized: no runtime BOOLEAN/BEVEL/
+  WEIGHTED_NORMAL dependency, no dense HIGH reference in native delivery.
+  Author intentional triangles/quads; zero source n-gons, non-manifold edges,
+  zero-length edges or degenerate faces on changed hard-surface meshes.
+- Preserve SCREEN_CONTENT and on/off/lock/website/resume states; software
+  Dynamic Island artwork; FRONT_SENSOR_MASK / FRONT_CAMERA_MASK under glass;
+  official 7.79 mm front-hardware datum; privacy indicator as screen state.
+  No coplanar island mesh, depth hack or runtime geometry offset.
+- All five finishes tint the body and intended aluminum controls in both web
+  and native consumers while retaining individual normal/roughness maps.
+- Control UV closing walls must not span/overlap the full unwrap strip. Bake
+  compatibility must be demonstrated after any UV change; rejected body macro
+  maps stay excluded. Geometry owns silhouette; maps carry shallow detail.
+- Catalog, manifest, all consumed bake inputs, saved blend, compat GLB,
+  Meshopt GLB and native bundle must refer to one reproducible candidate.
+- Exact Blender 5.2.1, focused contracts, full fast suite, exported world-space
+  geometry, Khronos compat+Meshopt, provenance, Storybook build/browser smoke,
+  canonical Media Catalog resolution and diff check must pass freshly.
+- Standards + Spec review must have no unresolved blocker. Final whole-device
+  HUMAN PASS must name the inspected candidate; then commit/push and the
+  authorized delivery/PR action. #119 remains DRAFT/HOLD until reconciliation
+  with the actual implementation branch; no automatic merge or release.
+
+#### Ordered stages and interactive checkpoints
+
+1. **[100%] Reconstruct current state.** Git, current issue/Asana, handoff and
+   relevant chats checked. Candidate `fcc2c47`; old named checkout is stale.
+2. **[100%] Restore trustworthy Storybook review.** Reproduce catalog drift and
+   copied-control finish failure; fix minimally. Load current + historical
+   reference through the existing viewer. Verify orbit, zoom, render/wireframe
+   switching and exact GLB identity in a real browser. Show this checkpoint.
+3. **[45%] Decide local quality corrections.** Exact appearance frozen, review
+   alternatives archived, 51 exported nodes and native-only parts inventoried;
+   existing viewer can isolate all leaves and nine groups. Recursive design is
+   recorded below. Next: first display-frame saved/exported RED/GREEN pilot.
+   Inspect front/rear, both rails,
+   bottom, camera and screen edges in render/clay/wire, all finishes. Record
+   each actual defect against this candidate. Keep accepted regions intact.
+4. **[0%] Repair production geometry and bakes.** One demonstrated defect per
+   RED/GREEN slice; repair UV seam / bake compatibility, HIGH exclusion,
+   provenance input coverage and modifier guard. Fix any owner-visible shape
+   or shading defect locally. Rebuild via existing pipeline, show each slice
+   in the same Storybook and repeat matched reference views.
+5. **[0%] Verify exported delivery and consumers.** Actual exported contour/
+   dimensions/material coverage, Meshopt, native bundle, fingerprints; focused
+   tests then full fast once; exact-candidate browser + Media Catalog checks.
+   Render/wire checkpoint remains inspectable.
+6. **[0%] Review and human decision.** Separate Standards/Spec review, then
+   owner whole-device render/wire PASS or explicit corrections. Loop only the
+   affected slice. No approval from counts, screenshots alone or old gates.
+7. **[0%] Close authorized delivery.** After PASS, commit/push, reconcile the
+   existing draft/branch, perform only authorized integration, verify the
+   delivered hashes/consumer, update #118/Asana/handoff and archive experiments
+   only with appropriate ownership. The project stays WIP until these gates.
+
+#### TDD seams already requested by the owner
+
+Use observable exported GLB/world-space/native/browser behavior, not private
+helper AST or constant-vs-constant checks. Each slice: observed RED on the
+exact candidate -> smallest source fix -> same GREEN -> matched interactive
+checkpoint. Test catalog drift without regenerating the committed file first;
+load actual GLB materials for all-finish map-preservation tests; inspect saved
+control UVs and packaged visible objects in Blender; mutate a bake in an
+isolated fixture to prove stale delivery rejection; prove exported contour
+coverage against deliberate diamond-like contour loss. Keep first RED logs.
+
+Needed text is limited to stage/reference labels, model identity, concise
+inspection instructions, defect/verdict records and this existing handoff.
+No marketing copy, new master specification or copied execution queue.
+
+#### Stage 2 result — 2026-10-05
+
+The earlier two-version checkpoint is superseded by the frozen-look checkpoint.
+Storybook is served on Titan at `http://127.0.0.1:6006/` from the existing
+static build. Single iPhone story: `models-devices--i-phone-17`, labelled
+FROZEN LOOK 05.10.2026 (68bcd228). Select mode `render` (internal
+value `texture`), `wireframe`, `clay`, or `normals`; drag to orbit, wheel to
+zoom, switch finish/screen state. Wireframe uses actual loaded GLB geometry,
+not an edge proxy. `part` selects whole assembly, one of nine groups or any of
+51 existing GLB mesh nodes. Selecting SCREEN_CONTENT preserves its multi-material
+group. Selection changes visibility only; transforms/parents/geometry stay intact.
+`fit` frames the selected part. Five finishes and screen states remain controls,
+not competing iPhone stories. No historical version is in the active story list.
+Wireframe uses a disposable light-colored diagnostic material on the same loaded
+triangle buffers so dark frame/optic leaves remain readable. Render restores the
+original materials and PBR maps. No depth/order/geometry workaround; this changes
+inspection line color, not the frozen rendered appearance.
+Finish and screen controls update saved original PBR materials even while a
+diagnostic material is visible. Browser regressions cover both Black/Off and
+White/Home selected in wireframe, then restored render; line color stays neutral.
+
+Observed RED: stale catalog (tests previously regenerated it before checking),
+four exported aluminum control names skipped by finish mapping, and the same
+names missing calibrated metal reflection policy. Minimal repairs retain all
+individual bake maps and leave production geometry/binary delivery unchanged.
+Current compat SHA-256 remains `68bcd22831e427a077ddfd48662e41bbe8ef46ebda0359c7153b9e3579afeae0`;
+reference SHA-256 is `da2a08021a5e02f2af8d9131ed8617cb03d0979346e12893008011a875fa703f`.
+
+Fresh evidence: preview 23/23; Python fast 209/209; exact Blender 5.2.1
+ten saved-candidate contracts PASS; Khronos compat and Meshopt 0 errors /
+0 warnings; manifest checks PASS for declared inputs only; Storybook build
+PASS; extended real-browser smoke PASS for 11 canonical assets + reference,
+all five finishes/map identity, triangle wireframe/render, orbit and zoom;
+diff check PASS. Declared-input verification does not close omitted bake input
+coverage. Full build still reports its large-chunk warning; runtime captures
+record existing THREE.Clock deprecation and a current GLB driver shader
+precision warning. Do not claim warning-free final runtime acceptance.
+
+Matched front / three-quarter / rear / bottom render, wire and clay captures
+were inspected. Initial quality observation: the USB-C inner edge/insertion
+reads brighter in the pre-optimization reference while the current cavity is
+darker/flatter. This is an open macro-review question, not an established
+geometry root cause. Inspect identical close-up views before choosing a fix.
+No whole-device visual PASS has been inferred from these images. Native finish,
+UV/bake seam, HIGH exclusion, provenance coverage, exported-contour regression
+and final consumer gates remain stages 3-7. No commit/push/merge this session.
+
+Oct05 actual-buffer wireframe audit: current 11,538 vs historical 64,554 tris.
+BACK_GLASS is 268 vs 780; SCREEN_CONTENT 268 vs 2,332; CAMERA_HOUSING 164 vs
+10,540. DISPLAY_GLASS_SEAT and DISPLAY_BEZEL are unchanged at 780 each; their
+maximum local indexed edge lengths are 150.412 and 148.6835 mm. These measurements
+identify review regions, not automatic defect thresholds. Both assets contain
+long planar edges. The two supplied cropped screenshots lack story/hash metadata;
+do not assign either image to a specific version based on appearance alone.
+
+#### Recursive work design after freeze
+
+Complete leaf/group inventory and source correspondence are research, not another
+execution queue: `docs/handoffs/iphone17-topology-component-research.md`. Issue
+#118 and Asana task 1219036864546294 continue to own work/status.
+
+Order: (1) display bezel and display seat pilot; (2) back/screen panels, logo and
+native-only SCREEN_GLASS; (3) body corners/rails/side and bottom cells; (4) each
+control and antenna with its corresponding body boundary; (5) USB cavity/tongue,
+each acoustic port and screw; (6) front masks/optic layers/receiver and screen
+states; (7) rear housing/seat, each camera's six leaves, flash/ring/mic; (8) whole
+device, native bundle, export/consumer/provenance gates and final owner decision.
+
+Each focused slice has at most one existing leaf or shared construction family.
+If a shared helper changes, verify every existing caller. For each slice:
+record its source object/region and actual GLB node, functional purpose, exact
+defect, mating neighbors and UV/bake constraints; reproduce RED on saved Blender
+or exported buffers; change only needed geometry/segments; materialize relevant
+production modifiers; update affected UV/bakes and fingerprint inputs; export
+through the existing pipeline; focused GREEN; inspect isolated leaf -> mating
+neighbors -> group -> full assembly in the same Storybook render/wireframe.
+An approved leaf is retained; it is not rebuilt simply because another fails.
+
+Use the frozen baseline and exactly matched macro viewpoints at an agreed close
+review zoom to choose segmentation. Diagnose silhouette deviation/highlight
+continuity before assigning numerical tolerances. Keep flat interiors sparse;
+do not impose universal quads, density, aspect ratio or triangle cap. A frame cap
+must have deliberate authored triangles/quads and controlled export triangulation,
+not an incidental n-gon triangulation. Acceptance is per region and assembly.
+
+"Assembly" is not joining all objects into one mesh. Existing root/anchors/names,
+material and screen-state boundaries remain. Weld only a continuous physical skin
+whose mating boundary is proven compatible; preserve distinct glass, controls,
+optics, decal and screen surfaces. No bulk object joins or hierarchy changes to
+save draw calls. Body's disconnected source cells need their own boundary audit.
+
+Pinned Blender 5.2.1 saved-file audit on Oct05: source and plugin bundle each have
+56 mesh objects (52 hide_render=False); delivery.blend has 52 meshes and no HIGH.
+Web exports 51 meshes: SCREEN_GLASS is native-only. Source/plugin keep four hidden
+references: BACK_GLASS_SEAT, BODY_ALUMINUM_HIGH and CAMERA_1_SEAT/CAMERA_2_SEAT.
+Plugin-bundle HIGH exclusion is therefore still unmet even though delivery.blend
+is clean. Visible native modifiers remain on antennas, FRONT_RECEIVER_MIC, USB
+cavity/tongue and SCREEN_GLASS. DISPLAY_BEZEL and DISPLAY_GLASS_SEAT each have
+two authored n-gons; SCREEN_GLASS has three. These are concrete pilot/native
+work items; the existing ten passing contracts do not cover all these requirements.
+
+Freeze/isolation milestone verification: mutation RED -> SHA guard GREEN;
+unfrozen primary story RED -> pinned story GREEN; absent part isolation RED ->
+all 51 leaves/nine groups GREEN in a real browser with unchanged parents/world
+transforms and assembly restoration. Preview24/24, fast209/209, exact Blender
+ten contracts, declared-input checks, Khronos compat/Meshopt 0 errors/0 warnings,
+Storybook build and extended browser smoke PASS. Driver/Clock/large-chunk warnings
+remain recorded. Standards/Spec milestone reviews: 0 findings each, worst none.
+No geometry repair, commit/push/merge or whole-device HUMAN PASS in this milestone.
+
+#### Historical implementation records below
+
+The following Oct03/Oct04 records are provenance, not current completion claims.
+Any older "release-candidate quality" / "only Human Gate remains" statement is
+superseded by the Oct05 owner topology rejection, frozen reference and recursive
+work design above. Old camera approval describes accepted appearance only.
 
 Finish production topology for the entire canonical iPhone 17 v30, not only the camera. Preserve Apple datums, materials, finishes, names, roles, anchors and v30 identity while replacing dense, n-gon-heavy or brittle source/runtime meshes with intentional low-poly hard-surface topology.
 

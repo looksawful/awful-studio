@@ -1,8 +1,31 @@
 # AWFUL STUDIO model preview
 
-Internal Storybook catalog for canonical 3D assets.
+One Storybook package (`preview/`), one Three.js viewer (`src/model-viewer.mjs`), one generated catalog. Browser wireframe shows the actual exported GLB triangles, including front/back surfaces; it does not show Blender's authored quad topology.
 
-## Local use
+## Where to review
+
+The permanent published address is https://looksawful.github.io/awful-studio/. On 2026-10-05, the latest successful Pages workflow was [36424975204](https://github.com/looksawful/awful-studio/actions/runs/36424975204), built on 2026-09-28 from `c3162abcc781e9ee917b3ba271d416fa3c5f65e4`. Its device stories exist, but this is an older published build. It does not contain the pinned review snapshots below.
+
+The current uncommitted review build on Titan is http://127.0.0.1:6006/?path=/story/models-catalog--catalog. This address works on Titan; it is not a shared internet address. Open the four device stories from that catalog to rotate, zoom and switch between render and GLB triangle wireframe. Every primary device story reads the same catalog entry shown on the landing page.
+
+| Primary story ID | Review selection, 2026-10-05 | GLB SHA-256 prefix | Triangles |
+| --- | --- | --- | --- |
+| `models-devices--i-phone-17` | Frozen look; topology not accepted | `68bcd22831e4` | 11,538 |
+| `models-devices--i-pad-pro-11` | iPad writer WIP snapshot; human review needed | `3640fec046ab` | 20,674 |
+| `models-devices--i-pad-pro-13` | iPad writer WIP snapshot; human review needed | `7003ee11422a` | 20,682 |
+| `models-devices--mac-book-pro-14` | MacBook G2 writer WIP snapshot; human review needed | `bc4a4c03f511` | 74,023 |
+
+These are selected snapshots. `v30`, `v6` and `v1` alone do not identify the latest geometry everywhere. Freshness requires GLB checksum, source revision, source commit and snapshot branch/HEAD. The exporter source commit can predate writer HEAD or omit uncommitted changes; the full snapshot identity and copied source manifest preserve that distinction. A manifest's `RELEASE_CANDIDATE` stage does not confer visual acceptance.
+
+## Sources and archive policy
+
+The iPad writer is `agent/51-ipad-control-geometry`, HEAD `c6c9457e238c65f32e521d8b7234c82d788fc175`, including rebuilt uncommitted source/runtime. MacBook is `fix/macbook-g2-overlay-calibration`, HEAD `e39d8d10` at audit, with uncommitted geometry-contract changes included in the source revision. These writers are separate checkouts and are not represented by the iPhone checkout's worktree list. Their source-file hashes, artifact hashes and GLB-root provenance were checked before copying the browser candidates.
+
+The iPhone freeze stays in `generated/iphone-review/frozen-current-2026-10-05/`. The three other byte-exact review copies and original manifests are in `generated/device-review/current-2026-10-05/`. They are review evidence, never replacement production sources. No native Blender source, generator or delivery file in another writer was edited. Embedded textures, current screen-state/glow metadata and MacBook animation clips are retained. All four browser loads verify the pinned checksum before parsing, then verify manifest provenance on the loaded root.
+
+Older device runtime files in this checkout remain at their production paths for existing consumers, but are not served by this review build or selectable as primary device stories. Historical iPhone reference evidence remains under `generated/iphone-review/archive/`, excluded from static serving. Do not delete old source evidence or duplicate binaries merely to hide them from the catalog. Replace a review snapshot only by an explicit new selection with new evidence; never silently overwrite the frozen iPhone.
+
+## Local use and verification
 
 ```powershell
 cd preview
@@ -10,36 +33,24 @@ npm ci
 npm run storybook
 ```
 
-Production verification:
-
 ```powershell
 npm test
 npm run storybook:build
 npm run smoke
 ```
 
-## Catalog
+`npm run catalog` assembles selected device snapshot metadata and existing Studio Rig/scene manifests. `catalog:check` rejects stale metadata without rewriting it. The same static build can be served locally or through the existing GitHub Pages workflow; a second preview application or hosting service is unnecessary.
 
-The generated catalog contains only current canonical assets:
-- iPhone 17 v30
-- iPad Pro 11 M5 v6
-- iPad Pro 13 M5 v6
-- MacBook Pro 14 M5 v1
-- Studio Rig v01 objects and LODs
-- White Studio v2
-- Dark Neon v2
-- Loft Daylight v2
+Studio Rig v01 and White Studio/Dark Neon/Loft Daylight v2 remain in the catalog. Studio Rig uses repository runtime files; scene GLBs remain preview exports from canonical Blender candidates.
 
-Device and Studio Rig GLBs are served from their canonical repository runtime paths. Scene GLBs under `generated/scenes/` are preview-only exports from the canonical Blender scene candidates.
+## iPhone presentation contract
 
-## iPhone web presentation
+The frozen snapshot pins display artwork, finish palette, material policies and lighting values. It preserves `SCREEN_CONTENT` states, software Dynamic Island artwork, privacy indicator as screen state, under-glass front masks, and the authored 7.79 mm hardware datum. The viewer does not move front optics to follow screen artwork. Wireframe uses exported triangle geometry; render restores its PBR materials and selected screen/finish state.
 
-The iPhone viewer adds Home, Off, Lock, Website and Resume display states. Website and Resume are live mobile captures of the public portfolio; the browser frame and lock artwork are illustrative. `public/screens/provenance.json` retains capture dimensions and source URLs.
+## Publishing and responsibility
 
-The display raster is 1206 × 2622, with a 402 × 874 logical viewport at 3×. At Apple's specified 460 ppi this corresponds to 66.59 × 144.78 mm, matching the canonical 66.57 × 144.79 mm active area within rounding. UI is mapped without cover cropping or screen-vertex rescaling; the inherited Home plate remains the official reference artwork.
+The existing `.github/workflows/preview-pages.yml` builds/deploys this Storybook on `main`, with manual dispatch also available. Working files and local evidence do not reach Pages automatically. Dispatching an old remote branch cannot publish uncommitted snapshots.
 
-`iphone-presentation.mjs` keeps the mapped/emitting material only on the front face, aligns visible front optics to the visible island, calibrates cavity/fastener reflections, and adds a correctly oriented display-sized area emitter. The canonical GLB now has a separate dark display-edge material and deep grille backings with an embedded weave normal map and exported UV tangents. The helper accepts both the original mesh and GLTFLoader's split-primitive group. Visual front-optic alignment remains a web override; the source hardware datum and LOW_DRAFT delivery stage are preserved.
+Current review preparation does not authorize committing, pushing, merging or deploying held model work. Keep each model's existing human visual gate and PR holds. Once the selected deliverable is approved and authorized for delivery, publish through this same workflow and verify deployed story IDs and exact GLB hashes before calling the published URL current.
 
-## Publishing
-
-`main` deploys the static Storybook through GitHub Pages. Working branches only validate the preview through `Extension QA`; they do not create permanent preview branches.
+GitHub owns implementation/evidence, Asana owns execution, and Notion owns durable context. Dated handoffs and published builds are provenance until current owner evidence verifies them; this README is a preview entry point, not another backlog.

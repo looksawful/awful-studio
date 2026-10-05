@@ -1,0 +1,227 @@
+{
+  "asset_id": "ipad_pro_13_m5",
+  "version": "v6",
+  "stage": "LOW_DRAFT",
+  "source_blend": "generated/ipad_pro_13_m5_low_v6.blend",
+  "delivery_blend": "runtime/v6/ipad_pro_13_m5_v6_delivery.blend",
+  "glb": "runtime/v6/ipad_pro_13_m5_v6_web.glb",
+  "body_dimensions_mm": [
+    215.5,
+    281.6,
+    5.1
+  ],
+  "dimension_order": [
+    "width_x",
+    "height_y",
+    "depth_z"
+  ],
+  "runtime_bounds_mm": [
+    215.578,
+    281.688,
+    7.314
+  ],
+  "units": "meters",
+  "source_up_axis": "+Z",
+  "source_forward_axis": "-Y",
+  "up_axis": "+Y",
+  "forward_axis": "+Z",
+  "root": "CTRL_IPAD_PRO_13",
+  "screen_object": "SCREEN_CONTENT",
+  "anchors": [
+    "ANCHOR_CENTER",
+    "ANCHOR_BOTTOM_CENTER",
+    "ANCHOR_SCREEN_CENTER",
+    "ANCHOR_REAR_CAMERA",
+    "SCREEN_GLOW_ANCHOR"
+  ],
+  "dimensional_drawing_url": "https://developer.apple.com/download/files/accessories/dimensional-drawings/ipad-pro-13-inch-m5.pdf",
+  "screen_states": {
+    "screen_off": {
+      "emission_strength": 0.0,
+      "glow_intensity": 0.0
+    },
+    "screen_on": {
+      "emission_strength": 0.85,
+      "glow_intensity": 1.0
+    }
+  },
+  "screen_glow": {
+    "anchor": "SCREEN_GLOW_ANCHOR",
+    "type": "rect_area",
+    "width_mm": 199.14,
+    "height_mm": 265.19,
+    "source_energy_w": 8.0
+  },
+  "lods": [
+    {
+      "name": "LOD0",
+      "file": "ipad_pro_13_m5_v6_web.glb"
+    }
+  ],
+  "materials": [
+    "MAT_APPLE_LOGO_DECAL",
+    "MAT_ASSEMBLY_GAP",
+    "MAT_DISPLAY_BEZEL",
+    "MAT_FLASH",
+    "MAT_FRONT_OPTIC",
+    "MAT_IPAD_ALUMINUM",
+    "MAT_IPAD_EDGE",
+    "MAT_OPTICAL_GLASS",
+    "MAT_OPTICS_BLACK",
+    "MAT_SCREEN_CONTENT"
+  ],
+  "exported_objects": [
+    "CTRL_IPAD_PRO_13",
+    "ANCHOR_BOTTOM_CENTER",
+    "ANCHOR_CENTER",
+    "ANCHOR_REAR_CAMERA",
+    "ANCHOR_SCREEN_CENTER",
+    "APPLE_LOGO_DECAL",
+    "BODY_ALUMINUM",
+    "BOTTOM_L_SPEAKER_01",
+    "BOTTOM_L_SPEAKER_02",
+    "BOTTOM_L_SPEAKER_03",
+    "BOTTOM_L_SPEAKER_04",
+    "BOTTOM_L_SPEAKER_05",
+    "BOTTOM_L_SPEAKER_06",
+    "BOTTOM_R_SPEAKER_01",
+    "BOTTOM_R_SPEAKER_02",
+    "BOTTOM_R_SPEAKER_03",
+    "BOTTOM_R_SPEAKER_04",
+    "BOTTOM_R_SPEAKER_05",
+    "BOTTOM_R_SPEAKER_06",
+    "CAMERA_HOUSING",
+    "DISPLAY_BEZEL",
+    "DISPLAY_GLASS_SEAT",
+    "FLASH",
+    "FRONT_CAMERA_GLASS",
+    "FRONT_CAMERA_INNER",
+    "FRONT_CAMERA_PUPIL",
+    "LIDAR",
+    "LIDAR_RING",
+    "PENCIL_MAGNETIC_RAIL",
+    "REAR_CAMERA_GLASS",
+    "REAR_CAMERA_INNER",
+    "REAR_CAMERA_PUPIL",
+    "REAR_CAMERA_RING",
+    "REAR_MIC",
+    "SCREEN_CONTENT",
+    "SCREEN_GLOW_ANCHOR",
+    "SMART_CONNECTOR_1",
+    "SMART_CONNECTOR_2",
+    "SMART_CONNECTOR_3",
+    "TOP_BUTTON",
+    "TOP_L_SPEAKER_01",
+    "TOP_L_SPEAKER_02",
+    "TOP_L_SPEAKER_03",
+    "TOP_L_SPEAKER_04",
+    "TOP_L_SPEAKER_05",
+    "TOP_L_SPEAKER_06",
+    "TOP_R_SPEAKER_01",
+    "TOP_R_SPEAKER_02",
+    "TOP_R_SPEAKER_03",
+    "TOP_R_SPEAKER_04",
+    "TOP_R_SPEAKER_05",
+    "TOP_R_SPEAKER_06",
+    "USB_C_CAVITY",
+    "USB_C_TONGUE",
+    "VOL_DOWN",
+    "VOL_UP"
+  ],
+  "runtime_roles": {
+    "BODY_ALUMINUM": "body",
+    "SCREEN_CONTENT": "screen",
+    "SCREEN_GLASS": "screen_glass",
+    "FRONT_CAMERA_GLASS": "front_camera_optic",
+    "TOP_BUTTON": "control",
+    "VOL_UP": "control",
+    "VOL_DOWN": "control",
+    "USB_C_CAVITY": "port",
+    "CAMERA_HOUSING": "camera_housing",
+    "REAR_CAMERA_GLASS": "camera_optic",
+    "LIDAR": "depth_sensor",
+    "APPLE_LOGO_DECAL": "branding"
+  },
+  "threejs_loader": "GLTFLoader",
+  "requires_meshopt_decoder": false,
+  "web_variants": {
+    "compat": {
+      "file": "ipad_pro_13_m5_v6_web.glb",
+      "requires": []
+    },
+    "meshopt": {
+      "file": "ipad_pro_13_m5_v6_web_meshopt.glb",
+      "requires": [
+        "MeshoptDecoder"
+      ],
+      "extensions_required": [
+        "EXT_meshopt_compression",
+        "KHR_mesh_quantization"
+      ]
+    }
+  },
+  "camera_fit": "runtime_bounds",
+  "source_revision": "06e46e261a6aa7dbd31db47cbf6550481ca51e718b7cee2d979a6dffeecc9bca",
+  "source_commit": "c6c9457e238c65f32e521d8b7234c82d788fc175",
+  "plugin_source_revision": "06e46e261a6aa7dbd31db47cbf6550481ca51e718b7cee2d979a6dffeecc9bca",
+  "generator_version": "ipad_v6_packaged_blend_web_delivery",
+  "delivery_profile": {
+    "simplification": "none",
+    "compression": "compat+meshopt",
+    "node_preservation": "required"
+  },
+  "default_web_variant": "compat",
+  "preferred_web_variant": "meshopt",
+  "web_optimizer": {
+    "tool": "@gltf-transform/cli",
+    "version": "4.5.0",
+    "command": "meshopt --level high"
+  },
+  "source_files": {
+    "assets/device_mockups/common/foundation_common.py": "1d68c3fff908b7ae149f74c31a19064eb6d2384234d33bd71071fea70d651d12",
+    "assets/device_mockups/ipad_pro/export_runtime_v6.py": "a3ad601ffb9cee2803487c66ee565ed848d88a4a2a6988ae5db2595e3cf7d7d9",
+    "assets/device_mockups/ipad_pro/generate_low_v6.py": "13f87d93f6c3f4ca6539bb0cc96996921a0f9d2d249c5513b3c5f3bfcab9c34e",
+    "assets/device_mockups/ipad_pro/optimize_runtime_v6.py": "e9eb6ac3ab33af97ab4ad008264c9c997c02715ce87be2fedff4ef2cb77c8c0a",
+    "assets/device_mockups/ipad_pro/reference/apple_logo_alpha.png": "50209309a1cf3bcb874118b27fe9c9779aaafabaf79bb304cf0aa3a2898c9833",
+    "assets/device_mockups/ipad_pro/reference/ipados26_lock_screen_13.png": "e5518a1b6e7adcb26629cc8929cdc204079d72408b5756c0f7960304373db7ce",
+    "assets/device_mockups/ipad_pro/reference/ipados26_official_screen_13.png": "8a260fe6c432132c2987179228d80a1022def52ce3d7dad74a6588abd36f122b"
+  },
+  "glb_qa": {
+    "triangle_count": 20682,
+    "required_nodes": [
+      "ANCHOR_BOTTOM_CENTER",
+      "ANCHOR_CENTER",
+      "ANCHOR_REAR_CAMERA",
+      "ANCHOR_SCREEN_CENTER",
+      "APPLE_LOGO_DECAL",
+      "CAMERA_HOUSING",
+      "CTRL_IPAD_PRO_13",
+      "FRONT_CAMERA_GLASS",
+      "LIDAR",
+      "REAR_CAMERA_GLASS",
+      "SCREEN_CONTENT",
+      "SCREEN_GLOW_ANCHOR"
+    ],
+    "node_count": 56,
+    "material_count": 10,
+    "runtime_bounds_mm": [
+      215.578,
+      281.688,
+      7.314
+    ]
+  },
+  "artifacts": {
+    "delivery_blend": {
+      "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_delivery.blend",
+      "sha256": "f5b05ed4d9c7b4682a17ef9e64041b6887758a34bdb6a4293491e50dcbe159c6"
+    },
+    "compat_glb": {
+      "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_web.glb",
+      "sha256": "7003ee11422a106b379bed8586b94d20d041d20e6d00edf84747048ad2d4a5c0"
+    },
+    "meshopt_glb": {
+      "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_web_meshopt.glb",
+      "sha256": "7c1d41412c3e08fa7933ecca3c80e703d25df1f9673608b2400cff8776975b83"
+    }
+  }
+}

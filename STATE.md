@@ -4,6 +4,8 @@ Last reviewed: 2026-09-13
 
 This is the short engineering handoff. Product requirements live in accepted specs; implementation status/evidence lives in released source, GitHub Issues, PRs and CI.
 
+Preview entry point (verified 2026-10-05): `preview/README.md`. The September 28 published Storybook and October 5 local review snapshots are different builds. Device delivery version labels alone do not identify current geometry. All selected device review candidates use the same Storybook package and generated catalog; production source ownership stays with their existing branches.
+
 ## Release state
 
 - Current release: 1.0.0.

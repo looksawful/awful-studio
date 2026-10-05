@@ -18,6 +18,13 @@ export function availableLods(asset) {
   return [{ name: 'Default', path: asset.previewGlb }];
 }
 
+export async function verifySnapshotBytes(bytes, expectedSha256) {
+  if (!/^[a-f0-9]{64}$/.test(expectedSha256 ?? '')) throw new Error('Frozen snapshot SHA-256 missing or invalid');
+  const digest = await globalThis.crypto.subtle.digest('SHA-256', bytes);
+  const actual = Array.from(new Uint8Array(digest), value => value.toString(16).padStart(2, '0')).join('');
+  if (actual !== expectedSha256) throw new Error(`Frozen snapshot checksum mismatch: ${actual}`);
+}
+
 export function validateModelProvenance(asset, root) {
   if (!root?.userData) return ['GLB provenance root missing'];
   const expected = {
@@ -44,6 +51,7 @@ export function cameraDirection(preset) {
 }
 
 export function previewMaterialPolicy(name, { hasTexture = false } = {}) {
+  if (/^MAT_ANODIZED_ALUMINUM_(ACTION_BUTTON|SIDE_BUTTON|VOL_UP|VOL_DOWN)$/.test(name)) name = 'MAT_ANODIZED_ALUMINUM';
   const surfacePolicies = {
     MAT_ANODIZED_ALUMINUM: { frontSide: true, envMapIntensity: 0.55, minRoughness: 0.28 },
     MAT_IPAD_ALUMINUM: { frontSide: true, envMapIntensity: 0.55, minRoughness: 0.3 },
