@@ -1,0 +1,22 @@
+{
+  "ANTENNA_SIDE_L_55": {
+    "max_sampled_surface_error_m": 2.193877662648447e-06,
+    "baseline_evaluated_triangles": 300,
+    "current_authored_triangles": 188
+  },
+  "ANTENNA_SIDE_L_-55": {
+    "max_sampled_surface_error_m": 2.193877662648447e-06,
+    "baseline_evaluated_triangles": 300,
+    "current_authored_triangles": 188
+  },
+  "ANTENNA_SIDE_R_55": {
+    "max_sampled_surface_error_m": 2.193877662648447e-06,
+    "baseline_evaluated_triangles": 300,
+    "current_authored_triangles": 188
+  },
+  "ANTENNA_SIDE_R_-55": {
+    "max_sampled_surface_error_m": 2.193877662648447e-06,
+    "baseline_evaluated_triangles": 300,
+    "current_authored_triangles": 188
+  }
+}

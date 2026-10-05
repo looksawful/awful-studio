@@ -654,3 +654,53 @@ Fresh fast verification after evidence retention exposed a hardcoded Blender pat
 in the diagnostic proof harness. It now requires CLI --blender, derives its repo
 and uses system temp fixtures. Actual RED/GREEN proof rerun PASS; fast209/209 PASS;
 independent Standards and Spec PASS. Geometry and candidate bytes are unchanged.
+
+## 2026-10-06 - Ticket #141 controls / antennas / recesses
+
+Geometry fixed point `f38343912861546bef5ea371604dad612b7e562a`; precommit
+HEAD `eb7021427a84805cbcd9d26ca94c6bdcd34c2027` adds only the independently
+reviewed portable #140 evidence harness. Source ownership/preflight confirmed;
+prototypes remain preserved/untracked. Baseline copies and raw diagnostics:
+`F:\Temp\iphone17-ticket141`.
+
+Fresh Blender audit: all five controls already have intentional saved capsule
+geometry,44 verts/44 faces, no runtime modifiers. No concrete control/recess defect
+was reproduced. Four antennas were saved8-vertex/6-face boxes with runtime BEVEL;
+GLB exported only12 triangles each. Focused contract observed RED before source edit.
+
+Retained local repair: materialize only the four antenna bevels in the existing
+source generator, before placement, with three controlled arc spans. Shared helpers,
+controls, mating body cells and all unrelated geometry are untouched. Two spans
+were rejected: sampled native surface error5.186um exceeded the selected5um bound.
+Three spans retain evaluated native surface within sampled2.194um. This is a
+bidirectional vertex-to-triangle sample, not a certified continuous Hausdorff bound.
+Native evaluated baseline was300 triangles per antenna; current saved geometry is
+96verts/98faces/188triangles, zero n-gons/non-manifold/degenerate/zero-length defects,
+no modifiers, preserved material/UV layer/datum/root. Complete saved triangle counters
+match all four compat GLB meshes.
+
+Exact retained candidate:
+- compat `17d542c9a8317401a182f453930fa9967fd8cddf10aa0278e49d2d34720fb40a`;
+- Meshopt `3e8250c6e5b01ab51778a5e7f6f5336db9fd6b36db568544974535ce01ab0b78`;
+- source revision `5202ef46c41e321c72a92992990c69ac792838fad8e9707bd188c72a04f83679`;
+- web12170 triangles, diagnostic only. Source_commit still a8ad3a2 precommit;
+  final provenance remains #145/#146. Frozen68bcd228...feae0 is unchanged.
+
+Fresh verification: existing build exit0; Blender5.2.1 all14 iPhone runtime contracts
+PASS; fast209/209, preview25/25 and Storybook build PASS; Khronos compat/Meshopt both
+0errors/0warnings. Exact baseline/current/frozen Storybook audits:9 assembled
+control/recess/antenna/body views, five finishes, clay and actual triangle-wire,
+63frames each, SHA/revision verified, geometry buffers invariant across modes,
+no browser errors. Matched sheets inspected by independent Spec reviewer: no
+pointed/diamond capsule boundary regression, spacing change, gap or shading break.
+Volume/Side/Camera control texture/clay views are pixel-identical to baseline;
+small Action-frame changes include the nearby repaired antenna. Body, all controls
+and other47 GLB meshes, materials and embedded images are byte unchanged.
+
+Independent Standards PASS + Spec PASS against the geometry fixed point.
+Durable evidence: `assets/device_mockups/iphone_17/evidence/ticket141_controls_antennas/`.
+Decision: retain #141 repair. Next frontier #142 bottom assembly / USB-C diagnosis;
+do not change USB color before isolating geometry/normals/material cause. Whole-device
+Human Gate remains pending after #146. Mobile access uses existing Storybook on
+`https://titan.tail85619a.ts.net:8443`; primary iPhone story is still the frozen look,
+not a working-candidate approval link. PR119 remains OPEN/DRAFT/HOLD; no push/merge/deploy.

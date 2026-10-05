@@ -13,7 +13,7 @@
         "hints": 0,
         "pass": true,
         "file": "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb",
-        "sha256": "61fa9616c5b26b7c9c43bf8b10db307ab132ac5dc311197f83992d9d2725def1"
+        "sha256": "17d542c9a8317401a182f453930fa9967fd8cddf10aa0278e49d2d34720fb40a"
       },
       "meshopt": {
         "validator_version": "2.0.0-dev.3.10",
@@ -23,7 +23,7 @@
         "hints": 0,
         "pass": true,
         "file": "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web_meshopt.glb",
-        "sha256": "74b1714b4e7d45a70de239d0c5f24a0d1d681e68276474b86ad9fe561f9a0ff5"
+        "sha256": "3e8250c6e5b01ab51778a5e7f6f5336db9fd6b36db568544974535ce01ab0b78"
       }
     },
     "ipad_pro_11_m5": {

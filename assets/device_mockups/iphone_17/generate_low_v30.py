@@ -973,6 +973,11 @@ for side, edge in (("L", "LEFT"), ("R", "RIGHT")):
     for z_mm in (55.0, -55.0):
         strip = fc.rounded_cube(f"ANTENNA_SIDE_{side}_{int(z_mm)}", (0.10*MM, 1.02*MM, 4.3*MM),
                                 0.06*MM, black, detail_c)
+        # Three arc spans preserve the evaluated bevel surface within 5 microns.
+        # Materialize it here: glTF exports the saved mesh, not this modifier.
+        strip.modifiers["EDGE_BEVEL"].segments = 3
+        bpy.context.view_layer.objects.active = strip
+        bpy.ops.object.modifier_apply(modifier="EDGE_BEVEL")
         fc.place_on_rounded_edge(strip, W, H, BODY_R, edge, z_mm*MM, outward=-0.018*MM, local_normal=(1,0,0))
 
 usb_cutter = fc.rounded_cube("USB_C_CUTTER", (8.99*MM, 3.00*MM, 1.82*MM), 0.91*MM, None, detail_c)

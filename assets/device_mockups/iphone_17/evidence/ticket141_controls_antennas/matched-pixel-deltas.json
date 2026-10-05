@@ -1,0 +1,254 @@
+{
+  "action-texture-black": {
+    "rmse255": 0.035618948939992144,
+    "changed_fraction": 8.076053348100974e-05
+  },
+  "vol-up-texture-black": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "vol-down-texture-black": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "side-texture-black": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "camera-control-texture-black": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "antenna-L-55-texture-black": {
+    "rmse255": 1.308311702705907,
+    "changed_fraction": 0.004932161151875952
+  },
+  "antenna-L--55-texture-black": {
+    "rmse255": 1.2640334740920227,
+    "changed_fraction": 0.004926392542341594
+  },
+  "antenna-R-55-texture-black": {
+    "rmse255": 0.9043678185675524,
+    "changed_fraction": 0.005147907148460935
+  },
+  "antenna-R--55-texture-black": {
+    "rmse255": 0.8620781933865433,
+    "changed_fraction": 0.00516636669897088
+  },
+  "action-texture-white": {
+    "rmse255": 0.18416287056924227,
+    "changed_fraction": 8.076053348100974e-05
+  },
+  "vol-up-texture-white": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "vol-down-texture-white": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "side-texture-white": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "camera-control-texture-white": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "antenna-L-55-texture-white": {
+    "rmse255": 2.0927541391881377,
+    "changed_fraction": 0.005217130462873229
+  },
+  "antenna-L--55-texture-white": {
+    "rmse255": 2.0620251858677108,
+    "changed_fraction": 0.005210208131432
+  },
+  "antenna-R-55-texture-white": {
+    "rmse255": 2.4887415514933804,
+    "changed_fraction": 0.005252895841986248
+  },
+  "antenna-R--55-texture-white": {
+    "rmse255": 2.3911082985727687,
+    "changed_fraction": 0.005248280954358761
+  },
+  "action-texture-mist_blue": {
+    "rmse255": 0.10871220097129568,
+    "changed_fraction": 7.960681157413817e-05
+  },
+  "vol-up-texture-mist_blue": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "vol-down-texture-mist_blue": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "side-texture-mist_blue": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "camera-control-texture-mist_blue": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "antenna-L-55-texture-mist_blue": {
+    "rmse255": 1.5934142211849474,
+    "changed_fraction": 0.005235590013383174
+  },
+  "antenna-L--55-texture-mist_blue": {
+    "rmse255": 1.562178666944577,
+    "changed_fraction": 0.005236743735290045
+  },
+  "antenna-R-55-texture-mist_blue": {
+    "rmse255": 1.5855501458006305,
+    "changed_fraction": 0.005263279339148092
+  },
+  "antenna-R--55-texture-mist_blue": {
+    "rmse255": 1.5174963207884165,
+    "changed_fraction": 0.00526212561724122
+  },
+  "action-texture-sage": {
+    "rmse255": 0.09201928954572183,
+    "changed_fraction": 8.076053348100974e-05
+  },
+  "vol-up-texture-sage": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "vol-down-texture-sage": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "side-texture-sage": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "camera-control-texture-sage": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "antenna-L-55-texture-sage": {
+    "rmse255": 1.497400848315796,
+    "changed_fraction": 0.005235590013383174
+  },
+  "antenna-L--55-texture-sage": {
+    "rmse255": 1.4638089190356456,
+    "changed_fraction": 0.005236743735290045
+  },
+  "antenna-R-55-texture-sage": {
+    "rmse255": 1.382541806557049,
+    "changed_fraction": 0.005263279339148092
+  },
+  "antenna-R--55-texture-sage": {
+    "rmse255": 1.3226593491652308,
+    "changed_fraction": 0.00526212561724122
+  },
+  "action-texture-lavender": {
+    "rmse255": 0.14520290380742715,
+    "changed_fraction": 8.076053348100974e-05
+  },
+  "vol-up-texture-lavender": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "vol-down-texture-lavender": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "side-texture-lavender": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "camera-control-texture-lavender": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "antenna-L-55-texture-lavender": {
+    "rmse255": 1.7652829863872808,
+    "changed_fraction": 0.005235590013383174
+  },
+  "antenna-L--55-texture-lavender": {
+    "rmse255": 1.734807939225098,
+    "changed_fraction": 0.005236743735290045
+  },
+  "antenna-R-55-texture-lavender": {
+    "rmse255": 1.9879090774847115,
+    "changed_fraction": 0.005263279339148092
+  },
+  "antenna-R--55-texture-lavender": {
+    "rmse255": 1.9039960956330149,
+    "changed_fraction": 0.00526212561724122
+  },
+  "action-clay-white": {
+    "rmse255": 0.10625411995153979,
+    "changed_fraction": 8.5375421108496e-05
+  },
+  "vol-up-clay-white": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "vol-down-clay-white": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "side-clay-white": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "camera-control-clay-white": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "antenna-L-55-clay-white": {
+    "rmse255": 1.4758906162732417,
+    "changed_fraction": 0.004759102865845217
+  },
+  "antenna-L--55-clay-white": {
+    "rmse255": 1.4694877927065901,
+    "changed_fraction": 0.004877936222252988
+  },
+  "antenna-R-55-clay-white": {
+    "rmse255": 1.0443891461532744,
+    "changed_fraction": 0.004806405464026951
+  },
+  "antenna-R--55-clay-white": {
+    "rmse255": 1.046011773838597,
+    "changed_fraction": 0.004962157921454612
+  },
+  "action-wireframe-white": {
+    "rmse255": 1.2502535623575828,
+    "changed_fraction": 0.00024574276616364394
+  },
+  "vol-up-wireframe-white": {
+    "rmse255": 0.5863710846929252,
+    "changed_fraction": 0.00012921685356961557
+  },
+  "vol-down-wireframe-white": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "side-wireframe-white": {
+    "rmse255": 0.6179137016992778,
+    "changed_fraction": 0.00011652591259402834
+  },
+  "camera-control-wireframe-white": {
+    "rmse255": 0.5971892955222978,
+    "changed_fraction": 0.0001142184687802852
+  },
+  "antenna-L-55-wireframe-white": {
+    "rmse255": 12.329670377151666,
+    "changed_fraction": 0.009556278554617196
+  },
+  "antenna-L--55-wireframe-white": {
+    "rmse255": 12.331589452927513,
+    "changed_fraction": 0.009551663666989708
+  },
+  "antenna-R-55-wireframe-white": {
+    "rmse255": 10.948528041660035,
+    "changed_fraction": 0.008634454751026812
+  },
+  "antenna-R--55-wireframe-white": {
+    "rmse255": 12.09747868331792,
+    "changed_fraction": 0.009555124832710324
+  }
+}

@@ -1,0 +1,58 @@
+[
+  {
+    "test": "iphone_v30_antenna_topology_contract.py",
+    "exit": 0
+  },
+  {
+    "test": "iphone_v30_body_cell_shape_contract.py",
+    "exit": 0
+  },
+  {
+    "test": "iphone_v30_body_rail_topology_contract.py",
+    "exit": 0
+  },
+  {
+    "test": "iphone_v30_body_topology_contract.py",
+    "exit": 0
+  },
+  {
+    "test": "iphone_v30_body_visible_material_contract.py",
+    "exit": 0
+  },
+  {
+    "test": "iphone_v30_bottom_topology_contract.py",
+    "exit": 0
+  },
+  {
+    "test": "iphone_v30_controls_topology_contract.py",
+    "exit": 0
+  },
+  {
+    "test": "iphone_v30_display_frame_topology_contract.py",
+    "exit": 0
+  },
+  {
+    "test": "iphone_v30_geometry_contract.py",
+    "exit": 0
+  },
+  {
+    "test": "iphone_v30_panel_stack_topology_contract.py",
+    "exit": 0
+  },
+  {
+    "test": "iphone_v30_rear_optics_topology_contract.py",
+    "exit": 0
+  },
+  {
+    "test": "iphone_v30_screen_topology_contract.py",
+    "exit": 0
+  },
+  {
+    "test": "iphone_v30_surface_topology_contract.py",
+    "exit": 0
+  },
+  {
+    "test": "iphone_v30_topology_contract.py",
+    "exit": 0
+  }
+]

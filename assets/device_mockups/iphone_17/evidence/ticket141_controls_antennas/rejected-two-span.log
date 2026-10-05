@@ -1,0 +1,12 @@
+00:00.344  blend            | Read blend: "F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\generated\iphone_17_low_v30.blend"
+00:00.422  blend            | Read blend: "F:\Temp\iphone17-ticket141\baseline.blend"
+Traceback (most recent call last):
+  File "F:\Temp\iphone17-ticket141\compare-native.py", line 13, in <module>
+    report[n]={'max_sampled_surface_error_m':error,'baseline_evaluated_triangles':len(old[1]),'current_authored_triangles':len(new[n][1])};assert error<5e-6,report
+                                                                                                                                                  ^^^^^^^^^^
+AssertionError: {'ANTENNA_SIDE_L_55': {'max_sampled_surface_error_m': 5.18606339028338e-06, 'baseline_evaluated_triangles': 300, 'current_authored_triangles': 108}}
+
+Error: script failed, file: 'F:\Temp\iphone17-ticket141\compare-native.py', exiting.
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit

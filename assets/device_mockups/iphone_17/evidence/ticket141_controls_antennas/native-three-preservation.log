@@ -1,0 +1,6 @@
+00:03.203  blend            | Read blend: "F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\generated\iphone_17_low_v30.blend"
+00:03.765  blend            | Read blend: "F:\Temp\iphone17-ticket141\baseline.blend"
+ANTENNA_NATIVE_PRESERVATION_GREEN {"ANTENNA_SIDE_L_55": {"max_sampled_surface_error_m": 2.193877662648447e-06, "baseline_evaluated_triangles": 300, "current_authored_triangles": 188}, "ANTENNA_SIDE_L_-55": {"max_sampled_surface_error_m": 2.193877662648447e-06, "baseline_evaluated_triangles": 300, "current_authored_triangles": 188}, "ANTENNA_SIDE_R_55": {"max_sampled_surface_error_m": 2.193877662648447e-06, "baseline_evaluated_triangles": 300, "current_authored_triangles": 188}, "ANTENNA_SIDE_R_-55": {"max_sampled_surface_error_m": 2.193877662648447e-06, "baseline_evaluated_triangles": 300, "current_authored_triangles": 188}}
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit

@@ -1,0 +1,135 @@
+{
+  "sha": "68bcd22831e427a077ddfd48662e41bbe8ef46ebda0359c7153b9e3579afeae0",
+  "sourceRevision": "5d109d5dc0cbf5665b74a456945b5bcc6ad675e815bc7a3b4c926c7b8d99d30f",
+  "sourceCommit": "48fa7986be33b1387fe2ccbdf577919e99313792",
+  "triangles": 11538,
+  "evidence": [
+    {
+      "name": "action",
+      "selection": "all",
+      "direction": [
+        -1,
+        0,
+        0.25
+      ],
+      "fraction": [
+        -0.49,
+        0.27217431989840246
+      ],
+      "distance": 0.04
+    },
+    {
+      "name": "vol-up",
+      "selection": "all",
+      "direction": [
+        -1,
+        0,
+        0.25
+      ],
+      "fraction": [
+        -0.49,
+        0.17759508054274445
+      ],
+      "distance": 0.04
+    },
+    {
+      "name": "vol-down",
+      "selection": "all",
+      "direction": [
+        -1,
+        0,
+        0.25
+      ],
+      "fraction": [
+        -0.49,
+        0.08268163892787914
+      ],
+      "distance": 0.04
+    },
+    {
+      "name": "side",
+      "selection": "all",
+      "direction": [
+        1,
+        0,
+        0.25
+      ],
+      "fraction": [
+        0.49,
+        0.13020520018715326
+      ],
+      "distance": 0.055
+    },
+    {
+      "name": "camera-control",
+      "selection": "all",
+      "direction": [
+        1,
+        0,
+        0.25
+      ],
+      "fraction": [
+        0.49,
+        -0.15640665730900338
+      ],
+      "distance": 0.055
+    },
+    {
+      "name": "antenna-L-55",
+      "selection": "all",
+      "direction": [
+        -1,
+        0,
+        0.25
+      ],
+      "fraction": [
+        -0.49,
+        0.36762248512799944
+      ],
+      "distance": 0.012
+    },
+    {
+      "name": "antenna-L--55",
+      "selection": "all",
+      "direction": [
+        -1,
+        0,
+        0.25
+      ],
+      "fraction": [
+        -0.49,
+        -0.36762248512799944
+      ],
+      "distance": 0.012
+    },
+    {
+      "name": "antenna-R-55",
+      "selection": "all",
+      "direction": [
+        1,
+        0,
+        0.25
+      ],
+      "fraction": [
+        0.49,
+        0.36762248512799944
+      ],
+      "distance": 0.012
+    },
+    {
+      "name": "antenna-R--55",
+      "selection": "all",
+      "direction": [
+        1,
+        0,
+        0.25
+      ],
+      "fraction": [
+        0.49,
+        -0.36762248512799944
+      ],
+      "distance": 0.012
+    }
+  ],
+  "errors": []
+}
