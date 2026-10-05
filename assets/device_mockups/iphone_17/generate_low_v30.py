@@ -13,6 +13,7 @@ import foundation_common as fc
 sys.path.insert(0, HERE)
 from camera_topology_v30 import camera_mesh, attach_camera_normal
 from body_topology_v30 import build_body_mesh, apple_bottom_surface
+from display_topology_v30 import display_frame_prism_y
 
 MM = fc.MM
 
@@ -553,12 +554,26 @@ back_glass = rounded_rect_strip_prism_y(
     segments=16,
 )
 
-front_seat = outward_prism("DISPLAY_GLASS_SEAT", COVER_W + 0.10*MM, COVER_H + 0.10*MM, 0.07*MM,
-                              COVER_R + 0.05*MM, gap_mat, screen_c, axis="Y",
-                              location=(0, -METAL_D*0.5 - 0.010*MM, 0), outline_segments=48)
-bezel = outward_prism("DISPLAY_BEZEL", SCREEN_W + 0.68*MM, SCREEN_H + 0.68*MM, 0.08*MM,
-                         SCREEN_R + 0.32*MM, bezel_mat, screen_c, axis="Y",
-                         location=(0, front_y + 0.08*MM, 0), outline_segments=48)
+front_seat = display_frame_prism_y(
+    "DISPLAY_GLASS_SEAT",
+    COVER_W + 0.10*MM,
+    COVER_H + 0.10*MM,
+    0.07*MM,
+    COVER_R + 0.05*MM,
+    gap_mat,
+    screen_c,
+    location=(0, -METAL_D*0.5 - 0.010*MM, 0),
+)
+bezel = display_frame_prism_y(
+    "DISPLAY_BEZEL",
+    SCREEN_W + 0.68*MM,
+    SCREEN_H + 0.68*MM,
+    0.08*MM,
+    SCREEN_R + 0.32*MM,
+    bezel_mat,
+    screen_c,
+    location=(0, front_y + 0.08*MM, 0),
+)
 
 screen_glass = outward_prism("SCREEN_GLASS", COVER_W, COVER_H, GLASS_T, COVER_R,
                                 glass, screen_c, axis="Y", location=(0, front_y, 0),

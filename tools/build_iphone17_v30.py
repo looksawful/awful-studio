@@ -15,6 +15,7 @@ GENERATOR_VERSION = 'web_delivery_camera_logo_normals_v30'
 SOURCE_FILES = [
     'assets/device_mockups/common/foundation_common.py',
     'assets/device_mockups/iphone_17/generate_low_v30.py',
+    'assets/device_mockups/iphone_17/display_topology_v30.py',
     'assets/device_mockups/iphone_17/camera_topology_v30.py',
     'assets/device_mockups/iphone_17/body_topology_v30.py',
     'assets/device_mockups/iphone_17/reference/camera_bake_v30/provenance.json',

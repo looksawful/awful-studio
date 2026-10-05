@@ -442,3 +442,64 @@ If that Human Gate passes:
 4. do not reopen the frozen camera aesthetics unless a real production-equivalence deviation is found.
 
 If the Human Gate finds a defect, fix only the exact affected topology slice and rerun its focused contract plus the full runtime/fast gates.
+
+
+## 2026-10-05 late — Ticket #138 display-frame topology repair
+
+This checkpoint supersedes the older "technical release-candidate quality" wording
+above. The owner's Oct05 whole-device topology rejection still stands. Only the
+display-frame slice is accepted by engineering evidence here; whole-device Human
+Gate remains pending.
+
+Baseline before this slice: commit `134f03f3a231a77fd62f7139f90815af63f0913a`.
+The frozen appearance reference remains immutable at
+`68bcd22831e427a077ddfd48662e41bbe8ef46ebda0359c7153b9e3579afeae0`.
+
+Ticket #138 root cause: `DISPLAY_BEZEL` and `DISPLAY_GLASS_SEAT` were authored
+with two n-gon caps each. Deterministic cap triangulation of the rejected baseline
+also exposed minimum triangle angle about 0.937 degrees and max aspect about
+43.22:1. A first attempted repair was rejected because it inflated each mesh to
+618 verts / 1024 faces and produced extreme slivers; its patch is retained outside
+the repo at `F:\Temp\iphone17-ticket138-v2-rejected.patch`.
+
+Retained repair:
+- dedicated `display_topology_v30.py`, following existing body/camera topology
+  module boundaries; no shared `foundation_common.rounded_prism` change;
+- each display-frame source mesh: 318 verts / 460 faces, 0 n-gons,
+  0 non-manifold edges, 108 outline points;
+- contour error: about 0.00582 mm bezel / 0.00645 mm glass seat;
+- deterministic cap triangulation: min angle about 7.39 degrees,
+  max aspect about 7.77:1;
+- dimensions, locations and material identities remain locked by the runtime
+  contract;
+- exact web delivery is 11,242 triangles, down from the frozen 11,538.
+
+Exact current identity:
+- source revision:
+  `c6a54220cb8b1bcfd8ef1b67a6f4c7c2d046d0396754bdd35272659ec19e23cd`;
+- compat GLB:
+  `56ff5dec5b31a96a8cc656b9f5872313bb94695427e8e73e3b6e0181c7e1d3d3`;
+- Meshopt GLB:
+  `82cf2c72f281d0560af95f087eb12efa1b66bee1e8ce493dea8af6a493a2656c`.
+
+Fresh verification on the retained repair:
+- Blender 5.2.1: baseline RED and current GREEN for
+  `iphone_v30_display_frame_topology_contract.py`;
+- all 11 iPhone v30 runtime contracts PASS;
+- Python fast suite 209/209 PASS;
+- preview tests 25/25 PASS;
+- Khronos glTF Validator 2.0.0-dev.3.10: compat and Meshopt both
+  0 errors / 0 warnings;
+- temporary exact-candidate Storybook build PASS;
+- browser evidence verified frozen SHA and current SHA independently and kept
+  geometry identity stable across texture / clay / actual triangle wire modes;
+- matched whole-device texture comparison changed about 0.0138% of pixels
+  (RMSE about 0.127/255); clay changed about 0.0008% (RMSE about 0.0016/255).
+
+Browser evidence is retained outside the repo at
+`F:\Temp\iphone17-ticket138-final-browser-evidence`. Temporary Storybook
+working-candidate files were removed/restored before staging.
+
+Decision: retain repair for Ticket #138. This does not approve screen/panel,
+body, controls, bottom, front hardware, rear system, production provenance or
+the whole device. Next frontier is Ticket #139. PR #119 remains DRAFT/HOLD.
