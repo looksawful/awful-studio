@@ -210,3 +210,124 @@ def display_frame_prism_y(
     bm.free()
     mesh.update()
     return obj
+
+
+def _rounded_outline(width, height, radius, segments):
+    half_w = width * 0.5
+    half_h = height * 0.5
+    corner_x = half_w - radius
+    corner_z = half_h - radius
+    corners = (
+        (corner_x, corner_z, 0.0),
+        (-corner_x, corner_z, 90.0),
+        (-corner_x, -corner_z, 180.0),
+        (corner_x, -corner_z, 270.0),
+    )
+    points = []
+    for center_x, center_z, start_degrees in corners:
+        for step in range(segments):
+            angle = math.radians(start_degrees + 90.0 * step / segments)
+            points.append(
+                (
+                    center_x + radius * math.cos(angle),
+                    center_z + radius * math.sin(angle),
+                )
+            )
+    return points
+
+
+def screen_glass_ring_y(
+    name,
+    outer_width,
+    outer_height,
+    outer_radius,
+    inner_width,
+    inner_height,
+    inner_radius,
+    depth,
+    material,
+    collection,
+    location=(0, 0, 0),
+    segments=24,
+    edge_bevel=0.0,
+):
+    """Build the native cover-glass ring directly, without boolean caps."""
+    outer = _rounded_outline(outer_width, outer_height, outer_radius, segments)
+    inner = _rounded_outline(inner_width, inner_height, inner_radius, segments)
+    if len(outer) != len(inner):
+        raise ValueError("outer and inner screen-glass outlines must match")
+
+    count = len(outer)
+    front_outer = 0
+    front_inner = count
+    back_outer = count * 2
+    back_inner = count * 3
+
+    verts = (
+        [(x, -depth * 0.5, z) for x, z in outer]
+        + [(x, -depth * 0.5, z) for x, z in inner]
+        + [(x, depth * 0.5, z) for x, z in outer]
+        + [(x, depth * 0.5, z) for x, z in inner]
+    )
+
+    faces = []
+    for index in range(count):
+        next_index = (index + 1) % count
+        # Front/back annulus.
+        faces.append(
+            (
+                front_outer + index,
+                front_outer + next_index,
+                front_inner + next_index,
+                front_inner + index,
+            )
+        )
+        faces.append(
+            (
+                back_outer + index,
+                back_inner + index,
+                back_inner + next_index,
+                back_outer + next_index,
+            )
+        )
+        # Outer shell and inner active-area wall.
+        faces.append(
+            (
+                front_outer + index,
+                back_outer + index,
+                back_outer + next_index,
+                front_outer + next_index,
+            )
+        )
+        faces.append(
+            (
+                front_inner + index,
+                front_inner + next_index,
+                back_inner + next_index,
+                back_inner + index,
+            )
+        )
+
+    mesh = bpy.data.meshes.new(f"{name}_MESH")
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+
+    obj = bpy.data.objects.new(name, mesh)
+    collection.objects.link(obj)
+    obj.location = location
+    if material:
+        mesh.materials.append(material)
+
+    bm = bmesh.new()
+    bm.from_mesh(mesh)
+    bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
+    bm.to_mesh(mesh)
+    bm.free()
+    mesh.update()
+
+    if edge_bevel > 0.0:
+        bevel = obj.modifiers.new("EDGE_BEVEL", "BEVEL")
+        bevel.width = edge_bevel
+        bevel.segments = 4
+        bevel.limit_method = "ANGLE"
+    return obj

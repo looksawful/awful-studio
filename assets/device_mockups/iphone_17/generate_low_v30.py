@@ -13,7 +13,7 @@ import foundation_common as fc
 sys.path.insert(0, HERE)
 from camera_topology_v30 import camera_mesh, attach_camera_normal
 from body_topology_v30 import build_body_mesh, apple_bottom_surface
-from display_topology_v30 import display_frame_prism_y
+from display_topology_v30 import display_frame_prism_y, screen_glass_ring_y
 
 MM = fc.MM
 
@@ -575,13 +575,21 @@ bezel = display_frame_prism_y(
     location=(0, front_y + 0.08*MM, 0),
 )
 
-screen_glass = outward_prism("SCREEN_GLASS", COVER_W, COVER_H, GLASS_T, COVER_R,
-                                glass, screen_c, axis="Y", location=(0, front_y, 0),
-                                edge_bevel=0.00006, outline_segments=48)
-active_cut = outward_prism("SCREEN_ACTIVE_CUTTER", SCREEN_W + 0.12*MM, SCREEN_H + 0.12*MM,
-                              GLASS_T + 0.25*MM, SCREEN_R + 0.06*MM, None, detail_c, axis="Y",
-                              location=(0, front_y, 0), outline_segments=48)
-fc.boolean_difference(screen_glass, active_cut, name="CUT_ACTIVE_AREA")
+screen_glass = screen_glass_ring_y(
+    "SCREEN_GLASS",
+    COVER_W,
+    COVER_H,
+    COVER_R,
+    SCREEN_W + 0.12*MM,
+    SCREEN_H + 0.12*MM,
+    SCREEN_R + 0.06*MM,
+    GLASS_T,
+    glass,
+    screen_c,
+    location=(0, front_y, 0),
+    edge_bevel=0.00006,
+)
+apply_runtime_bevel(screen_glass, 0.00006)
 
 front_hardware_z = H*0.5 - 7.79*MM
 cam_x = 6.72*MM
@@ -625,19 +633,8 @@ glow_anchor["glow_width_m"] = SCREEN_W
 glow_anchor["glow_height_m"] = SCREEN_H
 screen_content["screen_state"] = "screen_on"; screen_content["screen_on_emission"] = 0.85; screen_content["screen_off_emission"] = 0.0
 
-def hard_surface_glass(obj):
-    bevel = obj.modifiers.get("EDGE_BEVEL")
-    if bevel:
-        bevel.harden_normals = True
-    for poly in obj.data.polygons[2:]:
-        poly.use_smooth = True
-    weighted = obj.modifiers.new("WEIGHTED_NORMAL", "WEIGHTED_NORMAL")
-    weighted.keep_sharp = True
-    weighted.weight = 50
-
 for poly in back_glass.data.polygons:
     poly.use_smooth = False
-hard_surface_glass(screen_glass)
 # Screen material doubles as the clean glossy active glass surface for the current publishable LOW asset.
 sbsdf = screen_mat.node_tree.nodes.get("Principled BSDF")
 sbsdf.inputs["Coat Weight"].default_value = 0.0

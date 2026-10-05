@@ -503,3 +503,81 @@ working-candidate files were removed/restored before staging.
 Decision: retain repair for Ticket #138. This does not approve screen/panel,
 body, controls, bottom, front hardware, rear system, production provenance or
 the whole device. Next frontier is Ticket #139. PR #119 remains DRAFT/HOLD.
+
+## 2026-10-05 late - Ticket #139 screen/panel topology closure
+
+Fixed point for this slice: commit `b522ece91bf85828357c44b5c7fb96bfba816667`.
+The immutable appearance reference remains
+`68bcd22831e427a077ddfd48662e41bbe8ef46ebda0359c7153b9e3579afeae0`.
+
+Requirement ledger:
+- native `SCREEN_GLASS` is explicit saved production geometry: PASS;
+- authored n-gons and saved runtime modifier debt are removed: PASS;
+- `BACK_GLASS`, `SCREEN_CONTENT` and `APPLE_LOGO_DECAL` topology/material/UV contracts remain unchanged: PASS;
+- screen state and physical glass/content/bezel depth ordering remain explicit: PASS;
+- web-visible panel payload remains unchanged relative to accepted Ticket #138 web candidate: PASS;
+- whole-device topology remains owner-rejected and is outside this ticket.
+
+Root cause: native `SCREEN_GLASS` was produced as a solid rounded prism, then boolean-cut
+for the active area. The saved source retained three n-gons, an empty material slot,
+`EDGE_BEVEL`, and `WEIGHTED_NORMAL` modifier debt.
+
+RED evidence on exact `b522ece`: 784 saved verts / 396 faces / 3 n-gons,
+0 non-manifold edges, `EDGE_BEVEL + WEIGHTED_NORMAL`. Evaluated baseline geometry
+was 3,920 verts / 3,532 faces and still retained the three n-gons.
+
+Retained repair:
+- `display_topology_v30.py` now authors the native cover-glass ring directly from
+  matched outer/inner rounded outlines;
+- bevel is materialized through the existing runtime-bevel path;
+- the weighted-normal and boolean active-area path is removed for `SCREEN_GLASS`;
+- current saved `SCREEN_GLASS`: 1,920 verts / 1,920 faces, 0 n-gons,
+  0 non-manifold edges, no runtime modifiers, one `MAT_DISPLAY_GLASS` slot;
+- native glass dimensions/location and intentional no-UV contract are preserved.
+
+Exact current build identity before the Ticket #139 commit:
+- source revision:
+  `12ca0a810dcdc15ef404fd25c259d093333c1b43b902a9abedda4288940df24c`;
+- compat GLB:
+  `da0c8aa4b88e596e6ea7071c147cd75af721b947f1388f9d1f470de8fe13cd6e`;
+- Meshopt GLB:
+  `ba9bdf9f36a2397a136cd34d77fff54b2f01fbf16c428e1d020252f69e1049c1`;
+- web delivery remains 11,242 triangles because native-only `SCREEN_GLASS`
+  is intentionally excluded from web delivery.
+
+Fresh verification:
+- Blender 5.2.1 baseline RED and repaired GREEN for
+  `iphone_v30_panel_stack_topology_contract.py`;
+- all 12 iPhone v30 runtime contracts PASS;
+- Python fast suite 209/209 PASS after refreshing retained Khronos evidence;
+- Khronos glTF Validator 2.0.0-dev.3.10: compat and Meshopt both
+  0 errors / 0 warnings;
+- temporary exact-candidate preview suite 25/25 PASS and Storybook build PASS;
+- browser evidence pinned exact SHA/revision, verified required web panel nodes,
+  verified native-only `SCREEN_GLASS` does not leak into GLB, and kept geometry
+  buffers invariant across texture / clay / actual triangle-wire modes;
+- matched Blender 5.2.1 native renders using the existing `CAM_FRONT` and
+  `CAM_SCREEN_EDGE_MACRO` cameras show no visible silhouette/screen-stack
+  regression or z-fighting. Baseline/current RMSE is about 0.132/255 front and
+  0.474/255 edge macro; evidence is retained outside the repo at
+  `F:\\Temp\\iphone17-ticket139-native-evidence`.
+
+The Ticket #138 and Ticket #139 compat GLBs have byte-identical BIN chunks:
+`3150815ef0b71a975d44507599cdfa8a3285fe19acedd90cf7af5d55bb920bb6`
+(4,660,308 bytes). Their only node JSON change is the root provenance extras
+(`delivery_source_revision` / `delivery_source_commit`). Thus this native
+glass repair does not alter web geometry, indices, embedded binary payload, or
+web-visible panel appearance.
+
+Browser evidence is retained outside the repo at
+`F:\Temp\iphone17-ticket139-browser-evidence`. Temporary Storybook candidate
+files were removed/restored before staging.
+
+The generated manifest still records `source_commit=b522ece...` because the exact
+artifacts were built before this slice's commit. Final consumed-input/source-commit
+provenance reconciliation remains explicitly assigned to Tickets #145/#146; do
+not treat this checkpoint as final provenance closure.
+
+Decision: retain repair for Ticket #139. This does not approve body, controls,
+bottom, front hardware, rear system, production provenance, or the whole device.
+Next frontier is Ticket #140. PR #119 remains DRAFT/HOLD.
