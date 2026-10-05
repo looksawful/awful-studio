@@ -581,3 +581,69 @@ not treat this checkpoint as final provenance closure.
 Decision: retain repair for Ticket #139. This does not approve body, controls,
 bottom, front hardware, rear system, production provenance, or the whole device.
 Next frontier is Ticket #140. PR #119 remains DRAFT/HOLD.
+## 2026-10-06 - Ticket #140 body corners and rails
+
+Fixed point: `a8ad3a202d4c187ca28556fab9037d98b6457ea7`; branch
+`agent/118-topology-rebuild-v2`. Owner transferred active worktree execution to
+this continuation after residual writer activity completed. Incoming dirty files
+were backed up in `F:\Temp\iphone17-ticket140-continuation\incoming`.
+The prototypes directory and previous diagnostic captures were preserved.
+
+Actual defect: `_rounded_outline` traversed the inner body contour in the opposite
+order to the Apple outer outline. Connecting equally indexed points crossed the
+annulus and produced overlapping cap strips. Manifold/triangle-count checks had
+not detected this. An independent physical annulus coverage invariant reproduces
+RED on exact baseline: projected cap triangle area 0.005391497 m² versus physical
+outer-minus-inner area 0.000388314 m² on the front plane. Current passes both planes.
+
+Retained minimum repair:
+- correct only body inner-ring correspondence;
+- subdivide only long edges in the main shell (14 mm target), preserving disconnected
+  aperture/control cells, contour positions and material boundaries;
+- persist intentional main-cap diagonals in saved Blender geometry, rather than
+  measuring a prettier diagnostic triangulation;
+- assign existing materials before the local BMesh mutation;
+- stop the existing build on Blender Python exceptions (`--python-exit-code 7`).
+  A real failing Blender generator reproduced baseline reaching export after failure;
+  current stops before export/package in a temporary fixture without production writes.
+
+Current BODY_ALUMINUM: 2,944 verts / 3,250 faces / 5,868 triangles; zero n-gons,
+non-manifold, degenerate or zero-length defects; no runtime modifiers. The 632 main
+cap triangles have min angle 1.97924°, max aspect 23.1779:1, max edge 13.9067 mm.
+These diagnostics are local regression guards, not whole-device quality approval.
+All 632 cap triangles are present in the actual compat GLB buffers.
+
+Exact retained identity:
+- source revision `2c4cd1d64c35fee34dd4f015c42b480f033a0bf030d9168dbf52bb08cb580591`;
+- compat `61fa9616c5b26b7c9c43bf8b10db307ab132ac5dc311197f83992d9d2725def1`;
+- Meshopt `74b1714b4e7d45a70de239d0c5f24a0d1d681e68276474b86ad9fe561f9a0ff5`;
+- web delivery 11,466 triangles (diagnostic, not optimization goal).
+The appearance reference remains `68bcd228...feae0`, unchanged.
+Manifest/root source_commit remains the precommit fixed point; final consumed-input
+provenance closure is explicitly deferred to #145/#146.
+
+Fresh verification: Blender 5.2.1 all 13 iPhone runtime contracts PASS; fast209/209,
+preview25/25 and Storybook build PASS; Khronos compat/Meshopt both 0 errors/0 warnings.
+Matched exact baseline/current/frozen browser audits cover 15 views × render/clay/
+actual triangle wire each, with SHA/revision verification, identical geometry buffers
+across modes and zero browser errors. Four isolated corners and all four rails were
+checked; four assembled corner macros show no visible contact-edge notch or highlight
+break. Isolated bottom notches are covered by the existing panel stack; no aperture
+or tray redesign was justified. Whole-device matched texture deltas are small
+(front RMSE1.181/255, front3/4 0.642/255, rear3/4 0.862/255).
+All 50 other GLB mesh payloads, materials and embedded images are byte unchanged;
+body bounds are exact unchanged.
+
+Independent /code-review against a8ad3a2: Standards PASS and Spec PASS, limited to
+#140. Previous evidence gaps were resolved before acceptance. Durable evidence:
+`assets/device_mockups/iphone_17/evidence/ticket140_body_rails/`; full captures/logs:
+`F:\Temp\iphone17-ticket140-continuation`.
+Existing Storybook remains the review surface; additional Tailscale HTTPS8443 proxies
+its existing6006 server, preserving the separate443 route. Mobile landing:
+`https://titan.tail85619a.ts.net:8443/?path=/story/models-catalog--catalog`.
+The ordinary iPhone story still shows the frozen appearance snapshot; diagnostic
+candidate captures use the same viewer with exact bytes, not a second viewer.
+
+Decision: retain #140 repair after both review axes PASS. Next frontier #141:
+controls / antennas / recesses. No whole-device Human PASS, production provenance
+closure, merge, deploy or release is implied. #119 remains OPEN/DRAFT/HOLD.

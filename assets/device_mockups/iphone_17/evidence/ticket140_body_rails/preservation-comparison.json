@@ -1,0 +1,119 @@
+{
+  "unchanged_other_meshes": 50,
+  "materials_unchanged": true,
+  "embedded_images_unchanged": true,
+  "body_bounds_baseline": [
+    [
+      -35.725001245737076,
+      -74.80499893426895,
+      -3.6249998956918716
+    ],
+    [
+      35.725001245737076,
+      74.80499893426895,
+      3.6249998956918716
+    ]
+  ],
+  "body_bounds_current": [
+    [
+      -35.725001245737076,
+      -74.80499893426895,
+      -3.6249998956918716
+    ],
+    [
+      35.725001245737076,
+      74.80499893426895,
+      3.6249998956918716
+    ]
+  ],
+  "pixel_deltas": {
+    "corner-tl-texture": {
+      "rmse_255": 82.54745919016422,
+      "changed_fraction": 0.26839840324888087
+    },
+    "corner-tl-clay": {
+      "rmse_255": 98.88793244124089,
+      "changed_fraction": 0.26003276570215517
+    },
+    "corner-tr-texture": {
+      "rmse_255": 84.05177201009037,
+      "changed_fraction": 0.2690271816881259
+    },
+    "corner-tr-clay": {
+      "rmse_255": 99.39886082888951,
+      "changed_fraction": 0.2600269970926208
+    },
+    "corner-bl-texture": {
+      "rmse_255": 90.13605485523674,
+      "changed_fraction": 0.26671973787438275
+    },
+    "corner-bl-clay": {
+      "rmse_255": 98.66593772805173,
+      "changed_fraction": 0.2539376528681527
+    },
+    "corner-br-texture": {
+      "rmse_255": 91.54665101842559,
+      "changed_fraction": 0.26969864783792513
+    },
+    "corner-br-clay": {
+      "rmse_255": 99.07158708339134,
+      "changed_fraction": 0.25358461396465
+    },
+    "top-texture": {
+      "rmse_255": 19.917665615140248,
+      "changed_fraction": 0.03727675481102035
+    },
+    "top-clay": {
+      "rmse_255": 25.891106812695387,
+      "changed_fraction": 0.034805482486501456
+    },
+    "left-texture": {
+      "rmse_255": 7.916284921244813,
+      "changed_fraction": 0.01793691448613226
+    },
+    "left-clay": {
+      "rmse_255": 15.812346010436823,
+      "changed_fraction": 0.015635239281923487
+    },
+    "right-texture": {
+      "rmse_255": 8.64552813166639,
+      "changed_fraction": 0.01742696940329503
+    },
+    "right-clay": {
+      "rmse_255": 15.963868258024569,
+      "changed_fraction": 0.0151679819096405
+    },
+    "bottom-texture": {
+      "rmse_255": 30.98633437118212,
+      "changed_fraction": 0.03595689694955928
+    },
+    "bottom-clay": {
+      "rmse_255": 27.329027022556073,
+      "changed_fraction": 0.034630116756656976
+    },
+    "front-texture": {
+      "rmse_255": 1.180726088220765,
+      "changed_fraction": 0.0017421200793760671
+    },
+    "front-clay": {
+      "rmse_255": 0.8359070045475544,
+      "changed_fraction": 0.0016417462734782408
+    },
+    "front-three-texture": {
+      "rmse_255": 0.6416687118976967,
+      "changed_fraction": 0.0008422169920162444
+    },
+    "front-three-clay": {
+      "rmse_255": 0.4676129130141901,
+      "changed_fraction": 0.000749919239466519
+    },
+    "rear-three-texture": {
+      "rmse_255": 0.8620683791080451,
+      "changed_fraction": 0.0009448982417278139
+    },
+    "rear-three-clay": {
+      "rmse_255": 0.27012573211012353,
+      "changed_fraction": 0.0005918593382251142
+    }
+  }
+}

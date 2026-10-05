@@ -130,6 +130,82 @@ def _shell_faces(count):
     return faces
 
 
+def _refine_main_rail_edges(bm, target_length):
+    """Bound straight main-shell rails without touching disconnected local cells."""
+    bm.normal_update()
+    if any(len(face.verts) > 4 for face in bm.faces):
+        raise RuntimeError("body rail refinement expects n-gon-free authored input")
+
+    bm.verts.ensure_lookup_table()
+    seed = bm.verts[0]
+    seed_position = seed.co.copy()
+    component = {seed}
+    queue = [seed]
+    while queue:
+        vertex = queue.pop()
+        for edge in vertex.link_edges:
+            other = edge.other_vert(vertex)
+            if other not in component:
+                component.add(other)
+                queue.append(other)
+
+    groups = {}
+    for edge in list(bm.edges):
+        if edge.verts[0] not in component or edge.verts[1] not in component:
+            continue
+        length = edge.calc_length()
+        if length <= target_length:
+            continue
+        cuts = math.ceil(length / target_length) - 1
+        groups.setdefault(cuts, []).append(edge)
+
+    for cuts in sorted(groups, reverse=True):
+        live = [edge for edge in groups[cuts] if edge.is_valid]
+        if live:
+            bmesh.ops.subdivide_edges(
+                bm,
+                edges=live,
+                cuts=cuts,
+                use_grid_fill=True,
+            )
+
+    bm.normal_update()
+    introduced_ngons = [face for face in bm.faces if len(face.verts) > 4]
+    if introduced_ngons:
+        bmesh.ops.triangulate(
+            bm,
+            faces=introduced_ngons,
+            quad_method="BEAUTY",
+            ngon_method="BEAUTY",
+        )
+    bm.normal_update()
+    # Subdivision can replace the seed BMVert. Resolve its preserved corner
+    # coordinate before collecting the new straight-rail vertices.
+    seed = min(bm.verts, key=lambda vertex: (vertex.co - seed_position).length_squared)
+    if (seed.co - seed_position).length > 1e-9:
+        raise RuntimeError("body rail subdivision lost the authored corner seed")
+    component = {seed}
+    queue = [seed]
+    while queue:
+        vertex = queue.pop()
+        for edge in vertex.link_edges:
+            other = edge.other_vert(vertex)
+            if other not in component:
+                component.add(other)
+                queue.append(other)
+    # Persist deliberate cap diagonals; the exporter must not choose a new
+    # tessellation that reintroduces corner slivers on these thin strips.
+    cap_faces = [
+        face for face in bm.faces
+        if all(vertex in component for vertex in face.verts)
+        and abs(face.normal.y) > 0.99
+    ]
+    bmesh.ops.triangulate(
+        bm, faces=cap_faces, quad_method="BEAUTY", ngon_method="BEAUTY"
+    )
+    bm.normal_update()
+
+
 def build_body_mesh(
     name,
     width,
@@ -317,16 +393,16 @@ def build_body_mesh(
     mesh.update()
     mesh.materials.append(metal_material)
     mesh.materials.append(dark_material)
+    for index, polygon in enumerate(mesh.polygons):
+        polygon.material_index = master_materials[index]
 
     bm = bmesh.new()
     bm.from_mesh(mesh)
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
+    _refine_main_rail_edges(bm, 14.0 * mm)
     bm.to_mesh(mesh)
     bm.free()
     mesh.update()
-
-    for index, polygon in enumerate(mesh.polygons):
-        polygon.material_index = master_materials[index]
 
     obj = bpy.data.objects.new(name, mesh)
     collection.objects.link(obj)
@@ -353,10 +429,10 @@ def _rounded_outline(width, height, radius, segments):
         for step in range(segments + 1)
     ]
     return (
-        [(cx + dx, cz + dz) for dx, dz in quarter]
-        + [(-cx - dx, cz + dz) for dx, dz in reversed(quarter)]
-        + [(-cx - dx, -cz - dz) for dx, dz in quarter]
-        + [(cx + dx, -cz - dz) for dx, dz in reversed(quarter)]
+        [(cx + dx, cz + dz) for dx, dz in reversed(quarter)]
+        + [(-cx - dx, cz + dz) for dx, dz in quarter]
+        + [(-cx - dx, -cz - dz) for dx, dz in reversed(quarter)]
+        + [(cx + dx, -cz - dz) for dx, dz in quarter]
     )
 
 

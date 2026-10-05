@@ -1,0 +1,219 @@
+{
+  "sha": "da0c8aa4b88e596e6ea7071c147cd75af721b947f1388f9d1f470de8fe13cd6e",
+  "sourceRevision": "12ca0a810dcdc15ef404fd25c259d093333c1b43b902a9abedda4288940df24c",
+  "sourceCommit": "b522ece91bf85828357c44b5c7fb96bfba816667",
+  "triangles": 11242,
+  "evidence": [
+    {
+      "name": "front",
+      "selection": "all",
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "fraction": [
+        0,
+        0
+      ],
+      "distance": 0.32
+    },
+    {
+      "name": "front-three",
+      "selection": "all",
+      "direction": [
+        0.65,
+        0.4,
+        1
+      ],
+      "fraction": [
+        0,
+        0
+      ],
+      "distance": 0.32
+    },
+    {
+      "name": "rear-three",
+      "selection": "all",
+      "direction": [
+        0.65,
+        0.4,
+        -1
+      ],
+      "fraction": [
+        0,
+        0
+      ],
+      "distance": 0.32
+    },
+    {
+      "name": "corner-tl",
+      "selection": "mesh:BODY_ALUMINUM",
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "fraction": [
+        -0.4,
+        0.45
+      ],
+      "distance": 0.055
+    },
+    {
+      "name": "corner-tr",
+      "selection": "mesh:BODY_ALUMINUM",
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "fraction": [
+        0.4,
+        0.45
+      ],
+      "distance": 0.055
+    },
+    {
+      "name": "corner-bl",
+      "selection": "mesh:BODY_ALUMINUM",
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "fraction": [
+        -0.4,
+        -0.45
+      ],
+      "distance": 0.055
+    },
+    {
+      "name": "corner-br",
+      "selection": "mesh:BODY_ALUMINUM",
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "fraction": [
+        0.4,
+        -0.45
+      ],
+      "distance": 0.055
+    },
+    {
+      "name": "top",
+      "selection": "mesh:BODY_ALUMINUM",
+      "direction": [
+        0,
+        1,
+        0.3
+      ],
+      "fraction": [
+        0,
+        0.49
+      ],
+      "distance": 0.14
+    },
+    {
+      "name": "left",
+      "selection": "mesh:BODY_ALUMINUM",
+      "direction": [
+        -1,
+        0,
+        0.3
+      ],
+      "fraction": [
+        -0.49,
+        0
+      ],
+      "distance": 0.32
+    },
+    {
+      "name": "right",
+      "selection": "mesh:BODY_ALUMINUM",
+      "direction": [
+        1,
+        0,
+        0.3
+      ],
+      "fraction": [
+        0.49,
+        0
+      ],
+      "distance": 0.32
+    },
+    {
+      "name": "bottom",
+      "selection": "mesh:BODY_ALUMINUM",
+      "direction": [
+        0,
+        -1,
+        0.3
+      ],
+      "fraction": [
+        0,
+        -0.49
+      ],
+      "distance": 0.14
+    },
+    {
+      "name": "assembly-corner-tl",
+      "selection": "all",
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "fraction": [
+        -0.4,
+        0.45
+      ],
+      "distance": 0.055
+    },
+    {
+      "name": "assembly-corner-tr",
+      "selection": "all",
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "fraction": [
+        0.4,
+        0.45
+      ],
+      "distance": 0.055
+    },
+    {
+      "name": "assembly-corner-bl",
+      "selection": "all",
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "fraction": [
+        -0.4,
+        -0.45
+      ],
+      "distance": 0.055
+    },
+    {
+      "name": "assembly-corner-br",
+      "selection": "all",
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "fraction": [
+        0.4,
+        -0.45
+      ],
+      "distance": 0.055
+    }
+  ],
+  "errors": []
+}

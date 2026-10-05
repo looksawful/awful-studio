@@ -1,0 +1,78 @@
+{
+  "ticket": 140,
+  "fixed_point": "a8ad3a202d4c187ca28556fab9037d98b6457ea7",
+  "branch": "agent/118-topology-rebuild-v2",
+  "frozen_reference_sha256": "68bcd22831e427a077ddfd48662e41bbe8ef46ebda0359c7153b9e3579afeae0",
+  "compat_sha256": "61fa9616c5b26b7c9c43bf8b10db307ab132ac5dc311197f83992d9d2725def1",
+  "meshopt_sha256": "74b1714b4e7d45a70de239d0c5f24a0d1d681e68276474b86ad9fe561f9a0ff5",
+  "source_revision": "2c4cd1d64c35fee34dd4f015c42b480f033a0bf030d9168dbf52bb08cb580591",
+  "manifest_source_commit": "a8ad3a202d4c187ca28556fab9037d98b6457ea7",
+  "web_triangles": 11466,
+  "defect": "Reversed inner outline traversal caused crossed annulus face strips and excessive cap overlap/slivers.",
+  "repair": "Correct ring correspondence; split only long main-shell edges; persist intentional cap diagonals in Blender.",
+  "source_body": {
+    "vertices": 2944,
+    "faces": 3250,
+    "triangles": 5868,
+    "ngons": 0,
+    "nonmanifold": 0,
+    "degenerate": 0,
+    "zero_edges": 0,
+    "runtime_modifiers": 0
+  },
+  "source_cap_triangles_preserved_in_glb": 632,
+  "runtime_contracts_passed": 13,
+  "fast_passed": 209,
+  "preview_passed": 25,
+  "storybook_build": "PASS",
+  "khronos_compat": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "khronos_meshopt": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "browser_views_per_candidate": 15,
+  "browser_modes": [
+    "texture",
+    "clay",
+    "actual_triangle_wireframe"
+  ],
+  "other_meshes_byte_unchanged": 50,
+  "materials_images_unchanged": true,
+  "body_bounds_unchanged": true,
+  "review": {
+    "standards": "PASS",
+    "spec": "PASS",
+    "baseline": "a8ad3a2",
+    "scope": "Ticket140 body corners/rails only"
+  },
+  "whole_device_accepted": false,
+  "human_gate": "pending after integrated146 candidate",
+  "provenance_closure": "deferred145146",
+  "pr119": "DRAFT/HOLD",
+  "full_captures": "F:\\Temp\\iphone17-ticket140-continuation",
+  "evidence_sha256": {
+    "assembly-comparison-clay.jpg": "faf130a1fdad1a555642065836a7f2501ed4bd5410b99a31ddb7ff2e0e222d4b",
+    "assembly-comparison-texture.jpg": "992bfe386de29aac74ab0bb94abf6638be167d524243b92bdf63942d34ca248d",
+    "assembly-comparison-wireframe.jpg": "346d8b27f54705276c2015ea285dc8fbdb90fafeead2f97c728e70357c49d209",
+    "baseline-browser-audit.json": "444dffeb883f09eec8ec8b2f0c95a12de53767408d591952663127e3b5615836",
+    "baseline-iphone_v30_body_rail_topology_contract.log": "0016c25b463b389beafc2dc2167feea1b4e98e57f428bfb24a98e998a91108a2",
+    "build-failure-proof.log": "c1c0ee4e0daa1b4565d510875f0b910b5d1107fc61b415027f7d8ccc7e2d874a",
+    "build-failure-proof.py": "7e89e9e5260e56132c1cce04b7c1feb6577dc5fe1e36e10bd8c94c68770980cc",
+    "comparison-clay.jpg": "5ac81452e9c8f8bb9ad284a671e5bd1fdddf205f4618345def0e2ee43ca7e49f",
+    "comparison-texture.jpg": "615ea1d681bd382036e2935fd81bfd9e31096406979aa9eeb02a2138931322a5",
+    "comparison-wireframe.jpg": "1369ba128f543d754a594aa00496949bae3a4f9006cf22523514b114189f0596",
+    "current-browser-audit.json": "05a80deb3ada0d4af6926d4ad241ac91f10b19f73514ec024aad8cc888e23d81",
+    "fast.log": "7245b0e048119036597f9cb1307bba20195a81d31ae56ff5069561f5dda2d2f9",
+    "frozen-browser-audit.json": "50844f05f15dcebc2f74696b7469f747be73c70b7c4e893a262ea172a3342e1b",
+    "iphone_v30_body_rail_topology_contract.log": "916b3da83d377012c5a60d3279fc479c47ff562c2362d18f435c6a3d842acdf0",
+    "khronos-compat.json": "c5c4758be3e22bb5752f5b4ffad870b50addc99d0d105c935de3062df3378baf",
+    "khronos-meshopt.json": "95af91f096f1430dc1aa29774e8d1ca3346aa558dd28904729b50662eda8207b",
+    "preservation-comparison.json": "ef4fbb53265b119ff6c40a9e93bb309e1f002e17015f89a1f0ad44e65a0d1c03",
+    "preview-build.log": "43cfad19a62b6a0863f3432460af5b4ff950bc5e4840e044fe20f2ca4c934a23",
+    "preview-test.log": "5d83609159b55768e6ed57c3983f04dae929e746f03f629c234c936e7e882e41",
+    "runtime-summary.json": "307e1172f3bf20a548af43cca6021c938387a0a607543899dfbbc58d89af5177"
+  }
+}

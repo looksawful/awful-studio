@@ -1,0 +1,14 @@
+00:00.328  blend            | Read blend: "F:\Temp\iphone17-ticket140-continuation\baseline\assets\device_mockups\iphone_17\generated\iphone_17_low_v30.blend"
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit
+Traceback (most recent call last):
+  File "F:\Temp\iphone17-v30-topology-rebuild\tests\runtime\iphone_v30_body_rail_topology_contract.py", line 102, in <module>
+    verify_annulus_coverage()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "F:\Temp\iphone17-v30-topology-rebuild\tests\runtime\iphone_v30_body_rail_topology_contract.py", line 96, in verify_annulus_coverage
+    assert abs(total_area - expected_area) <= 1e-9, {
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'plane': -0.003625, 'triangle_area': 0.005391496903631462, 'physical_annulus_area': 0.00038831434782621126}
+
+Error: script failed, file: 'F:\Temp\iphone17-v30-topology-rebuild\tests\runtime\iphone_v30_body_rail_topology_contract.py', exiting.
