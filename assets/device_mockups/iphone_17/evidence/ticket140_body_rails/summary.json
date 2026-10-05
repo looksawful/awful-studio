@@ -60,7 +60,7 @@
     "baseline-browser-audit.json": "444dffeb883f09eec8ec8b2f0c95a12de53767408d591952663127e3b5615836",
     "baseline-iphone_v30_body_rail_topology_contract.log": "0016c25b463b389beafc2dc2167feea1b4e98e57f428bfb24a98e998a91108a2",
     "build-failure-proof.log": "c1c0ee4e0daa1b4565d510875f0b910b5d1107fc61b415027f7d8ccc7e2d874a",
-    "build-failure-proof.py": "7e89e9e5260e56132c1cce04b7c1feb6577dc5fe1e36e10bd8c94c68770980cc",
+    "build-failure-proof.py": "7d216b997fa0aceab329108899afd17f216bcb5bca47327f56a55446f1122b51",
     "comparison-clay.jpg": "5ac81452e9c8f8bb9ad284a671e5bd1fdddf205f4618345def0e2ee43ca7e49f",
     "comparison-texture.jpg": "615ea1d681bd382036e2935fd81bfd9e31096406979aa9eeb02a2138931322a5",
     "comparison-wireframe.jpg": "1369ba128f543d754a594aa00496949bae3a4f9006cf22523514b114189f0596",
@@ -74,5 +74,11 @@
     "preview-build.log": "43cfad19a62b6a0863f3432460af5b4ff950bc5e4840e044fe20f2ca4c934a23",
     "preview-test.log": "5d83609159b55768e6ed57c3983f04dae929e746f03f629c234c936e7e882e41",
     "runtime-summary.json": "307e1172f3bf20a548af43cca6021c938387a0a607543899dfbbc58d89af5177"
+  },
+  "portability_followup": {
+    "standards": "PASS",
+    "spec": "PASS",
+    "fast": "209/209 PASS",
+    "proof": "baseline export-reached2; current generator-stopped7stage1"
   }
 }

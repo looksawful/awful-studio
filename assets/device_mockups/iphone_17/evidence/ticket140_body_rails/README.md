@@ -16,3 +16,7 @@ that real Blender Python errors stop the existing build before export/package.
 
 Full 135 PNG captures and all raw diagnostics remain at
 F:\Temp\iphone17-ticket140-continuation. Prior captures and prototypes were preserved.
+
+Portability follow-up: invoke build-failure-proof.py with required --blender.
+Repository is derived from script location; fixtures use system temp. Fresh proof
+and fast209/209 PASS after the retained evidence was added; independent Standards/Spec PASS.

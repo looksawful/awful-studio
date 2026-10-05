@@ -1,8 +1,10 @@
 from pathlib import Path
-import importlib.util,sys,subprocess,tempfile,types
-r=Path(r'F:\Temp\iphone17-v30-topology-rebuild');e=Path(r'F:\Temp\iphone17-ticket140-continuation')
+import argparse,sys,subprocess,tempfile,types
+parser=argparse.ArgumentParser(description='Reproduce build failure handling without production writes')
+parser.add_argument('--blender',type=Path,required=True)
+b=str(parser.parse_args().blender.resolve())
+r=Path(__file__).resolve().parents[5];e=Path(tempfile.gettempdir())
 sys.path.insert(0,str(r/'tools'))
-b=r'D:\Blender Foundation\Blender 5.2\blender.exe'
 class ExportReached(Exception):pass
 def check(source,label):
  m=types.ModuleType('build_'+label);m.__file__=str(r/'tools/build_iphone17_v30.py');exec(compile(source,m.__file__,'exec'),m.__dict__)

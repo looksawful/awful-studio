@@ -1,0 +1,19 @@
+Traceback (most recent call last):
+  File "F:\Temp\ticket140-failure-to2lk_qj\generate_low_v30.py", line 1, in <module>
+    raise RuntimeError('TICKET140_INTENTIONAL_GENERATOR_FAILURE')
+RuntimeError: TICKET140_INTENTIONAL_GENERATOR_FAILURE
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit
+RED export-reached stages 2
+Traceback (most recent call last):
+  File "F:\Temp\ticket140-failure-prv7q09b\generate_low_v30.py", line 1, in <module>
+    raise RuntimeError('TICKET140_INTENTIONAL_GENERATOR_FAILURE')
+RuntimeError: TICKET140_INTENTIONAL_GENERATOR_FAILURE
+
+Error: script failed, file: 'F:\Temp\ticket140-failure-prv7q09b\generate_low_v30.py', exiting.
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit
+GREEN generator-stopped-7 stages 1
+BUILD_FAILURE_REGRESSION_GREEN: actual Blender failure stops before export/package; no production writes

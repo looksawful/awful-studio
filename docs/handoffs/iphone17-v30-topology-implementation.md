@@ -647,3 +647,10 @@ candidate captures use the same viewer with exact bytes, not a second viewer.
 Decision: retain #140 repair after both review axes PASS. Next frontier #141:
 controls / antennas / recesses. No whole-device Human PASS, production provenance
 closure, merge, deploy or release is implied. #119 remains OPEN/DRAFT/HOLD.
+
+### Ticket140 evidence portability follow-up
+
+Fresh fast verification after evidence retention exposed a hardcoded Blender path
+in the diagnostic proof harness. It now requires CLI --blender, derives its repo
+and uses system temp fixtures. Actual RED/GREEN proof rerun PASS; fast209/209 PASS;
+independent Standards and Spec PASS. Geometry and candidate bytes are unchanged.
