@@ -173,5 +173,7 @@
     "storybook-build.log": "0ccce97787beed7a2c9b0bdf7b3c12a55f5137420ad9b86768b82585480cdd51",
     "usb-frame-red.log": "1cbf2d8db150abce7dfb395155dd8edc97c665f9a7784ca46cc4f2f5dbd0273f",
     "usb-topology-red.log": "4ba4c1c9bedf174e63b2e4986424b1f2dc4b3cfe5b22a56dc00694855f45c4d5"
-  }
+  },
+  "implementation_commit": "2ea91ae2ee2c04c9839e01d985fc5b30583659d2",
+  "issue_state": "CLOSED"
 }
