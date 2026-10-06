@@ -358,7 +358,9 @@ class IPhoneWebShadingContractTests(unittest.TestCase):
             for primitive in primitives:
                 material = doc['materials'][primitive['material']]
                 self.assertIn('TEXCOORD_0', primitive['attributes'], name)
-                if part == 'glass':
+                if name == 'CAMERA_HOUSING' and material['name'] == 'MAT_OPTICS_BLACK':
+                    self.assertNotIn('normalTexture', material, name)
+                elif part == 'glass':
                     self.assertNotIn('normalTexture', material, name)
                 else:
                     self.assertIn('normalTexture', material, name)
@@ -369,7 +371,7 @@ class IPhoneWebShadingContractTests(unittest.TestCase):
                     png = blob[view.get('byteOffset', 0):view.get('byteOffset', 0) + view['byteLength']]
                     self.assertEqual(struct.unpack_from('>II', png, 16), (512, 512), name)
                     self.assertIn('TANGENT', primitive['attributes'], name)
-        self.assertEqual(total, 1288, 'frozen eight-mesh camera scope')
+        self.assertEqual(total, 1392, 'retained camera plus independently verified mic opening')
 
     def test_camera_control_is_separate_dark_glass_and_recessed(self):
         doc, _ = read_glb(GLB)

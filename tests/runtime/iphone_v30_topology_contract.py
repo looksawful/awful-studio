@@ -42,15 +42,24 @@ if '--baseline' not in args:
         assert metrics['source_ngons'] == metrics['ngons'] == 0, (name, metrics)
         assert metrics['nonmanifold_edges'] == 0, (name, metrics)
         assert metrics['signed_volume'] > 0, (name, metrics)
-        assert metrics['triangles'] == (164 if 'HOUSING' in name else 160), (name, metrics)
+        if name != 'CAMERA_HOUSING':
+            assert metrics['triangles'] == (164 if 'HOUSING' in name else 160), (name, metrics)
+        else:
+            # The independently tested physical microphone opening changes this cap.
+            # Its topology and authored/export coverage belong to the rear contract.
+            assert metrics['triangles'] == 2 * metrics['vertices'] - 4, (name, metrics)
         obj = bpy.data.objects[name]
-        if 'HOUSING' in name:
+        if name == 'CAMERA_HOUSING_SEAT':
             # Accepted caps span horizontal rows; no pole in the lens junction.
             assert not any(abs(v.co.x) < 1e-8 and abs(v.co.z) < 1e-8 for v in obj.data.vertices), name
             assert sum(len(p.vertices) == 4 and abs(p.normal.y) > .99 for p in obj.data.polygons) == 38, name
         for material in obj.data.materials:
             shader = material.node_tree.nodes.get('Principled BSDF')
-            assert shader.inputs['Normal'].is_linked == (not name.endswith('GLASS')), name
+            if name == 'CAMERA_HOUSING' and material.name == 'MAT_OPTICS_BLACK':
+                # Newly authored cavity walls use the existing unmapped mic material.
+                assert not shader.inputs['Normal'].is_linked, name
+            else:
+                assert shader.inputs['Normal'].is_linked == (not name.endswith('GLASS')), name
         assert obj.data.uv_layers.active, name
     if '--glb' in args:
         raw = Path(args[args.index('--glb') + 1]).read_bytes()

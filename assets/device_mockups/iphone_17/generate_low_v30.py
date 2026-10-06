@@ -790,10 +790,99 @@ for idx,(x_mm,z_mm) in enumerate((((W*0.5-CAM_CENTER_X_REF)/MM,(H*0.5-13.62*MM)/
         f"CAMERA_{idx}_PUPIL", 1.18*MM, 0.045*MM, black, detail_c,
         (x_mm*MM,D*0.5+3.30*MM,z_mm*MM), segments=16,
     )
-radial_prism_y(
+rear_mic = radial_prism_y(
     "REAR_MIC", 0.50*MM, 0.14*MM, black, detail_c,
     ((W*0.5-20.54*MM),D*0.5+1.02*MM,(H*0.5-22.48*MM)), segments=16,
 )
+def open_rear_mic_aperture(housing, mic):
+    """Expose the existing 1 mm microphone; retain the accepted plateau/UV field."""
+    bpy.context.view_layer.update()
+    mesh = housing.data
+    width = max(v.co.x for v in mesh.vertices) - min(v.co.x for v in mesh.vertices)
+    height = max(v.co.z for v in mesh.vertices) - min(v.co.z for v in mesh.vertices)
+    half_straight = (height - width) / 2
+    center = mic.matrix_world.translation.copy()
+    mic_front = max((mic.matrix_world @ v.co).y for v in mic.data.vertices)
+    front = max((housing.matrix_world @ v.co).y for v in mesh.vertices)
+    bottom, top = mic_front - 0.045*MM, front + 0.265*MM
+    bpy.ops.mesh.primitive_cylinder_add(
+        vertices=16, radius=0.50*MM, depth=top-bottom,
+        location=(center.x, (bottom+top)/2, center.z), rotation=(math.pi/2, 0, 0),
+    )
+    cutter = bpy.context.object
+    cutter.name = "REAR_MIC_PORT_CUTTER"
+    # Boolean material transfer must not introduce an empty cutter slot.
+    cutter.data.materials.append(mic.data.materials[0])
+    fc.boolean_difference(housing, cutter)
+    assert all(housing.data.materials), "Rear mic boolean introduced an empty slot"
+    cavity_material = housing.data.materials.find(mic.data.materials[0].name)
+    assert cavity_material >= 0
+    bm = bmesh.new()
+    bm.from_mesh(housing.data)
+    bmesh.ops.triangulate(bm, faces=[f for f in bm.faces if len(f.verts)>4],
+                         quad_method="BEAUTY", ngon_method="BEAUTY")
+    local = housing.matrix_world.inverted() @ center
+    front_y = max(v.co.y for v in bm.verts)
+    caps = [f for f in bm.faces if all(abs(v.co.y-front_y)<1e-8 and
+            abs(v.co.z)<=half_straight+1e-8 for v in f.verts)]
+    corners = [v for v in bm.verts if abs(v.co.y-front_y)<1e-8 and
+               abs(abs(v.co.x)-width/2)<1e-8 and abs(abs(v.co.z)-half_straight)<1e-8]
+    inner = [v for v in bm.verts if abs(v.co.y-front_y)<1e-8 and
+             abs(math.hypot(v.co.x-local.x, v.co.z-local.z)-0.50*MM)<1e-8]
+    assert len(corners)==4 and len(inner)==16, "Rear mic aperture boundary changed"
+    angle = lambda v: (math.atan2(v.co.z-local.z, v.co.x-local.x)+1e-6)%(2*math.pi)
+    inner.sort(key=angle)
+    angles = [math.atan2(v.co.z-local.z, v.co.x-local.x) for v in inner]
+    support = [bm.verts.new((local.x+2.0*MM*math.cos(a), front_y,
+                            local.z+2.0*MM*math.sin(a))) for a in angles]
+    bmesh.ops.delete(bm, geom=caps, context="FACES")
+    # Four matching boundary stations prevent long corner poles around the port.
+    for axis, sign in (("X",-1), ("X",1), ("Z",-1), ("Z",1)):
+        index = 0 if axis=="X" else 2
+        value = sign*(width/2 if axis=="X" else half_straight)
+        ends = [v for v in corners[:4] if abs(v.co[index]-value)<1e-8]
+        a, z = ends
+        desired = a.co.copy()
+        desired.x, desired.z = (value,0) if axis=="X" else (local.x,value)
+        edge = next(e for e in bm.edges if set(e.verts)==set(ends))
+        factor = (desired-a.co).dot(z.co-a.co)/(z.co-a.co).length_squared
+        _, vertex = bmesh.utils.edge_split(edge, a, factor)
+        vertex.co = desired
+        corners.append(vertex)
+    corners.sort(key=angle)
+    bmesh.ops.triangulate(bm, faces=[f for f in bm.faces if len(f.verts)>4],
+                         quad_method="BEAUTY", ngon_method="BEAUTY")
+    cap_faces = [bm.faces.new((inner[i],inner[(i+1)%16],support[(i+1)%16],support[i]))
+                 for i in range(16)]
+    # Retained feature-specific cap partitions, validated in Blender; no optimizer.
+    anchors = ((0,1),(1,4),(4,5),(5,8),(8,11),(11,12),(12,15),(15,0))
+    pivots = (1,1,1,1,2,0,2,0)
+    for i, ((start,end), pivot) in enumerate(zip(anchors,pivots)):
+        a, z = corners[i], corners[(i+1)%8]
+        arc = [support[(start+k)%16] for k in range((end-start)%16+1)]
+        triangles = [(a,z,arc[pivot])]
+        triangles += [(a,arc[k+1],arc[k]) for k in range(pivot)]
+        triangles += [(z,arc[k+1],arc[k]) for k in range(pivot,len(arc)-1)]
+        cap_faces.extend(bm.faces.new(tri) for tri in triangles)
+    uv = bm.loops.layers.uv.active
+    for face in cap_faces:
+        face.smooth = False
+        for loop in face.loops:
+            co = loop.vert.co
+            loop[uv].uv = (.54+(co.x/width+.5)*.42, .04+(co.z/height+.5)*.42)
+    # New cavity walls have no corresponding frozen bake; use the existing optics
+    # material. Accepted housing surfaces retain their material and UV response.
+    for face in bm.faces:
+        if all(math.hypot(v.co.x-local.x,v.co.z-local.z)<=0.501*MM for v in face.verts):
+            face.material_index = cavity_material
+    bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
+    bm.to_mesh(housing.data)
+    bm.free()
+    housing.data.update()
+
+
+open_rear_mic_aperture(housing, rear_mic)
+
 radial_prism_y(
     "FLASH_RING", 3.30*MM, 0.12*MM, metal_dark, detail_c,
     ((W*0.5-30.41*MM),D*0.5+0.30*MM,CAM_CENTER_Z), segments=32,

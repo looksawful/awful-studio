@@ -833,3 +833,66 @@ Next ticket144 rear-camera preservation audit. No push/merge/deploy.
 Manifest precommit identity intentionally awaits145146. Whole-device topology and
 HumanGate UNACCEPTED; final exact-candidate mobile links use existing Tailscale
 Storybook after146, not the current primary frozen-reference story.
+
+### Ticket144 WIP — rear preservation audit
+
+Fixed point e5827f735eacd0dc97ee027da5d04059f84620c0; branch/preflight/frozen SHA
+and existing Storybook HTTP200 verified. No camera geometry repair: all17 visible
+rear meshes clean (ngons/nonmanifold/zeroedges/degfaces/modifiers zero, positive
+signedvolume), and full exported geometry/normal/tangent/UV/index/node payloads
+match frozen68bcd228...feae0 exactly. All materials/textures/samplers/embedded
+images match frozen; source/delivery/bundle/manifest/bake files unchanged fromHEAD.
+
+Initial diagnostic wrongly demanded Blender loop-triangle vsGLB triangle identity:
+seven quadded leaves have alternative valid diagonals. This is not a geometryRED;
+all actualtriangles match uniquely to authoredfaces, with winding/boundary/area
+coverage independently checked. Existing rear runtimecontract expanded9→17leaves,
+plus actualGLB coverage. No weakened existingtest or modifiedproductioninputs.
+Capsule40-class/10cornersteps and circular40 radial samples preserve accepted
+UV/silhouette. Circularcap9degree fans are regular, not thin curved slivers. Seat
+min0.987degree/max58aspect concerns its straight planar0.30mm wall, not curved
+surface; speculative longitudinaldensity is unwarranted. Regionmetrics retained.
+Matingaudit: housing1.78mm and glass3.45mm above backglass, concentricstacks,
+ordered optical visible surfaces, descendingdiameters and flash/ringcontact PASS.
+Nativevolume nesting is intentional; no claim of pairwise disjoint optical solids.
+
+Fresh runtime17/17, fast209/209, preview25/25; Khronosboth0errors0warnings.
+Matched existingviewer9views×fivefinish/clay/actualwire current/frozen63frames each
+running. Initial fullback crop corrected symmetrically; partial folders retained as
+rejecteddiagnostics. SHA/revision/loadedstate/geometry invariants apply. Raw
+F:\Temp\iphone17-ticket144. Separate local30b Standards/Spec reviews running;
+primaryvisual adjudication and commit pending. No144PASS, no145work yet.
+Wholedevice/HumanGate remain UNACCEPTED, PR119DRAFT/HOLD, no push/merge/deploy.
+
+### Ticket144 concrete RED — supersedes no-defect/provisional reviews above
+
+Matched REAR_MIC macro missing physical aperture. Existing official drawing
+pure_ref/drawing_page_2.png Detail D shows Ø1mm rear microphone at currentdatum.
+Independent BVH9rays(center+8within0.35mm) fail new visibilityassertion: opaque
+CAMERA_HOUSING surfaceY5.755mm occludes REAR_MIC frontY5.065mm by0.69mm.
+Frozen appearance shares the defect. Geometry/UV/payload cleanliness and exact
+frozenidentity did not prove valid mating exposure. No source/model repair yet.
+Existing rear runtimecontract now intentionally RED; baseline17runtime PASS was
+before this additional independently observed assertion. Local30b reviewreports
+cover earlier audit-only state and are superseded; no final144PASS or commit.
+Next minimum physicalmic aperture repair restricted to housing/mic mating slice,
+preserving camera-stack/seat/flash/silhouette and accepted bake inputs. Then existing
+pipeline rebuild, focused/export/matched views, broader gates, new Standards+Spec
+review, commit/closure. No145work, wholedevice/HumanGatepending; PR119HOLD.
+
+## Ticket #144 repair closure checkpoint — 2026-10-06
+
+Fixed point remains `e5827f735eacd0dc97ee027da5d04059f84620c0`; this section supersedes the earlier "no repair yet" note.
+
+- Reproduced RED: official Detail D requires an exposed rear microphone Ø1 mm; nine native BVH rays were intercepted by `CAMERA_HOUSING` 0.69 mm before `REAR_MIC`.
+- Minimal source repair: author a local Ø1 mm housing aperture at the existing rear-mic datum. Camera stacks, seat, flash, body silhouette, transforms, accepted materials/images/bakes and screen states are not redesigned.
+- Fresh rear contract GREEN: all 17 rear leaves clean; authored/export face coverage passes; all nine mic visibility rays first hit `REAR_MIC`.
+- Fresh whole-device runtime contracts: 17/17 GREEN in Blender 5.2.1.
+- Broad regression: fast 209/209 GREEN; preview 25/25 GREEN; Storybook static build GREEN.
+- Khronos: compat and Meshopt 0 errors / 0 warnings.
+- Exact repaired browser audit: 9 views × 7 cases = 126 frames, zero capture errors; repaired compat GLB SHA-256 `7f91e3ca97ec4273862919f952c3ac8b367278207dab8a1e592f1b839cd3ae1f`, source revision `b5438febcbe35574c29f352d1e5daf356c0b6c81c604a96b42af72b2843e6cd6`.
+- Primary visual comparison of matched frozen vs repaired camera-system view confirms the intended delta: the physical rear-mic port becomes visible while camera/flash/housing silhouette remains unchanged. Wire review localizes new topology to the flat housing cap around the port.
+- Preservation note: a broad byte comparator observed regenerated `USB_C_CAVITY` UV drift max 5.96e-8 and derived tangent drift max 1.00e-4 (minimum tangent xyz dot 0.999922, handedness unchanged); POSITION/NORMAL/indices are byte-identical and USB runtime contracts remain GREEN. This is exporter floating-point/derived-field drift outside #144, not a geometry regression.
+- Independent local Standards + Spec reviews return PASS for #144 scope. They do not grant whole-device/Human acceptance.
+- `PR #119` remains HOLD; no push/merge/deploy. Whole-device Human Gate remains after #146.
+- Next after an explicit #144 commit/issue close: #145 production bundle/provenance gaps, then #146 exact whole-device integration.

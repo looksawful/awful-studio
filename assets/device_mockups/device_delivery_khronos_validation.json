@@ -9,21 +9,21 @@
         "validator_version": "2.0.0-dev.3.10",
         "errors": 0,
         "warnings": 0,
-        "infos": 49,
+        "infos": 51,
         "hints": 0,
         "pass": true,
         "file": "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb",
-        "sha256": "354e53759fabaac61a39ff4df7fd69ae410da2ff8c52353184bb769b813570b0"
+        "sha256": "d5839ec429f0c335eccdb7405c5aa6b1eeca17d46f4cad4d21639bc414637489"
       },
       "meshopt": {
         "validator_version": "2.0.0-dev.3.10",
         "errors": 0,
         "warnings": 0,
-        "infos": 50,
+        "infos": 52,
         "hints": 0,
         "pass": true,
         "file": "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web_meshopt.glb",
-        "sha256": "061c4df9e50fd31b6fe486f5431340d1d4cc051e3ffc7a842abc26de91677c1c"
+        "sha256": "05abbae17764a9bab0452e5c2b120b9b77ad9a3d73ac843e5ddca93d9803705b"
       }
     },
     "ipad_pro_11_m5": {
