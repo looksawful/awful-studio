@@ -822,3 +822,14 @@ Meshopt061c4df9e50fd31b6fe486f5431340d1d4cc051e3ffc7a842abc26de91677c1c;
 revision92f2b5fe5c4eb902f3253ff15a282ab51c1878db2f1eb306613f61872667a11e.
 12530webtris. Frozenreference unchanged. Commit pending staged verification;
 next144 only after143commit. Wholedevice and HumanGate remain unaccepted.
+
+### Ticket143 committed closure — supersedes WIP above
+
+Implementation/evidence commit d3037f8b6f6b0de4f1afd8a2680be2d3da1503f9.
+Staged fast209/209 and diffcheck PASS; only preserved prototypes remain untracked.
+Issue143 CLOSED, closurecomment6009258155; ledger118comment6009258478;
+Asana current notes updated without marking the whole task complete.
+Next ticket144 rear-camera preservation audit. No push/merge/deploy.
+Manifest precommit identity intentionally awaits145146. Whole-device topology and
+HumanGate UNACCEPTED; final exact-candidate mobile links use existing Tailscale
+Storybook after146, not the current primary frozen-reference story.
