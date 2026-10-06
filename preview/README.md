@@ -6,11 +6,11 @@ One Storybook package (`preview/`), one Three.js viewer (`src/model-viewer.mjs`)
 
 The permanent published address is https://looksawful.github.io/awful-studio/. On 2026-10-05, the latest successful Pages workflow was [36424975204](https://github.com/looksawful/awful-studio/actions/runs/36424975204), built on 2026-09-28 from `c3162abcc781e9ee917b3ba271d416fa3c5f65e4`. Its device stories exist, but this is an older published build. It does not contain the pinned review snapshots below.
 
-The current uncommitted review build on Titan is http://127.0.0.1:6006/?path=/story/models-catalog--catalog. This address works on Titan; it is not a shared internet address. Open the four device stories from that catalog to rotate, zoom and switch between render and GLB triangle wireframe. Every primary device story reads the same catalog entry shown on the landing page.
+The current local review build on Titan is http://127.0.0.1:6006/?path=/story/models-catalog--catalog. The iPhone primary story is the exact #146 Human Gate candidate; the frozen 2026-10-05 look remains preserved separately as appearance reference. Rotate, zoom, and switch between render, clay, and hidden-line GLB triangle wireframe. Every primary device story reads the same catalog entry shown on the landing page.
 
 | Primary story ID | Review selection, 2026-10-05 | GLB SHA-256 prefix | Triangles |
 | --- | --- | --- | --- |
-| `models-devices--i-phone-17` | Frozen look; topology not accepted | `68bcd22831e4` | 11,538 |
+| `models-devices--i-phone-17` | #146 exact Human Gate candidate; owner verdict required | `ba4ef30c68ef` | 12,634 |
 | `models-devices--i-pad-pro-11` | iPad writer WIP snapshot; human review needed | `3640fec046ab` | 20,674 |
 | `models-devices--i-pad-pro-13` | iPad writer WIP snapshot; human review needed | `7003ee11422a` | 20,682 |
 | `models-devices--mac-book-pro-14` | MacBook G2 writer WIP snapshot; human review needed | `bc4a4c03f511` | 74,023 |
@@ -21,7 +21,7 @@ These are selected snapshots. `v30`, `v6` and `v1` alone do not identify the lat
 
 The iPad writer is `agent/51-ipad-control-geometry`, HEAD `c6c9457e238c65f32e521d8b7234c82d788fc175`, including rebuilt uncommitted source/runtime. MacBook is `fix/macbook-g2-overlay-calibration`, HEAD `e39d8d10` at audit, with uncommitted geometry-contract changes included in the source revision. These writers are separate checkouts and are not represented by the iPhone checkout's worktree list. Their source-file hashes, artifact hashes and GLB-root provenance were checked before copying the browser candidates.
 
-The iPhone freeze stays in `generated/iphone-review/frozen-current-2026-10-05/`. The three other byte-exact review copies and original manifests are in `generated/device-review/current-2026-10-05/`. They are review evidence, never replacement production sources. No native Blender source, generator or delivery file in another writer was edited. Embedded textures, current screen-state/glow metadata and MacBook animation clips are retained. All four browser loads verify the pinned checksum before parsing, then verify manifest provenance on the loaded root.
+The iPhone freeze stays in `generated/iphone-review/frozen-current-2026-10-05/` as immutable appearance evidence. The selected #146 Human Gate snapshot is in `generated/iphone-review/human-gate-2026-10-06/`. The three other byte-exact review copies and original manifests are in `generated/device-review/current-2026-10-05/`. They are review evidence, never replacement production sources. No native Blender source, generator or delivery file in another writer was edited. Embedded textures, current screen-state/glow metadata and MacBook animation clips are retained. All four browser loads verify the pinned checksum before parsing, then verify manifest provenance on the loaded root.
 
 Older device runtime files in this checkout remain at their production paths for existing consumers, but are not served by this review build or selectable as primary device stories. Historical iPhone reference evidence remains under `generated/iphone-review/archive/`, excluded from static serving. Do not delete old source evidence or duplicate binaries merely to hide them from the catalog. Replace a review snapshot only by an explicit new selection with new evidence; never silently overwrite the frozen iPhone.
 

@@ -7,7 +7,7 @@ const repoRoot = path.resolve(previewRoot, '..');
 const output = path.join(previewRoot, 'generated', 'asset-catalog.json');
 
 const reviewDevices = [
-  'preview/generated/iphone-review/frozen-current-2026-10-05/asset.json',
+  'preview/generated/iphone-review/human-gate-2026-10-06/asset.json',
   'preview/generated/device-review/current-2026-10-05/ipad_pro_11_m5_v6/asset.json',
   'preview/generated/device-review/current-2026-10-05/ipad_pro_13_m5_v6/asset.json',
   'preview/generated/device-review/current-2026-10-05/macbook_pro_14_m5_v1/asset.json',

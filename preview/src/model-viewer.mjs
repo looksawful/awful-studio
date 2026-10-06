@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+﻿import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -127,7 +127,7 @@ class AwfulModelViewer extends HTMLElement {
     if (asset.materialCount != null) lines.push(`materials: ${asset.materialCount}`);
     if (asset.sourceCommit) lines.push(`source commit: ${asset.sourceCommit}`);
     if (asset.sourceRevision) lines.push(`source revision: ${asset.sourceRevision}`);
-    if (asset.reviewOnly) lines.push(`${asset.reviewStatus ?? (asset.frozenReview ? 'FROZEN LOOK — TOPOLOGY NOT ACCEPTED' : 'ARCHIVED REVIEW REFERENCE')} — snapshot: ${asset.snapshotCommit}`, `GLB SHA-256: ${asset.sha256}`);
+    if (asset.reviewOnly) lines.push(`${asset.reviewStatus ?? (asset.frozenReview ? 'FROZEN LOOK вЂ” TOPOLOGY NOT ACCEPTED' : 'ARCHIVED REVIEW REFERENCE')} вЂ” snapshot: ${asset.snapshotCommit}`, `GLB SHA-256: ${asset.sha256}`);
     if (asset.snapshotBranch) lines.push(`snapshot branch: ${asset.snapshotBranch}${asset.snapshotSourceDirty ? ' (includes uncommitted source/runtime)' : ''}`);
     if (asset.evidenceArchive) lines.push(`frozen source / render evidence: ${asset.evidenceArchive}`);
     return lines.join('\n');
@@ -223,6 +223,7 @@ class AwfulModelViewer extends HTMLElement {
     this._iphonePresentation = null;
     this._screenCompositeTexture?.dispose();
     this._screenCompositeTexture = null;
+    this.#clearWireframeOverlays();
     if (this._model) {
       this._scene.remove(this._model);
       this.#disposeObject(this._model);
@@ -515,10 +516,20 @@ class AwfulModelViewer extends HTMLElement {
     this._controls.update();
     this.#resize();
   }
+  #clearWireframeOverlays() {
+    for (const overlay of this._wireframeOverlays ?? []) {
+      overlay.removeFromParent();
+      overlay.material?.dispose?.();
+    }
+    this._wireframeOverlays = [];
+  }
+
   #applyRenderMode(mode) {
     if (!this._model) return;
+    this.#clearWireframeOverlays();
+    const overlays = [];
     this._model.traverse((object) => {
-      if (!object.isMesh) return;
+      if (!object.isMesh || object.userData.previewWireframeOverlay) return;
       const original = object.userData.previewOriginalMaterial;
       if (object.userData.previewTempMaterial) {
         object.userData.previewTempMaterial.dispose();
@@ -528,11 +539,34 @@ class AwfulModelViewer extends HTMLElement {
         object.material = original;
         const materials = Array.isArray(object.material) ? object.material : [object.material];
         for (const material of materials) material.wireframe = false;
+      } else if (mode === 'wireframe') {
+        const source = Array.isArray(original) ? original[0] : original;
+        const depth = new THREE.MeshBasicMaterial({
+          colorWrite: false,
+          depthWrite: true,
+          depthTest: true,
+          side: THREE.DoubleSide,
+        });
+        depth.name = source.name;
+        object.userData.previewTempMaterial = depth;
+        object.material = depth;
+
+        const wire = new THREE.MeshBasicMaterial({
+          color: 0xececec,
+          wireframe: true,
+          side: THREE.FrontSide,
+          depthWrite: false,
+          depthTest: true,
+        });
+        wire.name = '__PREVIEW_WIREFRAME__';
+        const overlay = new THREE.Mesh(object.geometry, wire);
+        overlay.name = '__PREVIEW_WIREFRAME__' + object.name;
+        overlay.userData.previewWireframeOverlay = true;
+        overlay.renderOrder = 1;
+        overlays.push([object, overlay]);
       } else {
         const source = Array.isArray(original) ? original[0] : original;
-        const temp = mode === 'wireframe'
-          ? new THREE.MeshBasicMaterial({ color: 0xececec, wireframe: true, side: source.side })
-          : mode === 'normals'
+        const temp = mode === 'normals'
           ? new THREE.MeshNormalMaterial()
           : new THREE.MeshStandardMaterial({ color: 0xb9b7b2, roughness: 0.58, metalness: 0.05 });
         temp.name = source.name;
@@ -540,6 +574,8 @@ class AwfulModelViewer extends HTMLElement {
         object.material = temp;
       }
     });
+    for (const [object, overlay] of overlays) object.add(overlay);
+    this._wireframeOverlays = overlays.map(([, overlay]) => overlay);
     this.#applyClipping();
   }
 
@@ -607,6 +643,7 @@ class AwfulModelViewer extends HTMLElement {
     this._screenCompositeTexture = null;
     this._screenTextures?.forEach(pending => { void pending.then(texture => texture.dispose(), () => {}); });
     this._screenTextures?.clear();
+    this.#clearWireframeOverlays();
     if (this._model) this.#disposeObject(this._model);
     this._screenGlow?.removeFromParent();
     this._screenGlow = null;

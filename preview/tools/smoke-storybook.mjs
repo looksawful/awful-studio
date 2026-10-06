@@ -93,7 +93,7 @@ async function checkStory(id, assetId, expectedClips = []) {
     if (!snapshot.asset.reviewOnly || snapshot.verified !== snapshot.asset.sha256) throw new Error(`${assetId}: device review snapshot was not verified`);
     const fingerprint = () => viewer.evaluate(element => {
       const meshes = [];
-      element._model.traverse(object => { if (object.isMesh) meshes.push([object.name, object.geometry.uuid, object.geometry.index?.count, object.geometry.attributes.position.count]); });
+      element._model.traverse(object => { if (object.isMesh && !object.userData.previewWireframeOverlay) meshes.push([object.name, object.geometry.uuid, object.geometry.index?.count, object.geometry.attributes.position.count]); });
       return meshes;
     });
     const before = await fingerprint();
@@ -101,11 +101,20 @@ async function checkStory(id, assetId, expectedClips = []) {
     const mode = page.locator('awful-model-viewer select[data-control="mode"]');
     await mode.selectOption('wireframe');
     const wire = await viewer.evaluate(element => {
-      let valid = true;
-      element._model.traverse(object => { if (object.isMesh) for (const material of (Array.isArray(object.material) ? object.material : [object.material])) valid &&= material.isMeshBasicMaterial && material.wireframe; });
-      return valid;
+      let baseValid = true, overlayValid = true, overlays = 0;
+      element._model.traverse(object => {
+        if (!object.isMesh) return;
+        const materials = Array.isArray(object.material) ? object.material : [object.material];
+        if (object.userData.previewWireframeOverlay) {
+          overlays++;
+          for (const material of materials) overlayValid &&= material.isMeshBasicMaterial && material.wireframe && material.depthTest && !material.depthWrite && material.color?.getHexString() === 'ececec';
+        } else {
+          for (const material of materials) baseValid &&= material.isMeshBasicMaterial && !material.wireframe && material.depthTest && material.depthWrite && material.colorWrite === false;
+        }
+      });
+      return { baseValid, overlayValid, overlays };
     });
-    if (!wire || JSON.stringify(before) !== JSON.stringify(await fingerprint())) throw new Error(`${assetId}: wireframe does not show unchanged GLB triangles`);
+    if (!wire.baseValid || !wire.overlayValid || wire.overlays !== before.length || JSON.stringify(before) !== JSON.stringify(await fingerprint())) throw new Error(`${assetId}: hidden-line wireframe does not preserve unchanged GLB triangles`);
     if (process.env.PREVIEW_EVIDENCE_DIR) {
       mkdirSync(process.env.PREVIEW_EVIDENCE_DIR, { recursive: true });
       await page.screenshot({ path: path.join(process.env.PREVIEW_EVIDENCE_DIR, `${assetId}-wireframe.png`) });
@@ -122,11 +131,11 @@ async function checkStory(id, assetId, expectedClips = []) {
   if (assetId === 'iphone-17-v30') {
     if (id === 'models-devices--i-phone-17') {
       const identity = await viewer.evaluate(element => ({ asset: element.asset, verified: element.dataset.snapshotVerified }));
-      if (!identity.asset.frozenReview || identity.verified !== '68bcd22831e427a077ddfd48662e41bbe8ef46ebda0359c7153b9e3579afeae0') throw new Error('Primary iPhone story is not the verified frozen look');
+      if (!identity.asset.frozenReview || identity.verified !== 'ba4ef30c68ef93470eff6d8d472d78454ad51f99a727469a8f6d12fa58eda05c') throw new Error('Primary iPhone story is not the verified #146 Human Gate candidate');
       const profile = await viewer.evaluate(element => ({ exposure: element._renderer.toneMappingExposure, fov: element._perspective.fov, environment: element._scene.environmentIntensity, light: element._viewLight.intensity }));
-      if (profile.exposure !== .7 || profile.fov !== 35 || profile.environment !== 1 || profile.light !== .65) throw new Error('Frozen look renderer profile changed');
+      if (profile.exposure !== .7 || profile.fov !== 35 || profile.environment !== 1 || profile.light !== .65) throw new Error('Human Gate renderer profile changed');
       const part = page.locator('awful-model-viewer select[data-control="part"]');
-      if (await part.count() !== 1) throw new Error('Frozen iPhone lacks part isolation');
+      if (await part.count() !== 1) throw new Error('Human Gate iPhone lacks part isolation');
       const originalNodes = await viewer.evaluate(element => element.asset.reviewParts.flatMap(group => group.meshes).map(name => {
         const node = element._model.getObjectByName(name);
         return [name, node.parent.uuid, node.matrixWorld.toArray()];
@@ -154,7 +163,7 @@ async function checkStory(id, assetId, expectedClips = []) {
     const readDelivery = () => viewer.evaluate(element => {
       const meshes = [], materials = {};
       element._model.traverse(object => {
-        if (!object.isMesh) return;
+        if (!object.isMesh || object.userData.previewWireframeOverlay) return;
         meshes.push([object.name, object.geometry.uuid, object.geometry.index?.count ?? object.geometry.attributes.position.count]);
         for (const material of (Array.isArray(object.material) ? object.material : [object.material])) {
           materials[material.name] = { color: material.color?.getHexString(), normal: material.normalMap?.uuid ?? null, roughness: material.roughnessMap?.uuid ?? null, wireframe: material.wireframe, envMapIntensity: material.envMapIntensity };
@@ -175,15 +184,30 @@ async function checkStory(id, assetId, expectedClips = []) {
       }
     }
     const mode = page.locator('awful-model-viewer select[data-control="mode"]');
+    const wireState = () => viewer.evaluate(element => {
+      let bases = 0, overlays = 0, valid = true;
+      element._model.traverse(object => {
+        if (!object.isMesh) return;
+        const materials = Array.isArray(object.material) ? object.material : [object.material];
+        if (object.userData.previewWireframeOverlay) {
+          overlays++;
+          for (const material of materials) valid &&= material.isMeshBasicMaterial && material.wireframe && material.color?.getHexString() === 'ececec' && material.depthTest && !material.depthWrite;
+        } else {
+          bases++;
+          for (const material of materials) valid &&= material.isMeshBasicMaterial && !material.wireframe && material.colorWrite === false && material.depthTest && material.depthWrite;
+        }
+      });
+      return { bases, overlays, valid };
+    });
     await mode.selectOption('wireframe');
-    const wire = await readDelivery();
-    if (Object.values(wire.materials).some(material => !material.wireframe)) throw new Error(`${id}: incomplete GLB wireframe`);
-    if (id === 'models-devices--i-phone-17' && Object.values(wire.materials).some(material => material.color !== 'ececec')) throw new Error('Dark source materials make isolated triangle wireframe unreadable');
-    if (JSON.stringify(wire.meshes) !== JSON.stringify(original.meshes)) throw new Error(`${id}: wireframe replaced delivery geometry`);
+    let hiddenLine = await wireState();
+    if (!hiddenLine.valid || hiddenLine.bases !== original.meshes.length || hiddenLine.overlays !== original.meshes.length) throw new Error(`${id}: incomplete hidden-line GLB wireframe`);
+    const wireGeometry = await readDelivery();
+    if (JSON.stringify(wireGeometry.meshes) !== JSON.stringify(original.meshes)) throw new Error(`${id}: wireframe replaced delivery geometry`);
     await page.locator('awful-model-viewer select[data-control="colorway"]').selectOption('black');
     await page.locator('awful-model-viewer select[data-control="screen-state"]').selectOption('screen_off');
-    const updatedWire = await readDelivery();
-    if (id === 'models-devices--i-phone-17' && Object.values(updatedWire.materials).some(material => material.color !== 'ececec')) throw new Error('Finish controls recolored the diagnostic wire material');
+    hiddenLine = await wireState();
+    if (!hiddenLine.valid) throw new Error('Finish controls changed the diagnostic wire overlay');
     await mode.selectOption('texture');
     const restored = await readDelivery();
     if (Object.values(restored.materials).some(material => material.wireframe)) throw new Error(`${id}: wireframe leaked into render`);
@@ -239,9 +263,9 @@ async function checkStory(id, assetId, expectedClips = []) {
   await page.close();
 }
 
-async function rejectChangedFrozenStory() {
+async function rejectChangedReviewStory() {
   const page = await browser.newPage();
-  await page.route('**/assets/iphone-review/frozen-current-2026-10-05/model.glb', async route => {
+  await page.route('**/assets/iphone-review/human-gate-2026-10-06/model.glb', async route => {
     const response = await route.fetch();
     const body = await response.body();
     body[body.length - 1] ^= 1;
@@ -251,7 +275,7 @@ async function rejectChangedFrozenStory() {
   const viewer = page.locator('awful-model-viewer[data-model-error]');
   await viewer.waitFor({ timeout: 20000 });
   const state = await viewer.evaluate(element => ({ error: element.dataset.modelError, loaded: element.dataset.modelLoaded }));
-  if (!/snapshot checksum mismatch/i.test(state.error) || state.loaded) throw new Error('Changed frozen GLB was not rejected before display');
+  if (!/snapshot checksum mismatch/i.test(state.error) || state.loaded) throw new Error('Changed pinned review GLB was not rejected before display');
   await page.close();
 }
 
@@ -271,7 +295,7 @@ try {
   const iphoneStories = Object.keys((await index.json()).entries).filter(id => id.startsWith('models-devices--i-phone-17'));
   if (JSON.stringify(iphoneStories) !== JSON.stringify(['models-devices--i-phone-17'])) throw new Error('Ambiguous iPhone variants remain in Storybook');
   await checkStory('models-devices--i-phone-17', 'iphone-17-v30');
-  await rejectChangedFrozenStory();
+  await rejectChangedReviewStory();
   await checkStory('models-devices--i-pad-pro-11', 'ipad-pro-11-m5-v6');
   await checkStory('models-devices--i-pad-pro-13', 'ipad-pro-13-m5-v6');
   await checkStory('models-devices--mac-book-pro-14', 'macbook-pro-14-m5-v1', ['lid_open', 'lid_close']);
@@ -282,7 +306,7 @@ try {
   await checkStory('models-scenes--white-studio', 'white-studio-v2');
   await checkStory('models-scenes--dark-neon', 'dark-neon-v2');
   await checkStory('models-scenes--loft-daylight', 'loft-daylight-v2');
-  console.log('Storybook model smoke passed: frozen iPhone + other canonical assets; actual GLB finish/maps, triangle wireframe/render, orbit and zoom verified');
+  console.log('Storybook model smoke passed: exact iPhone Human Gate candidate + other canonical assets; hidden-line GLB triangle wireframe/render, orbit and zoom verified');
 } finally {
   await browser.close();
   await new Promise((resolve) => server.close(resolve));

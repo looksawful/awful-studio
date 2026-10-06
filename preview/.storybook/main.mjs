@@ -1,6 +1,7 @@
 export default {
   stories: ['../stories/**/*.stories.mjs'],
   staticDirs: [
+    { from: '../generated/iphone-review/human-gate-2026-10-06', to: '/assets/iphone-review/human-gate-2026-10-06' },
     { from: '../generated/iphone-review/frozen-current-2026-10-05', to: '/assets/iphone-review/frozen-current-2026-10-05' },
     { from: '../generated/device-review/current-2026-10-05', to: '/assets/device-review/current-2026-10-05' },
     { from: '../public/screens', to: '/screens' },

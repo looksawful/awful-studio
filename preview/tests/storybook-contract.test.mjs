@@ -20,6 +20,15 @@ test('viewer uses Three GLTF runtime and orbit controls', () => {
   assert.match(source, /applyIphoneColorway/); assert.match(source, /#applyScreenState/); assert.match(source, /new THREE\.RectAreaLight/);
 });
 
+test('wireframe review uses hidden-line depth occlusion instead of x-ray triangles', () => {
+  const source = readFileSync(viewerPath, 'utf8');
+  assert.match(source, /previewWireframeOverlay/);
+  assert.match(source, /colorWrite:\s*false/);
+  assert.match(source, /depthWrite:\s*false/);
+  assert.match(source, /side:\s*THREE\.FrontSide/);
+  assert.doesNotMatch(source, /wireframe:\s*true,\s*side:\s*source\.side/);
+});
+
 test('storybook exposes every canonical model as a first-class story', () => {
   const expected = {
     'devices.stories.mjs': ['IPhone17', 'IPadPro11', 'IPadPro13', 'MacBookPro14'],

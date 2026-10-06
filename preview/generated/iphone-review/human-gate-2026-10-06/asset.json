@@ -1,0 +1,319 @@
+{
+  "id": "iphone-17-v30",
+  "label": "iPhone 17 - HUMAN GATE #146 (ba4ef30c)",
+  "group": "Devices",
+  "version": "v30",
+  "stage": "LOW_DRAFT",
+  "root": "CTRL_IPHONE_17",
+  "sourceBlend": "assets/device_mockups/iphone_17/generated/iphone_17_low_v30.blend",
+  "previewGlb": "assets/iphone-review/human-gate-2026-10-06/model.glb",
+  "lods": [],
+  "collision": null,
+  "sourceRevision": "9b1913cbd9fa9188dd61c119c7731e4d6ea9aa6ab520e0ca39ee347da65de1f5",
+  "sourceCommit": "16ae14ec8dcfddcd359e0e1db21d690f033964d5",
+  "triangleCount": 12634,
+  "materialCount": 24,
+  "animations": [],
+  "screenStates": {
+    "screen_off": {
+      "emission_strength": 0,
+      "glow_intensity": 0
+    },
+    "screen_on": {
+      "emission_strength": 0.85,
+      "glow_intensity": 1
+    }
+  },
+  "screenGlow": {
+    "anchor": "SCREEN_GLOW_ANCHOR",
+    "type": "rect_area",
+    "width_mm": 66.57,
+    "height_mm": 144.79,
+    "source_energy_w": 8
+  },
+  "reviewOnly": true,
+  "frozenReview": true,
+  "topologyAccepted": false,
+  "snapshotCommit": "61404d6",
+  "sha256": "ba4ef30c68ef93470eff6d8d472d78454ad51f99a727469a8f6d12fa58eda05c",
+  "reviewParts": [
+    {
+      "id": "panels_and_display",
+      "label": "panels and display",
+      "meshes": [
+        "BACK_GLASS",
+        "SCREEN_CONTENT",
+        "DISPLAY_BEZEL",
+        "DISPLAY_GLASS_SEAT",
+        "APPLE_LOGO_DECAL"
+      ]
+    },
+    {
+      "id": "body",
+      "label": "body",
+      "meshes": [
+        "BODY_ALUMINUM"
+      ]
+    },
+    {
+      "id": "side_controls",
+      "label": "side controls",
+      "meshes": [
+        "ACTION_BUTTON",
+        "ANTENNA_SIDE_L_55",
+        "ANTENNA_SIDE_L_-55",
+        "ANTENNA_SIDE_R_55",
+        "ANTENNA_SIDE_R_-55",
+        "CAMERA_CONTROL",
+        "SIDE_BUTTON",
+        "VOL_DOWN",
+        "VOL_UP"
+      ]
+    },
+    {
+      "id": "bottom",
+      "label": "bottom",
+      "meshes": [
+        "BOTTOM_MIC_APERTURE_01",
+        "BOTTOM_MIC_APERTURE_02",
+        "BOTTOM_MIC_APERTURE_03",
+        "BOTTOM_SCREW_L",
+        "BOTTOM_SCREW_R",
+        "BOTTOM_SPEAKER_APERTURE_01",
+        "BOTTOM_SPEAKER_APERTURE_02",
+        "BOTTOM_SPEAKER_APERTURE_03",
+        "BOTTOM_SPEAKER_APERTURE_04",
+        "BOTTOM_SPEAKER_APERTURE_05",
+        "USB_C_CAVITY",
+        "USB_C_TONGUE"
+      ]
+    },
+    {
+      "id": "front_hardware",
+      "label": "front hardware",
+      "meshes": [
+        "FRONT_CAMERA_GLASS",
+        "FRONT_CAMERA_INNER",
+        "FRONT_CAMERA_IRIS",
+        "FRONT_CAMERA_MASK",
+        "FRONT_CAMERA_PUPIL",
+        "FRONT_RECEIVER_MIC",
+        "FRONT_SENSOR_MASK"
+      ]
+    },
+    {
+      "id": "rear_camera_housing",
+      "label": "rear camera housing",
+      "meshes": [
+        "CAMERA_HOUSING",
+        "CAMERA_HOUSING_SEAT"
+      ]
+    },
+    {
+      "id": "rear_camera_1",
+      "label": "rear camera 1",
+      "meshes": [
+        "CAMERA_1_BEVEL",
+        "CAMERA_1_GLASS",
+        "CAMERA_1_INNER",
+        "CAMERA_1_IRIS",
+        "CAMERA_1_PUPIL",
+        "CAMERA_1_RING"
+      ]
+    },
+    {
+      "id": "rear_camera_2",
+      "label": "rear camera 2",
+      "meshes": [
+        "CAMERA_2_BEVEL",
+        "CAMERA_2_GLASS",
+        "CAMERA_2_INNER",
+        "CAMERA_2_IRIS",
+        "CAMERA_2_PUPIL",
+        "CAMERA_2_RING"
+      ]
+    },
+    {
+      "id": "rear_flash_and_mic",
+      "label": "rear flash and mic",
+      "meshes": [
+        "FLASH",
+        "FLASH_RING",
+        "REAR_MIC"
+      ]
+    }
+  ],
+  "evidenceArchive": "assets/device_mockups/iphone_17/evidence/ticket146_whole_device/",
+  "reviewMaterialPolicies": {
+    "MAT_ANODIZED_ALUMINUM_ACTION_BUTTON": {
+      "frontSide": true,
+      "envMapIntensity": 0.55,
+      "minRoughness": 0.28
+    },
+    "MAT_OPTICS_BLACK": {
+      "frontSide": true
+    },
+    "MAT_APPLE_LOGO_DECAL": {
+      "alphaTest": 0.5,
+      "transparent": false,
+      "depthWrite": true,
+      "frontSide": true
+    },
+    "MAT_BACK_GLASS": {
+      "frontSide": true,
+      "envMapIntensity": 0.32,
+      "minRoughness": 0.38
+    },
+    "MAT_ANODIZED_ALUMINUM": {
+      "frontSide": true,
+      "envMapIntensity": 0.55,
+      "minRoughness": 0.28
+    },
+    "MAT_UNDER_GLASS_BLACK": {
+      "frontSide": true
+    },
+    "MAT_APERTURE_GRILLE": {
+      "frontSide": true
+    },
+    "MAT_FASTENER": {
+      "frontSide": true
+    },
+    "MAT_CAMERA_BEVEL": {
+      "frontSide": true
+    },
+    "MAT_LENS_GLASS": {
+      "frontSide": true
+    },
+    "MAT_CAMERA_RING": {
+      "frontSide": true
+    },
+    "MAT_CAMERA_CONTROL_GLASS": {
+      "frontSide": true
+    },
+    "MAT_CAMERA_HOUSING": {
+      "frontSide": true,
+      "envMapIntensity": 0.45,
+      "minRoughness": 0.3
+    },
+    "MAT_CAMERA_HOUSING_SEAT": {
+      "frontSide": true
+    },
+    "MAT_DISPLAY_BEZEL": {
+      "frontSide": true
+    },
+    "MAT_ASSEMBLY_GAP": {
+      "frontSide": true
+    },
+    "MAT_FLASH": {
+      "frontSide": true
+    },
+    "MAT_ALUMINUM_EDGE": {
+      "frontSide": true
+    },
+    "MAT_FRONT_OPTIC": {
+      "frontSide": true
+    },
+    "MAT_SCREEN_CONTENT": {
+      "emissiveIntensity": 2,
+      "envMapIntensity": 0,
+      "minRoughness": 0.12,
+      "maxClearcoat": 0
+    },
+    "MAT_SCREEN_EDGE": {
+      "frontSide": true
+    },
+    "MAT_ANODIZED_ALUMINUM_SIDE_BUTTON": {
+      "frontSide": true,
+      "envMapIntensity": 0.55,
+      "minRoughness": 0.28
+    },
+    "MAT_ANODIZED_ALUMINUM_VOL_DOWN": {
+      "frontSide": true,
+      "envMapIntensity": 0.55,
+      "minRoughness": 0.28
+    },
+    "MAT_ANODIZED_ALUMINUM_VOL_UP": {
+      "frontSide": true,
+      "envMapIntensity": 0.55,
+      "minRoughness": 0.28
+    }
+  },
+  "reviewColorways": {
+    "black": {
+      "label": "Black",
+      "aluminum": "#292a2c",
+      "edge": "#232426",
+      "cameraHousing": "#6c6c6c",
+      "backGlass": "#6c6c6c"
+    },
+    "white": {
+      "label": "White",
+      "aluminum": "#b8b8b6",
+      "edge": "#a2a3a1",
+      "cameraHousing": "#f7f7f5",
+      "backGlass": "#f7f7f5"
+    },
+    "mist_blue": {
+      "label": "Mist Blue",
+      "aluminum": "#687c95",
+      "edge": "#566a82",
+      "cameraHousing": "#bdcde4",
+      "backGlass": "#bdcde4"
+    },
+    "sage": {
+      "label": "Sage",
+      "aluminum": "#737e5e",
+      "edge": "#5f6b4d",
+      "cameraHousing": "#c8d2af",
+      "backGlass": "#c8d2af"
+    },
+    "lavender": {
+      "label": "Lavender",
+      "aluminum": "#998fa8",
+      "edge": "#81758f",
+      "cameraHousing": "#efe4f4",
+      "backGlass": "#efe4f4"
+    }
+  },
+  "reviewScreenStates": {
+    "screen_on": {
+      "label": "Home screen",
+      "emission_strength": 1,
+      "dynamic_island_state": "idle"
+    },
+    "screen_off": {
+      "label": "Off",
+      "emission_strength": 0,
+      "glow_intensity": 0,
+      "dynamic_island_state": "off"
+    },
+    "screen_lock": {
+      "label": "Lock screen",
+      "texture": "assets/iphone-review/frozen-current-2026-10-05/screens/iphone-lock.png",
+      "emission_strength": 1,
+      "dynamic_island_state": "idle"
+    },
+    "screen_website": {
+      "label": "looksawful.ru",
+      "texture": "assets/iphone-review/frozen-current-2026-10-05/screens/iphone-website.png",
+      "emission_strength": 1,
+      "dynamic_island_state": "idle"
+    },
+    "screen_resume": {
+      "label": "Resume",
+      "texture": "assets/iphone-review/frozen-current-2026-10-05/screens/iphone-resume.png",
+      "emission_strength": 1,
+      "dynamic_island_state": "idle"
+    }
+  },
+  "reviewPresentation": {
+    "exposure": 0.7,
+    "environmentIntensity": 1,
+    "viewLightIntensity": 0.65,
+    "background": "#111111",
+    "perspectiveFov": 35
+  },
+  "reviewStatus": "HUMAN GATE #146 - OWNER VERDICT REQUIRED",
+  "snapshotBranch": "agent/118-topology-rebuild-v2",
+  "snapshotSourceDirty": true
+}
