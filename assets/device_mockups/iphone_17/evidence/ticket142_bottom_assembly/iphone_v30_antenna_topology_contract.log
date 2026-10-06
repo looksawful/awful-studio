@@ -1,0 +1,6 @@
+00:00.469  blend            | Read blend: "F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\generated\iphone_17_low_v30.blend"
+IPHONE_ANTENNA_TOPOLOGY_GREEN {"ANTENNA_SIDE_L_-55": {"degenerate_faces": 0, "faces": 98, "modifiers": [], "ngons": 0, "nonmanifold": 0, "verts": 96, "zero_edges": 0}, "ANTENNA_SIDE_L_55": {"degenerate_faces": 0, "faces": 98, "modifiers": [], "ngons": 0, "nonmanifold": 0, "verts": 96, "zero_edges": 0}, "ANTENNA_SIDE_R_-55": {"degenerate_faces": 0, "faces": 98, "modifiers": [], "ngons": 0, "nonmanifold": 0, "verts": 96, "zero_edges": 0}, "ANTENNA_SIDE_R_55": {"degenerate_faces": 0, "faces": 98, "modifiers": [], "ngons": 0, "nonmanifold": 0, "verts": 96, "zero_edges": 0}}
+IPHONE_ANTENNA_EXPORTED_TRIANGLES_GREEN 4
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit

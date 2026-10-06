@@ -1,0 +1,198 @@
+{
+  "bottom-texture-black": {
+    "rmse255": 0.8819164495891155,
+    "changed_fraction": 0.0017859615118371868
+  },
+  "usb-texture-black": {
+    "rmse255": 4.303978580477605,
+    "changed_fraction": 0.03646914947621025
+  },
+  "usb-oblique-texture-black": {
+    "rmse255": 1.265759334113211,
+    "changed_fraction": 0.011472610641930869
+  },
+  "microphones-texture-black": {
+    "rmse255": 2.5065359821615627,
+    "changed_fraction": 0.02564839171166182
+  },
+  "speakers-texture-black": {
+    "rmse255": 1.8548136653826608,
+    "changed_fraction": 0.014783792514652267
+  },
+  "screw-L-texture-black": {
+    "rmse255": 3.713392032251549,
+    "changed_fraction": 0.0601527527804698
+  },
+  "screw-R-texture-black": {
+    "rmse255": 3.557838026580914,
+    "changed_fraction": 0.0613860814989155
+  },
+  "bottom-texture-white": {
+    "rmse255": 2.0528411864889238,
+    "changed_fraction": 0.001790576399464673
+  },
+  "usb-texture-white": {
+    "rmse255": 18.01260571302903,
+    "changed_fraction": 0.03645761225714154
+  },
+  "usb-oblique-texture-white": {
+    "rmse255": 4.561705123044356,
+    "changed_fraction": 0.01154644884397065
+  },
+  "microphones-texture-white": {
+    "rmse255": 7.076801463685419,
+    "changed_fraction": 0.025755687849000876
+  },
+  "speakers-texture-white": {
+    "rmse255": 5.324459381623141,
+    "changed_fraction": 0.014839171166182103
+  },
+  "screw-L-texture-white": {
+    "rmse255": 11.069637174882205,
+    "changed_fraction": 0.060269278693063824
+  },
+  "screw-R-texture-white": {
+    "rmse255": 11.036966502547386,
+    "changed_fraction": 0.061563754672573724
+  },
+  "bottom-texture-mist_blue": {
+    "rmse255": 1.3823997963164358,
+    "changed_fraction": 0.0017848077899303152
+  },
+  "usb-texture-mist_blue": {
+    "rmse255": 14.160603918062865,
+    "changed_fraction": 0.03646684203239651
+  },
+  "usb-oblique-texture-mist_blue": {
+    "rmse255": 2.7502560094629986,
+    "changed_fraction": 0.011548756287784392
+  },
+  "microphones-texture-mist_blue": {
+    "rmse255": 4.44509619665505,
+    "changed_fraction": 0.025738382020397802
+  },
+  "speakers-texture-mist_blue": {
+    "rmse255": 3.352291718951076,
+    "changed_fraction": 0.014841478609995847
+  },
+  "screw-L-texture-mist_blue": {
+    "rmse255": 6.93181760971423,
+    "changed_fraction": 0.06027158613687757
+  },
+  "screw-R-texture-mist_blue": {
+    "rmse255": 6.8626576232562595,
+    "changed_fraction": 0.06154644884397065
+  },
+  "bottom-texture-sage": {
+    "rmse255": 1.2202663747649043,
+    "changed_fraction": 0.00178826895565093
+  },
+  "usb-texture-sage": {
+    "rmse255": 12.957573614865083,
+    "changed_fraction": 0.03647030319811712
+  },
+  "usb-oblique-texture-sage": {
+    "rmse255": 2.29144720776348,
+    "changed_fraction": 0.01154644884397065
+  },
+  "microphones-texture-sage": {
+    "rmse255": 3.810013600974154,
+    "changed_fraction": 0.025739535742304673
+  },
+  "speakers-texture-sage": {
+    "rmse255": 2.8684681069412328,
+    "changed_fraction": 0.01481378928423093
+  },
+  "screw-L-texture-sage": {
+    "rmse255": 5.909927969442309,
+    "changed_fraction": 0.06026466380543634
+  },
+  "screw-R-texture-sage": {
+    "rmse255": 5.820970595923316,
+    "changed_fraction": 0.06154068023443629
+  },
+  "bottom-texture-lavender": {
+    "rmse255": 1.634250026008013,
+    "changed_fraction": 0.001790576399464673
+  },
+  "usb-texture-lavender": {
+    "rmse255": 15.986704188180106,
+    "changed_fraction": 0.03645991970095528
+  },
+  "usb-oblique-texture-lavender": {
+    "rmse255": 3.361242991968762,
+    "changed_fraction": 0.01154644884397065
+  },
+  "microphones-texture-lavender": {
+    "rmse255": 5.355074246786414,
+    "changed_fraction": 0.025752226683280262
+  },
+  "speakers-texture-lavender": {
+    "rmse255": 4.0506373598367755,
+    "changed_fraction": 0.014846093497623333
+  },
+  "screw-L-texture-lavender": {
+    "rmse255": 8.41050599293947,
+    "changed_fraction": 0.06027620102450505
+  },
+  "screw-R-texture-lavender": {
+    "rmse255": 8.365283046640624,
+    "changed_fraction": 0.061581060501176794
+  },
+  "bottom-clay-white": {
+    "rmse255": 0.7486495705524466,
+    "changed_fraction": 0.0004303382712630947
+  },
+  "usb-clay-white": {
+    "rmse255": 6.082305564773832,
+    "changed_fraction": 0.006871567677327057
+  },
+  "usb-oblique-clay-white": {
+    "rmse255": 1.855314008958704,
+    "changed_fraction": 0.0021886104573353637
+  },
+  "microphones-clay-white": {
+    "rmse255": 2.7508737181442995,
+    "changed_fraction": 0.005074068946421154
+  },
+  "speakers-clay-white": {
+    "rmse255": 2.282207991892508,
+    "changed_fraction": 0.0026939406525451105
+  },
+  "screw-L-clay-white": {
+    "rmse255": 3.955054220814314,
+    "changed_fraction": 0.009675111911024967
+  },
+  "screw-R-clay-white": {
+    "rmse255": 3.9988196163978356,
+    "changed_fraction": 0.009708569846324242
+  },
+  "bottom-wireframe-white": {
+    "rmse255": 3.639640982072167,
+    "changed_fraction": 0.0011214176934791638
+  },
+  "usb-wireframe-white": {
+    "rmse255": 12.409262760215256,
+    "changed_fraction": 0.010103142738474319
+  },
+  "usb-oblique-wireframe-white": {
+    "rmse255": 8.452061913699701,
+    "changed_fraction": 0.005359038257418432
+  },
+  "microphones-wireframe-white": {
+    "rmse255": 12.773954936948181,
+    "changed_fraction": 0.009871244635193134
+  },
+  "speakers-wireframe-white": {
+    "rmse255": 9.92162605264596,
+    "changed_fraction": 0.005992431584290922
+  },
+  "screw-L-wireframe-white": {
+    "rmse255": 17.993071271465983,
+    "changed_fraction": 0.019121786884489362
+  },
+  "screw-R-wireframe-white": {
+    "rmse255": 17.975548941005684,
+    "changed_fraction": 0.018999492362360978
+  }
+}

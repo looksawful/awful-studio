@@ -1,0 +1,6 @@
+00:00.656  blend            | Read blend: "F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\generated\iphone_17_low_v30.blend"
+IPHONE_USB_TOPOLOGY_GREEN {"USB_C_CAVITY": {"degenerate_faces": 0, "faces": 108, "modifiers": [], "ngons": 0, "nonmanifold": 0, "vertices": 56, "zero_edges": 0}, "USB_C_TONGUE": {"degenerate_faces": 0, "faces": 188, "modifiers": [], "ngons": 0, "nonmanifold": 0, "vertices": 96, "zero_edges": 0}}
+IPHONE_USB_EXPORTED_TRIANGLES_GREEN ('USB_C_CAVITY', 'USB_C_TONGUE')
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit

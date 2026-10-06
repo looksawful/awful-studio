@@ -1,0 +1,177 @@
+{
+  "ticket": 142,
+  "fixed_point": "ff22bb2a0ed7ea0aee87f04d6e3f70b3a4aae7f1",
+  "compat_sha256": "679f6798e0b88e128cb991a22689b2d891a6f3d55544f1c65160fa50d020bb8c",
+  "meshopt_sha256": "36c2d54b84d82cb6aa3803c4a6842eeb6f0215a68e0e40fe08d0da741b87acd1",
+  "source_revision": "e0429e3d3ea23a808841e4cbcc4516774fb24eb68366cbb34de43a3f94f8783d",
+  "manifest_source_commit": "ff22bb2a0ed7ea0aee87f04d6e3f70b3a4aae7f1",
+  "web_triangles": 12442,
+  "frozen_sha256": "68bcd22831e427a077ddfd48662e41bbe8ef46ebda0359c7153b9e3579afeae0",
+  "source_blend_sha256": "1fa39b4dfbb679ece0ecf507797e2c6555319889d3bb63fe960ae06faa7dba7c",
+  "baseline_blend_sha256": "e92bff1a90524f2af760c9c25dafffe088957d64bdcd0af62e229c0cb79c76e8",
+  "root_cause": "Antiparallel +Z/-Z quaternion bottom placement rotates rectangular USB width into device depth; same defect reproduced in frozen reference. Saved native bevel debt also present. Materials unchanged.",
+  "repair": "Only explicit USB roll frame for cutter/cavity/tongue; save existing physical cavity/tongue bevel with two/three controlled spans and persistent BEAUTY export diagonals. Radial callers retain existing frame.",
+  "usb_cavity": {
+    "vertices": 56,
+    "faces_triangles": 108,
+    "bevel_spans": 2,
+    "ngons": 0,
+    "nonmanifold": 0,
+    "degenerate": 0,
+    "zero_edges": 0,
+    "modifiers": 0
+  },
+  "usb_tongue": {
+    "vertices": 96,
+    "faces_triangles": 188,
+    "bevel_spans": 3,
+    "ngons": 0,
+    "nonmanifold": 0,
+    "degenerate": 0,
+    "zero_edges": 0,
+    "modifiers": 0
+  },
+  "native_surface_preservation": {
+    "USB_C_CAVITY": {
+      "max_sampled_local_surface_error_m": 4.2335395846748725e-06,
+      "baseline_evaluated_triangles": 300,
+      "current_authored_triangles": 108
+    },
+    "USB_C_TONGUE": {
+      "max_sampled_local_surface_error_m": 3.548165977917961e-06,
+      "baseline_evaluated_triangles": 300,
+      "current_authored_triangles": 188
+    }
+  },
+  "preservation": {
+    "other_mesh_geometry_normals_tangents_indices_unchanged": 49,
+    "fully_byte_unchanged_other_meshes": 45,
+    "antenna_uv_float_rounding_max_delta": {
+      "ANTENNA_SIDE_L_55": 5.960464477539063e-08,
+      "ANTENNA_SIDE_L_-55": 5.960464477539063e-08,
+      "ANTENNA_SIDE_R_55": 5.960464477539063e-08,
+      "ANTENNA_SIDE_R_-55": 5.960464477539063e-08
+    },
+    "other_mesh_node_frames_unchanged": true,
+    "materials_unchanged": true,
+    "embedded_images_unchanged": true,
+    "body_bounds_baseline": [
+      [
+        -35.725001245737076,
+        -74.80499893426895,
+        -3.6249998956918716
+      ],
+      [
+        35.725001245737076,
+        74.80499893426895,
+        3.6249998956918716
+      ]
+    ],
+    "body_bounds_current": [
+      [
+        -35.725001245737076,
+        -74.80499893426895,
+        -3.6249998956918716
+      ],
+      [
+        35.725001245737076,
+        74.80499893426895,
+        3.6249998956918716
+      ]
+    ]
+  },
+  "runtime_passed": 16,
+  "fast_passed": 209,
+  "preview_passed": 25,
+  "storybook_build": "PASS",
+  "khronos": {
+    "compat_errors": 0,
+    "compat_warnings": 0,
+    "meshopt_errors": 0,
+    "meshopt_warnings": 0
+  },
+  "browser_assembled_views": 7,
+  "browser_isolated_usb_views": 2,
+  "frames_each_candidate": 63,
+  "finishes": [
+    "black",
+    "white",
+    "mist_blue",
+    "sage",
+    "lavender"
+  ],
+  "modes": [
+    "texture",
+    "clay",
+    "actual_triangle_wireframe"
+  ],
+  "review": {
+    "standards": "PASS",
+    "spec": "PASS",
+    "standards_findings": 0,
+    "spec_findings": 0,
+    "model": "qwen3-coder:30b",
+    "method": "Two separate local model review processes + primary evidence adjudication; hosted agent failed quota. No Codex CLI dependency.",
+    "adjudication": "review-adjudication.md",
+    "scope": "Ticket142 only"
+  },
+  "whole_device_accepted": false,
+  "human_gate": "pending exact integrated146candidate",
+  "provenance_closure": "145146",
+  "pr119": "DRAFT/HOLD",
+  "raw_evidence": "F:\\Temp\\iphone17-ticket142",
+  "evidence_sha256": {
+    "baseline-browser-audit.json": "baf08d2c7da8a6a10d2425c1cb888bfbe76237b5f5de656764f99a1b4b01cb01",
+    "baseline-export.json": "537fb2174fc71e416722239da6dfd4a86d723531a95517efb88fd383396c3649",
+    "baseline-isolated-audit.json": "88ff010a8b98d96ee26fa04dfc9c72c2e442cd58269aafef8748c5e1c8e3036a",
+    "baseline-native.json": "c84270e6e09a2db99fab8b8c9b1af496a70f0121ba923e0337919e62cf1aa990",
+    "build.log": "d350d14dde05629b94b048ba4dbc131fceac74c896c18d566eefdd3fb44575ac",
+    "comparison-clay-white.jpg": "6ceb36ef1e23be13d9d724a927b4ff3abeccb875c92d3afeaee002ea8f9e122e",
+    "comparison-texture-black.jpg": "ae8c1ad4e3d80836d85f2db13821b1186b257ff45f6cdb36f29408ccdd923a46",
+    "comparison-texture-lavender.jpg": "52bdb3b06bbd80e64396483cfe0c91bf060018a399799f75c7d668d3609b4926",
+    "comparison-texture-mist_blue.jpg": "0c4424bdbfc5e628f55990697e3808a616b74a8ee9dc4a1e2b05a5c983a75d7b",
+    "comparison-texture-sage.jpg": "6aa8ffb18c45657ccd5c9c0686442c65d7f1ac2e26ed2aaa5cfeb5819bf2f8ca",
+    "comparison-texture-white.jpg": "9db36b3b508280a111d1d17b2a0d4f5117bab7bda2b03bb5debfbde3da174e96",
+    "comparison-wireframe-white.jpg": "90dd32e43a8242d39156aed9bd864ef6e17d8e69544c6eb5bb2405eff949ae37",
+    "current-browser-audit.json": "9bf60490624b49f18cd9dd590bede4b024117bd1d49ec454ea4201efce87bd29",
+    "current-isolated-audit.json": "00cfb655d959b3f9beabb8e9e6ca6c8354d09caf4f80a36085bcb3689bdc1f46",
+    "fast-final.log": "08c418f4bf1569a12a56e610acf905d268e67e7667285e507a97c3697a8a1aa1",
+    "fast.log": "0ce1f7654bc65e246e42c6a6af3f7cd2dad25fcf824ffad86b3013e227075924",
+    "frozen-browser-audit.json": "54093a5d977be33b88f6aec2b86acd672fce87e6acd6fd7971f5547fc72c6765",
+    "frozen-isolated-audit.json": "e7afc38ef3028c1cadf3ef697fabb426c2f46957eb0329fce66910408dd4875c",
+    "iphone_v30_antenna_topology_contract.log": "1283df72aebb2557b8b0eb5b2399db5f8c70ccd6fee40efce637d7b351e83e8d",
+    "iphone_v30_body_cell_shape_contract.log": "c2948ceadb0bb17837a8f34109f4590368d5f6f8a8210d05200c4f81ab44bc58",
+    "iphone_v30_body_rail_topology_contract.log": "edc71c3d2c08bffeffe5bdd35a1507836714ec7601b5684832c2fe2f57e10801",
+    "iphone_v30_body_topology_contract.log": "38036e474a9c4f5883c5c2f6e200221a5b5c555f47b385ad7447f6783f0c8a1e",
+    "iphone_v30_body_visible_material_contract.log": "4b0733183c77d5311798782368de510df9af0ab40d7fc97b18bf6ad0b494987c",
+    "iphone_v30_bottom_topology_contract.log": "8537f55ae8fe7fc731121d334e073df0ff23e196fc0916336348da88964f3cec",
+    "iphone_v30_controls_topology_contract.log": "487e1d886afe3545dd0054aa9633f411baa9ab10c4179d8a8a1949af4631c43b",
+    "iphone_v30_display_frame_topology_contract.log": "6ef1bde4c262fe3aea4e3c72436894309cd6ce53d42bdea5a39cc3b1425bacd9",
+    "iphone_v30_geometry_contract.log": "45a6e89b56612a2c88de6b61226fc3f119e213e671b0e37ec2f983a2c8e7f2a8",
+    "iphone_v30_panel_stack_topology_contract.log": "16ae173dcc12556f3b89a05b76e5e94cf5315900229dd75fc4cec86e95bffb8d",
+    "iphone_v30_rear_optics_topology_contract.log": "4cbb2042c36f6383220a712bb572181d54c5f5fcc73221d94d5bd2de9d6f2428",
+    "iphone_v30_screen_topology_contract.log": "9875c2d7a8edd97b8c940e62d64858e2d25fafd18e0ea59fa49ca3d815ac7e3e",
+    "iphone_v30_surface_topology_contract.log": "ec07b0fb00a898cd4c8bb1662b31067733530f10f08e709b67484f444d14df12",
+    "iphone_v30_topology_contract.log": "6f5d91181003f832fa18c22478a7cc003d8e61b200ef471985083bc02f4cf59c",
+    "iphone_v30_usb_frame_contract.log": "b872038bff0f3f0c38884345f5dfd25c0811264759dc0b12a6dc67ab57680fcc",
+    "iphone_v30_usb_topology_contract.log": "fd88c0dda5b469fd50c98e942b59966511b8d017b665b7b19fc169068211c494",
+    "khronos-compat.json": "276dfc5447f7d5bc931230ca8cfaa5b63d3d2a84c2a96de8ae5d2bc7b9416b04",
+    "khronos-meshopt.json": "3b7dcc4307882e3322599dc4c437e9c010a8f10c183e8d15b5e7477041c289c5",
+    "matched-pixel-deltas.json": "024dd14b466a7dc071741c9cdcf8d2533f057b91de05f41c988992760a96c933",
+    "native-bevel-preservation.json": "34203743026fc2b9b6995fb859788beefe6711242fd515d9ab5c0c5fa394e864",
+    "native-preservation-factory.log": "24661db6d7abf01554658acbf94e140ee3f9dfd5d2cae288e3515186747df99a",
+    "preservation-comparison.json": "1cfca8c3f3c01e0d1db1d0b61a217be3354dc22afad48566061f110d902a86cc",
+    "preview-tests.log": "de405ea15a12c58e61fdbd78be4e4edea2a90e4e2220526d64ec73c0d606157c",
+    "README.md": "21086ad5aa58c2509685115e21798ff014c4ae8d713e683ebefb6106253c75bb",
+    "review-adjudication.md": "5638ad4f8dbd4eb96a3e20700107f5a915586bf5862267e4cb818be1f88c9620",
+    "review-spec.json": "a811ac3af6772a0e5cb463e9312c49f7f8311613ef7a320a2b474e049c8d9e8e",
+    "review-spec.md": "7b1e67e5cac764f27d03f61eaf0a75b3c5f88a005a74cf191238b3e9e59734be",
+    "review-standards.json": "4b1c36af8692a9f3787a4db3a3d9ae4a9c850ca9468fd571bf03fe8802051f82",
+    "review-standards.md": "d2ec6cf2cacab048cd7d0bb03fc282fa0d0c6f4a6a1814ebbc6e74975d676841",
+    "runtime-summary.json": "e10e11fccbc5b576431d314d4c4aa41d8b02314673273924faef5ecfbb4e92b3",
+    "runtime.log": "13f3b2a87c0c192c2055105bfd88dde90f4dacd427c04f8e44ea67eede6662f6",
+    "storybook-build.log": "0ccce97787beed7a2c9b0bdf7b3c12a55f5137420ad9b86768b82585480cdd51",
+    "usb-frame-red.log": "1cbf2d8db150abce7dfb395155dd8edc97c665f9a7784ca46cc4f2f5dbd0273f",
+    "usb-topology-red.log": "4ba4c1c9bedf174e63b2e4986424b1f2dc4b3cfe5b22a56dc00694855f45c4d5"
+  }
+}

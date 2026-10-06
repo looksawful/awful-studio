@@ -1,0 +1,5 @@
+00:00.641  blend            | Read blend: "F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\generated\iphone_17_low_v30.blend"
+IPHONE_BOTTOM_TOPOLOGY_GREEN {"BOTTOM_MIC_APERTURE_01": {"faces": 48, "ngons": 0, "nonmanifold": 0, "verts": 34}, "BOTTOM_MIC_APERTURE_02": {"faces": 48, "ngons": 0, "nonmanifold": 0, "verts": 34}, "BOTTOM_MIC_APERTURE_03": {"faces": 48, "ngons": 0, "nonmanifold": 0, "verts": 34}, "BOTTOM_SCREW_L": {"faces": 60, "ngons": 0, "nonmanifold": 0, "verts": 42}, "BOTTOM_SCREW_R": {"faces": 60, "ngons": 0, "nonmanifold": 0, "verts": 42}, "BOTTOM_SPEAKER_APERTURE_01": {"faces": 48, "ngons": 0, "nonmanifold": 0, "verts": 34}, "BOTTOM_SPEAKER_APERTURE_02": {"faces": 48, "ngons": 0, "nonmanifold": 0, "verts": 34}, "BOTTOM_SPEAKER_APERTURE_03": {"faces": 48, "ngons": 0, "nonmanifold": 0, "verts": 34}, "BOTTOM_SPEAKER_APERTURE_04": {"faces": 48, "ngons": 0, "nonmanifold": 0, "verts": 34}, "BOTTOM_SPEAKER_APERTURE_05": {"faces": 48, "ngons": 0, "nonmanifold": 0, "verts": 34}}
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit

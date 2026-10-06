@@ -1,0 +1,1954 @@
+{
+  "baseline": {
+    "sha256": "17d542c9a8317401a182f453930fa9967fd8cddf10aa0278e49d2d34720fb40a",
+    "nodes": {
+      "USB_C_CAVITY": {
+        "node": {
+          "extras": {
+            "runtime_role": "port",
+            "interactable": false
+          },
+          "mesh": 47,
+          "name": "USB_C_CAVITY",
+          "rotation": [
+            -0.7071067094802856,
+            0,
+            0.7071068286895752,
+            7.52407629533991e-08
+          ],
+          "translation": [
+            0,
+            -0.07340499758720398,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 216,
+              "NORMAL": 217,
+              "TEXCOORD_0": 218,
+              "TANGENT": 219
+            },
+            "indices": 220,
+            "material": 6
+          }
+        ],
+        "triangles": 12,
+        "world_bounds_mm": [
+          [
+            -1.1900005141705687,
+            -73.46499815777206,
+            -4.224999910894745
+          ],
+          [
+            1.1900005141705687,
+            -73.3449970166359,
+            4.224999910894745
+          ]
+        ]
+      },
+      "USB_C_TONGUE": {
+        "node": {
+          "mesh": 48,
+          "name": "USB_C_TONGUE",
+          "rotation": [
+            -0.7071067094802856,
+            0,
+            0.7071068286895752,
+            7.52407629533991e-08
+          ],
+          "translation": [
+            0,
+            -0.07400500029325485,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 221,
+              "NORMAL": 222,
+              "TEXCOORD_0": 223,
+              "TANGENT": 224
+            },
+            "indices": 220,
+            "material": 17
+          }
+        ],
+        "triangles": 12,
+        "world_bounds_mm": [
+          [
+            -0.24000034799081849,
+            -74.09500059331276,
+            -2.6249999330122087
+          ],
+          [
+            0.24000034799081849,
+            -73.91499999319694,
+            2.6249999330122087
+          ]
+        ]
+      },
+      "BOTTOM_MIC_APERTURE_01": {
+        "node": {
+          "mesh": 8,
+          "name": "BOTTOM_MIC_APERTURE_01",
+          "rotation": [
+            -0.7071067094802856,
+            0,
+            0.7071068286895752,
+            7.52407629533991e-08
+          ],
+          "translation": [
+            -0.016015000641345978,
+            -0.07382500171661377,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 42,
+              "NORMAL": 43,
+              "TEXCOORD_0": 44,
+              "TANGENT": 45
+            },
+            "indices": 46,
+            "material": 6
+          }
+        ],
+        "triangles": 64,
+        "world_bounds_mm": [
+          [
+            -16.69000064213496,
+            -73.88500181256565,
+            -0.6750000007889829
+          ],
+          [
+            -15.340000640556994,
+            -73.76500162066189,
+            0.6750000007889829
+          ]
+        ]
+      },
+      "BOTTOM_MIC_APERTURE_02": {
+        "node": {
+          "mesh": 9,
+          "name": "BOTTOM_MIC_APERTURE_02",
+          "rotation": [
+            -0.7071067094802856,
+            0,
+            0.7071068286895752,
+            7.52407629533991e-08
+          ],
+          "translation": [
+            -0.01375999953597784,
+            -0.07382500171661377,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 47,
+              "NORMAL": 48,
+              "TEXCOORD_0": 49,
+              "TANGENT": 50
+            },
+            "indices": 46,
+            "material": 6
+          }
+        ],
+        "triangles": 64,
+        "world_bounds_mm": [
+          [
+            -14.434999536766824,
+            -73.88500181256565,
+            -0.6750000007889829
+          ],
+          [
+            -13.084999535188857,
+            -73.76500162066189,
+            0.6750000007889829
+          ]
+        ]
+      },
+      "BOTTOM_MIC_APERTURE_03": {
+        "node": {
+          "mesh": 10,
+          "name": "BOTTOM_MIC_APERTURE_03",
+          "rotation": [
+            -0.7071067094802856,
+            0,
+            0.7071068286895752,
+            7.52407629533991e-08
+          ],
+          "translation": [
+            -0.011505000293254852,
+            -0.07382500171661377,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 51,
+              "NORMAL": 52,
+              "TEXCOORD_0": 53,
+              "TANGENT": 54
+            },
+            "indices": 46,
+            "material": 6
+          }
+        ],
+        "triangles": 64,
+        "world_bounds_mm": [
+          [
+            -12.180000294043836,
+            -73.88500181256565,
+            -0.6750000007889829
+          ],
+          [
+            -10.830000292465868,
+            -73.76500162066189,
+            0.6750000007889829
+          ]
+        ]
+      },
+      "BOTTOM_SPEAKER_APERTURE_01": {
+        "node": {
+          "mesh": 13,
+          "name": "BOTTOM_SPEAKER_APERTURE_01",
+          "rotation": [
+            -0.7071067094802856,
+            0,
+            0.7071068286895752,
+            7.52407629533991e-08
+          ],
+          "translation": [
+            0.011505000293254852,
+            -0.07382500171661377,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 64,
+              "NORMAL": 65,
+              "TEXCOORD_0": 66,
+              "TANGENT": 67
+            },
+            "indices": 46,
+            "material": 6
+          }
+        ],
+        "triangles": 64,
+        "world_bounds_mm": [
+          [
+            10.830000292465868,
+            -73.88500181256565,
+            -0.6750000007889829
+          ],
+          [
+            12.180000294043836,
+            -73.76500162066189,
+            0.6750000007889829
+          ]
+        ]
+      },
+      "BOTTOM_SPEAKER_APERTURE_02": {
+        "node": {
+          "mesh": 14,
+          "name": "BOTTOM_SPEAKER_APERTURE_02",
+          "rotation": [
+            -0.7071067094802856,
+            0,
+            0.7071068286895752,
+            7.52407629533991e-08
+          ],
+          "translation": [
+            0.01375999953597784,
+            -0.07382500171661377,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 68,
+              "NORMAL": 69,
+              "TEXCOORD_0": 70,
+              "TANGENT": 71
+            },
+            "indices": 46,
+            "material": 6
+          }
+        ],
+        "triangles": 64,
+        "world_bounds_mm": [
+          [
+            13.084999535188857,
+            -73.88500181256565,
+            -0.6750000007889829
+          ],
+          [
+            14.434999536766824,
+            -73.76500162066189,
+            0.6750000007889829
+          ]
+        ]
+      },
+      "BOTTOM_SPEAKER_APERTURE_03": {
+        "node": {
+          "mesh": 15,
+          "name": "BOTTOM_SPEAKER_APERTURE_03",
+          "rotation": [
+            -0.7071067094802856,
+            0,
+            0.7071068286895752,
+            7.52407629533991e-08
+          ],
+          "translation": [
+            0.016015000641345978,
+            -0.07382500171661377,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 72,
+              "NORMAL": 73,
+              "TEXCOORD_0": 74,
+              "TANGENT": 75
+            },
+            "indices": 46,
+            "material": 6
+          }
+        ],
+        "triangles": 64,
+        "world_bounds_mm": [
+          [
+            15.340000640556994,
+            -73.88500181256565,
+            -0.6750000007889829
+          ],
+          [
+            16.69000064213496,
+            -73.76500162066189,
+            0.6750000007889829
+          ]
+        ]
+      },
+      "BOTTOM_SPEAKER_APERTURE_04": {
+        "node": {
+          "mesh": 16,
+          "name": "BOTTOM_SPEAKER_APERTURE_04",
+          "rotation": [
+            0,
+            0,
+            -0.9999943375587463,
+            0.0033652284182608128
+          ],
+          "translation": [
+            0.018263405188918114,
+            -0.07381970435380936,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 76,
+              "NORMAL": 77,
+              "TEXCOORD_0": 78,
+              "TANGENT": 79
+            },
+            "indices": 46,
+            "material": 6
+          }
+        ],
+        "triangles": 64,
+        "world_bounds_mm": [
+          [
+            17.588016634844404,
+            -73.8842460260693,
+            -0.6750000175088644
+          ],
+          [
+            18.938793742991823,
+            -73.75516268154941,
+            0.6750000175088644
+          ]
+        ]
+      },
+      "BOTTOM_SPEAKER_APERTURE_05": {
+        "node": {
+          "mesh": 17,
+          "name": "BOTTOM_SPEAKER_APERTURE_05",
+          "rotation": [
+            0,
+            0,
+            -0.9999279975891113,
+            0.01200499851256609
+          ],
+          "translation": [
+            0.02050147019326687,
+            -0.07378768920898438,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 80,
+              "NORMAL": 81,
+              "TEXCOORD_0": 82,
+              "TANGENT": 83
+            },
+            "indices": 46,
+            "material": 6
+          }
+        ],
+        "triangles": 64,
+        "world_bounds_mm": [
+          [
+            19.82522407921512,
+            -73.86387750899999,
+            -0.6750000175088644
+          ],
+          [
+            21.17771630731862,
+            -73.71150090896876,
+            0.6750000175088644
+          ]
+        ]
+      },
+      "BOTTOM_SCREW_L": {
+        "node": {
+          "mesh": 11,
+          "name": "BOTTOM_SCREW_L",
+          "rotation": [
+            -0.7071067094802856,
+            0,
+            0.7071068286895752,
+            7.52407629533991e-08
+          ],
+          "translation": [
+            -0.006924999877810478,
+            -0.07465499639511108,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 55,
+              "NORMAL": 56,
+              "TEXCOORD_0": 57,
+              "TANGENT": 58
+            },
+            "indices": 59,
+            "material": 7
+          }
+        ],
+        "triangles": 80,
+        "world_bounds_mm": [
+          [
+            -7.674999871427106,
+            -74.77499649533642,
+            -0.7499999936166254
+          ],
+          [
+            -6.17499988419385,
+            -74.53499629488574,
+            0.7499999936166254
+          ]
+        ]
+      },
+      "BOTTOM_SCREW_R": {
+        "node": {
+          "mesh": 12,
+          "name": "BOTTOM_SCREW_R",
+          "rotation": [
+            -0.7071067094802856,
+            0,
+            0.7071068286895752,
+            7.52407629533991e-08
+          ],
+          "translation": [
+            0.006924999877810478,
+            -0.07465499639511108,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 60,
+              "NORMAL": 61,
+              "TEXCOORD_0": 62,
+              "TANGENT": 63
+            },
+            "indices": 59,
+            "material": 7
+          }
+        ],
+        "triangles": 80,
+        "world_bounds_mm": [
+          [
+            6.17499988419385,
+            -74.77499649533642,
+            -0.7499999936166254
+          ],
+          [
+            7.674999871427106,
+            -74.53499629488574,
+            0.7499999936166254
+          ]
+        ]
+      }
+    },
+    "materials": [
+      {
+        "doubleSided": true,
+        "name": "MAT_ANODIZED_ALUMINUM_ACTION_BUTTON",
+        "normalTexture": {
+          "index": 0
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.006000000052154064,
+            0.007000000216066837,
+            0.009999999776482582,
+            1
+          ],
+          "metallicRoughnessTexture": {
+            "index": 1
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_OPTICS_BLACK",
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.0007999999797903001,
+            0.0010000000474974513,
+            0.00139999995008111,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.07000000029802322
+        }
+      },
+      {
+        "alphaMode": "BLEND",
+        "extensions": {
+          "KHR_materials_clearcoat": {
+            "clearcoatFactor": 0.11999999731779099,
+            "clearcoatRoughnessFactor": 0.04500000178813934
+          }
+        },
+        "name": "MAT_APPLE_LOGO_DECAL",
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.14000000059604645,
+            0.15000000596046448,
+            0.17000000178813934,
+            1
+          ],
+          "baseColorTexture": {
+            "index": 2
+          },
+          "metallicFactor": 0.8600000143051147,
+          "roughnessFactor": 0.1599999964237213
+        }
+      },
+      {
+        "doubleSided": true,
+        "extensions": {
+          "KHR_materials_clearcoat": {
+            "clearcoatFactor": 0.2199999988079071,
+            "clearcoatRoughnessFactor": 0.09000000357627869
+          },
+          "KHR_materials_specular": {
+            "specularFactor": 0.36000001430511475
+          }
+        },
+        "name": "MAT_BACK_GLASS",
+        "normalTexture": {
+          "index": 3,
+          "scale": 0.18000000715255737
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            7.999999797903001e-05,
+            9.999999747378752e-05,
+            0.00014000000373926014,
+            1
+          ],
+          "metallicFactor": 0,
+          "metallicRoughnessTexture": {
+            "index": 4
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_ANODIZED_ALUMINUM",
+        "normalTexture": {
+          "index": 5,
+          "scale": 0.2199999988079071
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.006000000052154064,
+            0.007000000216066837,
+            0.009999999776482582,
+            1
+          ],
+          "metallicRoughnessTexture": {
+            "index": 6
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "extensions": {
+          "KHR_materials_specular": {
+            "specularFactor": 0
+          }
+        },
+        "name": "MAT_UNDER_GLASS_BLACK",
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            9.999999974752427e-07,
+            9.999999974752427e-07,
+            9.999999974752427e-07,
+            1
+          ],
+          "metallicFactor": 0
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_APERTURE_GRILLE",
+        "normalTexture": {
+          "index": 7,
+          "scale": 0.44999998807907104
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.0010000000474974513,
+            0.0012000000569969416,
+            0.0015999999595806003,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.8199999928474426
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_FASTENER",
+        "normalTexture": {
+          "index": 8,
+          "scale": 0.949999988079071
+        },
+        "pbrMetallicRoughness": {
+          "baseColorTexture": {
+            "index": 9
+          },
+          "metallicFactor": 0.9200000166893005,
+          "metallicRoughnessTexture": {
+            "index": 10
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_CAMERA_BEVEL",
+        "normalTexture": {
+          "index": 11
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.006000000052154064,
+            0.007000000216066837,
+            0.009999999776482582,
+            1
+          ],
+          "metallicRoughnessTexture": {
+            "index": 12
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "extensions": {
+          "KHR_materials_clearcoat": {
+            "clearcoatFactor": 0.6200000047683716,
+            "clearcoatRoughnessFactor": 0.00800000037997961
+          }
+        },
+        "name": "MAT_LENS_GLASS",
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.00011999999696854502,
+            0.00015999999595806003,
+            0.00023999999393709004,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.019999999552965164
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_CAMERA_RING",
+        "normalTexture": {
+          "index": 13
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.012000000104308128,
+            0.014000000432133675,
+            0.019999999552965164,
+            1
+          ],
+          "metallicRoughnessTexture": {
+            "index": 14
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "extensions": {
+          "KHR_materials_clearcoat": {
+            "clearcoatFactor": 0.2199999988079071,
+            "clearcoatRoughnessFactor": 0.07999999821186066
+          }
+        },
+        "name": "MAT_CAMERA_CONTROL_GLASS",
+        "normalTexture": {
+          "index": 15
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            7.999999797903001e-05,
+            9.000000136438757e-05,
+            0.00011999999696854502,
+            1
+          ],
+          "metallicFactor": 0,
+          "metallicRoughnessTexture": {
+            "index": 16
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_CAMERA_HOUSING",
+        "normalTexture": {
+          "index": 17
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.009999999776482582,
+            0.013000000268220901,
+            0.019999999552965164,
+            1
+          ],
+          "metallicRoughnessTexture": {
+            "index": 18
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_CAMERA_HOUSING_SEAT",
+        "normalTexture": {
+          "index": 19
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            7.999999797903001e-05,
+            9.999999747378752e-05,
+            0.00014000000373926014,
+            1
+          ],
+          "metallicFactor": 0,
+          "metallicRoughnessTexture": {
+            "index": 20
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_DISPLAY_BEZEL",
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.0010000000474974513,
+            0.0012000000569969416,
+            0.001500000013038516,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.10000000149011612
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_ASSEMBLY_GAP",
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.0005000000237487257,
+            0.0006000000284984708,
+            0.0007999999797903001,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.3199999928474426
+        }
+      },
+      {
+        "doubleSided": true,
+        "extensions": {
+          "KHR_materials_clearcoat": {
+            "clearcoatFactor": 0.25,
+            "clearcoatRoughnessFactor": 0.10000000149011612
+          }
+        },
+        "name": "MAT_FLASH",
+        "pbrMetallicRoughness": {
+          "baseColorTexture": {
+            "index": 21
+          },
+          "metallicFactor": 0,
+          "roughnessFactor": 0.3199999928474426
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_ALUMINUM_EDGE",
+        "normalTexture": {
+          "index": 22,
+          "scale": 0.18000000715255737
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.012000000104308128,
+            0.014000000432133675,
+            0.019999999552965164,
+            1
+          ],
+          "metallicRoughnessTexture": {
+            "index": 23
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "extensions": {
+          "KHR_materials_clearcoat": {
+            "clearcoatFactor": 0.18000000715255737,
+            "clearcoatRoughnessFactor": 0.07999999821186066
+          },
+          "KHR_materials_specular": {
+            "specularFactor": 0.30000001192092896
+          }
+        },
+        "name": "MAT_FRONT_OPTIC",
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.0020000000949949026,
+            0.004000000189989805,
+            0.008999999612569809,
+            1
+          ],
+          "baseColorTexture": {
+            "index": 24
+          },
+          "metallicFactor": 0,
+          "roughnessFactor": 0.20000000298023224
+        }
+      },
+      {
+        "doubleSided": true,
+        "emissiveFactor": [
+          0.8500000238418579,
+          0.8500000238418579,
+          0.8500000238418579
+        ],
+        "emissiveTexture": {
+          "index": 25
+        },
+        "extensions": {
+          "KHR_materials_clearcoat": {
+            "clearcoatRoughnessFactor": 0.03500000014901161
+          },
+          "KHR_materials_specular": {
+            "specularFactor": 0
+          }
+        },
+        "name": "MAT_SCREEN_CONTENT",
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "metallicFactor": 0
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_SCREEN_EDGE",
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.0010000000474974513,
+            0.0012000000569969416,
+            0.001500000013038516,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.36000001430511475
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_ANODIZED_ALUMINUM_SIDE_BUTTON",
+        "normalTexture": {
+          "index": 26
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.006000000052154064,
+            0.007000000216066837,
+            0.009999999776482582,
+            1
+          ],
+          "metallicRoughnessTexture": {
+            "index": 27
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_ANODIZED_ALUMINUM_VOL_DOWN",
+        "normalTexture": {
+          "index": 28
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.006000000052154064,
+            0.007000000216066837,
+            0.009999999776482582,
+            1
+          ],
+          "metallicRoughnessTexture": {
+            "index": 29
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_ANODIZED_ALUMINUM_VOL_UP",
+        "normalTexture": {
+          "index": 30
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.006000000052154064,
+            0.007000000216066837,
+            0.009999999776482582,
+            1
+          ],
+          "metallicRoughnessTexture": {
+            "index": 31
+          }
+        }
+      }
+    ]
+  },
+  "frozen": {
+    "sha256": "68bcd22831e427a077ddfd48662e41bbe8ef46ebda0359c7153b9e3579afeae0",
+    "nodes": {
+      "USB_C_CAVITY": {
+        "node": {
+          "extras": {
+            "runtime_role": "port",
+            "interactable": false
+          },
+          "mesh": 47,
+          "name": "USB_C_CAVITY",
+          "rotation": [
+            -0.7071067094802856,
+            0,
+            0.7071068286895752,
+            7.52407629533991e-08
+          ],
+          "translation": [
+            0,
+            -0.07340499758720398,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 215,
+              "NORMAL": 216,
+              "TEXCOORD_0": 217,
+              "TANGENT": 218
+            },
+            "indices": 219,
+            "material": 6
+          }
+        ],
+        "triangles": 12,
+        "world_bounds_mm": [
+          [
+            -1.1900005141705687,
+            -73.46499815777206,
+            -4.224999910894745
+          ],
+          [
+            1.1900005141705687,
+            -73.3449970166359,
+            4.224999910894745
+          ]
+        ]
+      },
+      "USB_C_TONGUE": {
+        "node": {
+          "mesh": 48,
+          "name": "USB_C_TONGUE",
+          "rotation": [
+            -0.7071067094802856,
+            0,
+            0.7071068286895752,
+            7.52407629533991e-08
+          ],
+          "translation": [
+            0,
+            -0.07400500029325485,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 220,
+              "NORMAL": 221,
+              "TEXCOORD_0": 222,
+              "TANGENT": 223
+            },
+            "indices": 219,
+            "material": 17
+          }
+        ],
+        "triangles": 12,
+        "world_bounds_mm": [
+          [
+            -0.24000034799081849,
+            -74.09500059331276,
+            -2.6249999330122087
+          ],
+          [
+            0.24000034799081849,
+            -73.91499999319694,
+            2.6249999330122087
+          ]
+        ]
+      },
+      "BOTTOM_MIC_APERTURE_01": {
+        "node": {
+          "mesh": 8,
+          "name": "BOTTOM_MIC_APERTURE_01",
+          "rotation": [
+            -0.7071067094802856,
+            0,
+            0.7071068286895752,
+            7.52407629533991e-08
+          ],
+          "translation": [
+            -0.016015000641345978,
+            -0.07382500171661377,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 42,
+              "NORMAL": 43,
+              "TEXCOORD_0": 44,
+              "TANGENT": 45
+            },
+            "indices": 46,
+            "material": 6
+          }
+        ],
+        "triangles": 64,
+        "world_bounds_mm": [
+          [
+            -16.69000064213496,
+            -73.88500181256565,
+            -0.6750000007889829
+          ],
+          [
+            -15.340000640556994,
+            -73.76500162066189,
+            0.6750000007889829
+          ]
+        ]
+      },
+      "BOTTOM_MIC_APERTURE_02": {
+        "node": {
+          "mesh": 9,
+          "name": "BOTTOM_MIC_APERTURE_02",
+          "rotation": [
+            -0.7071067094802856,
+            0,
+            0.7071068286895752,
+            7.52407629533991e-08
+          ],
+          "translation": [
+            -0.01375999953597784,
+            -0.07382500171661377,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 47,
+              "NORMAL": 48,
+              "TEXCOORD_0": 49,
+              "TANGENT": 50
+            },
+            "indices": 46,
+            "material": 6
+          }
+        ],
+        "triangles": 64,
+        "world_bounds_mm": [
+          [
+            -14.434999536766824,
+            -73.88500181256565,
+            -0.6750000007889829
+          ],
+          [
+            -13.084999535188857,
+            -73.76500162066189,
+            0.6750000007889829
+          ]
+        ]
+      },
+      "BOTTOM_MIC_APERTURE_03": {
+        "node": {
+          "mesh": 10,
+          "name": "BOTTOM_MIC_APERTURE_03",
+          "rotation": [
+            -0.7071067094802856,
+            0,
+            0.7071068286895752,
+            7.52407629533991e-08
+          ],
+          "translation": [
+            -0.011505000293254852,
+            -0.07382500171661377,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 51,
+              "NORMAL": 52,
+              "TEXCOORD_0": 53,
+              "TANGENT": 54
+            },
+            "indices": 46,
+            "material": 6
+          }
+        ],
+        "triangles": 64,
+        "world_bounds_mm": [
+          [
+            -12.180000294043836,
+            -73.88500181256565,
+            -0.6750000007889829
+          ],
+          [
+            -10.830000292465868,
+            -73.76500162066189,
+            0.6750000007889829
+          ]
+        ]
+      },
+      "BOTTOM_SPEAKER_APERTURE_01": {
+        "node": {
+          "mesh": 13,
+          "name": "BOTTOM_SPEAKER_APERTURE_01",
+          "rotation": [
+            -0.7071067094802856,
+            0,
+            0.7071068286895752,
+            7.52407629533991e-08
+          ],
+          "translation": [
+            0.011505000293254852,
+            -0.07382500171661377,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 64,
+              "NORMAL": 65,
+              "TEXCOORD_0": 66,
+              "TANGENT": 67
+            },
+            "indices": 46,
+            "material": 6
+          }
+        ],
+        "triangles": 64,
+        "world_bounds_mm": [
+          [
+            10.830000292465868,
+            -73.88500181256565,
+            -0.6750000007889829
+          ],
+          [
+            12.180000294043836,
+            -73.76500162066189,
+            0.6750000007889829
+          ]
+        ]
+      },
+      "BOTTOM_SPEAKER_APERTURE_02": {
+        "node": {
+          "mesh": 14,
+          "name": "BOTTOM_SPEAKER_APERTURE_02",
+          "rotation": [
+            -0.7071067094802856,
+            0,
+            0.7071068286895752,
+            7.52407629533991e-08
+          ],
+          "translation": [
+            0.01375999953597784,
+            -0.07382500171661377,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 68,
+              "NORMAL": 69,
+              "TEXCOORD_0": 70,
+              "TANGENT": 71
+            },
+            "indices": 46,
+            "material": 6
+          }
+        ],
+        "triangles": 64,
+        "world_bounds_mm": [
+          [
+            13.084999535188857,
+            -73.88500181256565,
+            -0.6750000007889829
+          ],
+          [
+            14.434999536766824,
+            -73.76500162066189,
+            0.6750000007889829
+          ]
+        ]
+      },
+      "BOTTOM_SPEAKER_APERTURE_03": {
+        "node": {
+          "mesh": 15,
+          "name": "BOTTOM_SPEAKER_APERTURE_03",
+          "rotation": [
+            -0.7071067094802856,
+            0,
+            0.7071068286895752,
+            7.52407629533991e-08
+          ],
+          "translation": [
+            0.016015000641345978,
+            -0.07382500171661377,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 72,
+              "NORMAL": 73,
+              "TEXCOORD_0": 74,
+              "TANGENT": 75
+            },
+            "indices": 46,
+            "material": 6
+          }
+        ],
+        "triangles": 64,
+        "world_bounds_mm": [
+          [
+            15.340000640556994,
+            -73.88500181256565,
+            -0.6750000007889829
+          ],
+          [
+            16.69000064213496,
+            -73.76500162066189,
+            0.6750000007889829
+          ]
+        ]
+      },
+      "BOTTOM_SPEAKER_APERTURE_04": {
+        "node": {
+          "mesh": 16,
+          "name": "BOTTOM_SPEAKER_APERTURE_04",
+          "rotation": [
+            0,
+            0,
+            -0.9999943375587463,
+            0.0033652284182608128
+          ],
+          "translation": [
+            0.018263405188918114,
+            -0.07381970435380936,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 76,
+              "NORMAL": 77,
+              "TEXCOORD_0": 78,
+              "TANGENT": 79
+            },
+            "indices": 46,
+            "material": 6
+          }
+        ],
+        "triangles": 64,
+        "world_bounds_mm": [
+          [
+            17.588016634844404,
+            -73.8842460260693,
+            -0.6750000175088644
+          ],
+          [
+            18.938793742991823,
+            -73.75516268154941,
+            0.6750000175088644
+          ]
+        ]
+      },
+      "BOTTOM_SPEAKER_APERTURE_05": {
+        "node": {
+          "mesh": 17,
+          "name": "BOTTOM_SPEAKER_APERTURE_05",
+          "rotation": [
+            0,
+            0,
+            -0.9999279975891113,
+            0.01200499851256609
+          ],
+          "translation": [
+            0.02050147019326687,
+            -0.07378768920898438,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 80,
+              "NORMAL": 81,
+              "TEXCOORD_0": 82,
+              "TANGENT": 83
+            },
+            "indices": 46,
+            "material": 6
+          }
+        ],
+        "triangles": 64,
+        "world_bounds_mm": [
+          [
+            19.82522407921512,
+            -73.86387750899999,
+            -0.6750000175088644
+          ],
+          [
+            21.17771630731862,
+            -73.71150090896876,
+            0.6750000175088644
+          ]
+        ]
+      },
+      "BOTTOM_SCREW_L": {
+        "node": {
+          "mesh": 11,
+          "name": "BOTTOM_SCREW_L",
+          "rotation": [
+            -0.7071067094802856,
+            0,
+            0.7071068286895752,
+            7.52407629533991e-08
+          ],
+          "translation": [
+            -0.006924999877810478,
+            -0.07465499639511108,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 55,
+              "NORMAL": 56,
+              "TEXCOORD_0": 57,
+              "TANGENT": 58
+            },
+            "indices": 59,
+            "material": 7
+          }
+        ],
+        "triangles": 80,
+        "world_bounds_mm": [
+          [
+            -7.674999871427106,
+            -74.77499649533642,
+            -0.7499999936166254
+          ],
+          [
+            -6.17499988419385,
+            -74.53499629488574,
+            0.7499999936166254
+          ]
+        ]
+      },
+      "BOTTOM_SCREW_R": {
+        "node": {
+          "mesh": 12,
+          "name": "BOTTOM_SCREW_R",
+          "rotation": [
+            -0.7071067094802856,
+            0,
+            0.7071068286895752,
+            7.52407629533991e-08
+          ],
+          "translation": [
+            0.006924999877810478,
+            -0.07465499639511108,
+            0
+          ]
+        },
+        "primitives": [
+          {
+            "attributes": {
+              "POSITION": 60,
+              "NORMAL": 61,
+              "TEXCOORD_0": 62,
+              "TANGENT": 63
+            },
+            "indices": 59,
+            "material": 7
+          }
+        ],
+        "triangles": 80,
+        "world_bounds_mm": [
+          [
+            6.17499988419385,
+            -74.77499649533642,
+            -0.7499999936166254
+          ],
+          [
+            7.674999871427106,
+            -74.53499629488574,
+            0.7499999936166254
+          ]
+        ]
+      }
+    },
+    "materials": [
+      {
+        "doubleSided": true,
+        "name": "MAT_ANODIZED_ALUMINUM_ACTION_BUTTON",
+        "normalTexture": {
+          "index": 0
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.006000000052154064,
+            0.007000000216066837,
+            0.009999999776482582,
+            1
+          ],
+          "metallicRoughnessTexture": {
+            "index": 1
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_OPTICS_BLACK",
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.0007999999797903001,
+            0.0010000000474974513,
+            0.00139999995008111,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.07000000029802322
+        }
+      },
+      {
+        "alphaMode": "BLEND",
+        "extensions": {
+          "KHR_materials_clearcoat": {
+            "clearcoatFactor": 0.11999999731779099,
+            "clearcoatRoughnessFactor": 0.04500000178813934
+          }
+        },
+        "name": "MAT_APPLE_LOGO_DECAL",
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.14000000059604645,
+            0.15000000596046448,
+            0.17000000178813934,
+            1
+          ],
+          "baseColorTexture": {
+            "index": 2
+          },
+          "metallicFactor": 0.8600000143051147,
+          "roughnessFactor": 0.1599999964237213
+        }
+      },
+      {
+        "doubleSided": true,
+        "extensions": {
+          "KHR_materials_clearcoat": {
+            "clearcoatFactor": 0.2199999988079071,
+            "clearcoatRoughnessFactor": 0.09000000357627869
+          },
+          "KHR_materials_specular": {
+            "specularFactor": 0.36000001430511475
+          }
+        },
+        "name": "MAT_BACK_GLASS",
+        "normalTexture": {
+          "index": 3,
+          "scale": 0.18000000715255737
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            7.999999797903001e-05,
+            9.999999747378752e-05,
+            0.00014000000373926014,
+            1
+          ],
+          "metallicFactor": 0,
+          "metallicRoughnessTexture": {
+            "index": 4
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_ANODIZED_ALUMINUM",
+        "normalTexture": {
+          "index": 5,
+          "scale": 0.2199999988079071
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.006000000052154064,
+            0.007000000216066837,
+            0.009999999776482582,
+            1
+          ],
+          "metallicRoughnessTexture": {
+            "index": 6
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "extensions": {
+          "KHR_materials_specular": {
+            "specularFactor": 0
+          }
+        },
+        "name": "MAT_UNDER_GLASS_BLACK",
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            9.999999974752427e-07,
+            9.999999974752427e-07,
+            9.999999974752427e-07,
+            1
+          ],
+          "metallicFactor": 0
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_APERTURE_GRILLE",
+        "normalTexture": {
+          "index": 7,
+          "scale": 0.44999998807907104
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.0010000000474974513,
+            0.0012000000569969416,
+            0.0015999999595806003,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.8199999928474426
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_FASTENER",
+        "normalTexture": {
+          "index": 8,
+          "scale": 0.949999988079071
+        },
+        "pbrMetallicRoughness": {
+          "baseColorTexture": {
+            "index": 9
+          },
+          "metallicFactor": 0.9200000166893005,
+          "metallicRoughnessTexture": {
+            "index": 10
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_CAMERA_BEVEL",
+        "normalTexture": {
+          "index": 11
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.006000000052154064,
+            0.007000000216066837,
+            0.009999999776482582,
+            1
+          ],
+          "metallicRoughnessTexture": {
+            "index": 12
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "extensions": {
+          "KHR_materials_clearcoat": {
+            "clearcoatFactor": 0.6200000047683716,
+            "clearcoatRoughnessFactor": 0.00800000037997961
+          }
+        },
+        "name": "MAT_LENS_GLASS",
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.00011999999696854502,
+            0.00015999999595806003,
+            0.00023999999393709004,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.019999999552965164
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_CAMERA_RING",
+        "normalTexture": {
+          "index": 13
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.012000000104308128,
+            0.014000000432133675,
+            0.019999999552965164,
+            1
+          ],
+          "metallicRoughnessTexture": {
+            "index": 14
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "extensions": {
+          "KHR_materials_clearcoat": {
+            "clearcoatFactor": 0.2199999988079071,
+            "clearcoatRoughnessFactor": 0.07999999821186066
+          }
+        },
+        "name": "MAT_CAMERA_CONTROL_GLASS",
+        "normalTexture": {
+          "index": 15
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            7.999999797903001e-05,
+            9.000000136438757e-05,
+            0.00011999999696854502,
+            1
+          ],
+          "metallicFactor": 0,
+          "metallicRoughnessTexture": {
+            "index": 16
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_CAMERA_HOUSING",
+        "normalTexture": {
+          "index": 17
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.009999999776482582,
+            0.013000000268220901,
+            0.019999999552965164,
+            1
+          ],
+          "metallicRoughnessTexture": {
+            "index": 18
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_CAMERA_HOUSING_SEAT",
+        "normalTexture": {
+          "index": 19
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            7.999999797903001e-05,
+            9.999999747378752e-05,
+            0.00014000000373926014,
+            1
+          ],
+          "metallicFactor": 0,
+          "metallicRoughnessTexture": {
+            "index": 20
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_DISPLAY_BEZEL",
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.0010000000474974513,
+            0.0012000000569969416,
+            0.001500000013038516,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.10000000149011612
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_ASSEMBLY_GAP",
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.0005000000237487257,
+            0.0006000000284984708,
+            0.0007999999797903001,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.3199999928474426
+        }
+      },
+      {
+        "doubleSided": true,
+        "extensions": {
+          "KHR_materials_clearcoat": {
+            "clearcoatFactor": 0.25,
+            "clearcoatRoughnessFactor": 0.10000000149011612
+          }
+        },
+        "name": "MAT_FLASH",
+        "pbrMetallicRoughness": {
+          "baseColorTexture": {
+            "index": 21
+          },
+          "metallicFactor": 0,
+          "roughnessFactor": 0.3199999928474426
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_ALUMINUM_EDGE",
+        "normalTexture": {
+          "index": 22,
+          "scale": 0.18000000715255737
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.012000000104308128,
+            0.014000000432133675,
+            0.019999999552965164,
+            1
+          ],
+          "metallicRoughnessTexture": {
+            "index": 23
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "extensions": {
+          "KHR_materials_clearcoat": {
+            "clearcoatFactor": 0.18000000715255737,
+            "clearcoatRoughnessFactor": 0.07999999821186066
+          },
+          "KHR_materials_specular": {
+            "specularFactor": 0.30000001192092896
+          }
+        },
+        "name": "MAT_FRONT_OPTIC",
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.0020000000949949026,
+            0.004000000189989805,
+            0.008999999612569809,
+            1
+          ],
+          "baseColorTexture": {
+            "index": 24
+          },
+          "metallicFactor": 0,
+          "roughnessFactor": 0.20000000298023224
+        }
+      },
+      {
+        "doubleSided": true,
+        "emissiveFactor": [
+          0.8500000238418579,
+          0.8500000238418579,
+          0.8500000238418579
+        ],
+        "emissiveTexture": {
+          "index": 25
+        },
+        "extensions": {
+          "KHR_materials_clearcoat": {
+            "clearcoatRoughnessFactor": 0.03500000014901161
+          },
+          "KHR_materials_specular": {
+            "specularFactor": 0
+          }
+        },
+        "name": "MAT_SCREEN_CONTENT",
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "metallicFactor": 0
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_SCREEN_EDGE",
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.0010000000474974513,
+            0.0012000000569969416,
+            0.001500000013038516,
+            1
+          ],
+          "metallicFactor": 0,
+          "roughnessFactor": 0.36000001430511475
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_ANODIZED_ALUMINUM_SIDE_BUTTON",
+        "normalTexture": {
+          "index": 26
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.006000000052154064,
+            0.007000000216066837,
+            0.009999999776482582,
+            1
+          ],
+          "metallicRoughnessTexture": {
+            "index": 27
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_ANODIZED_ALUMINUM_VOL_DOWN",
+        "normalTexture": {
+          "index": 28
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.006000000052154064,
+            0.007000000216066837,
+            0.009999999776482582,
+            1
+          ],
+          "metallicRoughnessTexture": {
+            "index": 29
+          }
+        }
+      },
+      {
+        "doubleSided": true,
+        "name": "MAT_ANODIZED_ALUMINUM_VOL_UP",
+        "normalTexture": {
+          "index": 30
+        },
+        "pbrMetallicRoughness": {
+          "baseColorFactor": [
+            0.006000000052154064,
+            0.007000000216066837,
+            0.009999999776482582,
+            1
+          ],
+          "metallicRoughnessTexture": {
+            "index": 31
+          }
+        }
+      }
+    ]
+  }
+}

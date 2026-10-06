@@ -1,0 +1,5 @@
+00:00.641  blend            | Read blend: "F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\generated\iphone_17_low_v30.blend"
+IPHONE_CONTROLS_BAKE_GREEN {"ACTION_BUTTON": {"faces": 44, "modifiers": [], "ngons": 0, "nonmanifold": 0, "uv_layers": 1, "verts": 44}, "CAMERA_CONTROL": {"faces": 44, "modifiers": [], "ngons": 0, "nonmanifold": 0, "uv_layers": 1, "verts": 44}, "SIDE_BUTTON": {"faces": 44, "modifiers": [], "ngons": 0, "nonmanifold": 0, "uv_layers": 1, "verts": 44}, "VOL_DOWN": {"faces": 44, "modifiers": [], "ngons": 0, "nonmanifold": 0, "uv_layers": 1, "verts": 44}, "VOL_UP": {"faces": 44, "modifiers": [], "ngons": 0, "nonmanifold": 0, "uv_layers": 1, "verts": 44}}
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit

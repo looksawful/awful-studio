@@ -704,3 +704,59 @@ do not change USB color before isolating geometry/normals/material cause. Whole-
 Human Gate remains pending after #146. Mobile access uses existing Storybook on
 `https://titan.tail85619a.ts.net:8443`; primary iPhone story is still the frozen look,
 not a working-candidate approval link. PR119 remains OPEN/DRAFT/HOLD; no push/merge/deploy.
+
+
+## #142 bottom assembly checkpoint — 2026-10-06 (review pending)
+
+Fixed point `ff22bb2a0ed7ea0aee87f04d6e3f70b3a4aae7f1`, same branch/worktree.
+Read-only preflight preserved prototypes and exact frozen appearance bytes;
+existing Storybook6006 remained available. No new viewer/exporter/pipeline.
+
+Root cause reproduced before repair: antiparallel +Z/-Z quaternion placement gives
+rectangular USB parts a90degree roll. Native/GLB cavity width was2.38mm instead
+of8.45mm and device-depth span8.45mm exceeded body7.25mm. Tongue width was0.48mm
+instead of5.25mm. Frozen appearance contains the same protrusion/vertical tongue.
+Matched texture and clay show geometry cause; no material or color change.
+Independent physical frame contract observed RED; explicit USB-only frame passed
+native/exported dimensions and retained insets1.40/0.80mm. Ten radial callers keep
+their previous frames. Separate RED proved saved BEVEL debt on both USB meshes.
+
+Minimum topology repair materializes existing40um cavity bevel with2spans and80um
+tongue bevel with3spans; persists BEAUTY triangles in authored geometry. Cavity
+56verts/108triangles, tongue96verts/188triangles; both zero n-gons, non-manifold,
+degenerate/zero-length defects and runtime modifiers. Complete source/GLB triangle
+counters match. Native bidirectional vertex-to-triangle sampled errors4.23354um
+and3.54817um are below5um diagnostic limit; not continuous Hausdorff certification.
+Planar fronts need two triangles, arc spans own bevel curvature; no dense remesh.
+
+Current exact working candidate:
+- compat `679f6798e0b88e128cb991a22689b2d891a6f3d55544f1c65160fa50d020bb8c`;
+- Meshopt `36c2d54b84d82cb6aa3803c4a6842eeb6f0215a68e0e40fe08d0da741b87acd1`;
+- source revision `e0429e3d3ea23a808841e4cbcc4516774fb24eb68366cbb34de43a3f94f8783d`;
+- web12442triangles, diagnostic only; manifest source_commit remains ff22bb2
+  precommit, final provenance deferred#145/#146. FrozenSHA unchanged.
+
+Fresh16/16Blender5.2.1 runtime contracts, fast209/209, preview25/25, Storybookbuild,
+Khronos compat/Meshopt0errors0warnings.49othermeshes preserve positions/normals/
+tangents/indices/worldframes;45fullpayloads byte-identical. Four antennaUV payloads
+have maximum floating delta5.960464477539063e-8. Materials/images and bodybounds
+identical, apertures/screw geometry and spacing unchanged. Do not claim all49
+payloads byte-identical. Shared helper's default radial branch remains unchanged.
+
+Matched existingviewer baseline/current/frozen:7assembled+2isolatedUSBviews,
+fivefinish texture/clay/actualtrianglewire,63frames each; SHA/revision checks,
+complete geometry-buffer invariants and browser-error checks PASS. Root inspected
+all seven assembled sheets and isolated USB wire. Native build bottom render also
+checked. Retained evidence: `assets/device_mockups/iphone_17/evidence/ticket142_bottom_assembly/`;
+raw189PNGs and diagnostic/review inputs `F:\Temp\iphone17-ticket142`.
+
+Standards/Spec review PASS after primary evidence adjudication. External reviewer hit usage quota; separate local
+reviewer processes are used as fallback without Codex CLI dependency. Early local
+advisory reports confused historicalRED with current GREEN and misclassified
+ordinary Blender math/pipeline usage as hard smells; rawreports retained, verdicts
+rejected. Final separate qwen3-coder:30b reports and primary adjudication are retained
+in evidence/review-adjudication.md. Hosted parallel-agent review was unavailable;
+local independent model review is explicitly identified. Commit/closure next. No#143 work before#142review+commit. No push/merge/deploy;
+PR119OPEN/DRAFT/HOLD. Whole-device Human Gate remains pending after#146 and will
+use exact candidate bytes via existing TailscaleStorybook8443. Primary story still
+shows frozenappearance, not this working candidate.

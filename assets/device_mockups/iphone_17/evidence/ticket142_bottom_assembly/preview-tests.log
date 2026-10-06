@@ -1,0 +1,37 @@
+
+> test
+> node --test tests/*.test.mjs
+
+✔ catalog generator produces only canonical model inventory (108.5492ms)
+✔ catalog check mode rejects no committed drift (93.3414ms)
+✔ the shared catalog identifies and verifies exactly the device snapshots shown by primary stories (24.3638ms)
+✔ official iPhone 17 colorways are exposed as material variants (1.4941ms)
+✔ exported aluminum controls follow all finishes and retain their bake maps (5.6844ms)
+✔ colorway changes tint without replacing PBR maps (1.4818ms)
+✔ active screen states keep the baseline Dynamic Island independent of raster artwork (0.1843ms)
+✔ website raster gets the baseline idle Dynamic Island in the compositor (1.7185ms)
+✔ display raster and mobile viewport preserve physical aspect and pixel pitch (0.2316ms)
+✔ only front display triangles emit; sides stay dark without modifying vertices (10.5369ms)
+✔ front camera keeps its authored hardware datum (0.298ms)
+✔ canonical multi-material display keeps emission, state controls and source edge ownership (2.8703ms)
+✔ GLTFLoader split primitives retain a working display and glow (2.1328ms)
+✔ frozen appearance accepts exact GLB bytes and rejects a changed snapshot (19.9345ms)
+✔ scene preview exporter is explicit and render-free (1.5421ms)
+✔ all canonical scene previews are materialized (0.623ms)
+✔ viewer uses Three GLTF runtime and orbit controls (1.7862ms)
+✔ storybook exposes every canonical model as a first-class story (1.2269ms)
+✔ preview URLs expose repository assets without copying binaries (1.0437ms)
+✔ preview URLs support GitHub Pages subpaths (0.2532ms)
+✔ LOD options preserve manifest order and fall back to preview model (1.038ms)
+✔ device model provenance rejects stale stage or source revision (0.3817ms)
+✔ camera presets are explicit and normalized (0.6063ms)
+✔ binary Apple decal uses crisp preview alpha policy (0.582ms)
+✔ baked aluminum control materials use the established metal lighting policy (0.212ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 345.0765

@@ -1,0 +1,5 @@
+00:00.578  blend            | Read blend: "F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\generated\iphone_17_low_v30.blend"
+IPHONE_DISPLAY_FRAME_TOPOLOGY_GREEN {"DISPLAY_BEZEL": {"cap_triangles": 416, "contour_error_m": 5.821526164533125e-06, "dimensions_m": [0.06724999845027924, 7.999999797903001e-05, 0.14546999335289001], "faces": 460, "location_m": [0.0, -0.003719999920576811, 0.0], "materials": ["MAT_DISPLAY_BEZEL"], "max_triangle_aspect": 7.770492978356359, "min_triangle_angle_deg": 7.390099267219941, "ngons": 0, "nonmanifold": 0, "outline_points": 108, "verts": 318}, "DISPLAY_GLASS_SEAT": {"cap_triangles": 416, "contour_error_m": 6.454659988325117e-06, "dimensions_m": [0.06955000013113022, 7.000000186963007e-05, 0.14770999550819397], "faces": 460, "location_m": [0.0, -0.0036349999718368053, 0.0], "materials": ["MAT_ASSEMBLY_GAP"], "max_triangle_aspect": 7.770463270592679, "min_triangle_angle_deg": 7.390126992406613, "ngons": 0, "nonmanifold": 0, "outline_points": 108, "verts": 318}}
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit

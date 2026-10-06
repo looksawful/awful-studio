@@ -1,0 +1,6 @@
+00:00.656  blend            | Read blend: "F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\generated\iphone_17_low_v30.blend"
+00:00.750  blend            | Read blend: "F:\Temp\iphone17-ticket142\baseline.blend"
+USB_NATIVE_PRESERVATION_GREEN {"USB_C_CAVITY": {"max_sampled_local_surface_error_m": 4.2335395846748725e-06, "baseline_evaluated_triangles": 300, "current_authored_triangles": 108}, "USB_C_TONGUE": {"max_sampled_local_surface_error_m": 3.548165977917961e-06, "baseline_evaluated_triangles": 300, "current_authored_triangles": 188}}
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit

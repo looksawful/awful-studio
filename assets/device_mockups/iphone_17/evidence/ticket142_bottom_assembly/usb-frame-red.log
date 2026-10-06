@@ -1,0 +1,11 @@
+00:01.031  blend            | Read blend: "F:\Temp\iphone17-ticket142\baseline.blend"
+Traceback (most recent call last):
+  File "F:\Temp\iphone17-v30-topology-rebuild\tests\runtime\iphone_v30_usb_frame_contract.py", line 20, in <module>
+    assert abs(dimensions[0] - width) < .001, (name, 'USB width spans device X', report)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('USB_C_CAVITY', 'USB width spans device X', {'USB_C_CAVITY': {'native_world_dimensions_mm': [2.3800013586878777, 8.449999615550041, 0.11999905109405518]}})
+
+Error: script failed, file: 'F:\Temp\iphone17-v30-topology-rebuild\tests\runtime\iphone_v30_usb_frame_contract.py', exiting.
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit

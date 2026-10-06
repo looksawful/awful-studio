@@ -1,0 +1,107 @@
+{
+  "sha": "17d542c9a8317401a182f453930fa9967fd8cddf10aa0278e49d2d34720fb40a",
+  "sourceRevision": "5202ef46c41e321c72a92992990c69ac792838fad8e9707bd188c72a04f83679",
+  "sourceCommit": "a8ad3a202d4c187ca28556fab9037d98b6457ea7",
+  "triangles": 12170,
+  "evidence": [
+    {
+      "name": "bottom",
+      "selection": "all",
+      "direction": [
+        0,
+        -1,
+        0.2
+      ],
+      "fraction": [
+        0,
+        -0.49
+      ],
+      "distance": 0.12
+    },
+    {
+      "name": "usb",
+      "selection": "all",
+      "direction": [
+        0,
+        -1,
+        0
+      ],
+      "fraction": [
+        0,
+        -0.49
+      ],
+      "distance": 0.025
+    },
+    {
+      "name": "usb-oblique",
+      "selection": "all",
+      "direction": [
+        0.5,
+        -1,
+        0.4
+      ],
+      "fraction": [
+        0,
+        -0.49
+      ],
+      "distance": 0.04
+    },
+    {
+      "name": "microphones",
+      "selection": "all",
+      "direction": [
+        0,
+        -1,
+        0.25
+      ],
+      "fraction": [
+        -0.196,
+        -0.49
+      ],
+      "distance": 0.03
+    },
+    {
+      "name": "speakers",
+      "selection": "all",
+      "direction": [
+        0,
+        -1,
+        0.25
+      ],
+      "fraction": [
+        0.24,
+        -0.49
+      ],
+      "distance": 0.04
+    },
+    {
+      "name": "screw-L",
+      "selection": "all",
+      "direction": [
+        0,
+        -1,
+        0.25
+      ],
+      "fraction": [
+        -0.097,
+        -0.49
+      ],
+      "distance": 0.02
+    },
+    {
+      "name": "screw-R",
+      "selection": "all",
+      "direction": [
+        0,
+        -1,
+        0.25
+      ],
+      "fraction": [
+        0.097,
+        -0.49
+      ],
+      "distance": 0.02
+    }
+  ],
+  "errors": []
+}

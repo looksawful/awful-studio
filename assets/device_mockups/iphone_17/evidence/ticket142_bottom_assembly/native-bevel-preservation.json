@@ -1,0 +1,12 @@
+{
+  "USB_C_CAVITY": {
+    "max_sampled_local_surface_error_m": 4.2335395846748725e-06,
+    "baseline_evaluated_triangles": 300,
+    "current_authored_triangles": 108
+  },
+  "USB_C_TONGUE": {
+    "max_sampled_local_surface_error_m": 3.548165977917961e-06,
+    "baseline_evaluated_triangles": 300,
+    "current_authored_triangles": 188
+  }
+}

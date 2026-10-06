@@ -279,11 +279,18 @@ CAM_INNER_W, CAM_INNER_H = CAM_INNER_X1 - CAM_INNER_X0, CAM_INNER_Z1 - CAM_INNER
 CAM_CENTER_X = W * 0.5 - CAM_CENTER_X_REF
 CAM_CENTER_Z = H * 0.5 - CAM_CENTER_Z_REF
 
-def place_on_apple_bottom(obj, x, *, outward=0.0):
-    """Place local +Z on the actual Apple Detail A bottom normal."""
+def place_on_apple_bottom(obj, x, *, outward=0.0, preserve_depth_axis=False):
+    """Place local +Z on the Apple bottom normal; optionally fix rectangular roll."""
     z, normal = apple_bottom_surface(x, W, H, iphone17_corner_profile)
     obj.location = fc.Vector((x, 0.0, z)) + normal * outward
-    obj.rotation_euler = fc.Vector((0, 0, 1)).rotation_difference(normal).to_euler()
+    if preserve_depth_axis:
+        # +Z to -Z has no unique quaternion roll. Keep local Y along device depth
+        # so rectangular USB width stays on X; radial callers retain their bake frame.
+        y_axis = fc.Vector((0, 1, 0))
+        x_axis = y_axis.cross(normal).normalized()
+        obj.rotation_euler = fc.Matrix((x_axis, y_axis, normal)).transposed().to_euler()
+    else:
+        obj.rotation_euler = fc.Vector((0, 0, 1)).rotation_difference(normal).to_euler()
     return obj
 
 
@@ -981,13 +988,26 @@ for side, edge in (("L", "LEFT"), ("R", "RIGHT")):
         fc.place_on_rounded_edge(strip, W, H, BODY_R, edge, z_mm*MM, outward=-0.018*MM, local_normal=(1,0,0))
 
 usb_cutter = fc.rounded_cube("USB_C_CUTTER", (8.99*MM, 3.00*MM, 1.82*MM), 0.91*MM, None, detail_c)
-place_on_apple_bottom(usb_cutter, 0.0, outward=-0.70*MM)
+place_on_apple_bottom(usb_cutter, 0.0, outward=-0.70*MM, preserve_depth_axis=True)
 fc.boolean_difference(body, usb_cutter, name="CUT_USB_C")
 boolean_cuts.append("USB_C")
 usb_cavity = fc.rounded_cube("USB_C_CAVITY", (8.45*MM, 2.38*MM, 0.12*MM), 0.04*MM, grille_mat, detail_c)
-place_on_apple_bottom(usb_cavity, 0.0, outward=-1.40*MM)
+place_on_apple_bottom(usb_cavity, 0.0, outward=-1.40*MM, preserve_depth_axis=True)
 usb_tongue = fc.rounded_cube("USB_C_TONGUE", (5.25*MM, 0.48*MM, 0.18*MM), 0.08*MM, metal_dark, detail_c)
-place_on_apple_bottom(usb_tongue, 0.0, outward=-0.80*MM)
+place_on_apple_bottom(usb_tongue, 0.0, outward=-0.80*MM, preserve_depth_axis=True)
+
+# Save the physical USB bevel and its export diagonals in the authored mesh.
+# Small cavity and tongue radii need two and three spans respectively.
+for usb_part, bevel_segments in ((usb_cavity, 2), (usb_tongue, 3)):
+    usb_part.modifiers["EDGE_BEVEL"].segments = bevel_segments
+    bpy.context.view_layer.objects.active = usb_part
+    bpy.ops.object.modifier_apply(modifier="EDGE_BEVEL")
+    bm = bmesh.new()
+    bm.from_mesh(usb_part.data)
+    bmesh.ops.triangulate(bm, faces=list(bm.faces), quad_method="BEAUTY", ngon_method="BEAUTY")
+    bm.to_mesh(usb_part.data)
+    bm.free()
+    usb_part.data.update()
 
 def radial_prism_z(name, radius, depth, material, collection, segments):
     """Build a sparse circular prism with triangle cap fans and a quad side wall."""

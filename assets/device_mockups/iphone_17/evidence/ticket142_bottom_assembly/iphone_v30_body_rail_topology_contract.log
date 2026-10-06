@@ -1,0 +1,7 @@
+00:00.625  blend            | Read blend: "F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\generated\iphone_17_low_v30.blend"
+IPHONE_BODY_ANNULUS_COVERAGE_GREEN 2
+IPHONE_BODY_RAIL_TOPOLOGY_GREEN {'component_verts': 600, 'cap_triangles': 632, 'min_angle_deg': 1.979239788678353, 'max_aspect': 23.17787267796046, 'max_edge_m': 0.013906700027738732}
+IPHONE_BODY_EXPORTED_CAPS_GREEN 632
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit
