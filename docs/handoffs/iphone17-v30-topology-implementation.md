@@ -762,3 +762,63 @@ criteria verified. Closure comments #1426008952003 and #1186008952569. Next#143.
 PR119OPEN/DRAFT/HOLD. Whole-device Human Gate remains pending after#146 and will
 use exact candidate bytes via existing TailscaleStorybook8443. Primary story still
 shows frozenappearance, not this working candidate.
+
+
+## #143 front hardware checkpoint — 2026-10-06 (WIP, no PASS/commit)
+
+Read-only preflight fixed `6b294e0067741f9e6f6a8ba8fb857b11e65b9600`; branch unchanged,
+prototypes preserved, frozenSHA verified, existing Storybook6006HTTP200.
+Exact baseline blend/GLB and raw diagnostics in `F:\Temp\iphone17-ticket143`.
+
+Two independently reproduced defects: sensor mask had4zeroedges/4degeneratefaces
+from a duplicated equator row where its rounded-strip radius equals halfheight;
+receiver retained a BEVEL modifier (saved8v/6f, evaluated300triangles).
+`front-topology-red.log` failed sensor before source edit. Minimum existing-helper
+fix omits only mirrored coincident equator row; BACK_GLASS/SCREEN_CONTENT callers
+retain their original rows. Sensor now52v/50f/100triangles; all50previous nondegenerate
+sourcefaces match exactly. Subsequent `receiver-topology-red.log` passed all sensor
+checks and failed receiver modifier debt. Materialized only existing clamped9.8um
+receiver rim with2spans; receiver56v/54f/108triangles, sampled native surfaceerror
+1.03765um (<5um diagnosticlimit, not certified Hausdorff). No UV/material/artwork/
+softwarestate/hardwaredatum redesign. No globalremesh/newpipeline.
+
+Focused front contract now passes all7front meshes, zero n-gons/non-manifold/
+degenerate/zero-length defects/modifiers, independent7.79mm hardware datum, finite
+strict depth gaps across mask/glass/inner/iris/pupil, complete source/GLB triangle
+correspondence and exported nondegenerate triangles. Existing full17runtime contracts
+PASS; expanded front contract separately rerun GREEN. Fast209/209, preview25/25,
+Khronos compat/Meshopt0errors0warnings current. Shared helper's other callers are
+covered by current native contracts and exact exported physical-buffer comparison.
+Other49geometry/frames/materials/images unchanged; antennaUV floating deltas recorded
+separately in preservation-comparison.json, no allpayload byteidentity claim.
+
+Current working compatSHA `354e53759fabaac61a39ff4df7fd69ae410da2ff8c52353184bb769b813570b0`;
+source revision `92f2b5fe5c4eb902f3253ff15a282ab51c1878db2f1eb306613f61872667a11e`;
+manifest source_commit2ea91ae precommit, final provenance#145/#146. Frozen unchanged.
+
+Existingviewer8views(front/angled, island/angled, receiver/angled, twoisolated),
+fivefinishes, fiveexisting screenstates, clay and actualwire:88frames/candidate.
+Verified baseline/current/frozen audits are still running with exactSHA/revision,
+awaited screen-state and geometry-buffer invariants. First partial captures without
+awaited-state assertion were stopped and retained as rejected diagnostics; only
+*-verified-browser results may support acceptance. Local independent Standards/Spec
+review processes run without CodexCLI dependency; final visual inspection, fresh
+Storybookbuild, review adjudication and staged checks must precede commit/closure.
+No#144 work until#143commit. Whole-device/HumanGate remains unaccepted; PR119HOLD.
+
+### Ticket143 final engineering review
+
+Standards PASS and Spec PASS after primary inspection of all11 exact-byte matched
+comparison sheets, 88frames per baseline/current/frozen (264total). Five finishes,
+five screen states, clay and actual GLB wire; eight front/macro/isolated views.
+No observed new front-stack visual regression or duplicate visible island.
+Direct resume macro crops the island; angled/full views supply visibility evidence.
+Local qwen3-coder30b reports lacked images; unsupported prose corrected explicitly
+in retained primary adjudication. Runtime17, expanded front source/delivery/bundle
+contracts, fast209, preview25, Storybook build, Khronos0errors/0warnings each PASS.
+Evidence: assets/device_mockups/iphone_17/evidence/ticket143_front_stack.
+Compat354e53759fabaac61a39ff4df7fd69ae410da2ff8c52353184bb769b813570b0;
+Meshopt061c4df9e50fd31b6fe486f5431340d1d4cc051e3ffc7a842abc26de91677c1c;
+revision92f2b5fe5c4eb902f3253ff15a282ab51c1878db2f1eb306613f61872667a11e.
+12530webtris. Frozenreference unchanged. Commit pending staged verification;
+next144 only after143commit. Wholedevice and HumanGate remain unaccepted.

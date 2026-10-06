@@ -1,0 +1,6 @@
+{
+  "sensor_non_degenerate_authored_faces_exact": 50,
+  "receiver_max_sampled_local_surface_error_m": 1.0376454611105146e-06,
+  "receiver_baseline_evaluated_triangles": 300,
+  "receiver_current_authored_triangles": 108
+}

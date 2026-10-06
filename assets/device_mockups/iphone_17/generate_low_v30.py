@@ -185,7 +185,11 @@ def rounded_rect_strip_prism_y(name, width, height, depth, radius, material, col
         x = cx + radius * math.sin(angle)
         z = cz + radius * math.cos(angle)
         top_rows.append((x, z))
-    rows = top_rows + [(x, -z) for x, z in reversed(top_rows)]
+    bottom_rows = [(x, -z) for x, z in reversed(top_rows)]
+    # A capsule has one equator row, not two coincident strip boundaries.
+    if abs(top_rows[-1][1]) < 1e-12:
+        bottom_rows = bottom_rows[1:]
+    rows = top_rows + bottom_rows
 
     points = []
     row_indices = []
@@ -744,6 +748,10 @@ front_camera_pupil = radial_prism_y(
     (cam_x, front_hardware_y + 0.085*MM, front_hardware_z), segments=8,
 )
 receiver = fc.rounded_cube("FRONT_RECEIVER_MIC", (14.02*MM, 0.020*MM, 0.30*MM), 0.14*MM, black, detail_c, location=(0, front_surface - 0.012*MM, H*0.5 - 0.62*MM))
+# Preserve the existing 9.8um clamped physical rim with two controlled arc spans.
+receiver.modifiers["EDGE_BEVEL"].segments = 2
+bpy.context.view_layer.objects.active = receiver
+bpy.ops.object.modifier_apply(modifier="EDGE_BEVEL")
 
 housing_x = CAM_CENTER_X
 housing_z = CAM_CENTER_Z

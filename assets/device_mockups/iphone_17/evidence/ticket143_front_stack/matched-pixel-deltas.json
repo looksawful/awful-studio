@@ -1,0 +1,354 @@
+{
+  "front-texture-black-screen_on.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "front-angle-texture-black-screen_on.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "island-texture-black-screen_on.png": {
+    "rmse255": 1.5339383912564757,
+    "changed_fraction": 0.001211408002215146
+  },
+  "island-angle-texture-black-screen_on.png": {
+    "rmse255": 0.19857468955800092,
+    "changed_fraction": 0.0006506991554755642
+  },
+  "receiver-texture-black-screen_on.png": {
+    "rmse255": 1.4189418117247394,
+    "changed_fraction": 0.0017709631270478564
+  },
+  "receiver-angle-texture-black-screen_on.png": {
+    "rmse255": 0.45779123542864203,
+    "changed_fraction": 0.002129770640084914
+  },
+  "sensor-isolated-texture-black-screen_on.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "receiver-isolated-texture-black-screen_on.png": {
+    "rmse255": 1.418471905647169,
+    "changed_fraction": 0.001780192902302829
+  },
+  "front-texture-white-screen_on.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "front-angle-texture-white-screen_on.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "island-texture-white-screen_on.png": {
+    "rmse255": 1.5361622081803086,
+    "changed_fraction": 0.001211408002215146
+  },
+  "island-angle-texture-white-screen_on.png": {
+    "rmse255": 0.464614628279433,
+    "changed_fraction": 0.0006599289307305368
+  },
+  "receiver-texture-white-screen_on.png": {
+    "rmse255": 1.4335157975959039,
+    "changed_fraction": 0.0017871152337440583
+  },
+  "receiver-angle-texture-white-screen_on.png": {
+    "rmse255": 0.6002573529844232,
+    "changed_fraction": 0.0021551525220360884
+  },
+  "sensor-isolated-texture-white-screen_on.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "receiver-isolated-texture-white-screen_on.png": {
+    "rmse255": 1.418471905647169,
+    "changed_fraction": 0.001780192902302829
+  },
+  "front-texture-mist_blue-screen_on.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "front-angle-texture-mist_blue-screen_on.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "island-texture-mist_blue-screen_on.png": {
+    "rmse255": 1.5334323746523004,
+    "changed_fraction": 0.001211408002215146
+  },
+  "island-angle-texture-mist_blue-screen_on.png": {
+    "rmse255": 0.3470148980314115,
+    "changed_fraction": 0.0006587752088236652
+  },
+  "receiver-texture-mist_blue-screen_on.png": {
+    "rmse255": 1.4239241935269407,
+    "changed_fraction": 0.0017871152337440583
+  },
+  "receiver-angle-texture-mist_blue-screen_on.png": {
+    "rmse255": 0.4666768852345356,
+    "changed_fraction": 0.002160921131570446
+  },
+  "sensor-isolated-texture-mist_blue-screen_on.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "receiver-isolated-texture-mist_blue-screen_on.png": {
+    "rmse255": 1.418471905647169,
+    "changed_fraction": 0.001780192902302829
+  },
+  "front-texture-sage-screen_on.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "front-angle-texture-sage-screen_on.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "island-texture-sage-screen_on.png": {
+    "rmse255": 1.5336827709300906,
+    "changed_fraction": 0.001211408002215146
+  },
+  "island-angle-texture-sage-screen_on.png": {
+    "rmse255": 0.31753604752385467,
+    "changed_fraction": 0.0006495454335686926
+  },
+  "receiver-texture-sage-screen_on.png": {
+    "rmse255": 1.422426890981524,
+    "changed_fraction": 0.0017871152337440583
+  },
+  "receiver-angle-texture-sage-screen_on.png": {
+    "rmse255": 0.44630759773428136,
+    "changed_fraction": 0.0021597674096635747
+  },
+  "sensor-isolated-texture-sage-screen_on.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "receiver-isolated-texture-sage-screen_on.png": {
+    "rmse255": 1.418471905647169,
+    "changed_fraction": 0.001780192902302829
+  },
+  "front-texture-lavender-screen_on.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "front-angle-texture-lavender-screen_on.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "island-texture-lavender-screen_on.png": {
+    "rmse255": 1.5336203324197486,
+    "changed_fraction": 0.001211408002215146
+  },
+  "island-angle-texture-lavender-screen_on.png": {
+    "rmse255": 0.4068843365410021,
+    "changed_fraction": 0.0006714661497992524
+  },
+  "receiver-texture-lavender-screen_on.png": {
+    "rmse255": 1.4280663332246772,
+    "changed_fraction": 0.0017848077899303152
+  },
+  "receiver-angle-texture-lavender-screen_on.png": {
+    "rmse255": 0.5209159909489706,
+    "changed_fraction": 0.002163228575384189
+  },
+  "sensor-isolated-texture-lavender-screen_on.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "receiver-isolated-texture-lavender-screen_on.png": {
+    "rmse255": 1.418471905647169,
+    "changed_fraction": 0.001780192902302829
+  },
+  "front-texture-white-screen_off.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "front-angle-texture-white-screen_off.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "island-texture-white-screen_off.png": {
+    "rmse255": 1.5361766030791615,
+    "changed_fraction": 0.001211408002215146
+  },
+  "island-angle-texture-white-screen_off.png": {
+    "rmse255": 0.46454509402688876,
+    "changed_fraction": 0.0006599289307305368
+  },
+  "receiver-texture-white-screen_off.png": {
+    "rmse255": 1.4336220298741345,
+    "changed_fraction": 0.0017813466242097005
+  },
+  "receiver-angle-texture-white-screen_off.png": {
+    "rmse255": 0.6001250376069033,
+    "changed_fraction": 0.0021539988001292166
+  },
+  "sensor-isolated-texture-white-screen_off.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "receiver-isolated-texture-white-screen_off.png": {
+    "rmse255": 1.418471905647169,
+    "changed_fraction": 0.001780192902302829
+  },
+  "front-texture-white-screen_lock.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "front-angle-texture-white-screen_lock.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "island-texture-white-screen_lock.png": {
+    "rmse255": 1.5361622081803086,
+    "changed_fraction": 0.001211408002215146
+  },
+  "island-angle-texture-white-screen_lock.png": {
+    "rmse255": 0.464614628279433,
+    "changed_fraction": 0.0006599289307305368
+  },
+  "receiver-texture-white-screen_lock.png": {
+    "rmse255": 1.4335157975959039,
+    "changed_fraction": 0.0017871152337440583
+  },
+  "receiver-angle-texture-white-screen_lock.png": {
+    "rmse255": 0.6002573529844232,
+    "changed_fraction": 0.0021551525220360884
+  },
+  "sensor-isolated-texture-white-screen_lock.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "receiver-isolated-texture-white-screen_lock.png": {
+    "rmse255": 1.418471905647169,
+    "changed_fraction": 0.001780192902302829
+  },
+  "front-texture-white-screen_website.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "front-angle-texture-white-screen_website.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "island-texture-white-screen_website.png": {
+    "rmse255": 1.5361622081803086,
+    "changed_fraction": 0.001211408002215146
+  },
+  "island-angle-texture-white-screen_website.png": {
+    "rmse255": 0.464614628279433,
+    "changed_fraction": 0.0006599289307305368
+  },
+  "receiver-texture-white-screen_website.png": {
+    "rmse255": 1.4335157975959039,
+    "changed_fraction": 0.0017871152337440583
+  },
+  "receiver-angle-texture-white-screen_website.png": {
+    "rmse255": 0.6002573529844232,
+    "changed_fraction": 0.0021551525220360884
+  },
+  "sensor-isolated-texture-white-screen_website.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "receiver-isolated-texture-white-screen_website.png": {
+    "rmse255": 1.418471905647169,
+    "changed_fraction": 0.001780192902302829
+  },
+  "front-texture-white-screen_resume.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "front-angle-texture-white-screen_resume.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "island-texture-white-screen_resume.png": {
+    "rmse255": 1.5361622081803086,
+    "changed_fraction": 0.001211408002215146
+  },
+  "island-angle-texture-white-screen_resume.png": {
+    "rmse255": 0.464614628279433,
+    "changed_fraction": 0.0006599289307305368
+  },
+  "receiver-texture-white-screen_resume.png": {
+    "rmse255": 1.4335157975959039,
+    "changed_fraction": 0.0017871152337440583
+  },
+  "receiver-angle-texture-white-screen_resume.png": {
+    "rmse255": 0.6002573529844232,
+    "changed_fraction": 0.0021551525220360884
+  },
+  "sensor-isolated-texture-white-screen_resume.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "receiver-isolated-texture-white-screen_resume.png": {
+    "rmse255": 1.418471905647169,
+    "changed_fraction": 0.001780192902302829
+  },
+  "front-clay-white-screen_on.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "front-angle-clay-white-screen_on.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "island-clay-white-screen_on.png": {
+    "rmse255": 0.26771392035293495,
+    "changed_fraction": 0.0009864322303751903
+  },
+  "island-angle-clay-white-screen_on.png": {
+    "rmse255": 0.2825315838390444,
+    "changed_fraction": 0.0007199224698878582
+  },
+  "receiver-clay-white-screen_on.png": {
+    "rmse255": 0.9015508897445933,
+    "changed_fraction": 0.0017190456412386357
+  },
+  "receiver-angle-clay-white-screen_on.png": {
+    "rmse255": 0.6035401990893983,
+    "changed_fraction": 0.002100927592413125
+  },
+  "sensor-isolated-clay-white-screen_on.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "receiver-isolated-clay-white-screen_on.png": {
+    "rmse255": 1.0108771658735003,
+    "changed_fraction": 0.001713277031704278
+  },
+  "front-wireframe-white-screen_on.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "front-angle-wireframe-white-screen_on.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "island-wireframe-white-screen_on.png": {
+    "rmse255": 1.6124197092414518,
+    "changed_fraction": 0.0012771701509068254
+  },
+  "island-angle-wireframe-white-screen_on.png": {
+    "rmse255": 1.307995818792224,
+    "changed_fraction": 0.000843370713923116
+  },
+  "receiver-wireframe-white-screen_on.png": {
+    "rmse255": 4.112974516153647,
+    "changed_fraction": 0.0035292353131201257
+  },
+  "receiver-angle-wireframe-white-screen_on.png": {
+    "rmse255": 3.293160711459899,
+    "changed_fraction": 0.003011214176934792
+  },
+  "sensor-isolated-wireframe-white-screen_on.png": {
+    "rmse255": 0.0,
+    "changed_fraction": 0.0
+  },
+  "receiver-isolated-wireframe-white-screen_on.png": {
+    "rmse255": 4.2010612351413705,
+    "changed_fraction": 0.003644607503807282
+  }
+}

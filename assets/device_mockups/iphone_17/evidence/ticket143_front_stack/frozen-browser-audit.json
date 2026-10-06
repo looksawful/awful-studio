@@ -1,0 +1,121 @@
+{
+  "sha": "68bcd22831e427a077ddfd48662e41bbe8ef46ebda0359c7153b9e3579afeae0",
+  "sourceRevision": "5d109d5dc0cbf5665b74a456945b5bcc6ad675e815bc7a3b4c926c7b8d99d30f",
+  "sourceCommit": "48fa7986be33b1387fe2ccbdf577919e99313792",
+  "triangles": 11538,
+  "evidence": [
+    {
+      "name": "front",
+      "selection": "all",
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "fraction": [
+        0,
+        0
+      ],
+      "distance": 0.23
+    },
+    {
+      "name": "front-angle",
+      "selection": "all",
+      "direction": [
+        0.35,
+        0.1,
+        1
+      ],
+      "fraction": [
+        0,
+        0
+      ],
+      "distance": 0.23
+    },
+    {
+      "name": "island",
+      "selection": "all",
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "fraction": [
+        0,
+        0.448
+      ],
+      "distance": 0.037
+    },
+    {
+      "name": "island-angle",
+      "selection": "all",
+      "direction": [
+        0.35,
+        0.1,
+        1
+      ],
+      "fraction": [
+        0,
+        0.448
+      ],
+      "distance": 0.045
+    },
+    {
+      "name": "receiver",
+      "selection": "all",
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "fraction": [
+        0,
+        0.496
+      ],
+      "distance": 0.023
+    },
+    {
+      "name": "receiver-angle",
+      "selection": "all",
+      "direction": [
+        0.3,
+        0.1,
+        1
+      ],
+      "fraction": [
+        0,
+        0.496
+      ],
+      "distance": 0.023
+    },
+    {
+      "name": "sensor-isolated",
+      "selection": "mesh:FRONT_SENSOR_MASK",
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "fraction": [
+        -0.058,
+        0.448
+      ],
+      "distance": 0.02
+    },
+    {
+      "name": "receiver-isolated",
+      "selection": "mesh:FRONT_RECEIVER_MIC",
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "fraction": [
+        0,
+        0.496
+      ],
+      "distance": 0.023
+    }
+  ],
+  "errors": []
+}

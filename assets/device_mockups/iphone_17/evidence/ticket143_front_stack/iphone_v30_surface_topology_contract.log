@@ -1,0 +1,5 @@
+00:00.359  blend            | Read blend: "F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\generated\iphone_17_low_v30.blend"
+IPHONE_SURFACE_TOPOLOGY_GREEN {"BACK_GLASS": {"faces": 134, "ngons": 0, "nonmanifold": 0, "verts": 136}, "FRONT_CAMERA_GLASS": {"faces": 66, "ngons": 0, "nonmanifold": 0, "verts": 46}, "FRONT_CAMERA_INNER": {"faces": 48, "ngons": 0, "nonmanifold": 0, "verts": 34}, "FRONT_CAMERA_IRIS": {"faces": 36, "ngons": 0, "nonmanifold": 0, "verts": 26}, "FRONT_CAMERA_MASK": {"faces": 72, "ngons": 0, "nonmanifold": 0, "verts": 50}, "FRONT_CAMERA_PUPIL": {"faces": 24, "ngons": 0, "nonmanifold": 0, "verts": 18}, "FRONT_SENSOR_MASK": {"faces": 50, "ngons": 0, "nonmanifold": 0, "verts": 52}}
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit

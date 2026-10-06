@@ -1,0 +1,191 @@
+F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\generate_low_v30.py:316: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  scene.world.use_nodes = True
+F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\generate_low_v30.py:814: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  logo_mat.use_nodes = True
+00:05.843  reports          | WARNING Path 'D:\Blender Foundation\Blender 5.2\5.2\datafiles\assets\brushes\essentials_brushes-gp_draw.blend' cannot be made relative for Material 'Dots Stroke'
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+00:05.843  reports          | WARNING Path 'D:\Blender Foundation\Blender 5.2\5.2\datafiles\assets\brushes\essentials_brushes-gp_draw.blend' cannot be made relative for Material 'Material'
+00:08.984  render           | Saved: 'F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\previews\low_v30\iphone_17_low_v30_front.png'
+00:09.812  render           | Saved: 'F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\previews\low_v30\iphone_17_low_v30_back.png'
+00:10.531  render           | Saved: 'F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\previews\low_v30\iphone_17_low_v30_three_quarter.png'
+00:11.281  render           | Saved: 'F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\previews\low_v30\iphone_17_low_v30_left_side.png'
+00:12.000  render           | Saved: 'F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\previews\low_v30\iphone_17_low_v30_right_side.png'
+00:12.797  render           | Saved: 'F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\previews\low_v30\iphone_17_low_v30_bottom_macro.png'
+00:13.547  render           | Saved: 'F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\previews\low_v30\iphone_17_low_v30_screen_edge_macro.png'
+00:14.484  render           | Saved: 'F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\previews\low_v30\iphone_17_low_v30_camera_macro.png'
+00:15.297  render           | Saved: 'F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\previews\low_v30\iphone_17_low_v30_front_sensor_macro.png'
+00:16.047  render           | Saved: 'F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\previews\low_v30\iphone_17_low_v30_back_three_quarter.png'
+Info: Saved as "iphone_17_low_v30.blend"
+AWFUL_STUDIO_SAVED F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\generated\iphone_17_low_v30.blend
+AWFUL_IPHONE17_V30_VALIDATION {"actual_mm": {"depth": 7.95, "height": 149.609998, "width": 71.450002}, "asset_id": "iphone_17", "blender_version": "5.2.1 LTS", "body_faces": 3250, "body_non_manifold_edges": 0, "body_vertices": 2944, "boolean_cut_count": 18, "boolean_cuts": ["DISPLAY_POCKET", "SCREEN_ACTIVE", "ACTION_BUTTON", "VOL_UP", "VOL_DOWN", "SIDE_BUTTON", "CAMERA_CONTROL", "USB_C", "BOTTOM_MIC_APERTURE_01", "BOTTOM_MIC_APERTURE_02", "BOTTOM_MIC_APERTURE_03", "BOTTOM_SPEAKER_APERTURE_01", "BOTTOM_SPEAKER_APERTURE_02", "BOTTOM_SPEAKER_APERTURE_03", "BOTTOM_SPEAKER_APERTURE_04", "BOTTOM_SPEAKER_APERTURE_05", "SCREW_L", "SCREW_R"], "button_min_protrusion_mm": 0.45, "camera_backing_protrusion_mm": 0.3, "camera_backing_visible": true, "camera_control_protrusion_mm": 0.0, "camera_control_recess_mm": 0.1, "cover_glass_mm": [69.45, 147.61], "delta_mm": {"depth": 0.0, "height": -2e-06, "width": 2e-06}, "display_active_area_mm": [66.57, 144.79], "expected_mm": {"depth": 7.95, "height": 149.61, "width": 71.45}, "forbidden_front_nodes": [], "front_camera_center_from_top_mm": 7.79, "front_camera_keepout_mm": [20.75, 5.12], "mandatory_missing": [], "material_count": 28, "object_count": 72, "official_reference": "Apple iPhone 17 Dimensional Drawings 2025-09-09", "passed": true, "revision": "production_topology_v30", "stage": "LOW_DRAFT"}
+
+Blender quit
+00:01.015  blend            | Read blend: "F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\generated\iphone_17_low_v30.blend"
+F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\export_runtime_v30.py:34: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  if logo_mat and logo_mat.use_nodes:
+F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\export_runtime_v30.py:42: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  and material.use_nodes
+INFO Draco is available, use library at D:\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_draco_bridge.dll
+INFO MeshOptimizer is available, use library at D:\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_meshopt_bridge.dll
+06:55:07 | INFO: Starting glTF 2.0 export
+06:55:07 | INFO: Extracting primitive: ACTION_BUTTON
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: ANTENNA_SIDE_L_55
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: ANTENNA_SIDE_L_-55
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: ANTENNA_SIDE_R_55
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: ANTENNA_SIDE_R_-55
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: APPLE_LOGO_DECAL
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: BACK_GLASS
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: BODY_ALUMINUM
+06:55:08 | INFO: Primitives created: 2
+06:55:08 | INFO: Extracting primitive: BOTTOM_MIC_APERTURE_01
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: BOTTOM_MIC_APERTURE_02
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: BOTTOM_MIC_APERTURE_03
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: BOTTOM_SCREW_L
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: BOTTOM_SCREW_R
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: BOTTOM_SPEAKER_APERTURE_01
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: BOTTOM_SPEAKER_APERTURE_02
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: BOTTOM_SPEAKER_APERTURE_03
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: BOTTOM_SPEAKER_APERTURE_04
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: BOTTOM_SPEAKER_APERTURE_05
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: CAMERA_1_BEVEL
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: CAMERA_1_GLASS
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: CAMERA_1_INNER
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: CAMERA_1_IRIS
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: CAMERA_1_PUPIL
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: CAMERA_1_RING
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: CAMERA_2_BEVEL
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: CAMERA_2_GLASS
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: CAMERA_2_INNER
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: CAMERA_2_IRIS
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: CAMERA_2_PUPIL
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: CAMERA_2_RING
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: CAMERA_CONTROL
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: CAMERA_HOUSING
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: CAMERA_HOUSING_SEAT
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: DISPLAY_BEZEL
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: DISPLAY_GLASS_SEAT
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: FLASH
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: FLASH_RING
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: FRONT_CAMERA_GLASS
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: FRONT_CAMERA_INNER
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: FRONT_CAMERA_IRIS
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: FRONT_CAMERA_MASK
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: FRONT_CAMERA_PUPIL
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: FRONT_RECEIVER_MIC
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: FRONT_SENSOR_MASK
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: REAR_MIC
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: SCREEN_CONTENT
+06:55:08 | INFO: Primitives created: 2
+06:55:08 | INFO: Extracting primitive: SIDE_BUTTON
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: USB_C_CAVITY
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: USB_C_TONGUE
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: VOL_DOWN
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Extracting primitive: VOL_UP
+06:55:08 | INFO: Primitives created: 1
+06:55:08 | INFO: Finished glTF 2.0 export in 0.7821404933929443 s
+
+Info: Packed 1 file(s)
+Info: Saved as "iphone_17_v30_delivery.blend"
+AWFUL_IPHONE17_V30_RUNTIME_EXPORT {"delivery": "F:\\Temp\\iphone17-v30-topology-rebuild\\assets\\device_mockups\\iphone_17\\runtime\\v30\\iphone_17_v30_delivery.blend", "glb": "F:\\Temp\\iphone17-v30-topology-rebuild\\assets\\device_mockups\\iphone_17\\runtime\\v30\\iphone_17_v30_web.glb", "glb_bytes": 4847516, "materials": 24, "objects": 57}
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit
+info: prune: Removed types... Accessor (234)
+warn: quantize: Skipping TEXCOORD_0; out of [0,1] range.
+warn: quantize: Skipping TEXCOORD_0; out of [0,1] range.
+warn: quantize: Skipping TEXCOORD_0; out of [0,1] range.
+warn: quantize: Skipping TEXCOORD_0; out of [0,1] range.
+warn: quantize: Skipping TEXCOORD_0; out of [0,1] range.
+warn: quantize: Skipping TEXCOORD_0; out of [0,1] range.
+warn: quantize: Skipping TEXCOORD_0; out of [0,1] range.
+warn: quantize: Skipping TEXCOORD_0; out of [0,1] range.
+warn: quantize: Skipping TEXCOORD_0; out of [0,1] range.
+warn: quantize: Skipping TEXCOORD_0; out of [0,1] range.
+warn: quantize: Skipping TEXCOORD_0; out of [0,1] range.
+warn: quantize: Skipping TEXCOORD_0; out of [0,1] range.
+warn: quantize: Skipping TEXCOORD_0; out of [0,1] range.
+warn: quantize: Skipping TEXCOORD_0; out of [0,1] range.
+info: prune: Removed types... Accessor (89)
+info: iphone_17_v30_web.glb (4.85 MB) → iphone_17_v30_web_meshopt.glb (4.24 MB)
+{
+  "compat_bytes": 4847516,
+  "meshopt_bytes": 4236384,
+  "ratio": 0.8739,
+  "critical_nodes": [
+    "ANCHOR_BOTTOM_CENTER",
+    "ANCHOR_CENTER",
+    "ANCHOR_REAR_CAMERA",
+    "ANCHOR_SCREEN_CENTER",
+    "CTRL_IPHONE_17",
+    "FRONT_CAMERA_GLASS",
+    "FRONT_CAMERA_MASK",
+    "FRONT_SENSOR_MASK",
+    "SCREEN_CONTENT"
+  ],
+  "extensions_required": [
+    "EXT_meshopt_compression",
+    "KHR_mesh_quantization"
+  ],
+  "manifest": "F:\\Temp\\iphone17-v30-topology-rebuild\\assets\\device_mockups\\iphone_17\\runtime\\v30\\iphone_17_v30.asset.json"
+}
+00:01.079  blend            | Read blend: "F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\generated\iphone_17_low_v30.blend"
+Info: Packed 1 file(s)
+Info: Saved as "iphone_17_low_v30.blend"
+AWFUL_DEVICE_PACKAGE_OK AWFUL_DEVICE_IPHONE_17 58 LOW_DRAFT low_v30 92f2b5fe5c4eb902f3253ff15a282ab51c1878db2f1eb306613f61872667a11e
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit
+{
+  "source_revision": "92f2b5fe5c4eb902f3253ff15a282ab51c1878db2f1eb306613f61872667a11e",
+  "source_commit": "2ea91ae2ee2c04c9839e01d985fc5b30583659d2",
+  "manifest": "F:\\Temp\\iphone17-v30-topology-rebuild\\assets\\device_mockups\\iphone_17\\runtime\\v30\\iphone_17_v30.asset.json",
+  "bundle": "F:\\Temp\\iphone17-v30-topology-rebuild\\extension\\awful_studio\\assets\\devices\\iphone_17_low_v30.blend"
+}

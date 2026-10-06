@@ -1,0 +1,393 @@
+{
+  "FRONT_CAMERA_GLASS": {
+    "verts": 46,
+    "faces": 66,
+    "ngons": 0,
+    "nonmanifold": 0,
+    "zero_edges": 0,
+    "tiny_faces": 0,
+    "modifiers": [],
+    "evaluated_verts": 46,
+    "evaluated_faces": 66,
+    "evaluated_triangles": 88,
+    "evaluated_ngons": 0,
+    "uv_layers": 1,
+    "materials": [
+      "MAT_FRONT_OPTIC"
+    ],
+    "matrix_world": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.006719999946653843
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.0038785000797361135
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.06701499968767166
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "local_bounds": [
+      [
+        -0.0008399999933317304,
+        -3.000000106112566e-06,
+        -0.000831449986435473
+      ],
+      [
+        0.0008399999933317304,
+        3.000000106112566e-06,
+        0.000831449986435473
+      ]
+    ]
+  },
+  "FRONT_CAMERA_INNER": {
+    "verts": 34,
+    "faces": 48,
+    "ngons": 0,
+    "nonmanifold": 0,
+    "zero_edges": 0,
+    "tiny_faces": 0,
+    "modifiers": [],
+    "evaluated_verts": 34,
+    "evaluated_faces": 48,
+    "evaluated_triangles": 64,
+    "evaluated_ngons": 0,
+    "uv_layers": 1,
+    "materials": [
+      "MAT_OPTICS_BLACK"
+    ],
+    "matrix_world": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.006719999946653843
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.003863499965518713
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.06701499968767166
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "local_bounds": [
+      [
+        -0.0005200000014156103,
+        -2.499999936844688e-06,
+        -0.0005200000014156103
+      ],
+      [
+        0.0005200000014156103,
+        2.499999936844688e-06,
+        0.0005200000014156103
+      ]
+    ]
+  },
+  "FRONT_CAMERA_IRIS": {
+    "verts": 26,
+    "faces": 36,
+    "ngons": 0,
+    "nonmanifold": 0,
+    "zero_edges": 0,
+    "tiny_faces": 0,
+    "modifiers": [],
+    "evaluated_verts": 26,
+    "evaluated_faces": 36,
+    "evaluated_triangles": 48,
+    "evaluated_ngons": 0,
+    "uv_layers": 1,
+    "materials": [
+      "MAT_FRONT_OPTIC"
+    ],
+    "matrix_world": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.006719999946653843
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.003848500084131956
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.06701499968767166
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "local_bounds": [
+      [
+        -0.0002800000074785203,
+        -1.9999999949504854e-06,
+        -0.0002800000074785203
+      ],
+      [
+        0.0002800000074785203,
+        1.9999999949504854e-06,
+        0.0002800000074785203
+      ]
+    ]
+  },
+  "FRONT_CAMERA_MASK": {
+    "verts": 50,
+    "faces": 72,
+    "ngons": 0,
+    "nonmanifold": 0,
+    "zero_edges": 0,
+    "tiny_faces": 0,
+    "modifiers": [],
+    "evaluated_verts": 50,
+    "evaluated_faces": 72,
+    "evaluated_triangles": 96,
+    "evaluated_ngons": 0,
+    "uv_layers": 1,
+    "materials": [
+      "MAT_UNDER_GLASS_BLACK"
+    ],
+    "matrix_world": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.006719999946653843
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.003918500151485205
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.06701499968767166
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "local_bounds": [
+      [
+        -0.0011500000255182385,
+        -3.999999989900971e-06,
+        -0.0011500000255182385
+      ],
+      [
+        0.0011500000255182385,
+        3.999999989900971e-06,
+        0.0011500000255182385
+      ]
+    ]
+  },
+  "FRONT_CAMERA_PUPIL": {
+    "verts": 18,
+    "faces": 24,
+    "ngons": 0,
+    "nonmanifold": 0,
+    "zero_edges": 0,
+    "tiny_faces": 0,
+    "modifiers": [],
+    "evaluated_verts": 18,
+    "evaluated_faces": 24,
+    "evaluated_triangles": 32,
+    "evaluated_ngons": 0,
+    "uv_layers": 1,
+    "materials": [
+      "MAT_OPTICS_BLACK"
+    ],
+    "matrix_world": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.006719999946653843
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.0038334999699145555
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.06701499968767166
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "local_bounds": [
+      [
+        -0.00011999999696854502,
+        -1.500000053056283e-06,
+        -0.00011999999696854502
+      ],
+      [
+        0.00011999999696854502,
+        1.500000053056283e-06,
+        0.00011999999696854502
+      ]
+    ]
+  },
+  "FRONT_RECEIVER_MIC": {
+    "verts": 8,
+    "faces": 6,
+    "ngons": 0,
+    "nonmanifold": 0,
+    "zero_edges": 0,
+    "tiny_faces": 0,
+    "modifiers": [
+      {
+        "type": "BEVEL",
+        "width": 9.800000043469481e-06,
+        "segments": 4
+      }
+    ],
+    "evaluated_verts": 152,
+    "evaluated_faces": 150,
+    "evaluated_triangles": 300,
+    "evaluated_ngons": 0,
+    "uv_layers": 1,
+    "materials": [
+      "MAT_OPTICS_BLACK"
+    ],
+    "matrix_world": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.003986999858170748
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.07418499886989594
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "local_bounds": [
+      [
+        -0.007009999826550484,
+        -9.999999747378752e-06,
+        -0.0001500000071246177
+      ],
+      [
+        0.007009999826550484,
+        9.999999747378752e-06,
+        0.0001500000071246177
+      ]
+    ]
+  },
+  "FRONT_SENSOR_MASK": {
+    "verts": 56,
+    "faces": 54,
+    "ngons": 0,
+    "nonmanifold": 0,
+    "zero_edges": 4,
+    "tiny_faces": 4,
+    "modifiers": [],
+    "evaluated_verts": 56,
+    "evaluated_faces": 54,
+    "evaluated_triangles": 108,
+    "evaluated_ngons": 0,
+    "uv_layers": 0,
+    "materials": [
+      "MAT_UNDER_GLASS_BLACK"
+    ],
+    "matrix_world": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.004149999935179949
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.003918500151485205
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.06701499968767166
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "local_bounds": [
+      [
+        -0.0035500000230968,
+        -3.999999989900971e-06,
+        -0.0011500000255182385
+      ],
+      [
+        0.0035500000230968,
+        3.999999989900971e-06,
+        0.0011500000255182385
+      ]
+    ]
+  }
+}

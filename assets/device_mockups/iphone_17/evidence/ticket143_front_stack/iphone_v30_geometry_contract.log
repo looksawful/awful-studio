@@ -1,0 +1,5 @@
+00:00.985  blend            | Read blend: "F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\generated\iphone_17_low_v30.blend"
+IPHONE_V30_GEOMETRY_GREEN {"blender": "5.2.1 LTS", "shells": {"BODY_ALUMINUM": {"signed_volume": 1.3955124046117468e-06, "non_manifold_edges": 0}, "BACK_GLASS": {"signed_volume": 3.544511817857152e-06, "non_manifold_edges": 0}, "CAMERA_HOUSING": {"signed_volume": 1.1456425696177539e-06, "non_manifold_edges": 0}, "CAMERA_HOUSING_SEAT": {"signed_volume": 2.751263934741623e-07, "non_manifold_edges": 0}, "FRONT_SENSOR_MASK": {"signed_volume": 1.2117966828317508e-10, "non_manifold_edges": 0}, "FRONT_CAMERA_MASK": {"signed_volume": 3.2859667212812244e-11, "non_manifold_edges": 0}}}
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit

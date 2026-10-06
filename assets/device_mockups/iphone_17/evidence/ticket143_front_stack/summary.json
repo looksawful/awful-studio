@@ -1,0 +1,174 @@
+{
+  "ticket": 143,
+  "fixed_point": "6b294e0067741f9e6f6a8ba8fb857b11e65b9600",
+  "compat_sha256": "354e53759fabaac61a39ff4df7fd69ae410da2ff8c52353184bb769b813570b0",
+  "meshopt_sha256": "061c4df9e50fd31b6fe486f5431340d1d4cc051e3ffc7a842abc26de91677c1c",
+  "source_revision": "92f2b5fe5c4eb902f3253ff15a282ab51c1878db2f1eb306613f61872667a11e",
+  "manifest_source_commit": "2ea91ae2ee2c04c9839e01d985fc5b30583659d2",
+  "web_triangles": 12530,
+  "frozen_sha256": "68bcd22831e427a077ddfd48662e41bbe8ef46ebda0359c7153b9e3579afeae0",
+  "baseline_blend_sha256": "1fa39b4dfbb679ece0ecf507797e2c6555319889d3bb63fe960ae06faa7dba7c",
+  "source_blend_sha256": "03b5d022b3c7816dc685cbbdd3dcbc5a6bbf79a59758ed2c5300da3d823d4464",
+  "repair": "Omit only capsule duplicate equator row in existing roundedstrip helper; materialize only existing9.8um receiver physical rim with2controlledarcspans. No artwork/datum/state/material edits.",
+  "sensor_mask": {
+    "vertices": 52,
+    "faces": 50,
+    "triangles": 100,
+    "all_previous_non_degenerate_faces_exact": true,
+    "defects": 0,
+    "modifiers": 0
+  },
+  "receiver": {
+    "vertices": 56,
+    "faces": 54,
+    "triangles": 108,
+    "bevel_spans": 2,
+    "defects": 0,
+    "modifiers": 0
+  },
+  "native_surface_preservation": {
+    "sensor_non_degenerate_authored_faces_exact": 50,
+    "receiver_max_sampled_local_surface_error_m": 1.0376454611105146e-06,
+    "receiver_baseline_evaluated_triangles": 300,
+    "receiver_current_authored_triangles": 108
+  },
+  "preservation": {
+    "other_mesh_geometry_normals_tangents_indices_unchanged": 49,
+    "fully_byte_unchanged_other_meshes": 45,
+    "antenna_uv_float_rounding_max_delta": {
+      "ANTENNA_SIDE_L_55": 5.960464477539063e-08,
+      "ANTENNA_SIDE_L_-55": 5.960464477539063e-08,
+      "ANTENNA_SIDE_R_55": 5.960464477539063e-08,
+      "ANTENNA_SIDE_R_-55": 5.960464477539063e-08
+    },
+    "other_mesh_node_frames_unchanged": true,
+    "materials_unchanged": true,
+    "embedded_images_unchanged": true,
+    "body_bounds_baseline": [
+      [
+        -35.725001245737076,
+        -74.80499893426895,
+        -3.6249998956918716
+      ],
+      [
+        35.725001245737076,
+        74.80499893426895,
+        3.6249998956918716
+      ]
+    ],
+    "body_bounds_current": [
+      [
+        -35.725001245737076,
+        -74.80499893426895,
+        -3.6249998956918716
+      ],
+      [
+        35.725001245737076,
+        74.80499893426895,
+        3.6249998956918716
+      ]
+    ]
+  },
+  "runtime_passed": 17,
+  "expanded_front_contract": "PASS after fullruntime loop",
+  "fast_passed": 209,
+  "preview_passed": 25,
+  "storybook_build": "PASS",
+  "browser_views": 8,
+  "frames_each_candidate": 88,
+  "finishes": [
+    "black",
+    "white",
+    "mist_blue",
+    "sage",
+    "lavender"
+  ],
+  "screen_states": [
+    "screen_on",
+    "screen_off",
+    "screen_lock",
+    "screen_website",
+    "screen_resume"
+  ],
+  "modes": [
+    "texture",
+    "clay",
+    "actual_triangle_wireframe"
+  ],
+  "khronos": {
+    "compat_errors": 0,
+    "compat_warnings": 0,
+    "meshopt_errors": 0,
+    "meshopt_warnings": 0
+  },
+  "review": {
+    "standards": "PASS",
+    "spec": "PASS",
+    "method": "Two separate local qwen3-coder:30b model review processes + primary evidence/visual adjudication; hostedagent quota unavailable, noCodexCLI dependency.",
+    "primary_visual_adjudication": "PASS",
+    "limitations": "Local model reviewers saw no images; unsupported prose corrected in primary adjudication. Scope143 only."
+  },
+  "whole_device_accepted": false,
+  "human_gate": "pending exact integrated146candidate",
+  "provenance_closure": "145146",
+  "pr119": "DRAFT/HOLD",
+  "raw_evidence": "F:\\Temp\\iphone17-ticket143",
+  "evidence_sha256": {
+    "baseline-browser-audit.json": "1e87bc6421fd348b8c0f4f5e2c7ed5b494b9adcb1ab292b210109900ea34531b",
+    "baseline-native.json": "eb7460653cc12667ebb3637e5820a6c70014d4ae4d99cb4f28cd7e02445c1a0c",
+    "build.log": "873c3d8f223d324d6009a75cfbee69ef01ddab02c764743c878cc9aeb9b479ba",
+    "bundle-front.log": "6309019b6cd5a961343636cbe6b9ce47ec55ba1297976893337ecf0db654840e",
+    "comparison-clay-white-screen_on.jpg": "28472f4cf6d5ac3a634a7d3aea4cd648243de6803666a19f73375b5bea880c29",
+    "comparison-texture-black-screen_on.jpg": "f6e5601cec86823e4becb157103b7df1d618b1cd5883c457ae4607fa633bfbed",
+    "comparison-texture-lavender-screen_on.jpg": "573b9ff731771575c4461eecdce41999136c01a931163c7bd35f5482718a0981",
+    "comparison-texture-mist_blue-screen_on.jpg": "d29b18944499da86ddcd81eca1167d326843d8d3cec908c577fed0d287ab6490",
+    "comparison-texture-sage-screen_on.jpg": "36370f0451acd205cd6935e295506f749265f6482a3cfd60b190faf9aeb93a36",
+    "comparison-texture-white-screen_lock.jpg": "9a5761c72a65b674b7fd9c98e8b4d8444ed1ef91b2e08ba3d97ac0dab361cc94",
+    "comparison-texture-white-screen_off.jpg": "b9fa7cdc9dc9619c444e40ce275c168eea18f27075dab1b8e9faff02b56f9ded",
+    "comparison-texture-white-screen_on.jpg": "21c8eacca06c36a61d5b9632718129c58411658de9a1919a3e48041261027080",
+    "comparison-texture-white-screen_resume.jpg": "69a3f93f4dbaf7824a8f4f3cb3c875ef43c15cec6aab7b52b847c176ba6f21a6",
+    "comparison-texture-white-screen_website.jpg": "c9a3b4923f9bcbb2d0d7075e2cf65b89bcc00fd1753dca388196d9ebe4304a2a",
+    "comparison-wireframe-white-screen_on.jpg": "a6cca3d338da736d846f94813fd3cdf9f3f2a460f87482293e802101554a2142",
+    "current-browser-audit.json": "496e520c4e3d5ea168051cf3ad1057f549cbff5cf0dcea5cbbb1d04d0fd4a45b",
+    "delivery-front.log": "68be94266b6555bd4d86369964eb324fc2aa4094c8d4acbd722743fad99d096f",
+    "fast-final.log": "36ef397569df9daea87e0bf17d21cae55213aef03a798d27407cf519466731b7",
+    "fast.log": "d567f4697f4ad3fd62eb3e95b707646854c00ed8010e2c9758b8c2bd6e8417e5",
+    "front-stack-green.log": "1b447c22be8bfa7a370754f3fa47fae50cbcc2b34200810564a649ed0b818063",
+    "front-topology-red.log": "df7550cd37ef8673475fd2bf142e758e6ccc445c30a684a9102bf02c18d06bf7",
+    "frozen-browser-audit.json": "1e8114ad9ea8750d988e44504a74b6049c04bd2e435e39652aee5efc6227bdd3",
+    "iphone_v30_antenna_topology_contract.log": "b8c9782c6dfc14ae71e48dc389dadd14191bd124daa896185ff7e04bfa671122",
+    "iphone_v30_body_cell_shape_contract.log": "a112b26741393caf00c5d25d8c0bd1586d3e19b4159c843d37484fed82e79449",
+    "iphone_v30_body_rail_topology_contract.log": "8cbda7764f59f66ab3b0eb20d846e8f547e18980e42b596d5ea85715cc973ae4",
+    "iphone_v30_body_topology_contract.log": "8846e304a8fbe632e3bad4e199208a1695aa78a74997cab4a7974a1c85fa897f",
+    "iphone_v30_body_visible_material_contract.log": "e1d95dee3523b288f39f91e17b477bd7b947e73ea1673f3002864a33aa1f371c",
+    "iphone_v30_bottom_topology_contract.log": "fe7c405f099e95e7da8775ccbda0d0834af6af87c373f170f2cfba677a9137a4",
+    "iphone_v30_controls_topology_contract.log": "98c824e410d1dcd3f68e206b7ccebb63c3c4484293bf4783473cf2a1bfd06d52",
+    "iphone_v30_display_frame_topology_contract.log": "01a96f4c4a8239925ad5cdcd1c5c230dad164eab3133250bacdbc3f3aa9de987",
+    "iphone_v30_front_stack_contract.log": "2d1549238466d7a142e9b398b1bb6ff53d635f445f449ddeb02a2367977ec7f2",
+    "iphone_v30_geometry_contract.log": "f69f11bd87edc9df590b7ee3f960ba89ceb121bb976f265a4f996ef9b65821a7",
+    "iphone_v30_panel_stack_topology_contract.log": "4ae3939a20049600fa9c66ae2017c97102972eee38ee0f98bddc873b659310de",
+    "iphone_v30_rear_optics_topology_contract.log": "97bbef02bfd20f159005d27c46fb5904eba4306ef1f87b74d6acf7722c3795ff",
+    "iphone_v30_screen_topology_contract.log": "0b8f0c4c855a78efaaf291258b7f37dc964910a6c70426fd46d6792dc9bcd9d3",
+    "iphone_v30_surface_topology_contract.log": "8c58b37e07d0692a04f7bf91fbc11d8e1bf2e61d8edd0a7a723b08dd9f6fe248",
+    "iphone_v30_topology_contract.log": "0f71ea0f7fe291cc39444528d8b1b92304b0b8f2aa6c13b3d58307ef700e48bb",
+    "iphone_v30_usb_frame_contract.log": "e0fa295c8bb97aca30720df51df231222ecafee93bb101288c61a3bbdf8e70bc",
+    "iphone_v30_usb_topology_contract.log": "a108907af8dd2d2ac92f95ed34abfc77b75770cb66e4fac5627d3beceb26904c",
+    "khronos-compat.json": "75f9ab00fbaf33efbc79999ef45dae8cd1c5371b0b6545dc2499113cf108650d",
+    "khronos-meshopt.json": "c0f91538e69bddcc3e2f24a7eac414de32d2dd029d1a31ad2a0727b9927b6450",
+    "matched-pixel-deltas.json": "64e8088e8c03e709dd1627342366896c46d1ad03c8602425aee2df402158b69a",
+    "native-preservation.json": "4af0d65f6c86fec20628e037fe884005ebdbae7493532c2d7a9d71097ee32c30",
+    "native-preservation.log": "d1f9fb366ba10464ebaff269ef2a13c4716e3f5a1c887a94819ded0d1f764051",
+    "preservation-comparison.json": "1cfca8c3f3c01e0d1db1d0b61a217be3354dc22afad48566061f110d902a86cc",
+    "preview-tests.log": "6e403dcf89f72dcaf7ed749a1f7d7f5d0ea7646feb44d383c1fdc0898a36e6cf",
+    "README.md": "d9e79c1f00add3c368504231720d91aaf72e7275185b2c8fac022954f94f272e",
+    "receiver-topology-red.log": "65bb7a792e6a05023596610e44956a884591e8629c012ed914d489dcca4610a7",
+    "review-adjudication.md": "4e4f12d53f2f808175c53ab9443e2ce0cc05dfd7a80ecb3073771426da6be3d6",
+    "review-spec.json": "bfd0cb10dc9f6f33d6f51105d5bf3f8589493945e90df51c936e1ee9c9b15150",
+    "review-spec.md": "c9e26049dd60bbf8a708e9f49c212fe8807e3981941e5d38c4df18196d17a56e",
+    "review-standards.json": "0544d8da771eb423aaae8b271f6e73d13419f2a1e706fa945c9702836f7f6f2b",
+    "review-standards.md": "aa2e4d3ae92bb57393ed6827478cfdee811d3b28fe4863ac3e176049ece552ed",
+    "runtime-summary.json": "20a1a3159bb8342372951ff24a9892af4b73df47272235781870d20d6cbc74f7",
+    "runtime.log": "e215c46bd93dd4be304637c2612abb19ddb77ebe9650c27e546e4ffd312c26cd",
+    "storybook-build.log": "2898800a5c199a7b04a7a67fc8ab025338e385e03431ece6c2bbf79149decbed"
+  }
+}

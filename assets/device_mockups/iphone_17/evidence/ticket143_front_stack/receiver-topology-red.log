@@ -1,0 +1,11 @@
+00:00.937  blend            | Read blend: "F:\Temp\iphone17-v30-topology-rebuild\assets\device_mockups\iphone_17\generated\iphone_17_low_v30.blend"
+Traceback (most recent call last):
+  File "F:\Temp\iphone17-v30-topology-rebuild\tests\runtime\iphone_v30_front_stack_contract.py", line 22, in <module>
+    assert not row['modifiers'], (name, 'front physical bevel must be authored', report)
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('FRONT_RECEIVER_MIC', 'front physical bevel must be authored', {'FRONT_SENSOR_MASK': {'vertices': 52, 'faces': 50, 'ngons': 0, 'nonmanifold': 0, 'zero_edges': 0, 'degenerate_faces': 0, 'modifiers': []}, 'FRONT_CAMERA_MASK': {'vertices': 50, 'faces': 72, 'ngons': 0, 'nonmanifold': 0, 'zero_edges': 0, 'degenerate_faces': 0, 'modifiers': []}, 'FRONT_CAMERA_GLASS': {'vertices': 46, 'faces': 66, 'ngons': 0, 'nonmanifold': 0, 'zero_edges': 0, 'degenerate_faces': 0, 'modifiers': []}, 'FRONT_CAMERA_INNER': {'vertices': 34, 'faces': 48, 'ngons': 0, 'nonmanifold': 0, 'zero_edges': 0, 'degenerate_faces': 0, 'modifiers': []}, 'FRONT_CAMERA_IRIS': {'vertices': 26, 'faces': 36, 'ngons': 0, 'nonmanifold': 0, 'zero_edges': 0, 'degenerate_faces': 0, 'modifiers': []}, 'FRONT_CAMERA_PUPIL': {'vertices': 18, 'faces': 24, 'ngons': 0, 'nonmanifold': 0, 'zero_edges': 0, 'degenerate_faces': 0, 'modifiers': []}, 'FRONT_RECEIVER_MIC': {'vertices': 8, 'faces': 6, 'ngons': 0, 'nonmanifold': 0, 'zero_edges': 0, 'degenerate_faces': 0, 'modifiers': ['BEVEL']}})
+
+Error: script failed, file: 'F:\Temp\iphone17-v30-topology-rebuild\tests\runtime\iphone_v30_front_stack_contract.py', exiting.
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit

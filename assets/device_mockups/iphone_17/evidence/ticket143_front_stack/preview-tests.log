@@ -1,0 +1,37 @@
+
+> test
+> node --test tests/*.test.mjs
+
+✔ catalog generator produces only canonical model inventory (382.0175ms)
+✔ catalog check mode rejects no committed drift (130.1298ms)
+✔ the shared catalog identifies and verifies exactly the device snapshots shown by primary stories (99.98ms)
+✔ official iPhone 17 colorways are exposed as material variants (6.2056ms)
+✔ exported aluminum controls follow all finishes and retain their bake maps (106.8952ms)
+✔ colorway changes tint without replacing PBR maps (4.3498ms)
+✔ active screen states keep the baseline Dynamic Island independent of raster artwork (0.1927ms)
+✔ website raster gets the baseline idle Dynamic Island in the compositor (1.2831ms)
+✔ display raster and mobile viewport preserve physical aspect and pixel pitch (0.2532ms)
+✔ only front display triangles emit; sides stay dark without modifying vertices (16.7981ms)
+✔ front camera keeps its authored hardware datum (0.4336ms)
+✔ canonical multi-material display keeps emission, state controls and source edge ownership (6.5175ms)
+✔ GLTFLoader split primitives retain a working display and glow (2.3603ms)
+✔ frozen appearance accepts exact GLB bytes and rejects a changed snapshot (42.7284ms)
+✔ scene preview exporter is explicit and render-free (2.1595ms)
+✔ all canonical scene previews are materialized (0.7394ms)
+✔ viewer uses Three GLTF runtime and orbit controls (1.8721ms)
+✔ storybook exposes every canonical model as a first-class story (3.1098ms)
+✔ preview URLs expose repository assets without copying binaries (2.2935ms)
+✔ preview URLs support GitHub Pages subpaths (0.3215ms)
+✔ LOD options preserve manifest order and fall back to preview model (1.3748ms)
+✔ device model provenance rejects stale stage or source revision (0.5863ms)
+✔ camera presets are explicit and normalized (0.8014ms)
+✔ binary Apple decal uses crisp preview alpha policy (0.6372ms)
+✔ baked aluminum control materials use the established metal lighting policy (1.1806ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 811.7942
