@@ -1,0 +1,154 @@
+{
+  "sha": "ba4ef30c68ef93470eff6d8d472d78454ad51f99a727469a8f6d12fa58eda05c",
+  "meshoptSha": "57f25b2a72741e7ea630fa5580e112e6f4a40c4a2830813bb901e8690edf7b07",
+  "pluginSha": "82173e9bdfb0c22d521ea939ed4dd7343600bcfdd87e8d3b516ac6414f4b40a3",
+  "sourceRevision": "9b1913cbd9fa9188dd61c119c7731e4d6ea9aa6ab520e0ca39ee347da65de1f5",
+  "sourceCommit": "16ae14ec8dcfddcd359e0e1db21d690f033964d5",
+  "writerHead": "45cc11b",
+  "meshNodes": 51,
+  "nodeCount": 57,
+  "triangles": 12634,
+  "evidence": [
+    {
+      "name": "front",
+      "selection": "all",
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "fraction": [
+        0,
+        0
+      ],
+      "distance": 0.29
+    },
+    {
+      "name": "front-three-quarter",
+      "selection": "all",
+      "direction": [
+        0.45,
+        0.1,
+        1
+      ],
+      "fraction": [
+        0,
+        0
+      ],
+      "distance": 0.29
+    },
+    {
+      "name": "left-side",
+      "selection": "all",
+      "direction": [
+        1,
+        0,
+        0
+      ],
+      "fraction": [
+        0,
+        0
+      ],
+      "distance": 0.2
+    },
+    {
+      "name": "right-side",
+      "selection": "all",
+      "direction": [
+        -1,
+        0,
+        0
+      ],
+      "fraction": [
+        0,
+        0
+      ],
+      "distance": 0.2
+    },
+    {
+      "name": "bottom",
+      "selection": "all",
+      "direction": [
+        0,
+        -1,
+        0
+      ],
+      "fraction": [
+        0,
+        -0.42
+      ],
+      "distance": 0.16
+    },
+    {
+      "name": "back",
+      "selection": "all",
+      "direction": [
+        0,
+        0,
+        -1
+      ],
+      "fraction": [
+        0,
+        0
+      ],
+      "distance": 0.29
+    },
+    {
+      "name": "rear-three-quarter",
+      "selection": "all",
+      "direction": [
+        -0.4,
+        0.1,
+        -1
+      ],
+      "fraction": [
+        0,
+        0
+      ],
+      "distance": 0.29
+    },
+    {
+      "name": "camera-system",
+      "selection": "all",
+      "direction": [
+        0,
+        0,
+        -1
+      ],
+      "fraction": [
+        0.317,
+        0.35
+      ],
+      "distance": 0.095
+    },
+    {
+      "name": "rear-mic",
+      "selection": "all",
+      "direction": [
+        0,
+        0,
+        -1
+      ],
+      "fraction": [
+        0.218,
+        0.35
+      ],
+      "distance": 0.019
+    },
+    {
+      "name": "housing-wire",
+      "selection": "mesh:CAMERA_HOUSING",
+      "direction": [
+        0,
+        0,
+        -1
+      ],
+      "fraction": [
+        0.317,
+        0.35
+      ],
+      "distance": 0.095
+    }
+  ],
+  "errors": []
+}

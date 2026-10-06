@@ -1,0 +1,84 @@
+
+> storybook:build
+> npm run catalog:check && storybook build --config-dir .storybook --output-dir storybook-static
+
+
+> catalog:check
+> node tools/generate-catalog.mjs --check
+
+
+[90mтФМ[39m  Building storybook v10.6.0
+[90mтФВ[39m
+[32mтЧЗ[39m  Cleaning outputDir: [36mstorybook-static[39m
+[90mтФВ[39m
+[32mтЧЗ[39m  Loading presets
+[90mтФВ[39m
+[32mтЧЗ[39m  Building manager..
+[90mтФВ[39m
+[34mтЧП[39m  Building open services..
+[90mтФВ[39m
+[34mтЧП[39m  Building preview..
+[90mтФВ[39m  [43mVite[49m [36mvite v8.3.0 [32mbuilding client environment for production...[36m[39m
+transforming...
+[90mтФВ[39m
+[34mтЧП[39m  Copying static files:
+[90mтФВ[39m  [36mgenerated\iphone-review\frozen-current-2026-10-05[39m at
+[90mтФВ[39m  [36mstorybook-static\assets\iphone-review\frozen-current-2026-10-05[39m
+тЬУ 44 modules transformed.
+[90mтФВ[39m
+[34mтЧП[39m  Copying static files: [36mgenerated\device-review\current-2026-10-05[39m at
+[90mтФВ[39m  [36mstorybook-static\assets\device-review\current-2026-10-05[39m
+[90mтФВ[39m
+[34mтЧП[39m  Copying static files: [36mpublic\screens[39m at [36mstorybook-static\screens[39m
+[90mтФВ[39m
+[34mтЧП[39m  Copying static files:
+[90mтФВ[39m  [36m..\assets\studio_equipment\studio_rig_v01\runtime\glb[39m at
+[90mтФВ[39m  [36mstorybook-static\assets\studio_equipment\studio_rig_v01\runtime\glb[39m
+rendering chunks...
+[90mтФВ[39m
+[34mтЧП[39m  Copying static files:
+[90mтФВ[39m  [36m..\assets\studio_equipment\studio_rig_v01\runtime\lod[39m at
+[90mтФВ[39m  [36mstorybook-static\assets\studio_equipment\studio_rig_v01\runtime\lod[39m
+[90mтФВ[39m
+[34mтЧП[39m  Copying static files:
+[90mтФВ[39m  [36m..\assets\studio_equipment\studio_rig_v01\runtime\collision[39m at
+[90mтФВ[39m  [36mstorybook-static\assets\studio_equipment\studio_rig_v01\runtime\collision[39m
+[90mтФВ[39m
+[34mтЧП[39m  Copying static files: [36mgenerated\scenes[39m at
+[90mтФВ[39m  [36mstorybook-static\preview-scenes[39m
+computing gzip size...
+[90mтФВ[39m  [43mVite[49m storybook-static/iframe.html
+[90mтФВ[39m  18.53 kB тФВ gzip:   5.23 kB
+[90mтФВ[39m  storybook-static/assets/scenes.stories-CgNpZenO.js              0.46
+[90mтФВ[39m  kB тФВ gzip:   0.31 kB
+[90mтФВ[39m  storybook-static/assets/studio-equipment.stories-GakdeIhH.js    0.59
+[90mтФВ[39m  kB тФВ gzip:   0.37 kB
+[90mтФВ[39m  storybook-static/assets/rolldown-runtime-Dh6celcD.js            0.62
+[90mтФВ[39m  kB тФВ gzip:   0.41 kB
+[90mтФВ[39m  storybook-static/assets/devices.stories-BAbO0kq3.js             0.72
+[90mтФВ[39m  kB тФВ gzip:   0.44 kB
+[90mтФВ[39m  storybook-static/assets/preload-helper-KpucdegZ.js              1.33
+[90mтФВ[39m  kB тФВ gzip:   0.75 kB
+[90mтФВ[39m  storybook-static/assets/catalog.stories-vrsm_ThD.js             1.36
+[90mтФВ[39m  kB тФВ gzip:   0.88 kB
+[90mтФВ[39m  storybook-static/vite-inject-mocker-entry.js                   27.83
+[90mтФВ[39m  kB тФВ gzip:   9.67 kB
+[90mтФВ[39m  storybook-static/assets/iframe-njz0prvn.js                    858.39
+[90mтФВ[39m  kB тФВ gzip: 239.91 kB
+[90mтФВ[39m  storybook-static/assets/story-factory-BoDlRPI4.js             957.71
+[90mтФВ[39m  kB тФВ gzip: 288.48 kB
+
+[90mтФВ[39m  [43mVite[49m [32mтЬУ built in 442ms[39m
+[90mтФВ[39m
+[33mтЦ▓[39m  [43mVite[49m [33m[plugin builtin:vite-reporter]
+[90mтФВ[39m  (!) Some chunks are larger than 500 kB after minification. Consider:
+[90mтФВ[39m  - Using dynamic import() to code-split the application
+[90mтФВ[39m  - Use build.rolldownOptions.output.codeSplitting to improve chunking:
+[90mтФВ[39m  ]8;;https://rolldown.rs/reference/OutputOptions.codeSplittinghttps://rolldown.rs/reference/OutputOptions.codeSplitting]8;;
+[90mтФВ[39m  - Adjust chunk size limit for this warning via
+[90mтФВ[39m  build.chunkSizeWarningLimit.[39m
+[90mтФВ[39m
+[32mтЧЗ[39m  Output directory:
+[90mтФВ[39m  F:/Temp/iphone17-v30-topology-rebuild/preview/storybook-static
+[90mтФВ[39m
+[90mтФФ[39m  Storybook build completed successfully

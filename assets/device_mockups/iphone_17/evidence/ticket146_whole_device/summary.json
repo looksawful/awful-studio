@@ -1,0 +1,50 @@
+{
+  "ticket": 146,
+  "status": "TECHNICAL_GREEN_HUMAN_GATE_PENDING",
+  "writer_head": "45cc11b",
+  "source_revision": "9b1913cbd9fa9188dd61c119c7731e4d6ea9aa6ab520e0ca39ee347da65de1f5",
+  "source_commit": "16ae14ec8dcfddcd359e0e1db21d690f033964d5",
+  "compat_sha256": "ba4ef30c68ef93470eff6d8d472d78454ad51f99a727469a8f6d12fa58eda05c",
+  "meshopt_sha256": "57f25b2a72741e7ea630fa5580e112e6f4a40c4a2830813bb901e8690edf7b07",
+  "delivery_blend_sha256": "650aeb1f82fb73d612d7ac9731f589fe93daddc9ac9e41897c9513cb7464f67b",
+  "plugin_bundle_sha256": "82173e9bdfb0c22d521ea939ed4dd7343600bcfdd87e8d3b516ac6414f4b40a3",
+  "mesh_nodes": 51,
+  "node_count": 57,
+  "triangles": 12634,
+  "browser_review_views": 10,
+  "browser_errors": [],
+  "fast_tests": {
+    "passed": 213,
+    "total": 213
+  },
+  "preview_tests": {
+    "passed": 25,
+    "total": 25
+  },
+  "runtime_contracts": {
+    "passed": 17,
+    "total": 17
+  },
+  "storybook_build": "GREEN",
+  "storybook_smoke": "GREEN",
+  "khronos": {
+    "compat": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "meshopt": {
+      "errors": 0,
+      "warnings": 0
+    }
+  },
+  "human_gate": "PENDING",
+  "merge_deploy": "HOLD",
+  "variant_semantics": {
+    "mesh_nodes": 51,
+    "parent_mismatches": 0,
+    "material_mismatches": 0,
+    "max_world_bound_delta_mm": 0.004395274716619164,
+    "tolerance_mm": 0.01,
+    "pass": true
+  }
+}

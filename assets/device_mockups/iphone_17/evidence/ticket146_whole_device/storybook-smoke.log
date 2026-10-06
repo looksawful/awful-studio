@@ -1,0 +1,5 @@
+
+> smoke
+> node tools/smoke-storybook.mjs
+
+Storybook model smoke passed: frozen iPhone + other canonical assets; actual GLB finish/maps, triangle wireframe/render, orbit and zoom verified

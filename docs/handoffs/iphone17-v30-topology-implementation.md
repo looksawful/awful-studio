@@ -909,3 +909,12 @@ Fixed point remains `e5827f735eacd0dc97ee027da5d04059f84620c0`; this section sup
 - Exact GLB SHA-256: compat `ba4ef30c68ef93470eff6d8d472d78454ad51f99a727469a8f6d12fa58eda05c`; Meshopt `57f25b2a72741e7ea630fa5580e112e6f4a40c4a2830813bb901e8690edf7b07`.
 - Plugin bundle SHA-256: `82173e9bdfb0c22d521ea939ed4dd7343600bcfdd87e8d3b516ac6414f4b40a3`.
 - #145 is ready for a local commit/issue close. PR #119 remains HOLD; no merge/deploy or whole-device Human PASS. Next slice: #146 exact whole-device integration.
+
+## Ticket #146 exact whole-device technical gate - 2026-10-06
+
+- Fixed candidate remains writer `45cc11b`, source revision `9b1913cbd9fa9188dd61c119c7731e4d6ea9aa6ab520e0ca39ee347da65de1f5`.
+- Exact compat SHA-256 `ba4ef30c68ef93470eff6d8d472d78454ad51f99a727469a8f6d12fa58eda05c`; Meshopt `57f25b2a72741e7ea630fa5580e112e6f4a40c4a2830813bb901e8690edf7b07`.
+- Exact candidate browser audit: 51 mesh nodes, 57 total nodes, 12,634 triangles, 10 review cameras, five finishes, screen on/off, 0 browser errors.
+- Fresh full gates: fast 213/213; preview 25/25; Blender runtime 17/17; Storybook build GREEN; Storybook smoke GREEN; Khronos compat + Meshopt 0 errors / 0 warnings.
+- Compat/Meshopt semantic identity: 51/51 mesh nodes; no parent/material mismatches; maximum per-mesh world-bound drift 0.0044 mm against a 0.01 mm contract.
+- Technical gate is GREEN. Human Gate is still PENDING. Do not merge/deploy or close #118/#146 until owner visual verdict.

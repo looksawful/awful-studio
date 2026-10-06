@@ -1,0 +1,12 @@
+{
+  "compat_node_count": 57,
+  "meshopt_node_count": 57,
+  "compat_mesh_node_count": 51,
+  "meshopt_mesh_node_count": 51,
+  "parent_mismatches": [],
+  "material_mismatches": [],
+  "max_world_bound_delta_mm": 0.004395274716619164,
+  "worst_world_bound_mesh": "DISPLAY_BEZEL",
+  "tolerance_mm": 0.01,
+  "pass": true
+}
