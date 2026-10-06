@@ -896,3 +896,16 @@ Fixed point remains `e5827f735eacd0dc97ee027da5d04059f84620c0`; this section sup
 - Independent local Standards + Spec reviews return PASS for #144 scope. They do not grant whole-device/Human acceptance.
 - `PR #119` remains HOLD; no push/merge/deploy. Whole-device Human Gate remains after #146.
 - Next after an explicit #144 commit/issue close: #145 production bundle/provenance gaps, then #146 exact whole-device integration.
+
+## Ticket #145 production bundle/provenance closure — 2026-10-06
+
+- Reproduced plugin-bundle leak before the fix: source/plugin each carried 56 meshes, including hidden `BODY_ALUMINUM_HIGH`, `BACK_GLASS_SEAT`, `CAMERA_1_SEAT`, `CAMERA_2_SEAT`; three hidden meshes still had unapplied modifiers. Runtime delivery was already clean at 52 visible meshes.
+- Reproduced provenance gap: the canonical source fingerprint omitted the consumed front-camera detail mask, five immutable control normal maps plus their provenance record, and build/packaging inputs that change delivery identity.
+- Fix: `package_device_asset.py` now has an opt-in `--runtime-visible-only` mode; the iPhone v30 build opts in without changing iPad/MacBook packaging behavior.
+- Rebuilt plugin bundle is 52 visible meshes, 0 hidden meshes, 0 modifiers, 0 HIGH/reference flags. Generated authoring source intentionally retains the four hidden helper/HIGH meshes; delivery and plugin do not.
+- Source fingerprint now covers 27 inputs, including the consumed texture/bake files and `optimize_runtime_v30.py`, `build_iphone17_v30.py`, `package_device_asset.py`, `device_delivery_contract.py`. Control-bake provenance pins SHA-256 for all five maps.
+- New source revision: `9b1913cbd9fa9188dd61c119c7731e4d6ea9aa6ab520e0ca39ee347da65de1f5`.
+- Fresh verification: fast 212/212 GREEN; Blender runtime 17/17 GREEN; Khronos compat and Meshopt 0 errors / 0 warnings.
+- Exact GLB SHA-256: compat `ba4ef30c68ef93470eff6d8d472d78454ad51f99a727469a8f6d12fa58eda05c`; Meshopt `57f25b2a72741e7ea630fa5580e112e6f4a40c4a2830813bb901e8690edf7b07`.
+- Plugin bundle SHA-256: `82173e9bdfb0c22d521ea939ed4dd7343600bcfdd87e8d3b516ac6414f4b40a3`.
+- #145 is ready for a local commit/issue close. PR #119 remains HOLD; no merge/deploy or whole-device Human PASS. Next slice: #146 exact whole-device integration.

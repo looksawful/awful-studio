@@ -29,6 +29,17 @@ SOURCE_FILES = [
     'assets/device_mockups/iphone_17/reference/ios26_home_screen_clean_1206x2622.png',
     'assets/device_mockups/iphone_17/reference/ios26_home_screen_dynamic_state_1206x2622.png',
     'assets/device_mockups/iphone_17/reference/flash_diffuser_v30.png',
+    'assets/device_mockups/iphone_17/reference/front_camera_detail_mask.png',
+    'assets/device_mockups/iphone_17/reference/control_bake_v30/provenance.json',
+    'assets/device_mockups/iphone_17/reference/control_bake_v30/action_button_normal.png',
+    'assets/device_mockups/iphone_17/reference/control_bake_v30/camera_control_normal.png',
+    'assets/device_mockups/iphone_17/reference/control_bake_v30/side_button_normal.png',
+    'assets/device_mockups/iphone_17/reference/control_bake_v30/vol_down_normal.png',
+    'assets/device_mockups/iphone_17/reference/control_bake_v30/vol_up_normal.png',
+    'assets/device_mockups/iphone_17/optimize_runtime_v30.py',
+    'tools/build_iphone17_v30.py',
+    'tools/package_device_asset.py',
+    'tools/device_delivery_contract.py',
 ]
 sys.path.insert(0, str(ROOT / 'tools'))
 from device_delivery_contract import source_fingerprint, sha256_file
@@ -73,7 +84,8 @@ def main():
     bundle = ROOT / 'extension/awful_studio/assets/devices/iphone_17_low_v30.blend'
     run(blender, '--factory-startup', '--background', '--python-exit-code', '7', generated, '--python', ROOT / 'tools/package_device_asset.py', '--',
         '--output', bundle, '--entry', 'AWFUL_DEVICE_IPHONE_17', '--root', 'CTRL_IPHONE_17',
-        '--key', 'IPHONE_17', '--stage', 'LOW_DRAFT', '--variant', 'low_v30', '--revision', revision)
+        '--key', 'IPHONE_17', '--stage', 'LOW_DRAFT', '--variant', 'low_v30', '--revision', revision,
+        '--runtime-visible-only')
     update_iphone_loader_revision(ROOT / 'extension/awful_studio/device_asset_loader.py', revision)
     manifest_path = RUNTIME / 'iphone_17_v30.asset.json'
     manifest = json.loads(manifest_path.read_text(encoding='utf-8'))

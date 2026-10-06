@@ -25,5 +25,12 @@
     "SIDE_BUTTON",
     "CAMERA_CONTROL"
   ],
-  "note": "Immutable production bake inputs. Generator consumes these maps; it does not rebake."
+  "note": "Immutable production bake inputs. Generator consumes these maps; it does not rebake.",
+  "maps": {
+    "action_button_normal.png": "7515f3d1cfc0ac486aacee3cf84cd0bbff8edbf95d47a88512e5f5edc0ff85c1",
+    "camera_control_normal.png": "81a9778a89e9f4b97eb7db6047152cd5da45f86ab81c9765b3ae7bd3784a0c66",
+    "side_button_normal.png": "fa3e5280662eeffe4fe34416ab9fb7bc4723a65bfbbfbd69177f926761192b11",
+    "vol_down_normal.png": "0369f38b122971f4e5d2172a5b31f4b05164f695c568464a83f6c7314f2d2478",
+    "vol_up_normal.png": "626a0f67c4c244ade949ed04ad3287cb49c6a36872bf412cc8ee938c4ed94b78"
+  }
 }

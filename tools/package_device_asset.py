@@ -15,6 +15,7 @@ device_key = arg('--key')
 stage = arg('--stage')
 variant = arg('--variant')
 revision = arg('--revision')
+runtime_visible_only = '--runtime-visible-only' in argv
 root = bpy.data.objects.get(root_name)
 if root is None:
     raise RuntimeError(f'missing root {root_name}')
@@ -26,9 +27,16 @@ def belongs(obj):
             return True
         cur = cur.parent
     return False
-device_objects = [obj for obj in bpy.data.objects if belongs(obj)]
-for obj in list(bpy.data.objects):
+def authorized(obj):
     if not belongs(obj):
+        return False
+    if runtime_visible_only and obj.type == 'MESH' and obj.hide_render:
+        return False
+    return True
+
+device_objects = [obj for obj in bpy.data.objects if authorized(obj)]
+for obj in list(bpy.data.objects):
+    if not authorized(obj):
         bpy.data.objects.remove(obj, do_unlink=True)
 entry = bpy.data.collections.get(entry_name) or bpy.data.collections.new(entry_name)
 if entry.name not in bpy.context.scene.collection.children:
@@ -41,7 +49,8 @@ root['awful_asset_id'] = str(root.get('asset_id', ''))
 root['awful_asset_stage'] = stage
 root['awful_asset_variant'] = variant
 root['awful_device_key'] = device_key
-root['awful_packaging_contract'] = '1.1'
+root['awful_packaging_contract'] = '1.2' if runtime_visible_only else '1.1'
+root['awful_runtime_visible_only'] = runtime_visible_only
 root['awful_source_revision'] = revision
 for collection in list(bpy.data.collections):
     if collection != entry and not collection.objects and not collection.children:

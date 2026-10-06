@@ -21,13 +21,13 @@ Preserve `assets/device_mockups/iphone_17/prototypes/`; it is intentionally untr
 Current cloud authority is newer than the linked local worktree.
 Notion G2 overlay delta: draft PR #132, commit `0d25c1f` stacked on `2f95ad1`; corrected native-pixel overlay calibration; 24/24 focused G2 tests GREEN; Blender construction/deck/ports GREEN; hinge 103/103 states (0..102°) with 0.0 mm³ checked intersections. Canonical v1 rebuild remains blocked until visual review of eight model→Apple overlays.
 Asana task `1218804719095022` (2026-10-05 checkpoint) selects GLB SHA-256 `bc4a4c03f51167a1e7bf789c4ac79cedc446142ecc15fefa7320531c920808d8`, 74,023 triangles, writer `fix/macbook-g2-overlay-calibration @ e39d8d10`; shared preview 25/25 + static Storybook + 11 browser stories + exact hashes GREEN. This is review evidence, not production promotion.
-Local linked worktree currently visible on Titan is `C:\Users\awful\projects\awful-studio-macbook-g2` at `518bb25` on `agent/129-geometry-calibration`; the newer cloud commit IDs were not present in this clone's current refs during recovery. Treat this as STATUS CONFLICT: locate/fetch the exact newer writer before any MacBook write.
+Local linked worktree currently visible on Titan is `awful-studio-macbook-g2` at `518bb25` on `agent/129-geometry-calibration`; the newer cloud commit IDs were not present in this clone's current refs during recovery. Treat this as STATUS CONFLICT: locate/fetch the exact newer writer before any MacBook write.
 
 ## iPad Pro M5 11/13
 Current Notion authority: PR #122 / `agent/51-ipad-control-geometry @ c6c9457e238c65f32e521d8b7234c82d788fc175`. Verified branch evidence includes physical controls, corrected rear optics, recessed USB-C internals, corrected normals, emission-only OLED content with separate reflective glass, bounded viewer depth, regenerated 11/13 assets, 170 fast + 13 preview + Storybook + 11 browser-smoke GREEN.
 Remaining gate: reference-led rear-camera dimensions/silhouette; calibrated native screen UI/site-resume variants; final same-camera LOW visual acceptance. Keep 11/13 independent and do not reopen verified optical/USB/normals/browser-depth/single-surface work without a new failing repro.
 Asana current review snapshots: 11-inch GLB SHA `3640fec046ababec08ef22481705743dbf8a6a60cb0397872020e7daeb83a3dc` / 20,674 tris; 13-inch SHA `7003ee11422a106b379bed8586b94d20d041d20e6d00edf84747048ad2d4a5c0` / 20,682 tris. Both point to `c6c9457 + uncommitted rebuilt source/runtime`; shared preview checks GREEN, Human visual gate still open.
-The only iPad worktree presently linked in this local clone is detached `C:\Users\awful\3d-closeout-temp\ipad-pr122-verify @ 9f3462e`. Treat local-vs-cloud writer identity as STATUS CONFLICT before writes.
+The only iPad worktree presently linked in this local clone is detached `ipad-pr122-verify @ 9f3462e`. Treat local-vs-cloud writer identity as STATUS CONFLICT before writes.
 
 ## Continuation order
 1. Finish #144 from the existing dirty iPhone writer without touching preserved prototypes.
