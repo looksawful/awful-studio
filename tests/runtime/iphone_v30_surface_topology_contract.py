@@ -4,7 +4,9 @@ import bmesh
 import bpy
 
 limits={
-    "BACK_GLASS":136,
+    # #147 replaces the sparse strip cap with a local CDT fill. Keep a hard budget
+    # so quality cannot regress into unbounded tessellation.
+    "BACK_GLASS":800,
     "FRONT_SENSOR_MASK":56,
     "FRONT_CAMERA_MASK":50,
     "FRONT_CAMERA_GLASS":46,

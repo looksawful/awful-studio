@@ -918,3 +918,13 @@ Fixed point remains `e5827f735eacd0dc97ee027da5d04059f84620c0`; this section sup
 - Fresh full gates: fast 213/213; preview 25/25; Blender runtime 17/17; Storybook build GREEN; Storybook smoke GREEN; Khronos compat + Meshopt 0 errors / 0 warnings.
 - Compat/Meshopt semantic identity: 51/51 mesh nodes; no parent/material mismatches; maximum per-mesh world-bound drift 0.0044 mm against a 0.01 mm contract.
 - Technical gate is GREEN. Human Gate is still PENDING. Do not merge/deploy or close #118/#146 until owner visual verdict.
+
+## Ticket #147 BACK_GLASS topology repair — 2026-10-07
+
+- Human Gate topology reject reproduced on the exact pre-fix candidate: min angle 0.071 deg, max aspect 58.97, max visible-cap edge 141.78 mm.
+- BACK_GLASS now uses a deterministic constrained-Delaunay cap fill with the exact rounded-rectangle boundary preserved.
+- Exported visible-cap result: min angle 8.18 deg, max aspect 7.01, max edge 8.81 mm.
+- Quality contract: min angle >= 5 deg, aspect <= 10, max cap edge <= 25% of panel height.
+- Apple dimensions/rear depth, materials/UV/normals, manifold geometry and node identity remain GREEN.
+- Full gates: fast 214/214; Blender runtime 17/17; Khronos compat + Meshopt 0 errors / 0 warnings.
+- #148 BODY_ALUMINUM rail/aperture topology is next. Whole-device Human Gate remains rejected/pending.

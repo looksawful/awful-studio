@@ -4,6 +4,8 @@ import os
 import sys
 import bmesh
 import bpy
+from mathutils import Vector
+from mathutils.geometry import delaunay_2d_cdt
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 COMMON = os.path.normpath(os.path.join(HERE, "..", "common"))
@@ -217,6 +219,131 @@ def rounded_rect_strip_prism_y(name, width, height, depth, radius, material, col
     )
     for index, a in enumerate(boundary):
         b = boundary[(index + 1) % len(boundary)]
+        faces.append((a, b, b + count, a + count))
+
+    mesh = bpy.data.meshes.new(f"{name}_MESH")
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    collection.objects.link(obj)
+    obj.location = location
+    if material:
+        mesh.materials.append(material)
+
+    bm = bmesh.new()
+    bm.from_mesh(mesh)
+    bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
+    bm.to_mesh(mesh)
+    bm.free()
+    mesh.update()
+    return obj
+
+
+
+def rounded_rect_cdt_prism_y(
+    name,
+    width,
+    height,
+    depth,
+    radius,
+    material,
+    collection,
+    location=(0, 0, 0),
+    *,
+    target_step=6.0 * MM,
+    corner_segments=16,
+):
+    """Build a rounded-rectangle prism with local constrained-Delaunay cap triangles."""
+    half_w, half_h = width * 0.5, height * 0.5
+    cx, cz = half_w - radius, half_h - radius
+    if cx <= 0.0 or cz <= 0.0:
+        raise ValueError("rounded rectangle radius must fit inside width/height")
+
+    top_segments = max(1, math.ceil((width - 2.0 * radius) / target_step))
+    side_segments = max(1, math.ceil((height - 2.0 * radius) / target_step))
+    boundary = []
+
+    for index in range(top_segments + 1):
+        x = -cx + (2.0 * cx) * index / top_segments
+        boundary.append((x, half_h))
+    for index in range(1, corner_segments + 1):
+        angle = math.pi * 0.5 - (math.pi * 0.5) * index / corner_segments
+        boundary.append((cx + radius * math.cos(angle), cz + radius * math.sin(angle)))
+    for index in range(1, side_segments + 1):
+        z = cz - (2.0 * cz) * index / side_segments
+        boundary.append((half_w, z))
+    for index in range(1, corner_segments + 1):
+        angle = -(math.pi * 0.5) * index / corner_segments
+        boundary.append((cx + radius * math.cos(angle), -cz + radius * math.sin(angle)))
+    for index in range(1, top_segments + 1):
+        x = cx - (2.0 * cx) * index / top_segments
+        boundary.append((x, -half_h))
+    for index in range(1, corner_segments + 1):
+        angle = -math.pi * 0.5 - (math.pi * 0.5) * index / corner_segments
+        boundary.append((-cx + radius * math.cos(angle), -cz + radius * math.sin(angle)))
+    for index in range(1, side_segments + 1):
+        z = -cz + (2.0 * cz) * index / side_segments
+        boundary.append((-half_w, z))
+    for index in range(1, corner_segments):
+        angle = math.pi - (math.pi * 0.5) * index / corner_segments
+        boundary.append((-cx + radius * math.cos(angle), cz + radius * math.sin(angle)))
+
+    coords = [Vector(point) for point in boundary]
+    boundary_count = len(coords)
+    x_cells = max(2, math.floor(width / target_step))
+    z_cells = max(2, math.floor(height / target_step))
+    margin = min(0.4 * MM, target_step * 0.1)
+
+    def inside_cap(x, z):
+        ax, az = abs(x), abs(z)
+        if ax > half_w - margin or az > half_h - margin:
+            return False
+        if ax <= cx or az <= cz:
+            return True
+        return (ax - cx) ** 2 + (az - cz) ** 2 <= (radius - margin) ** 2
+
+    for z_index in range(z_cells):
+        z = -half_h + (z_index + 0.5) * height / z_cells
+        for x_index in range(x_cells):
+            x = -half_w + (x_index + 0.5) * width / x_cells
+            if inside_cap(x, z):
+                coords.append(Vector((x, z)))
+
+    boundary_edges = [
+        (index, (index + 1) % boundary_count)
+        for index in range(boundary_count)
+    ]
+    result = delaunay_2d_cdt(
+        coords,
+        boundary_edges,
+        [list(range(boundary_count))],
+        1,
+        1e-9,
+        True,
+    )
+    cap_coords, _, cap_faces, source_vertices, _, _ = result
+    cap_faces = [tuple(face) for face in cap_faces if len(face) == 3]
+    if not cap_faces:
+        raise RuntimeError(f"{name}: constrained Delaunay cap produced no triangles")
+
+    output_for_source = {}
+    for output_index, source_indices in enumerate(source_vertices):
+        for source_index in source_indices:
+            output_for_source[source_index] = output_index
+    boundary_output = [output_for_source[index] for index in range(boundary_count)]
+
+    count = len(cap_coords)
+    verts = (
+        [(point.x, -depth * 0.5, point.y) for point in cap_coords]
+        + [(point.x, depth * 0.5, point.y) for point in cap_coords]
+    )
+    faces = list(cap_faces)
+    faces.extend(
+        tuple(index + count for index in reversed(face))
+        for face in cap_faces
+    )
+    for index, a in enumerate(boundary_output):
+        b = boundary_output[(index + 1) % boundary_count]
         faces.append((a, b, b + count, a + count))
 
     mesh = bpy.data.meshes.new(f"{name}_MESH")
@@ -553,7 +680,7 @@ back_seat = outward_prism("BACK_GLASS_SEAT", COVER_W + 0.12*MM, COVER_H + 0.12*M
                              COVER_R + 0.06*MM, gap_mat, body_c, axis="Y",
                              location=(0, METAL_D*0.5 + 0.012*MM, 0), outline_segments=48)
 back_seat.hide_render = True
-back_glass = rounded_rect_strip_prism_y(
+back_glass = rounded_rect_cdt_prism_y(
     "BACK_GLASS",
     COVER_W,
     COVER_H,
@@ -562,7 +689,8 @@ back_glass = rounded_rect_strip_prism_y(
     back_mat,
     body_c,
     location=(0, back_y, 0),
-    segments=16,
+    target_step=6.0 * MM,
+    corner_segments=16,
 )
 
 front_seat = display_frame_prism_y(
