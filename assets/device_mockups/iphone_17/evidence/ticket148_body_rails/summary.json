@@ -1,0 +1,41 @@
+{
+  "ticket": 148,
+  "status": "GREEN",
+  "before": {
+    "min_angle_deg": 0.01582774675459956,
+    "max_aspect": 2798.844018883372,
+    "side_p95_aspect": 159.47678383079236
+  },
+  "after": {
+    "triangles": 794,
+    "min_angle_deg": 5.927195412761857,
+    "max_aspect": 9.683855021910636,
+    "max_edge_mm": 60.01452271939738
+  },
+  "quality_contract": {
+    "min_angle_deg": 5.0,
+    "max_aspect": 10.0
+  },
+  "source_revision": "bbcbb93ce541dcaeccc93470770df69f6fa77514cd7182c5fdb8c2dcc861c507",
+  "compat_sha256": "e8678121f510844abda164d714ac45a7abbf129aad408ee355c7a4a137eb920d",
+  "meshopt_sha256": "054b341fb92b587b105952b318681450de268186c6812b44ad247337a24185bf",
+  "fast_tests": {
+    "passed": 216,
+    "total": 216
+  },
+  "runtime_contracts": {
+    "passed": 17,
+    "total": 17
+  },
+  "khronos": {
+    "compat": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "meshopt": {
+      "errors": 0,
+      "warnings": 0
+    }
+  },
+  "scope": "BODY_ALUMINUM side rails/aperture cells only; bottom cells intentionally unchanged for #149"
+}

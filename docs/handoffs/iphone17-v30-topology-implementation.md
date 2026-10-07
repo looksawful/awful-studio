@@ -928,3 +928,12 @@ Fixed point remains `e5827f735eacd0dc97ee027da5d04059f84620c0`; this section sup
 - Apple dimensions/rear depth, materials/UV/normals, manifold geometry and node identity remain GREEN.
 - Full gates: fast 214/214; Blender runtime 17/17; Khronos compat + Meshopt 0 errors / 0 warnings.
 - #148 BODY_ALUMINUM rail/aperture topology is next. Whole-device Human Gate remains rejected/pending.
+
+## Ticket #148 BODY_ALUMINUM rail/aperture topology - 2026-10-07
+
+- Human Gate topology reject is being repaired under the owner-confirmed visible-surface seam: min angle >= 5 deg, aspect <= 10.
+- Side annulus cells now use 44 uniform rays instead of clustered authored/corner angles, with explicit per-quad quality diagonals.
+- Main shell gains one depth split on full-depth curved rail edges; Apple silhouette/datums and already-good control geometry are preserved.
+- Exact compat BODY_ALUMINUM side surfaces: 794 triangles, min angle 5.9272 deg, max aspect 9.6839.
+- Full fast 216/216 GREEN; Blender runtime 17/17 GREEN; Khronos compat + Meshopt 0 errors / 0 warnings.
+- Bottom cells remain intentionally unchanged and are #149 scope. Whole-device #146 remains rejected/pending.

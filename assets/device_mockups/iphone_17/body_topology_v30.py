@@ -62,6 +62,95 @@ def _matched_annulus_loops(xa, xb, ya, yb, hole, base_segments=16):
     return outer, inner
 
 
+def _uniform_annulus_loops(xa, xb, ya, yb, hole, segments=44):
+    """Sample a convex hole and rectangular cell on the same uniform rays.
+
+    Unlike _matched_annulus_loops, this deliberately avoids injecting every
+    authored/corner angle into the correspondence. Those clustered angles are
+    what created needle-like radial cells around narrow controls.
+    """
+    cx = sum(x for x, _ in hole) / len(hole)
+    cy = sum(y for _, y in hole) / len(hole)
+    outer, inner = [], []
+    for index in range(segments):
+        angle = 2.0 * math.pi * index / segments
+        dx, dy = math.cos(angle), math.sin(angle)
+        tx = ((xb - cx) if dx > 0 else (xa - cx)) / dx if abs(dx) > 1e-12 else 1e30
+        ty = ((yb - cy) if dy > 0 else (ya - cy)) / dy if abs(dy) > 1e-12 else 1e30
+        outer_t = min(value for value in (tx, ty) if value > 0)
+        outer.append((cx + dx * outer_t, cy + dy * outer_t))
+
+        lo, hi = 0.0, outer_t
+        for _ in range(64):
+            mid = (lo + hi) * 0.5
+            if _point_in_polygon(cx + dx * mid, cy + dy * mid, hole):
+                lo = mid
+            else:
+                hi = mid
+        inner.append((cx + dx * lo, cy + dy * lo))
+    return outer, inner
+
+
+def _triangle_quality_2d(a, b, c):
+    lengths = (
+        math.dist(a, b),
+        math.dist(b, c),
+        math.dist(c, a),
+    )
+    if min(lengths) <= 1e-14:
+        return 0.0, float("inf")
+    angles = []
+    for point, first, second in ((a, b, c), (b, c, a), (c, a, b)):
+        ux, uy = first[0] - point[0], first[1] - point[1]
+        vx, vy = second[0] - point[0], second[1] - point[1]
+        denominator = math.hypot(ux, uy) * math.hypot(vx, vy)
+        cosine = (ux * vx + uy * vy) / denominator
+        angles.append(math.degrees(math.acos(max(-1.0, min(1.0, cosine)))))
+    return min(angles), max(lengths) / min(lengths)
+
+
+def _quality_shell_faces(outer_loop, hole_loop):
+    """Extrude an annulus while pinning the better cap diagonal per segment."""
+    count = len(hole_loop)
+    if len(outer_loop) != count:
+        raise ValueError("annulus loops must have the same vertex count")
+    faces, materials = [], []
+    for index in range(count):
+        nxt = (index + 1) % count
+        oi, oj = outer_loop[index], outer_loop[nxt]
+        hi, hj = hole_loop[index], hole_loop[nxt]
+        first = (
+            _triangle_quality_2d(oi, oj, hj),
+            _triangle_quality_2d(oi, hj, hi),
+        )
+        second = (
+            _triangle_quality_2d(oi, oj, hi),
+            _triangle_quality_2d(oj, hj, hi),
+        )
+        first_min = min(metric[0] for metric in first)
+        second_min = min(metric[0] for metric in second)
+        if first_min >= second_min:
+            faces.extend((
+                (index, nxt, count + nxt),
+                (index, count + nxt, count + index),
+                (3 * count + nxt, 3 * count + index, 2 * count + index),
+                (3 * count + nxt, 2 * count + index, 2 * count + nxt),
+            ))
+        else:
+            faces.extend((
+                (index, nxt, count + index),
+                (nxt, count + nxt, count + index),
+                (3 * count + nxt, 3 * count + index, 2 * count + nxt),
+                (3 * count + index, 2 * count + index, 2 * count + nxt),
+            ))
+        faces.extend((
+            (nxt, index, 2 * count + index, 2 * count + nxt),
+            (count + index, count + nxt, 3 * count + nxt, 3 * count + index),
+        ))
+        materials.extend((0, 0, 1, 1, 1, 1))
+    return faces, materials
+
+
 def _circle(cx, radius, segments=16):
     return [
         (
@@ -168,6 +257,38 @@ def _refine_main_rail_edges(bm, target_length):
                 cuts=cuts,
                 use_grid_fill=True,
             )
+
+    # Subdivision can replace the original BMVerts. Re-resolve the main
+    # connected component before selecting depth edges.
+    seed = min(bm.verts, key=lambda vertex: (vertex.co - seed_position).length_squared)
+    component = {seed}
+    queue = [seed]
+    while queue:
+        vertex = queue.pop()
+        for edge in vertex.link_edges:
+            other = edge.other_vert(vertex)
+            if other not in component:
+                component.add(other)
+                queue.append(other)
+
+    # The curved outer rail uses short Apple-profile segments across the full
+    # 7.25 mm device depth. Split only those main-shell depth edges once so
+    # exported corner triangles do not become long needles.
+    component_depth_edges = []
+    for edge in list(bm.edges):
+        if edge.verts[0] not in component or edge.verts[1] not in component:
+            continue
+        delta = edge.verts[1].co - edge.verts[0].co
+        length = delta.length
+        if length > 4.0 * 0.001 and abs(delta.y) / length > 0.98:
+            component_depth_edges.append(edge)
+    if component_depth_edges:
+        bmesh.ops.subdivide_edges(
+            bm,
+            edges=component_depth_edges,
+            cuts=1,
+            use_grid_fill=True,
+        )
 
     bm.normal_update()
     introduced_ngons = [face for face in bm.faces if len(face.verts) > 4]
@@ -336,14 +457,12 @@ def build_body_mesh(
     def side_cell(side, zlo, zhi, hole, thickness=0.01 * mm):
         outer_x = -width * 0.5 if side == "L" else width * 0.5
         inward = 1 if side == "L" else -1
-        outer_loop, hole_loop = _matched_annulus_loops(y0, y1, zlo, zhi, hole, base_segments=32)
-        n = len(hole_loop)
+        outer_loop, hole_loop = _uniform_annulus_loops(y0, y1, zlo, zhi, hole, segments=44)
         verts = []
         for x in (outer_x, outer_x + inward * thickness):
             verts.extend((x, y, z) for y, z in outer_loop)
             verts.extend((x, y, z) for y, z in hole_loop)
-        fs = _shell_faces(n)
-        mats = [0 if index % 4 == 0 else 1 for index in range(len(fs))]
+        fs, mats = _quality_shell_faces(outer_loop, hole_loop)
         _append_component(master_vertices, master_faces, master_materials, verts, fs, mats)
 
     def side_fill(side, zlo, zhi, thickness=0.01 * mm):
@@ -377,15 +496,15 @@ def build_body_mesh(
 
     flat_lo, flat_hi = -55.575*mm, 55.575*mm
     side_fill("L", flat_lo, 4*mm)
-    side_cell("L", 4*mm, 19.47*mm, _capsule(12.37*mm, 3.04*mm, 11.76*mm))
-    side_cell("L", 19.47*mm, 33.645*mm, _capsule(26.57*mm, 3.04*mm, 11.76*mm))
-    side_cell("L", 33.645*mm, 48*mm, _capsule(40.72*mm, 3.04*mm, 7.46*mm))
+    side_cell("L", 4*mm, 19.47*mm, _capsule(12.37*mm, 3.04*mm, 11.76*mm, steps=64))
+    side_cell("L", 19.47*mm, 33.645*mm, _capsule(26.57*mm, 3.04*mm, 11.76*mm, steps=64))
+    side_cell("L", 33.645*mm, 48*mm, _capsule(40.72*mm, 3.04*mm, 7.46*mm, steps=64))
     side_fill("L", 48*mm, flat_hi)
 
     side_fill("R", flat_lo, -36*mm)
-    side_cell("R", -36*mm, -10*mm, _capsule(-23.40*mm, 3.41*mm, 17.66*mm))
+    side_cell("R", -36*mm, -10*mm, _capsule(-23.40*mm, 3.41*mm, 17.66*mm, steps=64))
     side_fill("R", -10*mm, 6*mm)
-    side_cell("R", 6*mm, 32*mm, _capsule(19.48*mm, 3.04*mm, 18.26*mm))
+    side_cell("R", 6*mm, 32*mm, _capsule(19.48*mm, 3.04*mm, 18.26*mm, steps=64))
     side_fill("R", 32*mm, flat_hi)
 
     mesh = bpy.data.meshes.new(name + "_MESH")
@@ -399,7 +518,7 @@ def build_body_mesh(
     bm = bmesh.new()
     bm.from_mesh(mesh)
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
-    _refine_main_rail_edges(bm, 14.0 * mm)
+    _refine_main_rail_edges(bm, 12.0 * mm)
     bm.to_mesh(mesh)
     bm.free()
     mesh.update()

@@ -19,8 +19,8 @@
     "height": -2e-06
   },
   "body_non_manifold_edges": 0,
-  "body_vertices": 2944,
-  "body_faces": 3250,
+  "body_vertices": 2780,
+  "body_faces": 3542,
   "boolean_cuts": [
     "DISPLAY_POCKET",
     "SCREEN_ACTIVE",

@@ -102,6 +102,42 @@ def visible_cap_metrics(doc, blob, node_name, normal_axis):
     }
 
 
+def material_surface_metrics(doc, blob, node_name, material_name, *, excluded_normal_axis=None, required_normal_axis=None):
+    node = next(node for node in doc["nodes"] if node.get("name") == node_name)
+    mesh = doc["meshes"][node["mesh"]]
+    material_names = [material.get("name") for material in doc.get("materials", [])]
+    metrics = []
+    for primitive in mesh["primitives"]:
+        material_index = primitive.get("material")
+        if material_index is None or material_names[material_index] != material_name:
+            continue
+        positions = accessor_values(doc, blob, primitive["attributes"]["POSITION"])
+        indices = [value[0] for value in accessor_values(doc, blob, primitive["indices"])]
+        for offset in range(0, len(indices), 3):
+            points = [positions[indices[offset + step]] for step in range(3)]
+            first = _subtract(points[1], points[0])
+            second = _subtract(points[2], points[0])
+            normal = _cross(first, second)
+            normal_length = _length(normal)
+            if normal_length <= 1e-15:
+                metrics.append((0.0, float("inf"), 0.0))
+                continue
+            unit_axis = [abs(value / normal_length) for value in normal]
+            if excluded_normal_axis is not None and unit_axis[excluded_normal_axis] >= 0.9:
+                continue
+            if required_normal_axis is not None and unit_axis[required_normal_axis] < 0.9:
+                continue
+            metrics.append(triangle_metrics(points))
+    if not metrics:
+        raise AssertionError(f"{node_name}/{material_name} has no target triangles")
+    return {
+        "triangles": len(metrics),
+        "min_angle_deg": min(value[0] for value in metrics),
+        "max_aspect": max(value[1] for value in metrics),
+        "max_edge_mm": max(value[2] for value in metrics),
+    }
+
+
 class IPhoneTopologyQualityContractTests(unittest.TestCase):
     def test_back_glass_major_caps_use_local_well_shaped_triangles(self):
         doc, blob = read_glb(GLB)
@@ -110,6 +146,19 @@ class IPhoneTopologyQualityContractTests(unittest.TestCase):
         self.assertGreaterEqual(metrics["min_angle_deg"], 5.0, metrics)
         self.assertLessEqual(metrics["max_aspect"], 10.0, metrics)
         self.assertLessEqual(metrics["max_edge_mm"], 147.61 * 0.25, metrics)
+
+    def test_body_visible_rail_and_aperture_surfaces_use_well_shaped_triangles(self):
+        doc, blob = read_glb(GLB)
+        metrics = material_surface_metrics(
+            doc,
+            blob,
+            "BODY_ALUMINUM",
+            "MAT_ANODIZED_ALUMINUM",
+            required_normal_axis=0,
+        )
+
+        self.assertGreaterEqual(metrics["min_angle_deg"], 5.0, metrics)
+        self.assertLessEqual(metrics["max_aspect"], 10.0, metrics)
 
 
 if __name__ == "__main__":
