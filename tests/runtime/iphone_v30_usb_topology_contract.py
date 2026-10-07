@@ -97,7 +97,8 @@ for name in names:
         assert face['exported_triangles'] == face['expected_triangles'], (
             name, 'authored face triangulation count changed', face,
         )
-        tolerance = max(1e-12, face['area'] * 1e-5)
+        # GLB positions are float32; tiny physical bevel faces need a small absolute area floor.
+        tolerance = max(2e-12, face['area'] * 1e-5)
         assert abs(face['exported_area'] - face['area']) <= tolerance, (
             name, 'exported triangles do not cover authored face area', face,
         )

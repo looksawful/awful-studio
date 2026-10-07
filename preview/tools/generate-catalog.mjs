@@ -6,8 +6,7 @@ const previewRoot = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
 const repoRoot = path.resolve(previewRoot, '..');
 const output = path.join(previewRoot, 'generated', 'asset-catalog.json');
 
-const reviewDevices = [
-  'preview/generated/iphone-review/human-gate-2026-10-06/asset.json',
+const reviewDevicePaths = [
   'preview/generated/device-review/current-2026-10-05/ipad_pro_11_m5_v6/asset.json',
   'preview/generated/device-review/current-2026-10-05/ipad_pro_13_m5_v6/asset.json',
   'preview/generated/device-review/current-2026-10-05/macbook_pro_14_m5_v1/asset.json',
@@ -20,6 +19,27 @@ const sceneConfigs = [
 ];
 
 const readJson = (relative) => JSON.parse(fs.readFileSync(path.join(repoRoot, relative), 'utf8'));
+
+function iphoneReviewEntry() {
+  const review = readJson('preview/generated/iphone-review/frozen-current-2026-10-05/asset.json');
+  const manifest = readJson('assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30.asset.json');
+  const sha256 = manifest.artifacts.compat_glb.sha256;
+  return {
+    ...review,
+    label: `iPhone 17 - HUMAN GATE #146 (${sha256.slice(0, 8)})`,
+    previewGlb: manifest.artifacts.compat_glb.path,
+    sourceRevision: manifest.source_revision,
+    sourceCommit: manifest.source_commit,
+    triangleCount: manifest.glb_qa.triangle_count,
+    materialCount: manifest.glb_qa.material_count,
+    snapshotCommit: manifest.source_commit,
+    snapshotBranch: 'agent/118-topology-rebuild-v2',
+    snapshotSourceDirty: false,
+    evidenceArchive: null,
+    sha256,
+    reviewStatus: 'HUMAN GATE #146 - OWNER VERDICT REQUIRED',
+  };
+}
 const studioLabels = {
   studio_support_cstand_01: 'C-Stand',
   profoto_d1_500_air: 'Profoto D1 500 Air',
@@ -63,7 +83,8 @@ function sceneEntry([id, label, metadataPath, sourceBlend]) {
   };
 }
 const assets = [
-  ...reviewDevices.map(readJson),
+  iphoneReviewEntry(),
+  ...reviewDevicePaths.map(readJson),
   ...studioEntries(),
   ...sceneConfigs.map(sceneEntry),
 ];
@@ -77,7 +98,7 @@ for (const asset of assets) {
 
 const catalog = {
   schemaVersion: 1,
-  generatedFrom: 'pinned device review snapshots; canonical studio and scene manifests',
+  generatedFrom: 'canonical iPhone runtime manifest; pinned device review snapshots; canonical studio and scene manifests',
   assets,
 };
 const serialized = `${JSON.stringify(catalog, null, 2)}\n`;

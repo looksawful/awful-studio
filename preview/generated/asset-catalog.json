@@ -1,21 +1,21 @@
 {
   "schemaVersion": 1,
-  "generatedFrom": "pinned device review snapshots; canonical studio and scene manifests",
+  "generatedFrom": "canonical iPhone runtime manifest; pinned device review snapshots; canonical studio and scene manifests",
   "assets": [
     {
       "id": "iphone-17-v30",
-      "label": "iPhone 17 - HUMAN GATE #146 (ba4ef30c)",
+      "label": "iPhone 17 - HUMAN GATE #146 (ca525c5d)",
       "group": "Devices",
       "version": "v30",
       "stage": "LOW_DRAFT",
       "root": "CTRL_IPHONE_17",
       "sourceBlend": "assets/device_mockups/iphone_17/generated/iphone_17_low_v30.blend",
-      "previewGlb": "assets/iphone-review/human-gate-2026-10-06/model.glb",
+      "previewGlb": "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb",
       "lods": [],
       "collision": null,
-      "sourceRevision": "9b1913cbd9fa9188dd61c119c7731e4d6ea9aa6ab520e0ca39ee347da65de1f5",
-      "sourceCommit": "16ae14ec8dcfddcd359e0e1db21d690f033964d5",
-      "triangleCount": 12634,
+      "sourceRevision": "0373f2b4899d2dbf1af7710895439021593004036239916c8de4894637c038a9",
+      "sourceCommit": "c0d6198b65903d723074a044c623f7f582f0d316",
+      "triangleCount": 12738,
       "materialCount": 24,
       "animations": [],
       "screenStates": {
@@ -38,8 +38,8 @@
       "reviewOnly": true,
       "frozenReview": true,
       "topologyAccepted": false,
-      "snapshotCommit": "61404d6",
-      "sha256": "ba4ef30c68ef93470eff6d8d472d78454ad51f99a727469a8f6d12fa58eda05c",
+      "snapshotCommit": "c0d6198b65903d723074a044c623f7f582f0d316",
+      "sha256": "ca525c5d164294f2f40ad2c7228a0bbb8b24cd2a8ee32cba8915d31337da6f80",
       "reviewParts": [
         {
           "id": "panels_and_display",
@@ -147,7 +147,7 @@
           ]
         }
       ],
-      "evidenceArchive": "assets/device_mockups/iphone_17/evidence/ticket146_whole_device/",
+      "evidenceArchive": null,
       "reviewMaterialPolicies": {
         "MAT_ANODIZED_ALUMINUM_ACTION_BUTTON": {
           "frontSide": true,
@@ -317,9 +317,9 @@
         "background": "#111111",
         "perspectiveFov": 35
       },
-      "reviewStatus": "HUMAN GATE #146 - OWNER VERDICT REQUIRED",
       "snapshotBranch": "agent/118-topology-rebuild-v2",
-      "snapshotSourceDirty": true
+      "snapshotSourceDirty": false,
+      "reviewStatus": "HUMAN GATE #146 - OWNER VERDICT REQUIRED"
     },
     {
       "id": "ipad-pro-11-m5-v6",

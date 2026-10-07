@@ -131,7 +131,7 @@ async function checkStory(id, assetId, expectedClips = []) {
   if (assetId === 'iphone-17-v30') {
     if (id === 'models-devices--i-phone-17') {
       const identity = await viewer.evaluate(element => ({ asset: element.asset, verified: element.dataset.snapshotVerified }));
-      if (!identity.asset.frozenReview || identity.verified !== 'ba4ef30c68ef93470eff6d8d472d78454ad51f99a727469a8f6d12fa58eda05c') throw new Error('Primary iPhone story is not the verified #146 Human Gate candidate');
+      if (!identity.asset.frozenReview || identity.verified !== identity.asset.sha256) throw new Error('Primary iPhone story is not the verified #146 Human Gate candidate');
       const profile = await viewer.evaluate(element => ({ exposure: element._renderer.toneMappingExposure, fov: element._perspective.fov, environment: element._scene.environmentIntensity, light: element._viewLight.intensity }));
       if (profile.exposure !== .7 || profile.fov !== 35 || profile.environment !== 1 || profile.light !== .65) throw new Error('Human Gate renderer profile changed');
       const part = page.locator('awful-model-viewer select[data-control="part"]');
@@ -265,7 +265,7 @@ async function checkStory(id, assetId, expectedClips = []) {
 
 async function rejectChangedReviewStory() {
   const page = await browser.newPage();
-  await page.route('**/assets/iphone-review/human-gate-2026-10-06/model.glb', async route => {
+  await page.route('**/assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb', async route => {
     const response = await route.fetch();
     const body = await response.body();
     body[body.length - 1] ^= 1;

@@ -9,6 +9,7 @@ const previewRoot = fileURLToPath(new URL('..', import.meta.url));
 const repoRoot = path.resolve(previewRoot, '..');
 const generator = path.join(previewRoot, 'tools', 'generate-catalog.mjs');
 const catalogPath = path.join(previewRoot, 'generated', 'asset-catalog.json');
+const iphoneManifestPath = path.join(repoRoot, 'assets', 'device_mockups', 'iphone_17', 'runtime', 'v30', 'iphone_17_v30.asset.json');
 
 const runGenerator = (...args) => spawnSync(process.execPath, [generator, ...args], {
   cwd: repoRoot,
@@ -37,6 +38,13 @@ test('catalog generator produces only canonical model inventory', () => {
     'LOW_DRAFT',
     'RELEASE_CANDIDATE',
   ]);
+
+  const iphone = devices[0];
+  const iphoneManifest = JSON.parse(readFileSync(iphoneManifestPath, 'utf8'));
+  assert.equal(iphone.sha256, iphoneManifest.artifacts.compat_glb.sha256);
+  assert.equal(iphone.previewGlb, iphoneManifest.artifacts.compat_glb.path);
+  assert.equal(iphone.sourceRevision, iphoneManifest.source_revision);
+  assert.equal(iphone.sourceCommit, iphoneManifest.source_commit);
 
   const studio = catalog.assets.filter((asset) => asset.group === 'Studio Equipment');
   assert.equal(studio.length, 4);
