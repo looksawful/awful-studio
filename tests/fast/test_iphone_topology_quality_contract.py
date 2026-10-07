@@ -102,15 +102,16 @@ def visible_cap_metrics(doc, blob, node_name, normal_axis):
     }
 
 
-def material_surface_metrics(doc, blob, node_name, material_name, *, excluded_normal_axis=None, required_normal_axis=None):
+def material_surface_metrics(doc, blob, node_name, material_name=None, *, excluded_normal_axis=None, required_normal_axis=None, normal_threshold=0.9, centroid_axis=None, centroid_max_mm=None):
     node = next(node for node in doc["nodes"] if node.get("name") == node_name)
     mesh = doc["meshes"][node["mesh"]]
     material_names = [material.get("name") for material in doc.get("materials", [])]
     metrics = []
     for primitive in mesh["primitives"]:
         material_index = primitive.get("material")
-        if material_index is None or material_names[material_index] != material_name:
-            continue
+        if material_name is not None:
+            if material_index is None or material_names[material_index] != material_name:
+                continue
         positions = accessor_values(doc, blob, primitive["attributes"]["POSITION"])
         indices = [value[0] for value in accessor_values(doc, blob, primitive["indices"])]
         for offset in range(0, len(indices), 3):
@@ -123,10 +124,14 @@ def material_surface_metrics(doc, blob, node_name, material_name, *, excluded_no
                 metrics.append((0.0, float("inf"), 0.0))
                 continue
             unit_axis = [abs(value / normal_length) for value in normal]
-            if excluded_normal_axis is not None and unit_axis[excluded_normal_axis] >= 0.9:
+            if excluded_normal_axis is not None and unit_axis[excluded_normal_axis] >= normal_threshold:
                 continue
-            if required_normal_axis is not None and unit_axis[required_normal_axis] < 0.9:
+            if required_normal_axis is not None and unit_axis[required_normal_axis] < normal_threshold:
                 continue
+            if centroid_axis is not None and centroid_max_mm is not None:
+                centroid_mm = sum(point[centroid_axis] for point in points) / 3.0 * 1000.0
+                if centroid_mm > centroid_max_mm:
+                    continue
             metrics.append(triangle_metrics(points))
     if not metrics:
         raise AssertionError(f"{node_name}/{material_name} has no target triangles")
@@ -159,6 +164,33 @@ class IPhoneTopologyQualityContractTests(unittest.TestCase):
 
         self.assertGreaterEqual(metrics["min_angle_deg"], 5.0, metrics)
         self.assertLessEqual(metrics["max_aspect"], 10.0, metrics)
+
+    def test_bottom_visible_cells_use_well_shaped_triangles(self):
+        doc, blob = read_glb(GLB)
+        metrics = material_surface_metrics(
+            doc,
+            blob,
+            "BODY_ALUMINUM",
+            "MAT_ANODIZED_ALUMINUM",
+            centroid_axis=1,
+            centroid_max_mm=-74.70,
+        )
+        self.assertGreaterEqual(metrics["min_angle_deg"], 5.0, metrics)
+        self.assertLessEqual(metrics["max_aspect"], 10.0, metrics)
+
+    def test_usb_major_visible_surfaces_use_well_shaped_triangles(self):
+        doc, blob = read_glb(GLB)
+        for node_name in ("USB_C_CAVITY", "USB_C_TONGUE"):
+            with self.subTest(node=node_name):
+                metrics = material_surface_metrics(
+                    doc,
+                    blob,
+                    node_name,
+                    required_normal_axis=1,
+                    normal_threshold=0.99,
+                )
+                self.assertGreaterEqual(metrics["min_angle_deg"], 5.0, metrics)
+                self.assertLessEqual(metrics["max_aspect"], 10.0, metrics)
 
 
 if __name__ == "__main__":

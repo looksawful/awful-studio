@@ -1221,15 +1221,35 @@ place_on_apple_bottom(usb_cavity, 0.0, outward=-1.40*MM, preserve_depth_axis=Tru
 usb_tongue = fc.rounded_cube("USB_C_TONGUE", (5.25*MM, 0.48*MM, 0.18*MM), 0.08*MM, metal_dark, detail_c)
 place_on_apple_bottom(usb_tongue, 0.0, outward=-0.80*MM, preserve_depth_axis=True)
 
-# Save the physical USB bevel and its export diagonals in the authored mesh.
-# Small cavity and tongue radii need two and three spans respectively.
+# Materialize the physical USB bevel. Preserve quads where possible: forcing
+# every face to triangles created needle diagonals across the broad visible
+# cavity/tongue surfaces. Only residual n-gons need an authored BEAUTY split.
 for usb_part, bevel_segments in ((usb_cavity, 2), (usb_tongue, 3)):
     usb_part.modifiers["EDGE_BEVEL"].segments = bevel_segments
     bpy.context.view_layer.objects.active = usb_part
     bpy.ops.object.modifier_apply(modifier="EDGE_BEVEL")
     bm = bmesh.new()
     bm.from_mesh(usb_part.data)
-    bmesh.ops.triangulate(bm, faces=list(bm.faces), quad_method="BEAUTY", ngon_method="BEAUTY")
+    bm.normal_update()
+    if usb_part is usb_tongue:
+        # The tongue's central face is ~5.09 x 0.32 mm after bevel. One
+        # mid-length split keeps its exported triangles under the visible
+        # hard-surface 5 deg / 10 aspect quality contract.
+        long_major_edges = [
+            edge for edge in bm.edges
+            if edge.calc_length() > 4.0 * MM
+            and any(abs(face.normal.z) > 0.99 for face in edge.link_faces)
+        ]
+        bmesh.ops.subdivide_edges(
+            bm,
+            edges=long_major_edges,
+            cuts=1,
+            use_grid_fill=True,
+        )
+        bm.normal_update()
+    ngons = [face for face in bm.faces if len(face.verts) > 4]
+    if ngons:
+        bmesh.ops.triangulate(bm, faces=ngons, quad_method="BEAUTY", ngon_method="BEAUTY")
     bm.to_mesh(usb_part.data)
     bm.free()
     usb_part.data.update()

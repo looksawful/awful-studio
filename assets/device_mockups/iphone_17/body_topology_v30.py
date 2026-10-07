@@ -422,19 +422,16 @@ def build_body_mesh(
     bottom_z = -height * 0.5
 
     def flat_bottom_cell(xa, xb, hole, thickness=0.01 * mm):
-        outer_loop, hole_loop = _matched_annulus_loops(xa, xb, y0, y1, hole)
-        n = len(hole_loop)
+        outer_loop, hole_loop = _uniform_annulus_loops(xa, xb, y0, y1, hole, segments=12)
         verts = []
         for z in (bottom_z, bottom_z + thickness):
             verts.extend((x, y, z) for x, y in outer_loop)
             verts.extend((x, y, z) for x, y in hole_loop)
-        fs = _shell_faces(n)
-        mats = [0 if index % 4 == 0 else 1 for index in range(len(fs))]
+        fs, mats = _quality_shell_faces(outer_loop, hole_loop)
         _append_component(master_vertices, master_faces, master_materials, verts, fs, mats)
 
     def curved_bottom_cell(xa, xb, hole, thickness=0.01 * mm):
-        outer_loop, hole_loop = _matched_annulus_loops(xa, xb, y0, y1, hole)
-        n = len(hole_loop)
+        outer_loop, hole_loop = _uniform_annulus_loops(xa, xb, y0, y1, hole, segments=12)
 
         def surface(point, back=False):
             x, y = point
@@ -450,8 +447,7 @@ def build_body_mesh(
             + [surface(point, True) for point in outer_loop]
             + [surface(point, True) for point in hole_loop]
         )
-        fs = _shell_faces(n)
-        mats = [0 if index % 4 == 0 else 1 for index in range(len(fs))]
+        fs, mats = _quality_shell_faces(outer_loop, hole_loop)
         _append_component(master_vertices, master_faces, master_materials, verts, fs, mats)
 
     def side_cell(side, zlo, zhi, hole, thickness=0.01 * mm):
@@ -477,22 +473,22 @@ def build_body_mesh(
         _append_component(master_vertices, master_faces, master_materials, verts, fs, mats)
 
     for xa, xb, hole in (
-        (-15.0*mm, -12.6325*mm, _circle(-13.760*mm, .675*mm)),
-        (-12.6325*mm, -9.215*mm, _circle(-11.505*mm, .675*mm)),
-        (-9.215*mm, -5.2*mm, _circle(-6.925*mm, .78*mm)),
-        (-5.2*mm, 5.2*mm, _rounded_rect(0, 8.99*mm, 3.00*mm, .91*mm)),
-        (5.2*mm, 9.215*mm, _circle(6.925*mm, .78*mm)),
-        (9.215*mm, 12.6325*mm, _circle(11.505*mm, .675*mm)),
-        (12.6325*mm, 15.0*mm, _circle(13.760*mm, .675*mm)),
+        (-15.0*mm, -12.6325*mm, _circle(-13.760*mm, .675*mm, segments=64)),
+        (-12.6325*mm, -9.215*mm, _circle(-11.505*mm, .675*mm, segments=64)),
+        (-9.215*mm, -5.2*mm, _circle(-6.925*mm, .78*mm, segments=64)),
+        (-5.2*mm, 5.2*mm, _rounded_rect(0, 8.99*mm, 3.00*mm, .91*mm, steps=16)),
+        (5.2*mm, 9.215*mm, _circle(6.925*mm, .78*mm, segments=64)),
+        (9.215*mm, 12.6325*mm, _circle(11.505*mm, .675*mm, segments=64)),
+        (12.6325*mm, 15.0*mm, _circle(13.760*mm, .675*mm, segments=64)),
     ):
         flat_bottom_cell(xa, xb, hole)
 
     left_curve_start = outer[bottom_left_edge][0]
     right_curve_end = outer[(bottom_right_edge_2 + 1) % count][0]
-    curved_bottom_cell(left_curve_start, -15.0*mm, _circle(-16.015*mm, .675*mm))
-    curved_bottom_cell(15.0*mm, 17.1425*mm, _circle(16.015*mm, .675*mm))
-    curved_bottom_cell(17.1425*mm, 19.3975*mm, _circle(18.270*mm, .675*mm))
-    curved_bottom_cell(19.3975*mm, right_curve_end, _circle(20.525*mm, .675*mm))
+    curved_bottom_cell(left_curve_start, -15.0*mm, _circle(-16.015*mm, .675*mm, segments=64))
+    curved_bottom_cell(15.0*mm, 17.1425*mm, _circle(16.015*mm, .675*mm, segments=64))
+    curved_bottom_cell(17.1425*mm, 19.3975*mm, _circle(18.270*mm, .675*mm, segments=64))
+    curved_bottom_cell(19.3975*mm, right_curve_end, _circle(20.525*mm, .675*mm, segments=64))
 
     flat_lo, flat_hi = -55.575*mm, 55.575*mm
     side_fill("L", flat_lo, 4*mm)
