@@ -733,7 +733,7 @@ apply_runtime_bevel(screen_glass, 0.00006)
 front_hardware_z = H*0.5 - 7.79*MM
 cam_x = 6.72*MM
 
-screen_content = rounded_rect_strip_prism_y(
+screen_content = display_frame_prism_y(
     "SCREEN_CONTENT",
     SCREEN_W,
     SCREEN_H,
@@ -742,7 +742,8 @@ screen_content = rounded_rect_strip_prism_y(
     screen_mat,
     screen_c,
     location=(0, front_y + 0.010*MM, 0),
-    segments=16,
+    outer_segments=16,
+    inner_segments=4,
 )
 
 # SCREEN_CONTENT stays clean replaceable artwork. Physical front hardware is
