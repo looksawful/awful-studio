@@ -58,6 +58,7 @@ def source_files_for(size: str, asset_id: str) -> list[str]:
     return [
         'assets/device_mockups/common/foundation_common.py',
         'assets/device_mockups/ipad_pro/generate_low_v6.py',
+        'assets/device_mockups/ipad_pro/planar_topology_v6.py',
         'assets/device_mockups/ipad_pro/export_runtime_v6.py',
         'assets/device_mockups/ipad_pro/optimize_runtime_v6.py',
         f'assets/device_mockups/ipad_pro/reference/ipados26_official_screen_{size}.png',
