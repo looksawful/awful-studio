@@ -149,6 +149,28 @@ jobs:
             extension/awful_studio/assets/devices/ipad_pro_*_low_v6.blend
             extension/awful_studio/device_asset_loader.py
           if-no-files-found: error
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: preview/package-lock.json
+      - name: Build Storybook from rebuilt iPad runtime
+        working-directory: preview
+        run: |
+          npm ci
+          npm run catalog
+          npm run storybook:build
+      - name: Smoke rebuilt iPad Storybook
+        working-directory: preview
+        run: |
+          npx playwright install --with-deps chromium
+          npm run smoke
+      - name: Upload Storybook topology prototype
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: storybook-topology-prototype
+          path: preview/storybook-static
+          if-no-files-found: error
 
   merge-gate:
     if: always()
