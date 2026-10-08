@@ -1,6 +1,7 @@
 import json, math, os, sys, bmesh, bpy
 HERE=os.path.dirname(os.path.abspath(__file__))
 COMMON=os.path.normpath(os.path.join(HERE,'..','common'))
+if HERE not in sys.path: sys.path.insert(0,HERE)
 if COMMON not in sys.path: sys.path.insert(0,COMMON)
 import foundation_common as fc
 from planar_topology_v6 import structured_rounded_prism_y
