@@ -16,172 +16,67 @@ def structured_rounded_prism_y(
     collection,
     location=(0, 0, 0),
     *,
-    outer_segments=48,
-    inner_segments=8,
-    inner_ratio=0.5,
+    corner_rows=8,
 ):
-    """Build quality-bounded rounded-rectangle caps without perimeter n-gons."""
-    if outer_segments % inner_segments:
-        raise ValueError("outer_segments must be divisible by inner_segments")
-    if not 0.0 < inner_ratio < 1.0:
-        raise ValueError("inner_ratio must be between zero and one")
+    """Build rounded-rectangle caps as a bounded row/column grid."""
+    if corner_rows < 2:
+        raise ValueError("corner_rows must be at least 2")
 
     half_w, half_h = width * 0.5, height * 0.5
     cx, cz = half_w - radius, half_h - radius
+    if cx <= 0.0 or cz <= 0.0:
+        raise ValueError("rounded rectangle radius must fit inside width/height")
+
+    target_step = radius
+    columns = max(4, math.ceil(width / target_step))
+    middle_rows = max(2, math.ceil((2.0 * cz) / target_step))
+
+    rows = []
+    for index in range(corner_rows + 1):
+        offset = radius * index / corner_rows
+        z = half_h - offset
+        x = cx + math.sqrt(max(0.0, radius * radius - (z - cz) ** 2))
+        rows.append((z, x))
+
+    for index in range(1, middle_rows):
+        z = cz - (2.0 * cz) * index / middle_rows
+        rows.append((z, half_w))
+
+    for index in range(corner_rows + 1):
+        offset = radius * index / corner_rows
+        z = -cz - offset
+        x = cx + math.sqrt(max(0.0, radius * radius - (z + cz) ** 2))
+        if rows and abs(rows[-1][0] - z) < 1e-12:
+            continue
+        rows.append((z, x))
+
     points = []
-    point_indices = {}
-
-    def point_index(x, z):
-        key = (round(x, 12), round(z, 12))
-        if key not in point_indices:
-            point_indices[key] = len(points)
+    row_indices = []
+    for z, half_span in rows:
+        indices = []
+        for column in range(columns + 1):
+            x = -half_span + (2.0 * half_span) * column / columns
+            indices.append(len(points))
             points.append((x, z))
-        return point_indices[key]
+        row_indices.append(indices)
 
-    xs = (-cx, 0.0, cx)
-    zs = (-cz, -cz * 0.5, 0.0, cz * 0.5, cz)
-    grid = {
-        (x_index, z_index): point_index(x, z)
-        for x_index, x in enumerate(xs)
-        for z_index, z in enumerate(zs)
-    }
     cap_faces = []
-
-    for x_index in range(2):
-        for z_index in range(4):
+    for row_index in range(len(row_indices) - 1):
+        upper = row_indices[row_index]
+        lower = row_indices[row_index + 1]
+        for column in range(columns):
             cap_faces.append((
-                grid[(x_index, z_index)],
-                grid[(x_index + 1, z_index)],
-                grid[(x_index + 1, z_index + 1)],
-                grid[(x_index, z_index + 1)],
+                upper[column],
+                upper[column + 1],
+                lower[column + 1],
+                lower[column],
             ))
-
-    inner_radius = radius * inner_ratio
-    top_inner = [point_index(x, cz + inner_radius) for x in xs]
-    top_outer = [point_index(x, half_h) for x in xs]
-    bottom_inner = [point_index(x, -cz - inner_radius) for x in xs]
-    bottom_outer = [point_index(x, -half_h) for x in xs]
-    left_inner = [point_index(-cx - inner_radius, z) for z in zs]
-    left_outer = [point_index(-half_w, z) for z in zs]
-    right_inner = [point_index(cx + inner_radius, z) for z in zs]
-    right_outer = [point_index(half_w, z) for z in zs]
-
-    for x_index in range(2):
-        cap_faces.extend((
-            (
-                grid[(x_index, 4)],
-                grid[(x_index + 1, 4)],
-                top_inner[x_index + 1],
-                top_inner[x_index],
-            ),
-            (
-                top_inner[x_index],
-                top_inner[x_index + 1],
-                top_outer[x_index + 1],
-                top_outer[x_index],
-            ),
-            (
-                bottom_outer[x_index],
-                bottom_outer[x_index + 1],
-                bottom_inner[x_index + 1],
-                bottom_inner[x_index],
-            ),
-            (
-                bottom_inner[x_index],
-                bottom_inner[x_index + 1],
-                grid[(x_index + 1, 0)],
-                grid[(x_index, 0)],
-            ),
-        ))
-
-    for z_index in range(4):
-        cap_faces.extend((
-            (
-                left_outer[z_index],
-                left_inner[z_index],
-                left_inner[z_index + 1],
-                left_outer[z_index + 1],
-            ),
-            (
-                left_inner[z_index],
-                grid[(0, z_index)],
-                grid[(0, z_index + 1)],
-                left_inner[z_index + 1],
-            ),
-            (
-                grid[(2, z_index)],
-                right_inner[z_index],
-                right_inner[z_index + 1],
-                grid[(2, z_index + 1)],
-            ),
-            (
-                right_inner[z_index],
-                right_outer[z_index],
-                right_outer[z_index + 1],
-                right_inner[z_index + 1],
-            ),
-        ))
-
-    corner_specs = (
-        (cx, cz, 0.0, grid[(2, 4)]),
-        (-cx, cz, 90.0, grid[(0, 4)]),
-        (-cx, -cz, 180.0, grid[(0, 0)]),
-        (cx, -cz, 270.0, grid[(2, 0)]),
-    )
-    outer_arcs = []
-    transition_ratio = outer_segments // inner_segments
-
-    for corner_x, corner_z, start_degrees, center_index in corner_specs:
-        outer_arc = []
-        for step in range(outer_segments + 1):
-            angle = math.radians(start_degrees + 90.0 * step / outer_segments)
-            outer_arc.append(point_index(
-                corner_x + radius * math.cos(angle),
-                corner_z + radius * math.sin(angle),
-            ))
-
-        inner_arc = []
-        for step in range(inner_segments + 1):
-            angle = math.radians(start_degrees + 90.0 * step / inner_segments)
-            inner_arc.append(point_index(
-                corner_x + inner_radius * math.cos(angle),
-                corner_z + inner_radius * math.sin(angle),
-            ))
-
-        for step in range(inner_segments):
-            cap_faces.append((center_index, inner_arc[step], inner_arc[step + 1]))
-
-        for step in range(inner_segments):
-            inner_a = inner_arc[step]
-            inner_b = inner_arc[step + 1]
-            outer_start = step * transition_ratio
-            outer = outer_arc[outer_start:outer_start + transition_ratio + 1]
-            midpoint = transition_ratio // 2
-            for offset in range(midpoint):
-                cap_faces.append((inner_a, outer[offset], outer[offset + 1]))
-            cap_faces.append((inner_a, outer[midpoint], inner_b))
-            for offset in range(midpoint, transition_ratio):
-                cap_faces.append((inner_b, outer[offset], outer[offset + 1]))
-
-        outer_arcs.append(outer_arc)
 
     boundary = []
-
-    def extend_boundary(indices):
-        for index in indices:
-            if not boundary or boundary[-1] != index:
-                boundary.append(index)
-
-    extend_boundary(outer_arcs[0])
-    extend_boundary((top_outer[1], top_outer[0]))
-    extend_boundary(outer_arcs[1][1:])
-    extend_boundary((left_outer[3], left_outer[2], left_outer[1], left_outer[0]))
-    extend_boundary(outer_arcs[2][1:])
-    extend_boundary((bottom_outer[1], bottom_outer[2]))
-    extend_boundary(outer_arcs[3][1:])
-    extend_boundary((right_outer[1], right_outer[2], right_outer[3], right_outer[4]))
-    if boundary[-1] == boundary[0]:
-        boundary.pop()
+    boundary.extend(row_indices[0])
+    boundary.extend(row[-1] for row in row_indices[1:])
+    boundary.extend(reversed(row_indices[-1][:-1]))
+    boundary.extend(row[0] for row in reversed(row_indices[1:-1]))
 
     count = len(points)
     verts = (
