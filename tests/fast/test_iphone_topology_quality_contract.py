@@ -194,6 +194,13 @@ class IPhoneTopologyQualityContractTests(unittest.TestCase):
         self.assertLessEqual(metrics["max_aspect"], 10.0, metrics)
         self.assertLessEqual(metrics["max_edge_mm"], 147.61 * 0.25, metrics)
 
+    def test_screen_content_major_caps_use_local_well_shaped_triangles(self):
+        doc, blob = read_glb(GLB)
+        metrics = visible_cap_metrics(doc, blob, "SCREEN_CONTENT", normal_axis=2)
+
+        self.assertGreaterEqual(metrics["min_angle_deg"], 5.0, metrics)
+        self.assertLessEqual(metrics["max_aspect"], 10.0, metrics)
+
     def test_body_visible_rail_and_aperture_surfaces_use_well_shaped_triangles(self):
         doc, blob = read_glb(GLB)
         metrics = material_surface_metrics(
