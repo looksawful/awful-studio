@@ -1,6 +1,7 @@
 import json, math, os, sys, bmesh, bpy
 HERE=os.path.dirname(os.path.abspath(__file__))
 COMMON=os.path.normpath(os.path.join(HERE,'..','common'))
+if HERE not in sys.path: sys.path.insert(0,HERE)
 if COMMON not in sys.path: sys.path.insert(0,COMMON)
 import foundation_common as fc
 from planar_topology_v6 import structured_rounded_prism_y
@@ -46,9 +47,9 @@ screen_bsdf=screen_mat.node_tree.nodes.get('Principled BSDF'); screen_mat.node_t
 screen_bsdf.inputs['Specular IOR Level'].default_value=0.0
 flash=fc.make_material('MAT_FLASH',(0.90,0.84,0.68),0.0,0.16)
 body=fc.rounded_prism('BODY_ALUMINUM',W,H,CORE_D,s['br']*MM,metal,body_c,axis='Y',location=(0,CORE_Y,0),outline_segments=48)
-structured_rounded_prism_y('DISPLAY_GLASS_SEAT',W-.30*MM,H-.30*MM,.05*MM,(s['br']-.15)*MM,gap,screen_c,location=(0,FRONT_Y+.025*MM,0),outer_segments=48,inner_segments=8)
-structured_rounded_prism_y('DISPLAY_BEZEL',SW+1.3*MM,SH+1.3*MM,.08*MM,(s['sr']+.50)*MM,bezel,screen_c,location=(0,FRONT_Y-.04*MM,0),outer_segments=48,inner_segments=8)
-screen_content=structured_rounded_prism_y('SCREEN_CONTENT',SW,SH,.06*MM,s['sr']*MM,screen_mat,screen_c,location=(0,FRONT_Y-.09*MM,0),outer_segments=48,inner_segments=8)
+structured_rounded_prism_y('DISPLAY_GLASS_SEAT',W-.30*MM,H-.30*MM,.05*MM,(s['br']-.15)*MM,gap,screen_c,location=(0,FRONT_Y+.025*MM,0))
+structured_rounded_prism_y('DISPLAY_BEZEL',SW+1.3*MM,SH+1.3*MM,.08*MM,(s['sr']+.50)*MM,bezel,screen_c,location=(0,FRONT_Y-.04*MM,0))
+screen_content=structured_rounded_prism_y('SCREEN_CONTENT',SW,SH,.06*MM,s['sr']*MM,screen_mat,screen_c,location=(0,FRONT_Y-.09*MM,0))
 uv=screen_content.data.uv_layers.new(name='UVMap')
 for loop in screen_content.data.loops:
     co=screen_content.data.vertices[loop.vertex_index].co
