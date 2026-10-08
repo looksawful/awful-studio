@@ -10,6 +10,67 @@ import bmesh
 import bpy
 
 
+def circular_cap_topology(radius, segments, inner_ratio=0.5):
+    """Return a circular boundary plus a low-valence structured triangular cap."""
+    if segments < 8:
+        raise ValueError("circular caps require at least 8 boundary segments")
+    inner_segments = 4 if segments <= 8 else 6 if segments <= 12 else 8
+    outer = [
+        (
+            radius * math.cos(2 * math.pi * index / segments),
+            radius * math.sin(2 * math.pi * index / segments),
+        )
+        for index in range(segments)
+    ]
+    inner = [
+        (
+            radius * inner_ratio * math.cos(2 * math.pi * index / inner_segments),
+            radius * inner_ratio * math.sin(2 * math.pi * index / inner_segments),
+        )
+        for index in range(inner_segments)
+    ]
+    points = outer + inner + [(0.0, 0.0)]
+    cap = []
+    outer_index = inner_index = 0
+    while outer_index < segments or inner_index < inner_segments:
+        outer_next = (
+            (outer_index + 1) / segments
+            if outer_index < segments
+            else float("inf")
+        )
+        inner_next = (
+            (inner_index + 1) / inner_segments
+            if inner_index < inner_segments
+            else float("inf")
+        )
+        outer_current = outer_index % segments
+        inner_current = segments + inner_index % inner_segments
+        if abs(outer_next - inner_next) < 1e-12:
+            next_outer = (outer_index + 1) % segments
+            next_inner = segments + (inner_index + 1) % inner_segments
+            cap.append((outer_current, next_outer, next_inner))
+            cap.append((outer_current, next_inner, inner_current))
+            outer_index += 1
+            inner_index += 1
+        elif outer_next < inner_next:
+            next_outer = (outer_index + 1) % segments
+            cap.append((outer_current, next_outer, inner_current))
+            outer_index += 1
+        else:
+            next_inner = segments + (inner_index + 1) % inner_segments
+            cap.append((outer_current, next_inner, inner_current))
+            inner_index += 1
+
+    center = len(points) - 1
+    for index in range(inner_segments):
+        cap.append((
+            center,
+            segments + index,
+            segments + (index + 1) % inner_segments,
+        ))
+    return points, list(range(segments)), cap
+
+
 def camera_mesh(name, width, height, depth, material, collection, location, *, capsule=False):
     """Build the accepted 40-class shell, caps and deterministic bake UVs."""
     radius = width / 2
@@ -39,10 +100,7 @@ def camera_mesh(name, width, height, depth, material, collection, location, *, c
             else:
                 cap.append((a[0], b[0], b[1], a[1]))
     else:
-        points = [(radius * math.cos(2 * math.pi * i / 40), radius * math.sin(2 * math.pi * i / 40)) for i in range(40)]
-        boundary = list(range(40))
-        points.append((0, 0))
-        cap = [(40, i, (i + 1) % 40) for i in range(40)]
+        points, boundary, cap = circular_cap_topology(radius, 40)
     count = len(points)
     vertices = [(x, y, z) for y in (-depth / 2, depth / 2) for x, z in points]
     faces = cap + [tuple(i + count for i in reversed(face)) for face in cap]

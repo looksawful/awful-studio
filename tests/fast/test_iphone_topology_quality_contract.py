@@ -102,6 +102,48 @@ def visible_cap_metrics(doc, blob, node_name, normal_axis):
     }
 
 
+def visible_cap_fan_metrics(doc, blob, node_name, normal_axis, normal_threshold=0.9):
+    node = next(node for node in doc["nodes"] if node.get("name") == node_name)
+    mesh = doc["meshes"][node["mesh"]]
+    groups = {}
+    for primitive_index, primitive in enumerate(mesh["primitives"]):
+        positions = accessor_values(doc, blob, primitive["attributes"]["POSITION"])
+        indices = [value[0] for value in accessor_values(doc, blob, primitive["indices"])]
+        for offset in range(0, len(indices), 3):
+            triangle = indices[offset:offset + 3]
+            points = [positions[index] for index in triangle]
+            first = _subtract(points[1], points[0])
+            second = _subtract(points[2], points[0])
+            normal = _cross(first, second)
+            normal_length = _length(normal)
+            if normal_length <= 1e-15:
+                continue
+            if abs(normal[normal_axis] / normal_length) < normal_threshold:
+                continue
+            plane = round(sum(point[normal_axis] for point in points) / 3.0, 7)
+            groups.setdefault(plane, []).append(
+                tuple((primitive_index, index) for index in triangle)
+            )
+    if not groups:
+        raise AssertionError(f"{node_name} has no visible-cap triangles")
+
+    worst = None
+    for plane, triangles in groups.items():
+        incidence = {}
+        for triangle in triangles:
+            for vertex in triangle:
+                incidence[vertex] = incidence.get(vertex, 0) + 1
+        candidate = {
+            "plane": plane,
+            "triangles": len(triangles),
+            "max_vertex_incidence": max(incidence.values()),
+            "fan_fraction": max(incidence.values()) / len(triangles),
+        }
+        if worst is None or candidate["fan_fraction"] > worst["fan_fraction"]:
+            worst = candidate
+    return worst
+
+
 def material_surface_metrics(doc, blob, node_name, material_name=None, *, excluded_normal_axis=None, required_normal_axis=None, normal_threshold=0.9, centroid_axis=None, centroid_max_mm=None):
     node = next(node for node in doc["nodes"] if node.get("name") == node_name)
     mesh = doc["meshes"][node["mesh"]]
@@ -191,6 +233,54 @@ class IPhoneTopologyQualityContractTests(unittest.TestCase):
                 )
                 self.assertGreaterEqual(metrics["min_angle_deg"], 5.0, metrics)
                 self.assertLessEqual(metrics["max_aspect"], 10.0, metrics)
+
+    def test_visible_circular_caps_do_not_use_full_perimeter_center_fans(self):
+        doc, blob = read_glb(GLB)
+        y_caps = (
+            "FRONT_CAMERA_MASK",
+            "FRONT_CAMERA_GLASS",
+            "FRONT_CAMERA_INNER",
+            "FRONT_CAMERA_IRIS",
+            "FRONT_CAMERA_PUPIL",
+            "CAMERA_1_RING",
+            "CAMERA_1_BEVEL",
+            "CAMERA_1_GLASS",
+            "CAMERA_1_INNER",
+            "CAMERA_1_IRIS",
+            "CAMERA_1_PUPIL",
+            "CAMERA_2_RING",
+            "CAMERA_2_BEVEL",
+            "CAMERA_2_GLASS",
+            "CAMERA_2_INNER",
+            "CAMERA_2_IRIS",
+            "CAMERA_2_PUPIL",
+            "REAR_MIC",
+            "FLASH_RING",
+            "FLASH",
+        )
+        z_caps = (
+            "BOTTOM_MIC_APERTURE_01",
+            "BOTTOM_MIC_APERTURE_02",
+            "BOTTOM_MIC_APERTURE_03",
+            "BOTTOM_SPEAKER_APERTURE_01",
+            "BOTTOM_SPEAKER_APERTURE_02",
+            "BOTTOM_SPEAKER_APERTURE_03",
+            "BOTTOM_SPEAKER_APERTURE_04",
+            "BOTTOM_SPEAKER_APERTURE_05",
+            "BOTTOM_SCREW_L",
+            "BOTTOM_SCREW_R",
+        )
+        # Blender Y caps export on glTF Z; Blender Z caps export on glTF Y.
+        for node_name, normal_axis in (
+            *((name, 2) for name in y_caps),
+            *((name, 1) for name in z_caps),
+        ):
+            with self.subTest(node=node_name):
+                structure = visible_cap_fan_metrics(doc, blob, node_name, normal_axis)
+                quality = visible_cap_metrics(doc, blob, node_name, normal_axis)
+                self.assertLess(structure["fan_fraction"], 0.75, structure)
+                self.assertGreaterEqual(quality["min_angle_deg"], 5.0, quality)
+                self.assertLessEqual(quality["max_aspect"], 10.0, quality)
 
 
 if __name__ == "__main__":

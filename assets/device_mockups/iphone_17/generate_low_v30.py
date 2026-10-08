@@ -13,7 +13,7 @@ if COMMON not in sys.path:
     sys.path.insert(0, COMMON)
 import foundation_common as fc
 sys.path.insert(0, HERE)
-from camera_topology_v30 import camera_mesh, attach_camera_normal
+from camera_topology_v30 import camera_mesh, attach_camera_normal, circular_cap_topology
 from body_topology_v30 import build_body_mesh, apple_bottom_surface
 from display_topology_v30 import display_frame_prism_y, screen_glass_ring_y
 
@@ -780,27 +780,18 @@ sbsdf.inputs["Coat Weight"].default_value = 0.0
 sbsdf.inputs["Coat Roughness"].default_value = 0.035
 
 def radial_prism_y(name, radius, depth, material, collection, location, segments):
-    """Build a sparse circular Y-depth prism with tangent-friendly UVs."""
-    points = [
-        (
-            radius * math.cos(2.0 * math.pi * index / segments),
-            radius * math.sin(2.0 * math.pi * index / segments),
-        )
-        for index in range(segments)
-    ]
-    points.append((0.0, 0.0))
-    center = segments
+    """Build a circular Y-depth prism with low-valence structured cap triangles."""
+    points, boundary, cap = circular_cap_topology(radius, segments)
     count = len(points)
     verts = [
         (x, y, z)
         for y in (-depth * 0.5, depth * 0.5)
         for x, z in points
     ]
-    cap = [(center, index, (index + 1) % segments) for index in range(segments)]
     faces = cap + [tuple(vertex + count for vertex in reversed(face)) for face in cap]
-    for index in range(segments):
-        next_index = (index + 1) % segments
-        faces.append((index, next_index, next_index + count, index + count))
+    for index, first in enumerate(boundary):
+        second = boundary[(index + 1) % len(boundary)]
+        faces.append((first, second, second + count, first + count))
 
     mesh = bpy.data.meshes.new(f"{name}_MESH")
     mesh.from_pydata(verts, [], faces)
@@ -1255,28 +1246,18 @@ for usb_part, bevel_segments in ((usb_cavity, 2), (usb_tongue, 3)):
     usb_part.data.update()
 
 def radial_prism_z(name, radius, depth, material, collection, segments):
-    """Build a sparse circular prism with triangle cap fans and a quad side wall."""
-    verts = []
-    for z in (-depth * 0.5, depth * 0.5):
-        verts.extend(
-            (
-                radius * math.cos(2.0 * math.pi * index / segments),
-                radius * math.sin(2.0 * math.pi * index / segments),
-                z,
-            )
-            for index in range(segments)
-        )
-        verts.append((0.0, 0.0, z))
-
-    lower_center = segments
-    upper_start = segments + 1
-    upper_center = upper_start + segments
-    faces = []
-    for index in range(segments):
-        next_index = (index + 1) % segments
-        faces.append((lower_center, next_index, index))
-        faces.append((upper_center, upper_start + index, upper_start + next_index))
-        faces.append((index, next_index, upper_start + next_index, upper_start + index))
+    """Build a circular Z-depth prism with low-valence structured cap triangles."""
+    points, boundary, cap = circular_cap_topology(radius, segments)
+    count = len(points)
+    verts = (
+        [(x, y, -depth * 0.5) for x, y in points]
+        + [(x, y, depth * 0.5) for x, y in points]
+    )
+    faces = [tuple(reversed(face)) for face in cap]
+    faces.extend(tuple(index + count for index in face) for face in cap)
+    for index, first in enumerate(boundary):
+        second = boundary[(index + 1) % len(boundary)]
+        faces.append((first, second, second + count, first + count))
 
     mesh = bpy.data.meshes.new(f"{name}_MESH")
     mesh.from_pydata(verts, [], faces)
