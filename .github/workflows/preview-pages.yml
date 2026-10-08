@@ -2,7 +2,7 @@ name: Deploy model preview
 
 on:
   push:
-    branches: [main, agent/152-ipad-topology]
+    branches: [main]
     paths:
       - 'preview/**'
       - 'assets/device_mockups/**'
