@@ -98,7 +98,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add             assets/device_mockups/iphone_17/generated/iphone_17_low_v30.blend             assets/device_mockups/iphone_17/evidence/low_v30_validation.json             assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30.asset.json             assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_delivery.blend             assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb             assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web_meshopt.glb             extension/awful_studio/assets/devices/iphone_17_low_v30.blend             extension/awful_studio/device_asset_loader.py             preview/generated/asset-catalog.json             iphone-khronos-summary.json
+          git add -f assets/device_mockups/iphone_17/evidence/low_v30_validation.json
+          git add assets/device_mockups/iphone_17/generated/iphone_17_low_v30.blend assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30.asset.json assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_delivery.blend assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web_meshopt.glb extension/awful_studio/assets/devices/iphone_17_low_v30.blend extension/awful_studio/device_asset_loader.py preview/generated/asset-catalog.json iphone-khronos-summary.json
           git add -u .github/workflows/iphone-topology-rebuild.yml
           git diff --cached --check
           git commit -m "fix(iphone17): rebuild screen topology delivery (#155)"
