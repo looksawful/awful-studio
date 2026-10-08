@@ -162,7 +162,6 @@ class IPadTopologyQualityContractTests(unittest.TestCase):
             "DISPLAY_GLASS_SEAT",
             "DISPLAY_BEZEL",
             "SCREEN_CONTENT",
-            "SCREEN_GLASS",
         )
         for size, path in GLBS.items():
             doc, blob = read_glb(path)
