@@ -120,6 +120,36 @@ jobs:
         working-directory: preview
         run: npm run smoke
 
+
+  ipad-topology-rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Install exact official Blender
+        shell: bash
+        run: |
+          python tools/setup_blender.py --destination .blender > blender-path.txt
+          echo "BLENDER=$(tail -n 1 blender-path.txt)" >> "$GITHUB_ENV"
+      - name: Rebuild both canonical iPad v6 deliveries
+        shell: bash
+        run: python tools/build_ipad_v6_web.py --blender "$BLENDER" --size all
+      - name: Verify rebuilt iPad topology and delivery contracts
+        shell: bash
+        run: |
+          python -m unittest tests.fast.test_ipad_topology_quality_contract tests.fast.test_ipad_web_delivery_contract -v
+          git diff --check
+      - name: Upload rebuilt iPad assets
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ipad-topology-rebuild
+          path: |
+            assets/device_mockups/ipad_pro/generated/*_low_v6.blend
+            assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_*_v6*
+            extension/awful_studio/assets/devices/ipad_pro_*_low_v6.blend
+            extension/awful_studio/device_asset_loader.py
+          if-no-files-found: error
+
   merge-gate:
     if: always()
     needs: [fast, candidate, runtime-windows, preview]
