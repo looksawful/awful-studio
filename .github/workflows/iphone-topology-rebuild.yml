@@ -30,7 +30,7 @@ jobs:
         shell: bash
         run: |
           python tools/setup_blender.py --destination .blender > blender-path.txt
-          echo "BLENDER=$PWD/$(tail -n 1 blender-path.txt)" >> "$GITHUB_ENV"
+          echo "BLENDER=$(tail -n 1 blender-path.txt)" >> "$GITHUB_ENV"
       - name: Rebuild exact iPhone delivery
         working-directory: source
         shell: bash
