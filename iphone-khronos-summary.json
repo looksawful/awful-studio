@@ -1,0 +1,22 @@
+{
+  "compat": {
+    "validator_version": "2.0.0-dev.3.10",
+    "errors": 0,
+    "warnings": 0,
+    "infos": 51,
+    "hints": 0,
+    "pass": true,
+    "file": "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb",
+    "sha256": "7a57e99284f0055830382049a7d9eb6a98a5467b023f0a9f2ec2ef8a423cdf53"
+  },
+  "meshopt": {
+    "validator_version": "2.0.0-dev.3.10",
+    "errors": 0,
+    "warnings": 0,
+    "infos": 52,
+    "hints": 0,
+    "pass": true,
+    "file": "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web_meshopt.glb",
+    "sha256": "cb0f0bc7ec386aef73407ea244b2ffbdc351561bbd0beef9d0eab4862913ec2a"
+  }
+}

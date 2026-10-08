@@ -4,7 +4,7 @@
   "assets": [
     {
       "id": "iphone-17-v30",
-      "label": "iPhone 17 - HUMAN GATE #146 (413d1818)",
+      "label": "iPhone 17 - HUMAN GATE #146 (7a57e992)",
       "group": "Devices",
       "version": "v30",
       "stage": "LOW_DRAFT",
@@ -13,9 +13,9 @@
       "previewGlb": "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb",
       "lods": [],
       "collision": null,
-      "sourceRevision": "94a7d1f9ef637aacb93f26fdc7e410dcd1d78ca1a9b2fea50c431d7e33f01abb",
-      "sourceCommit": "0f6b7d1a5112622e3e6eb2744af79f8e466f17d4",
-      "triangleCount": 13674,
+      "sourceRevision": "00ea0cb1bdd5834eeb59a1e7087d6aa9c75f0cdc7c8ddb5d4043388492b472bb",
+      "sourceCommit": "870bc6670a2e8c48f7df601b1c1a16561219873c",
+      "triangleCount": 13878,
       "materialCount": 24,
       "animations": [],
       "screenStates": {
@@ -38,8 +38,8 @@
       "reviewOnly": true,
       "frozenReview": true,
       "topologyAccepted": false,
-      "snapshotCommit": "0f6b7d1a5112622e3e6eb2744af79f8e466f17d4",
-      "sha256": "413d181890d8684634c1a58fc6f05342c4d5efc1709123a93dd740c32086cf54",
+      "snapshotCommit": "870bc6670a2e8c48f7df601b1c1a16561219873c",
+      "sha256": "7a57e99284f0055830382049a7d9eb6a98a5467b023f0a9f2ec2ef8a423cdf53",
       "reviewParts": [
         {
           "id": "panels_and_display",
