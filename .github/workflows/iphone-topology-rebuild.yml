@@ -8,40 +8,98 @@ on:
       - '.github/workflows/iphone-topology-rebuild.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   rebuild:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Checkout exact geometry source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 870bc6670a2e8c48f7df601b1c1a16561219873c
+          path: source
+      - name: Checkout writable feature branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          path: branch
       - name: Install exact official Blender
+        working-directory: source
         shell: bash
         run: |
           python tools/setup_blender.py --destination .blender > blender-path.txt
-          echo "BLENDER=$(tail -n 1 blender-path.txt)" >> "$GITHUB_ENV"
+          echo "BLENDER=$PWD/$(tail -n 1 blender-path.txt)" >> "$GITHUB_ENV"
       - name: Rebuild exact iPhone delivery
+        working-directory: source
         shell: bash
         run: python tools/build_iphone17_v30.py --blender "$BLENDER" --skip-previews
       - name: Refresh preview catalog
+        working-directory: source
         shell: bash
         run: node preview/tools/generate-catalog.mjs
       - name: Verify rebuilt topology seam
+        working-directory: source
         shell: bash
         run: python -m unittest tests.fast.test_iphone_topology_quality_contract -v
-      - name: Upload rebuilt delivery
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: iphone-v30-topology-rebuild
-          path: |
-            assets/device_mockups/iphone_17/generated/iphone_17_low_v30.blend
-            assets/device_mockups/iphone_17/evidence/low_v30_validation.json
-            assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30.asset.json
-            assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_delivery.blend
-            assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb
-            assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web_meshopt.glb
-            extension/awful_studio/assets/devices/iphone_17_low_v30.blend
-            extension/awful_studio/device_asset_loader.py
-            preview/generated/asset-catalog.json
-          if-no-files-found: error
+      - name: Validate rebuilt GLBs with Khronos validator
+        working-directory: source
+        shell: bash
+        run: |
+          npm install --prefix /tmp/gltf-validator --no-save gltf-validator@2.0.0-dev.3.10
+          node - <<'NODE'
+          const fs = require('fs');
+          const validator = require('/tmp/gltf-validator/node_modules/gltf-validator');
+          const crypto = require('crypto');
+          const files = {
+            compat: 'assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb',
+            meshopt: 'assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web_meshopt.glb',
+          };
+          (async () => {
+            const summary = {};
+            for (const [name, file] of Object.entries(files)) {
+              const bytes = fs.readFileSync(file);
+              const report = await validator.validateBytes(new Uint8Array(bytes), { uri: file });
+              summary[name] = {
+                validator_version: report.validatorVersion,
+                errors: report.issues.numErrors,
+                warnings: report.issues.numWarnings,
+                infos: report.issues.numInfos,
+                hints: report.issues.numHints,
+                pass: report.issues.numErrors === 0 && report.issues.numWarnings === 0,
+                file,
+                sha256: crypto.createHash('sha256').update(bytes).digest('hex'),
+              };
+              fs.writeFileSync('/tmp/iphone-' + name + '-khronos.json', JSON.stringify(report, null, 2));
+            }
+            fs.writeFileSync('/tmp/iphone-khronos-summary.json', JSON.stringify(summary, null, 2));
+            console.log('IPHONE_KHRONOS', JSON.stringify(summary));
+            if (!summary.compat.pass || !summary.meshopt.pass) process.exit(1);
+          })();
+          NODE
+      - name: Copy canonical outputs into feature branch
+        shell: bash
+        run: |
+          cp source/assets/device_mockups/iphone_17/generated/iphone_17_low_v30.blend branch/assets/device_mockups/iphone_17/generated/
+          cp source/assets/device_mockups/iphone_17/evidence/low_v30_validation.json branch/assets/device_mockups/iphone_17/evidence/
+          cp source/assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30.asset.json branch/assets/device_mockups/iphone_17/runtime/v30/
+          cp source/assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_delivery.blend branch/assets/device_mockups/iphone_17/runtime/v30/
+          cp source/assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb branch/assets/device_mockups/iphone_17/runtime/v30/
+          cp source/assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web_meshopt.glb branch/assets/device_mockups/iphone_17/runtime/v30/
+          cp source/extension/awful_studio/assets/devices/iphone_17_low_v30.blend branch/extension/awful_studio/assets/devices/
+          cp source/extension/awful_studio/device_asset_loader.py branch/extension/awful_studio/
+          cp source/preview/generated/asset-catalog.json branch/preview/generated/
+          cp /tmp/iphone-khronos-summary.json branch/iphone-khronos-summary.json
+          rm branch/.github/workflows/iphone-topology-rebuild.yml
+      - name: Commit rebuilt delivery and remove temporary harness
+        working-directory: branch
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add             assets/device_mockups/iphone_17/generated/iphone_17_low_v30.blend             assets/device_mockups/iphone_17/evidence/low_v30_validation.json             assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30.asset.json             assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_delivery.blend             assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb             assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web_meshopt.glb             extension/awful_studio/assets/devices/iphone_17_low_v30.blend             extension/awful_studio/device_asset_loader.py             preview/generated/asset-catalog.json             iphone-khronos-summary.json
+          git add -u .github/workflows/iphone-topology-rebuild.yml
+          git diff --cached --check
+          git commit -m "fix(iphone17): rebuild screen topology delivery (#155)"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
