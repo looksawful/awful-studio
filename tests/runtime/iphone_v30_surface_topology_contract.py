@@ -8,11 +8,12 @@ limits={
     # so quality cannot regress into unbounded tessellation.
     "BACK_GLASS":800,
     "FRONT_SENSOR_MASK":56,
-    "FRONT_CAMERA_MASK":50,
-    "FRONT_CAMERA_GLASS":46,
-    "FRONT_CAMERA_INNER":34,
-    "FRONT_CAMERA_IRIS":26,
-    "FRONT_CAMERA_PUPIL":18,
+    # Visible circular caps keep the same perimeter and add one bounded support ring.
+    "FRONT_CAMERA_MASK":66,
+    "FRONT_CAMERA_GLASS":62,
+    "FRONT_CAMERA_INNER":50,
+    "FRONT_CAMERA_IRIS":38,
+    "FRONT_CAMERA_PUPIL":26,
 }
 report={}
 for name,limit in limits.items():

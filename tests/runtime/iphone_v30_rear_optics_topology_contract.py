@@ -4,15 +4,16 @@ import bmesh
 import bpy
 
 limits={
-    "CAMERA_1_INNER":66,
-    "CAMERA_2_INNER":66,
-    "CAMERA_1_IRIS":50,
-    "CAMERA_2_IRIS":50,
-    "CAMERA_1_PUPIL":34,
-    "CAMERA_2_PUPIL":34,
-    "REAR_MIC":34,
-    "FLASH_RING":66,
-    "FLASH":66,
+    # Low-valence circular caps add one bounded inner support ring.
+    "CAMERA_1_INNER":82,
+    "CAMERA_2_INNER":82,
+    "CAMERA_1_IRIS":66,
+    "CAMERA_2_IRIS":66,
+    "CAMERA_1_PUPIL":50,
+    "CAMERA_2_PUPIL":50,
+    "REAR_MIC":50,
+    "FLASH_RING":82,
+    "FLASH":82,
 }
 names=list(limits)+['CAMERA_HOUSING','CAMERA_HOUSING_SEAT']+[
     f'CAMERA_{i}_{part}' for i in (1,2) for part in ('RING','BEVEL','GLASS')]

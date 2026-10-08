@@ -18,6 +18,7 @@ for name in apertures+screws:
     bm.free()
     assert report[name]["ngons"]==0,report
     assert report[name]["nonmanifold"]==0,report
-    limit=34 if name in apertures else 42
+    # One inner support ring replaces the rejected full-cap center fan.
+    limit=50 if name in apertures else 58
     assert report[name]["verts"]<=limit,report
 print("IPHONE_BOTTOM_TOPOLOGY_GREEN",json.dumps(report,sort_keys=True))
