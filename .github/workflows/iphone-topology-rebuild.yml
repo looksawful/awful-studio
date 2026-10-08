@@ -1,0 +1,47 @@
+name: Temporary iPhone topology rebuild
+
+on:
+  pull_request:
+    paths:
+      - 'assets/device_mockups/iphone_17/**'
+      - 'tests/fast/test_iphone_topology_quality_contract.py'
+      - '.github/workflows/iphone-topology-rebuild.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Install exact official Blender
+        shell: bash
+        run: |
+          python tools/setup_blender.py --destination .blender > blender-path.txt
+          echo "BLENDER=$(tail -n 1 blender-path.txt)" >> "$GITHUB_ENV"
+      - name: Rebuild exact iPhone delivery
+        shell: bash
+        run: python tools/build_iphone17_v30.py --blender "$BLENDER" --skip-previews
+      - name: Refresh preview catalog
+        shell: bash
+        run: node preview/tools/generate-catalog.mjs
+      - name: Verify rebuilt topology seam
+        shell: bash
+        run: python -m unittest tests.fast.test_iphone_topology_quality_contract -v
+      - name: Upload rebuilt delivery
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: iphone-v30-topology-rebuild
+          path: |
+            assets/device_mockups/iphone_17/generated/iphone_17_low_v30.blend
+            assets/device_mockups/iphone_17/evidence/low_v30_validation.json
+            assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30.asset.json
+            assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_delivery.blend
+            assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb
+            assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web_meshopt.glb
+            extension/awful_studio/assets/devices/iphone_17_low_v30.blend
+            extension/awful_studio/device_asset_loader.py
+            preview/generated/asset-catalog.json
+          if-no-files-found: error
