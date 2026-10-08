@@ -1,11 +1,14 @@
 <meta name="robots" content="noindex,nofollow,noarchive">
 <script>
-(() => {
+(async () => {
   const key = 'awful-review-ok';
-  const code = 'AWFUL-2610';
+  const expected = 'a28f882a94ee4675b73ea49e86bbdd2a1c65d9cb27bc711772f00149ffce1f9b';
   if (sessionStorage.getItem(key) === '1') return;
-  const entered = window.prompt('AWFUL STUDIO review code');
-  if (entered !== code) {
+  const entered = window.prompt('AWFUL STUDIO review password') ?? '';
+  const bytes = new TextEncoder().encode(entered);
+  const hash = await crypto.subtle.digest('SHA-256', bytes);
+  const actual = [...new Uint8Array(hash)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+  if (actual !== expected) {
     document.documentElement.innerHTML = '<body style="margin:0;background:#111;color:#eee;font:16px system-ui;display:grid;place-items:center;height:100vh">Access denied</body>';
     throw new Error('review code required');
   }
