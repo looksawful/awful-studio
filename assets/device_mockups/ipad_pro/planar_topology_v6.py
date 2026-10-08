@@ -18,7 +18,7 @@ def structured_rounded_prism_y(
     *,
     outer_segments=48,
     inner_segments=8,
-    inner_ratio=0.5,
+    inner_ratio=0.75,
 ):
     """Build quality-bounded rounded-rectangle caps without perimeter n-gons."""
     if outer_segments % inner_segments:
