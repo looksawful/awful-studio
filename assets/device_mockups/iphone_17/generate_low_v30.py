@@ -253,6 +253,7 @@ def rounded_rect_cdt_prism_y(
     target_step=6.0 * MM,
     corner_segments=16,
     corner_guard=False,
+    cutouts=(),
 ):
     """Build a rounded-rectangle prism with local constrained-Delaunay cap triangles."""
     half_w, half_h = width * 0.5, height * 0.5
@@ -260,7 +261,7 @@ def rounded_rect_cdt_prism_y(
     if cx <= 0.0 or cz <= 0.0:
         raise ValueError("rounded rectangle radius must fit inside width/height")
 
-    top_segments = max(1, math.ceil((width - 2.0 * radius) / target_step))
+    top_segments = max(1, math.ceil((width - 2.0 * radius) / (min(target_step, 6.0*MM) if cutouts else target_step)))
     side_segments = max(1, math.ceil((height - 2.0 * radius) / target_step))
     boundary = []
 
@@ -318,10 +319,53 @@ def rounded_rect_cdt_prism_y(
                 angle = math.radians(start_deg + 180.0 * k / corner_segments)
                 coords.append(Vector((x_center + inner_radius * math.cos(angle), z_center + inner_radius * math.sin(angle))))
 
+    def in_ring(point, ring):
+        inside = False
+        x, z = point
+        for i, (a, b) in enumerate(ring):
+            c, d = ring[(i + 1) % len(ring)]
+            if ((b > z) != (d > z)) and (x < a + (c - a) * (z - b) / (d - b)):
+                inside = not inside
+        return inside
+
+    hole_loops = []
+    if cutouts:
+        coords = coords[:boundary_count] + [
+            point for point in coords[boundary_count:]
+            if not any(in_ring((point.x, point.y), ring) for ring in cutouts)
+        ]
+        # Steiner support close to the small optic apertures prevents long
+        # needle triangles from connecting millimetre-scale edges to the grid.
+        for ring in cutouts:
+            cx = sum(point[0] for point in ring) / len(ring)
+            cz = sum(point[1] for point in ring) / len(ring)
+            for x, z in ring:
+                dx, dz = x - cx, z - cz
+                d = math.hypot(dx, dz)
+                coords.append(Vector((x + dx / d * 2.0 * MM,
+                                      z + dz / d * 2.0 * MM)))
+        optic_z = sum(z for ring in cutouts for _, z in ring) / sum(len(ring) for ring in cutouts)
+        # Local support only. Other devices and the remaining display keep their
+        # original sparse quality-bounded triangulation.
+        for row in range(-4, 3):
+            for col in range(-7, 8):
+                x, z = col * 2.0 * MM, optic_z + row * 2.0 * MM
+                if not inside_cap(x, z) or any(in_ring((x, z), ring) for ring in cutouts):
+                    continue
+                if any((point.x - x)**2 + (point.y - z)**2 < (0.7*MM)**2 for point in coords):
+                    continue
+                coords.append(Vector((x, z)))
+        for ring in cutouts:
+            start = len(coords)
+            coords.extend(Vector(point) for point in ring)
+            hole_loops.append(list(range(start, len(coords))))
+
     boundary_edges = [
         (index, (index + 1) % boundary_count)
         for index in range(boundary_count)
     ]
+    for loop in hole_loops:
+        boundary_edges.extend((loop[i], loop[(i + 1) % len(loop)]) for i in range(len(loop)))
     result = delaunay_2d_cdt(
         coords,
         boundary_edges,
@@ -331,7 +375,13 @@ def rounded_rect_cdt_prism_y(
         True,
     )
     cap_coords, _, cap_faces, source_vertices, _, _ = result
-    cap_faces = [tuple(face) for face in cap_faces if len(face) == 3]
+    cap_faces = [
+        tuple(face) for face in cap_faces if len(face) == 3
+        and not any(in_ring(
+            (sum(cap_coords[i].x for i in face) / 3,
+             sum(cap_coords[i].y for i in face) / 3), ring
+        ) for ring in cutouts)
+    ]
     if not cap_faces:
         raise RuntimeError(f"{name}: constrained Delaunay cap produced no triangles")
 
@@ -354,6 +404,11 @@ def rounded_rect_cdt_prism_y(
     for index, a in enumerate(boundary_output):
         b = boundary_output[(index + 1) % boundary_count]
         faces.append((a, b, b + count, a + count))
+    for loop in hole_loops:
+        out = [output_for_source[index] for index in loop]
+        for i, a in enumerate(out):
+            b = out[(i + 1) % len(out)]
+            faces.append((b, a, a + count, b + count))
 
     mesh = bpy.data.meshes.new(f"{name}_MESH")
     mesh.from_pydata(verts, [], faces)
@@ -748,6 +803,36 @@ apply_runtime_bevel(screen_glass, 0.00006)
 front_hardware_z = H*0.5 - 7.79*MM
 cam_x = 6.72*MM
 
+def rounded_optic_aperture(x, z, width, height, radius, arc_steps=4):
+    half_x = width * 0.5 - radius
+    half_z = height * 0.5 - radius
+    points = []
+    for cx, cz, first_angle in (
+        (half_x, half_z, 0),
+        (-half_x, half_z, 90),
+        (-half_x, -half_z, 180),
+        (half_x, -half_z, 270),
+    ):
+        for step in range(arc_steps):
+            angle = math.radians(first_angle + step * 90 / arc_steps)
+            points.append((x + cx + radius * math.cos(angle),
+                           z + cz + radius * math.sin(angle)))
+    return points
+
+# Two genuine display openings expose authored TrueDepth optics. The software
+# Dynamic Island stays in replaceable screen artwork, not duplicate geometry.
+aperture_margin = 0.04 * MM
+front_optic_apertures = (
+    rounded_optic_aperture(-4.15*MM, front_hardware_z,
+                          7.10*MM + 2*aperture_margin,
+                          2.30*MM + 2*aperture_margin,
+                          1.15*MM + aperture_margin),
+    rounded_optic_aperture(cam_x, front_hardware_z,
+                          2.30*MM + 2*aperture_margin,
+                          2.30*MM + 2*aperture_margin,
+                          1.15*MM + aperture_margin),
+)
+
 screen_content = rounded_rect_cdt_prism_y(
     "SCREEN_CONTENT",
     SCREEN_W,
@@ -760,6 +845,7 @@ screen_content = rounded_rect_cdt_prism_y(
     target_step=12*MM,
     corner_segments=20,
     corner_guard=True,
+    cutouts=front_optic_apertures,
 )
 
 # SCREEN_CONTENT stays clean replaceable artwork. Physical front hardware is

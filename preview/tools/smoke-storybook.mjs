@@ -135,6 +135,48 @@ async function checkStory(id, assetId, expectedClips = []) {
         if (!islandCenterRgb || Math.max(...islandCenterRgb) > 5) {
           throw new Error(`iPhone system-owned Dynamic Island missing from screen_on compositor: ${JSON.stringify(islandCenterRgb)}`);
         }
+        // The raster pill alone is insufficient: actual GLB polygons must
+        // expose both physical sensor and camera without an opaque screen cap.
+        const opticVisibility = await viewer.evaluate((element) => {
+          const meshes = [];
+          element._model.updateMatrixWorld(true);
+          element._model.traverse((node) => { if (node.isMesh) meshes.push(node); });
+          const V = element._model.position.constructor;
+          const a = new V(), b = new V(), c = new V();
+          const covers = (mesh, x, y) => {
+            const pos = mesh.geometry.attributes.position;
+            const index = mesh.geometry.index;
+            const count = index ? index.count : pos.count;
+            for (let i = 0; i < count; i += 3) {
+              a.fromBufferAttribute(pos, index ? index.getX(i) : i).applyMatrix4(mesh.matrixWorld);
+              b.fromBufferAttribute(pos, index ? index.getX(i + 1) : i + 1).applyMatrix4(mesh.matrixWorld);
+              c.fromBufferAttribute(pos, index ? index.getX(i + 2) : i + 2).applyMatrix4(mesh.matrixWorld);
+              const d = (b.y - c.y) * (a.x - c.x) + (c.x - b.x) * (a.y - c.y);
+              if (Math.abs(d) < 1e-12) continue;
+              const u = ((b.y - c.y) * (x - c.x) + (c.x - b.x) * (y - c.y)) / d;
+              const v = ((c.y - a.y) * (x - c.x) + (a.x - c.x) * (y - c.y)) / d;
+              if (u >= -1e-7 && v >= -1e-7 && u + v <= 1 + 1e-7) return true;
+            }
+            return false;
+          };
+          const opaqueScreen = meshes.filter((m) => m.name.startsWith('SCREEN_CONTENT_'));
+          const anyScreen = (x, y) => opaqueScreen.some((m) => covers(m, x, y));
+          const targets = [
+            { x: -0.00415, y: 0.067015, optic: 'FRONT_SENSOR_MASK' },
+            { x: 0.00672, y: 0.067015, optic: 'FRONT_CAMERA_GLASS' },
+          ];
+          return {
+            ordinaryScreenCovered: anyScreen(0, 0),
+            clearOptics: targets.map(({ x, y, optic }) => ({
+              optic, covered: anyScreen(x, y),
+              opticPresent: meshes.some((m) => m.name === optic && covers(m, x, y)),
+            })),
+          };
+        });
+        if (!opticVisibility.ordinaryScreenCovered ||
+            opticVisibility.clearOptics.some(({ covered, opticPresent }) => covered || !opticPresent)) {
+          throw new Error(`iPhone front optic is hidden behind opaque GLB screen: ${JSON.stringify(opticVisibility)}`);
+        }
       }
       const glow = await viewer.evaluate((element) => ({
         actual: [element._screenGlow?.width, element._screenGlow?.height],

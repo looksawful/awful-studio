@@ -31,7 +31,7 @@ EXPECTED = {
         "dimensions_m": (0.06657, 0.000325, 0.14479),
         "location_m": (0.0, -0.00379, 0.0),
         "radius_m": 0.01055,
-        "max_vertices": 480,
+        "max_vertices": 800,  # two real optic cutouts plus localized Steiner support
         "max_cap_edge_m": 0.020,
     },
 }
