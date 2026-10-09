@@ -122,10 +122,15 @@ jobs:
 
 
   ipad-topology-rebuild:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'agent/152-ipad-topology'
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
       - name: Install exact official Blender
         shell: bash
         run: |
@@ -154,23 +159,35 @@ jobs:
           node-version: '24'
           cache: npm
           cache-dependency-path: preview/package-lock.json
-      - name: Build Storybook from rebuilt iPad runtime
+      - name: Install preview dependencies and refresh catalog
         working-directory: preview
         run: |
           npm ci
           npm run catalog
-          npm run storybook:build
+      - name: Pin rebuilt iPad assets to the review branch
+        shell: bash
+        run: |
+          if git log -1 --format=%s | grep -Fq 'chore(ipad): pin rebuilt topology assets'; then
+            echo 'Rebuilt assets are already pinned on this source revision.'
+            exit 0
+          fi
+          git add             assets/device_mockups/ipad_pro/generated/ipad_pro_11_m5_low_v6.blend             assets/device_mockups/ipad_pro/generated/ipad_pro_13_m5_low_v6.blend             assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6.asset.json             assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_delivery.blend             assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_web.glb             assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_web_meshopt.glb             assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6.asset.json             assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_delivery.blend             assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_web.glb             assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_web_meshopt.glb             extension/awful_studio/assets/devices/ipad_pro_11_m5_low_v6.blend             extension/awful_studio/assets/devices/ipad_pro_13_m5_low_v6.blend             extension/awful_studio/device_asset_loader.py             preview/generated/asset-catalog.json
+          if git diff --cached --quiet; then
+            echo 'No rebuilt asset changes to pin.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'chore(ipad): pin rebuilt topology assets (#152)'
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
+      - name: Build Storybook from rebuilt iPad runtime
+        working-directory: preview
+        run: npm run storybook:build
       - name: Smoke rebuilt iPad Storybook
         working-directory: preview
         run: |
           npx playwright install --with-deps chromium
           npm run smoke
-      - name: Upload Storybook topology prototype
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: storybook-topology-prototype
-          path: preview/storybook-static
-          if-no-files-found: error
 
   merge-gate:
     if: always()
