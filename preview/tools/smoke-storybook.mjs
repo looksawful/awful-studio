@@ -74,6 +74,13 @@ async function checkStory(id, assetId, expectedClips = []) {
       }
       await screen.selectOption('screen_off');
       await screen.selectOption('screen_on');
+      const glow = await viewer.evaluate((element) => ({
+        actual: [element._screenGlow?.width, element._screenGlow?.height],
+        expected: [element.asset?.screenGlow?.width_mm / 1000, element.asset?.screenGlow?.height_mm / 1000],
+      }));
+      if (!glow.actual.every((value, index) => Number.isFinite(value) && Math.abs(value - glow.expected[index]) < 1e-6)) {
+        throw new Error(`${assetId}: screen glow dimensions do not match manifest ${JSON.stringify(glow)}`);
+      }
     }
     if (expectedClips.length) {
       const clips = page.locator('awful-model-viewer select[data-control="animation-clip"]');

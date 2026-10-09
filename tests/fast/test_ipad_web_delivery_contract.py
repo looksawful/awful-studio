@@ -43,6 +43,8 @@ def glb_node_names(path: Path) -> set[str]:
 class IPadWebDeliveryContractTests(unittest.TestCase):
     def test_v6_runtime_manifests_are_current_and_match_plugin_sources(self):
         loader = load_loader()
+        generator = (ROOT / 'assets/device_mockups/ipad_pro/generate_low_v6.py').read_text(encoding='utf-8')
+        self.assertIn('ipados26_lock_screen_', generator)
         for size, (asset_id, key, root_name) in CASES.items():
             manifest_path = RUNTIME / f'{asset_id}_v6.asset.json'
             self.assertTrue(manifest_path.is_file(), f'missing iPad {size} runtime manifest')
@@ -71,18 +73,24 @@ class IPadWebDeliveryContractTests(unittest.TestCase):
             compat = RUNTIME / manifest['web_variants']['compat']['file']
             meshopt = RUNTIME / manifest['web_variants']['meshopt']['file']
             required = {
-                root_name, 'SCREEN_CONTENT', 'SCREEN_GLASS', 'FRONT_CAMERA_GLASS',
+                root_name, 'SCREEN_CONTENT', 'FRONT_CAMERA_GLASS',
                 'APPLE_LOGO_DECAL', 'CAMERA_HOUSING', 'REAR_CAMERA_GLASS', 'LIDAR',
                 'ANCHOR_CENTER', 'ANCHOR_BOTTOM_CENTER', 'ANCHOR_SCREEN_CENTER',
                 'ANCHOR_REAR_CAMERA', 'SCREEN_GLOW_ANCHOR',
             }
-            self.assertTrue(required <= glb_node_names(compat))
-            self.assertTrue(required <= glb_node_names(meshopt))
+            compat_nodes = glb_node_names(compat)
+            meshopt_nodes = glb_node_names(meshopt)
+            self.assertTrue(required <= compat_nodes)
+            self.assertTrue(required <= meshopt_nodes)
+            self.assertEqual(sum(name in compat_nodes for name in ('SCREEN_CONTENT', 'SCREEN_GLASS')), 1)
+            self.assertEqual(sum(name in meshopt_nodes for name in ('SCREEN_CONTENT', 'SCREEN_GLASS')), 1)
             self.assertEqual(manifest['default_web_variant'], 'compat')
             self.assertEqual(manifest['preferred_web_variant'], 'meshopt')
             doc = glb_doc(compat)
             screen_material = next(m for m in doc['materials'] if m.get('name') == 'MAT_SCREEN_CONTENT')
-            self.assertIn('baseColorTexture', screen_material['pbrMetallicRoughness'])
+            self.assertNotIn('baseColorTexture', screen_material['pbrMetallicRoughness'])
+            self.assertLessEqual(max(screen_material['pbrMetallicRoughness']['baseColorFactor'][:3]), 0.01)
+            self.assertEqual(screen_material['extensions']['KHR_materials_specular']['specularFactor'], 0)
             self.assertIn('emissiveTexture', screen_material)
 
 

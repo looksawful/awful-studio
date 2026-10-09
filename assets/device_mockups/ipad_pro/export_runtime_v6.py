@@ -103,7 +103,7 @@ for obj in bpy.context.selected_objects:
     obj.select_set(False)
 exported = []
 for obj in [root] + list(root.children_recursive):
-    if obj.type in {'MESH', 'EMPTY'} and not obj.hide_render:
+    if obj.type in {'MESH', 'EMPTY'} and not obj.hide_render and obj.name != 'SCREEN_GLASS':
         obj.select_set(True)
         exported.append(obj.name)
 bpy.context.view_layer.objects.active = root

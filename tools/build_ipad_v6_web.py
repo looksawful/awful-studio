@@ -13,7 +13,6 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 DEVICE = ROOT / 'assets/device_mockups/ipad_pro'
 RUNTIME = DEVICE / 'runtime/v6'
-GENERATOR_VERSION = 'ipad_v6_packaged_blend_web_delivery'
 LOADER_PATH = ROOT / 'extension/awful_studio/device_asset_loader.py'
 CASES = {
     '11': ('ipad_pro_11_m5', 'DEVICE_IPAD_PRO_11', 'CTRL_IPAD_PRO_11'),
@@ -59,9 +58,11 @@ def source_files_for(size: str, asset_id: str) -> list[str]:
     return [
         'assets/device_mockups/common/foundation_common.py',
         'assets/device_mockups/ipad_pro/generate_low_v6.py',
+        'assets/device_mockups/ipad_pro/planar_topology_v6.py',
         'assets/device_mockups/ipad_pro/export_runtime_v6.py',
         'assets/device_mockups/ipad_pro/optimize_runtime_v6.py',
         f'assets/device_mockups/ipad_pro/reference/ipados26_official_screen_{size}.png',
+        f'assets/device_mockups/ipad_pro/reference/ipados26_lock_screen_{size}.png',
         'assets/device_mockups/ipad_pro/reference/apple_logo_alpha.png',
     ]
 
@@ -75,24 +76,22 @@ def build_one(blender: Path, size: str, loader):
         cwd=ROOT, text=True,
     ).strip()
     generated = DEVICE / f'generated/{asset_id}_low_v6.blend'
-    evidence = DEVICE / f'evidence/{asset_id}_low_v6_validation.json'
-    previews = DEVICE / f'previews/{size}/low_v6'
-    run(
-        blender, '--factory-startup', '--background',
-        '--python', DEVICE / 'generate_low_v6.py', '--',
-        '--size', size,
-        '--out', generated,
-        '--evidence', evidence,
-        '--previews', previews,
-    )
     source_blend = ROOT / f'extension/awful_studio/assets/devices/{asset_id}_low_v6.blend'
-    run(blender, '--factory-startup', '--background', generated, '--python', ROOT / 'tools/package_device_asset.py', '--',
+    # Never label a cached blend with the fingerprint of newer generator code.
+    run(blender, '--factory-startup', '--background', '--python-exit-code', '1',
+        '--python', DEVICE / 'generate_low_v6.py', '--', '--size', size,
+        '--out', generated, '--skip-previews')
+    run(blender, '--factory-startup', '--background', generated, '--python-exit-code', '1',
+        '--python', ROOT / 'tests/runtime/ipad_control_geometry_contract.py', '--', '--size', size)
+    run(blender, '--factory-startup', '--background', generated, '--python-exit-code', '1',
+        '--python', DEVICE / 'validate_optics_ports.py')
+    run(blender, '--factory-startup', '--background', generated, '--python-exit-code', '1', '--python', ROOT / 'tools/package_device_asset.py', '--',
         '--output', source_blend, '--entry', f'AWFUL_DEVICE_IPAD_PRO_{size}', '--root', root_name,
         '--key', f'IPAD_PRO_{size}', '--stage', 'LOW_DRAFT', '--variant', 'low_v6', '--revision', revision)
     update_loader_revision(LOADER_PATH, loader_key, revision)
     plugin_revision = revision
     run(
-        blender, source_blend, '--background', '--python', DEVICE / 'export_runtime_v6.py', '--',
+        blender, '--factory-startup', '--background', source_blend, '--python-exit-code', '1', '--python', DEVICE / 'export_runtime_v6.py', '--',
         '--size', size,
         '--source-revision', revision,
         '--source-commit', source_commit,
@@ -104,7 +103,6 @@ def build_one(blender: Path, size: str, loader):
     manifest_path = RUNTIME / f'{prefix}.asset.json'
     manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
     manifest['source_files'] = source_hashes
-    manifest['generator_version'] = GENERATOR_VERSION
 
     compat = RUNTIME / f'{prefix}_web.glb'
     meshopt = RUNTIME / f'{prefix}_web_meshopt.glb'
@@ -112,7 +110,7 @@ def build_one(blender: Path, size: str, loader):
     doc = read_glb_json(compat)
     names = {node.get('name') for node in doc.get('nodes', []) if node.get('name')}
     required = {
-        root_name, 'SCREEN_CONTENT', 'SCREEN_GLASS', 'FRONT_CAMERA_GLASS',
+        root_name, 'SCREEN_CONTENT', 'FRONT_CAMERA_GLASS',
         'APPLE_LOGO_DECAL', 'CAMERA_HOUSING', 'REAR_CAMERA_GLASS', 'LIDAR',
         'ANCHOR_CENTER', 'ANCHOR_BOTTOM_CENTER', 'ANCHOR_SCREEN_CENTER',
         'ANCHOR_REAR_CAMERA', 'SCREEN_GLOW_ANCHOR',
@@ -140,12 +138,9 @@ def build_one(blender: Path, size: str, loader):
         'runtime_bounds_mm': manifest['runtime_bounds_mm'],
     }
     artifacts = {
-        'generated_blend': generated,
-        'validation': evidence,
         'delivery_blend': delivery,
         'compat_glb': compat,
         'meshopt_glb': meshopt,
-        'plugin_bundle': source_blend,
     }
     manifest['artifacts'] = {
         name: {

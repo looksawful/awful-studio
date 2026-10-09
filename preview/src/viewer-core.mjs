@@ -18,18 +18,17 @@ export function availableLods(asset) {
   return [{ name: 'Default', path: asset.previewGlb }];
 }
 
-export function validateModelProvenance(asset, root) {
-  if (!root?.userData) return ['GLB provenance root missing'];
-  const expected = {
-    delivery_version: asset.version,
-    delivery_stage: asset.stage,
-    delivery_source_revision: asset.sourceRevision,
-    delivery_source_commit: asset.sourceCommit,
-  };
-  return Object.entries(expected)
-    .filter(([, value]) => value != null)
-    .filter(([key, value]) => root.userData[key] !== value)
-    .map(([key]) => `GLB provenance mismatch: ${key}`);
+/** Use the delivery manifest's physical screen rectangle when available. */
+export function screenGlowDimensions(asset, geometrySize = {}) {
+  const width = Number(asset?.screenGlow?.width_mm) / 1000;
+  const height = Number(asset?.screenGlow?.height_mm) / 1000;
+  if (Number.isFinite(width) && width > 0 && Number.isFinite(height) && height > 0) {
+    return [width, height];
+  }
+  const localWidth = Math.abs(Number(geometrySize.x));
+  const localHeight = Math.abs(Number(geometrySize.y));
+  if (localWidth > 0 && localHeight > 0) return [localWidth, localHeight];
+  return [localWidth, localHeight].sort((a, b) => b - a);
 }
 
 export function cameraDirection(preset) {
@@ -41,6 +40,10 @@ export function cameraDirection(preset) {
   const direction = directions[preset];
   if (!direction) throw new Error(`Unknown camera preset: ${preset}`);
   return direction;
+}
+
+export function perspectiveClipPlanes(distance) {
+  return { near: Math.max(distance / 100, 0.0001), far: Math.max(distance * 10, 0.1) };
 }
 
 export function previewMaterialPolicy(name, { hasTexture = false } = {}) {

@@ -18,7 +18,7 @@
   "runtime_bounds_mm": [
     215.578,
     281.688,
-    6.564
+    6.394
   ],
   "units": "meters",
   "source_up_axis": "+Z",
@@ -62,7 +62,6 @@
     "MAT_APPLE_LOGO_DECAL",
     "MAT_ASSEMBLY_GAP",
     "MAT_DISPLAY_BEZEL",
-    "MAT_DISPLAY_GLASS",
     "MAT_FLASH",
     "MAT_FRONT_OPTIC",
     "MAT_IPAD_ALUMINUM",
@@ -107,7 +106,6 @@
     "REAR_CAMERA_RING",
     "REAR_MIC",
     "SCREEN_CONTENT",
-    "SCREEN_GLASS",
     "SCREEN_GLOW_ANCHOR",
     "SMART_CONNECTOR_1",
     "SMART_CONNECTOR_2",
@@ -126,6 +124,7 @@
     "TOP_R_SPEAKER_05",
     "TOP_R_SPEAKER_06",
     "USB_C_CAVITY",
+    "USB_C_TONGUE",
     "VOL_DOWN",
     "VOL_UP"
   ],
@@ -162,9 +161,9 @@
     }
   },
   "camera_fit": "runtime_bounds",
-  "source_revision": "fab88ffb8004423c55851571de446dde3369bef97e8f7908373dcf7b994779dc",
-  "source_commit": "2c659b2754654827c23d62dfc269d2719754a223",
-  "plugin_source_revision": "fab88ffb8004423c55851571de446dde3369bef97e8f7908373dcf7b994779dc",
+  "source_revision": "3efe7acbfe55c3e92d5a17d7c74c5a0fededd56f2ce6f610d4c0afce379544ff",
+  "source_commit": "1a4bd053561a9373358fcd5f2a180d0d9e92a797",
+  "plugin_source_revision": "3efe7acbfe55c3e92d5a17d7c74c5a0fededd56f2ce6f610d4c0afce379544ff",
   "generator_version": "ipad_v6_packaged_blend_web_delivery",
   "delivery_profile": {
     "simplification": "none",
@@ -180,14 +179,16 @@
   },
   "source_files": {
     "assets/device_mockups/common/foundation_common.py": "1d68c3fff908b7ae149f74c31a19064eb6d2384234d33bd71071fea70d651d12",
-    "assets/device_mockups/ipad_pro/export_runtime_v6.py": "80a2e8197b87cbf9207713ecbbdc61d86809d356797621ba82da4e2767f01c06",
-    "assets/device_mockups/ipad_pro/generate_low_v6.py": "d47bc00c9a07898871edb43e27c2b25c2203221f393c3ef80a3154015489f5ee",
-    "assets/device_mockups/ipad_pro/optimize_runtime_v6.py": "a2c1755323c6e301d341dfa91c7377228dbbf00d76cbc5a4f1473d81754b2058",
+    "assets/device_mockups/ipad_pro/export_runtime_v6.py": "a3ad601ffb9cee2803487c66ee565ed848d88a4a2a6988ae5db2595e3cf7d7d9",
+    "assets/device_mockups/ipad_pro/generate_low_v6.py": "289cb167b1c45138cd8710ae14a39a9c3ba983e0d7acce643e7ec36f6c7709eb",
+    "assets/device_mockups/ipad_pro/optimize_runtime_v6.py": "e9eb6ac3ab33af97ab4ad008264c9c997c02715ce87be2fedff4ef2cb77c8c0a",
+    "assets/device_mockups/ipad_pro/planar_topology_v6.py": "220e6b94a98f5aff6593d71c96cb0795f3bc5526f2579149e220e425e6b106f7",
     "assets/device_mockups/ipad_pro/reference/apple_logo_alpha.png": "50209309a1cf3bcb874118b27fe9c9779aaafabaf79bb304cf0aa3a2898c9833",
+    "assets/device_mockups/ipad_pro/reference/ipados26_lock_screen_13.png": "e5518a1b6e7adcb26629cc8929cdc204079d72408b5756c0f7960304373db7ce",
     "assets/device_mockups/ipad_pro/reference/ipados26_official_screen_13.png": "8a260fe6c432132c2987179228d80a1022def52ce3d7dad74a6588abd36f122b"
   },
   "glb_qa": {
-    "triangle_count": 20704,
+    "triangle_count": 34744,
     "required_nodes": [
       "ANCHOR_BOTTOM_CENTER",
       "ANCHOR_CENTER",
@@ -200,29 +201,28 @@
       "LIDAR",
       "REAR_CAMERA_GLASS",
       "SCREEN_CONTENT",
-      "SCREEN_GLASS",
       "SCREEN_GLOW_ANCHOR"
     ],
     "node_count": 56,
-    "material_count": 11,
+    "material_count": 10,
     "runtime_bounds_mm": [
       215.578,
       281.688,
-      6.564
+      6.394
     ]
   },
   "artifacts": {
     "delivery_blend": {
       "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_delivery.blend",
-      "sha256": "f14b996d6f72bda584065bf48c27454a30c376fcabb130407aead4ada004fdd8"
+      "sha256": "aa61a687fb146f5dd13e61b3f42b4f24451023409e48e9c09df4c4d1e180736d"
     },
     "compat_glb": {
       "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_web.glb",
-      "sha256": "493018d1c634d57a2ade0d1398fecf29eb2ed1e380e76601b40dd4795ec7e0a0"
+      "sha256": "ba80c77ea73a452c17ec3d2a17518aa245fd10c374cefdd7f700b30e5e025a9b"
     },
     "meshopt_glb": {
       "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_web_meshopt.glb",
-      "sha256": "69c832370becaba4cab488f14fd1ccef341d7cf45621c6538937218841f9ed30"
+      "sha256": "838f0f5719308b09875808e7ac107495e2bf69e9e71ea98204f53fbe5e59e255"
     }
   }
 }
