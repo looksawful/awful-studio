@@ -218,7 +218,7 @@ class AwfulModelViewer extends HTMLElement {
           texture.anisotropy = maxAnisotropy;
           texture.needsUpdate = true;
         }
-        if (asset.id === 'iphone-17-v30' && material.name === 'MAT_SCREEN_CONTENT') {
+        if (this._asset?.id === 'iphone-17-v30' && material.name === 'MAT_SCREEN_CONTENT') {
           // System-owned Dynamic Island, composited over replaceable screen artwork.
           // Pixel datum: original Apple iOS 26 screenshot, 1206x2622 (not hardware geometry).
           const source = material.emissiveMap ?? material.map;
