@@ -1,8 +1,10 @@
 import json, math, os, sys, bmesh, bpy
 HERE=os.path.dirname(os.path.abspath(__file__))
 COMMON=os.path.normpath(os.path.join(HERE,'..','common'))
+if HERE not in sys.path: sys.path.insert(0,HERE)
 if COMMON not in sys.path: sys.path.insert(0,COMMON)
 import foundation_common as fc
+from planar_topology_v6 import structured_rounded_prism_y
 MM=fc.MM
 SPECS={
  '11':dict(w=177.5,h=249.7,d=5.3,sw=160.13,sh=232.32,br=9.0,sr=6.8),
@@ -26,25 +28,28 @@ ctrl_c=fc.make_collection(f'IPAD_PRO_{SIZE}_CONTROLLERS')
 metal=fc.make_material('MAT_IPAD_ALUMINUM',(0.0045,0.0055,0.0080),1.0,0.30)
 metal_dark=fc.make_material('MAT_IPAD_EDGE',(0.010,0.012,0.017),1.0,0.22)
 black=fc.make_material('MAT_OPTICS_BLACK',(0.0005,0.0007,0.0010),0.0,0.08)
-gap=fc.make_material('MAT_ASSEMBLY_GAP',(0.0003,0.0004,0.0006),0.0,0.34)
-bezel=fc.make_material('MAT_DISPLAY_BEZEL',(0.0005,0.0007,0.0010),0.0,0.12)
+gap=fc.make_material('MAT_ASSEMBLY_GAP',(0.0003,0.0004,0.0006),0.0,0.55)
+gap.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value=.08
+bezel=fc.make_material('MAT_DISPLAY_BEZEL',(0.0005,0.0007,0.0010),0.0,0.30)
+bezel.node_tree.nodes.get('Principled BSDF').inputs['Specular IOR Level'].default_value=.12
 glass=fc.make_material('MAT_DISPLAY_GLASS',(0.008,0.010,0.014),0.0,0.12)
 gbsdf=glass.node_tree.nodes.get('Principled BSDF'); gbsdf.inputs['Coat Weight'].default_value=.14; gbsdf.inputs['Coat Roughness'].default_value=.10; gbsdf.inputs['Alpha'].default_value=.10
 try: glass.surface_render_method='DITHERED'
 except Exception: pass
-optic=fc.make_material('MAT_OPTICAL_GLASS',(0.0008,0.0012,0.0020),0.0,0.025)
+optic=fc.make_glass_material('MAT_OPTICAL_GLASS',(0.015,0.020,0.028),0.035,transmission=.90,ior=1.52)
 obsdf=optic.node_tree.nodes.get('Principled BSDF'); obsdf.inputs['Coat Weight'].default_value=.55; obsdf.inputs['Coat Roughness'].default_value=.010
 front_optic=fc.make_material('MAT_FRONT_OPTIC',(0.0040,0.0060,0.0100),0.0,0.028)
 fobsdf=front_optic.node_tree.nodes.get('Principled BSDF'); fobsdf.inputs['Coat Weight'].default_value=.62; fobsdf.inputs['Coat Roughness'].default_value=.012
 screen_mat=fc.make_material('MAT_SCREEN_CONTENT',(0.0018,0.0026,0.0040),0.0,0.18)
-screen_path=os.path.join(HERE,'reference',f'ipados26_official_screen_{SIZE}.png')
+screen_path=os.path.join(HERE,'reference',f'ipados26_lock_screen_{SIZE}.png')
 screen_tex=screen_mat.node_tree.nodes.new('ShaderNodeTexImage'); screen_tex.image=bpy.data.images.load(screen_path,check_existing=True); screen_tex.image.colorspace_settings.name='sRGB'; screen_tex.image.pack()
-screen_bsdf=screen_mat.node_tree.nodes.get('Principled BSDF'); screen_mat.node_tree.links.new(screen_tex.outputs['Color'],screen_bsdf.inputs['Base Color']); screen_mat.node_tree.links.new(screen_tex.outputs['Color'],screen_bsdf.inputs['Emission Color']); screen_bsdf.inputs['Emission Strength'].default_value=.85
+screen_bsdf=screen_mat.node_tree.nodes.get('Principled BSDF'); screen_mat.node_tree.links.new(screen_tex.outputs['Color'],screen_bsdf.inputs['Emission Color']); screen_bsdf.inputs['Emission Strength'].default_value=.85
+screen_bsdf.inputs['Specular IOR Level'].default_value=0.0
 flash=fc.make_material('MAT_FLASH',(0.90,0.84,0.68),0.0,0.16)
 body=fc.rounded_prism('BODY_ALUMINUM',W,H,CORE_D,s['br']*MM,metal,body_c,axis='Y',location=(0,CORE_Y,0),outline_segments=48)
-fc.rounded_prism('DISPLAY_GLASS_SEAT',W-.30*MM,H-.30*MM,.05*MM,(s['br']-.15)*MM,gap,screen_c,axis='Y',location=(0,FRONT_Y+.025*MM,0),outline_segments=48)
-fc.rounded_prism('DISPLAY_BEZEL',SW+1.3*MM,SH+1.3*MM,.08*MM,(s['sr']+.50)*MM,bezel,screen_c,axis='Y',location=(0,FRONT_Y-.04*MM,0),outline_segments=48)
-screen_content=fc.rounded_prism('SCREEN_CONTENT',SW,SH,.06*MM,s['sr']*MM,screen_mat,screen_c,axis='Y',location=(0,FRONT_Y-.09*MM,0),outline_segments=48)
+structured_rounded_prism_y('DISPLAY_GLASS_SEAT',W-.30*MM,H-.30*MM,.05*MM,(s['br']-.15)*MM,gap,screen_c,location=(0,FRONT_Y+.025*MM,0))
+structured_rounded_prism_y('DISPLAY_BEZEL',SW+1.3*MM,SH+1.3*MM,.08*MM,(s['sr']+.50)*MM,bezel,screen_c,location=(0,FRONT_Y-.04*MM,0))
+screen_content=structured_rounded_prism_y('SCREEN_CONTENT',SW,SH,.06*MM,s['sr']*MM,screen_mat,screen_c,location=(0,FRONT_Y-.09*MM,0))
 uv=screen_content.data.uv_layers.new(name='UVMap')
 for loop in screen_content.data.loops:
     co=screen_content.data.vertices[loop.vertex_index].co
@@ -59,10 +64,14 @@ fc.cylinder('FRONT_CAMERA_INNER',.55*MM,.016*MM,black,detail_c,(W*.5-4.5*MM,FRON
 fc.cylinder('FRONT_CAMERA_PUPIL',.24*MM,.012*MM,front_optic,detail_c,(W*.5-4.5*MM,FRONT_SURFACE+.002*MM,0),axis='Y',vertices=48)
 hs=29.0*MM; hx=-W*.5+hs*.5+5.5*MM; hz=H*.5-hs*.5-6.5*MM
 housing=fc.rounded_prism('CAMERA_HOUSING',hs,hs,.82*MM,6.4*MM,metal,detail_c,axis='Y',location=(hx,D*.5+.39*MM,hz),edge_bevel=.00018,outline_segments=48)
-fc.cylinder('REAR_CAMERA_RING',6.35*MM,.46*MM,metal_dark,detail_c,(hx-5.8*MM,D*.5+.86*MM,hz+5.5*MM),axis='Y',vertices=128)
+rear_ring=fc.cylinder('REAR_CAMERA_RING',6.35*MM,.46*MM,metal_dark,detail_c,(hx-5.8*MM,D*.5+.86*MM,hz+5.5*MM),axis='Y',vertices=128)
+ring_cut=fc.cylinder('REAR_RING_CUTTER',5.25*MM,1.2*MM,None,detail_c,(hx-5.8*MM,D*.5+.86*MM,hz+5.5*MM),axis='Y',vertices=96)
+fc.boolean_difference(rear_ring,ring_cut,name='OPEN_LENS_RING')
+housing_cut=fc.cylinder('CAMERA_HOUSING_CUTTER',5.10*MM,1.6*MM,None,detail_c,(hx-5.8*MM,D*.5+.70*MM,hz+5.5*MM),axis='Y',vertices=96)
+fc.boolean_difference(housing,housing_cut,name='CAMERA_OPTICAL_WELL')
 fc.cylinder('REAR_CAMERA_GLASS',5.20*MM,.22*MM,optic,detail_c,(hx-5.8*MM,D*.5+1.18*MM,hz+5.5*MM),axis='Y',vertices=128)
-fc.cylinder('REAR_CAMERA_INNER',3.75*MM,.12*MM,black,detail_c,(hx-5.8*MM,D*.5+1.34*MM,hz+5.5*MM),axis='Y',vertices=96)
-fc.cylinder('REAR_CAMERA_PUPIL',1.55*MM,.06*MM,optic,detail_c,(hx-5.8*MM,D*.5+1.43*MM,hz+5.5*MM),axis='Y',vertices=80)
+fc.cylinder('REAR_CAMERA_INNER',4.85*MM,.12*MM,black,detail_c,(hx-5.8*MM,D*.5+.96*MM,hz+5.5*MM),axis='Y',vertices=96)
+fc.cylinder('REAR_CAMERA_PUPIL',1.55*MM,.06*MM,front_optic,detail_c,(hx-5.8*MM,D*.5+1.04*MM,hz+5.5*MM),axis='Y',vertices=80)
 fc.cylinder('FLASH',2.75*MM,.16*MM,flash,detail_c,(hx+5.8*MM,D*.5+.92*MM,hz+5.5*MM),axis='Y',vertices=80)
 fc.cylinder('LIDAR_RING',4.15*MM,.18*MM,metal_dark,detail_c,(hx-5.8*MM,D*.5+.88*MM,hz-5.5*MM),axis='Y',vertices=96)
 fc.cylinder('LIDAR',3.35*MM,.14*MM,optic,detail_c,(hx-5.8*MM,D*.5+1.02*MM,hz-5.5*MM),axis='Y',vertices=96)
@@ -84,8 +93,10 @@ for loop,coord in zip(mesh.loops,((0,0),(1,0),(1,1),(0,1))): uv.data[loop.index]
 boolean_cuts=[]
 usb_cut=fc.rounded_cube('USB_C_CUTTER',(12.8*MM,3.2*MM,1.8*MM),.55*MM,None,detail_c)
 fc.place_on_rounded_edge(usb_cut,W,H,s['br']*MM,'BOTTOM',0,outward=-.55*MM,local_normal=(0,0,1)); fc.boolean_difference(body,usb_cut,name='CUT_USB_C'); boolean_cuts.append('USB_C')
-usb=fc.rounded_cube('USB_C_CAVITY',(11.3*MM,1.65*MM,.46*MM),.40*MM,black,detail_c)
-fc.place_on_rounded_edge(usb,W,H,s['br']*MM,'BOTTOM',0,outward=-.24*MM,local_normal=(0,0,1))
+usb=fc.rounded_cube('USB_C_CAVITY',(11.3*MM,2.3*MM,.16*MM),.07*MM,black,detail_c)
+fc.place_on_rounded_edge(usb,W,H,s['br']*MM,'BOTTOM',0,outward=-1.25*MM,local_normal=(0,0,1))
+tongue=fc.rounded_cube('USB_C_TONGUE',(7.2*MM,.55*MM,.80*MM),.12*MM,black,detail_c)
+fc.place_on_rounded_edge(tongue,W,H,s['br']*MM,'BOTTOM',0,outward=-.65*MM,local_normal=(0,0,1))
 for edge_name in ('BOTTOM','TOP'):
     for side in (-1,1):
         base_x=side*(W*.5-20*MM)
@@ -96,12 +107,17 @@ for edge_name in ('BOTTOM','TOP'):
             cavity=fc.cylinder(f'{edge_name}_{"L" if side<0 else "R"}_SPEAKER_{idx:02d}',.46*MM,.34*MM,black,detail_c,axis='Z',vertices=32)
             fc.place_on_rounded_edge(cavity,W,H,s['br']*MM,edge_name,x,outward=-.16*MM,local_normal=(0,0,1)); boolean_cuts.append(f'SPK_{edge_name}_{side}_{idx}')
 # Physical button recesses and shallow controls.
+CONTROL_PROFILE=2.26*MM
+CONTROL_RECESS_CLEARANCE=.20*MM
+VOLUME_LENGTH=10.06*MM
+VOLUME_UP_FROM_TOP=19.33*MM
+VOLUME_DOWN_FROM_TOP=31.39*MM
 def edge_button(name,edge_name,coord,dims,cut_dims,normal):
     cut=fc.rounded_cube(name+'_CUTTER',cut_dims,.25*MM,None,detail_c); fc.place_on_rounded_edge(cut,W,H,s['br']*MM,edge_name,coord,outward=-.28*MM,local_normal=normal); fc.boolean_difference(body,cut,name='CUT_'+name); boolean_cuts.append(name)
     btn=fc.rounded_cube(name,dims,.12*MM,metal_dark,detail_c); fc.place_on_rounded_edge(btn,W,H,s['br']*MM,edge_name,coord,outward=.018*MM,local_normal=normal); return btn
-edge_button('TOP_BUTTON','TOP',-W*.5+24*MM,(14*MM,.72*MM,.12*MM),(14.8*MM,1.3*MM,1.0*MM),(0,0,1))
-edge_button('VOL_UP','RIGHT',H*.5-28*MM,(.12*MM,.72*MM,10*MM),(1.0*MM,1.3*MM,10.8*MM),(1,0,0))
-edge_button('VOL_DOWN','RIGHT',H*.5-44*MM,(.12*MM,.72*MM,10*MM),(1.0*MM,1.3*MM,10.8*MM),(1,0,0))
+edge_button('TOP_BUTTON','TOP',-W*.5+24*MM,(14*MM,CONTROL_PROFILE,.12*MM),(14.8*MM,CONTROL_PROFILE+CONTROL_RECESS_CLEARANCE,1.0*MM),(0,0,1))
+edge_button('VOL_UP','RIGHT',H*.5-VOLUME_UP_FROM_TOP,(.12*MM,CONTROL_PROFILE,VOLUME_LENGTH),(1.0*MM,CONTROL_PROFILE+CONTROL_RECESS_CLEARANCE,10.8*MM),(1,0,0))
+edge_button('VOL_DOWN','RIGHT',H*.5-VOLUME_DOWN_FROM_TOP,(.12*MM,CONTROL_PROFILE,VOLUME_LENGTH),(1.0*MM,CONTROL_PROFILE+CONTROL_RECESS_CLEARANCE,10.8*MM),(1,0,0))
 bev=fc.add_bevel(body,.00018,segments=4)
 for edge in body.data.edges: edge.use_edge_sharp=True
 bev.harden_normals=True
@@ -111,13 +127,20 @@ for idx,x_mm in enumerate((-5.27,0,5.27),1):
     fc.cylinder(f'SMART_CONNECTOR_{idx}',1.35*MM,.22*MM,metal_dark,detail_c,(x_mm*MM,D*.5+.08*MM,-H*.5+12*MM),axis='Y',vertices=32)
 rail=fc.rounded_cube('PENCIL_MAGNETIC_RAIL',(.04*MM,.72*MM,82*MM),.04*MM,metal_dark,detail_c)
 fc.place_on_rounded_edge(rail,W,H,s['br']*MM,'RIGHT',6*MM,outward=-.012*MM,local_normal=(1,0,0))
+# Correct handedness of closed X/Z prisms before shading and web export.
+for obj in list(bpy.data.objects):
+    if obj.type != 'MESH': continue
+    bm=bmesh.new(); bm.from_mesh(obj.data)
+    if bm.faces and all(edge.is_manifold for edge in bm.edges) and bm.calc_volume(signed=True)<0:
+        bmesh.ops.reverse_faces(bm,faces=list(bm.faces)); bm.to_mesh(obj.data); obj.data.update()
+    bm.free()
 root=fc.empty(f'CTRL_IPAD_PRO_{SIZE}',ctrl_c)
 glow_anchor.parent=root
 for c in (body_c,detail_c,screen_c):
     for o in c.objects: o.parent=root
 root['asset_id']=f'ipad_pro_{SIZE}_m5'; root['asset_version']='low_v6_0.3'; root['stage']='LOW_DRAFT'; root['size_variant']=SIZE
 root['dimensions_mm']=f"{s['w']} x {s['h']} x {s['d']}"; root['screen_object']='SCREEN_CONTENT'; root['runtime_contract']='awful-device-v1'
-root['screen_texture']=f'reference/ipados26_official_screen_{SIZE}.png'; root['screen_texture_source']='Apple Support iPad User Guide, iPadOS 26 official lock screen artwork'; root['screen_texture_source_url']='https://help.apple.com/assets/698A8EFC4AF0A5C4CF042598/698A8F004AF0A5C4CF04259E/en_US/3fc0f24ff5065da6a985df207b96d8f2.png'
+root['screen_texture']=f'reference/ipados26_lock_screen_{SIZE}.png'; root['screen_texture_source']='Derived clean lock screen from Apple Support iPadOS 26 reference art'; root['screen_texture_source_url']='https://help.apple.com/assets/698A8EFC4AF0A5C4CF042598/698A8F004AF0A5C4CF04259E/en_US/3fc0f24ff5065da6a985df207b96d8f2.png'
 root['screen_state_default']='screen_on'; root['screen_on_emission_strength']=.85; root['screen_off_emission_strength']=0.0; root['screen_glow_energy']=8.0; root['screen_glow_type']='rect_area'
 root['dimensional_drawing_url']=f'https://developer.apple.com/download/files/accessories/dimensional-drawings/ipad-pro-{SIZE}-inch-m5.pdf'
 scene=bpy.context.scene; scene.render.resolution_x=1600; scene.render.resolution_y=1600; scene.render.resolution_percentage=100; scene.view_settings.exposure=-1.05
@@ -180,6 +203,7 @@ def render_profile(cam, filename):
     scene.view_settings.exposure=profile[0]
     for n,e in profile[1].items(): set_light(n,e)
     fc.render_camera(cam,os.path.join(PREVIEWS,filename))
-for cam,filename in renders: render_profile(cam,filename)
+if '--skip-previews' not in sys.argv:
+    for cam,filename in renders: render_profile(cam,filename)
 print('AWFUL_LOW_VALIDATION',json.dumps(evidence,sort_keys=True))
 if not passed: raise RuntimeError(f'iPad Pro {SIZE} LOW v6 validation failed')

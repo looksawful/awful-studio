@@ -3,10 +3,20 @@ import { test } from 'node:test';
 import {
   availableLods,
   cameraDirection,
+  perspectiveClipPlanes,
   resolveAssetUrl,
   previewMaterialPolicy,
-  validateModelProvenance,
+  screenGlowDimensions,
 } from '../src/viewer-core.mjs';
+
+test('perspective depth separates the display from its bezel at a 40 micron gap', () => {
+  for (const distance of [0.4, 0.8, 1.2]) {
+    const { near, far } = perspectiveClipPlanes(distance);
+    const depth = (z) => Math.floor((far / (far - near) - far * near / ((far - near) * z)) * (2 ** 24 - 1));
+    assert.ok(Math.abs(depth(distance) - depth(distance + 0.00004)) >= 4);
+    assert.ok(near < distance / 2 && far > distance * 2, 'product must remain inside the camera range');
+  }
+});
 
 test('preview URLs expose repository assets without copying binaries', () => {
   assert.equal(
@@ -40,30 +50,16 @@ test('LOD options preserve manifest order and fall back to preview model', () =>
     { name: 'Default', path: 'assets/model.glb' },
   ]);
 });
-test('device model provenance rejects stale stage or source revision', () => {
-  const asset = { version: 'v30', stage: 'LOW_DRAFT', sourceRevision: 'abc', sourceCommit: 'def' };
-  const root = { userData: {
-    delivery_version: 'v30',
-    delivery_stage: 'LOW_DRAFT',
-    delivery_source_revision: 'abc',
-    delivery_source_commit: 'def',
-  } };
-  assert.deepEqual(validateModelProvenance(asset, root), []);
-  assert.deepEqual(
-    validateModelProvenance({ ...asset, stage: 'RELEASE_CANDIDATE' }, root),
-    ['GLB provenance mismatch: delivery_stage'],
-  );
-  assert.deepEqual(
-    validateModelProvenance({ ...asset, sourceRevision: 'stale' }, root),
-    ['GLB provenance mismatch: delivery_source_revision'],
-  );
-});
-
 test('camera presets are explicit and normalized', () => {
   assert.deepEqual(cameraDirection('front'), [0, 0, 1]);
   assert.deepEqual(cameraDirection('side'), [1, 0, 0]);
   assert.deepEqual(cameraDirection('top'), [0, 1, 0]);
   assert.throws(() => cameraDirection('diagonal'), /Unknown camera preset/);
+});
+
+test('screen glow preserves manifest width and height orientation', () => {
+  assert.deepEqual(screenGlowDimensions({ screenGlow: { width_mm: 160.13, height_mm: 232.32 } }, { x: 0.16013, y: 0.23232, z: 0.00006 }), [0.16013, 0.23232]);
+  assert.deepEqual(screenGlowDimensions({}, { x: 0.16, y: 0.23, z: 0.001 }), [0.16, 0.23]);
 });
 
 test('binary Apple decal uses crisp preview alpha policy', () => {

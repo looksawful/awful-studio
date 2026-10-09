@@ -41,3 +41,6 @@ assets/device_mockups/macbook_pro_14/optimize_runtime_v1.py text eol=lf
 assets/device_mockups/macbook_pro_14/runtime/v1/*.json text eol=lf
 tools/build_macbook_v1_web.py text eol=lf
 tests/fast/test_macbook_web_delivery_contract.py text eol=lf
+
+tools/package_device_asset.py text eol=lf
+tools/device_delivery_contract.py text eol=lf

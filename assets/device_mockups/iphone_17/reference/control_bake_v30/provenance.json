@@ -1,0 +1,36 @@
+{
+  "source": "controls_lowpoly_bake_2026_10_03",
+  "high_source": "canonical v30 side controls before low-poly replacement, with geometric edge bevel",
+  "low_policy": {
+    "topology": "paired capsule rows, no n-gon caps, no central fan",
+    "steps_per_half": 5,
+    "source_vertices_per_control": 44,
+    "source_faces_per_control": 44,
+    "source_triangles_per_control": 84
+  },
+  "bake": {
+    "type": "tangent-space normal",
+    "resolution_px": [
+      256,
+      256
+    ],
+    "margin_px": 16,
+    "cage_extrusion_mm": 0.06,
+    "max_ray_distance_mm": 0.1
+  },
+  "parts": [
+    "ACTION_BUTTON",
+    "VOL_UP",
+    "VOL_DOWN",
+    "SIDE_BUTTON",
+    "CAMERA_CONTROL"
+  ],
+  "note": "Immutable production bake inputs. Generator consumes these maps; it does not rebake.",
+  "maps": {
+    "action_button_normal.png": "7515f3d1cfc0ac486aacee3cf84cd0bbff8edbf95d47a88512e5f5edc0ff85c1",
+    "camera_control_normal.png": "81a9778a89e9f4b97eb7db6047152cd5da45f86ab81c9765b3ae7bd3784a0c66",
+    "side_button_normal.png": "fa3e5280662eeffe4fe34416ab9fb7bc4723a65bfbbfbd69177f926761192b11",
+    "vol_down_normal.png": "0369f38b122971f4e5d2172a5b31f4b05164f695c568464a83f6c7314f2d2478",
+    "vol_up_normal.png": "626a0f67c4c244ade949ed04ad3287cb49c6a36872bf412cc8ee938c4ed94b78"
+  }
+}

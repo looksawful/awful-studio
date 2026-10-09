@@ -281,6 +281,40 @@ class AWFUL_OT_ApplyDeviceScreen(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class AWFUL_OT_ApplyDeviceColorway(bpy.types.Operator):
+    bl_idname = 'awful.apply_device_colorway'
+    bl_label = 'Set Device Finish'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        if context.scene is None or legacy.REG.object('CYC') is None:
+            return False
+        key = context.scene.awful_studio.product_mockup
+        try:
+            device_asset_loader.colorway_keys(key)
+            root = device_asset_loader._active_device_root(legacy, context.scene)
+        except (ValueError, RuntimeError):
+            return False
+        return str(root.get('awful_mockup_key', '')) == key
+
+    def execute(self, context):
+        scene = context.scene
+        settings = scene.awful_studio
+        try:
+            colorway = settings.device_colorway
+            with ownership.for_scene(scene):
+                root = device_asset_loader.apply_device_colorway(
+                    legacy, scene, colorway)
+            label = device_asset_loader.colorway_spec(
+                settings.product_mockup, colorway)['label']
+            self.report({'INFO'}, f'Finish {label}: {root.name}')
+        except Exception as exc:
+            self.report({'ERROR'}, str(exc))
+            return {'CANCELLED'}
+        return {'FINISHED'}
+
+
 class AWFUL_OT_ApplyDeviceOrientation(bpy.types.Operator):
     bl_idname = 'awful.apply_device_orientation'
     bl_label = 'Set Device Orientation'
@@ -338,8 +372,8 @@ class AWFUL_OT_ApplyDeviceHinge(bpy.types.Operator):
 CLASSES = (AWFUL_AddonPreferences, AWFUL_SceneState, *legacy.CLASSES,
            AWFUL_OT_Build, AWFUL_OT_Rebuild, AWFUL_OT_Remove, AWFUL_OT_ResetSystem,
            AWFUL_OT_Migrate, AWFUL_OT_RegisterExternalAssetLibrary, AWFUL_OT_ClearCache, AWFUL_OT_GenerateMockup,
-           AWFUL_OT_ApplyDeviceScreen, AWFUL_OT_ApplyDeviceOrientation,
-           AWFUL_OT_ApplyDeviceHinge)
+           AWFUL_OT_ApplyDeviceScreen, AWFUL_OT_ApplyDeviceColorway,
+           AWFUL_OT_ApplyDeviceOrientation, AWFUL_OT_ApplyDeviceHinge)
 
 
 def register():

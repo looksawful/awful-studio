@@ -15,9 +15,31 @@ GENERATOR_VERSION = 'web_delivery_camera_logo_normals_v30'
 SOURCE_FILES = [
     'assets/device_mockups/common/foundation_common.py',
     'assets/device_mockups/iphone_17/generate_low_v30.py',
+    'assets/device_mockups/iphone_17/display_topology_v30.py',
+    'assets/device_mockups/iphone_17/camera_topology_v30.py',
+    'assets/device_mockups/iphone_17/body_topology_v30.py',
+    'assets/device_mockups/iphone_17/reference/camera_bake_v30/provenance.json',
+    'assets/device_mockups/iphone_17/reference/camera_bake_v30/seat_40_normal.png',
+    'assets/device_mockups/iphone_17/reference/camera_bake_v30/housing_40_normal.png',
+    'assets/device_mockups/iphone_17/reference/camera_bake_v30/ring_40_normal.png',
+    'assets/device_mockups/iphone_17/reference/camera_bake_v30/bevel_40_normal.png',
     'assets/device_mockups/iphone_17/export_runtime_v30.py',
     'assets/device_mockups/iphone_17/reference/apple_logo_glb_mask.png',
     'assets/device_mockups/iphone_17/reference/ios26_home_screen_1206x2622.png',
+    'assets/device_mockups/iphone_17/reference/ios26_home_screen_clean_1206x2622.png',
+    'assets/device_mockups/iphone_17/reference/ios26_home_screen_dynamic_state_1206x2622.png',
+    'assets/device_mockups/iphone_17/reference/flash_diffuser_v30.png',
+    'assets/device_mockups/iphone_17/reference/front_camera_detail_mask.png',
+    'assets/device_mockups/iphone_17/reference/control_bake_v30/provenance.json',
+    'assets/device_mockups/iphone_17/reference/control_bake_v30/action_button_normal.png',
+    'assets/device_mockups/iphone_17/reference/control_bake_v30/camera_control_normal.png',
+    'assets/device_mockups/iphone_17/reference/control_bake_v30/side_button_normal.png',
+    'assets/device_mockups/iphone_17/reference/control_bake_v30/vol_down_normal.png',
+    'assets/device_mockups/iphone_17/reference/control_bake_v30/vol_up_normal.png',
+    'assets/device_mockups/iphone_17/optimize_runtime_v30.py',
+    'tools/build_iphone17_v30.py',
+    'tools/package_device_asset.py',
+    'tools/device_delivery_contract.py',
 ]
 sys.path.insert(0, str(ROOT / 'tools'))
 from device_delivery_contract import source_fingerprint, sha256_file
@@ -43,6 +65,7 @@ def update_iphone_loader_revision(path: Path, revision: str) -> None:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--blender', type=Path, required=True)
+    parser.add_argument('--skip-previews', action='store_true', help='Retain previews during structural iteration')
     args = parser.parse_args()
     blender = args.blender.resolve()
     revision, source_hashes = source_fingerprint(ROOT, SOURCE_FILES)
@@ -52,15 +75,17 @@ def main():
     generated = DEVICE / 'generated/iphone_17_low_v30.blend'
     evidence = DEVICE / 'evidence/low_v30_validation.json'
     previews = DEVICE / 'previews/low_v30'
-    run(blender, '--factory-startup', '--background', '--python', DEVICE / 'generate_low_v30.py', '--',
-        '--out', generated, '--evidence', evidence, '--previews', previews)
-    run(blender, '--factory-startup', '--background', generated, '--python', DEVICE / 'export_runtime_v30.py', '--',
+    run(blender, '--factory-startup', '--background', '--python-exit-code', '7', '--python', DEVICE / 'generate_low_v30.py', '--',
+        '--out', generated, '--evidence', evidence, '--previews', previews,
+        *(['--skip-previews'] if args.skip_previews else []))
+    run(blender, '--factory-startup', '--background', '--python-exit-code', '7', generated, '--python', DEVICE / 'export_runtime_v30.py', '--',
         '--source-revision', revision, '--source-commit', source_commit)
     run(sys.executable, DEVICE / 'optimize_runtime_v30.py')
     bundle = ROOT / 'extension/awful_studio/assets/devices/iphone_17_low_v30.blend'
-    run(blender, '--factory-startup', '--background', generated, '--python', ROOT / 'tools/package_device_asset.py', '--',
+    run(blender, '--factory-startup', '--background', '--python-exit-code', '7', generated, '--python', ROOT / 'tools/package_device_asset.py', '--',
         '--output', bundle, '--entry', 'AWFUL_DEVICE_IPHONE_17', '--root', 'CTRL_IPHONE_17',
-        '--key', 'IPHONE_17', '--stage', 'LOW_DRAFT', '--variant', 'low_v30', '--revision', revision)
+        '--key', 'IPHONE_17', '--stage', 'LOW_DRAFT', '--variant', 'low_v30', '--revision', revision,
+        '--runtime-visible-only')
     update_iphone_loader_revision(ROOT / 'extension/awful_studio/device_asset_loader.py', revision)
     manifest_path = RUNTIME / 'iphone_17_v30.asset.json'
     manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
@@ -73,7 +98,7 @@ def main():
         raise RuntimeError('invalid GLB JSON chunk')
     doc = json.loads(raw[20:20 + json_len].decode('utf-8').rstrip(' \t\r\n\0'))
     names = {node.get('name') for node in doc.get('nodes', [])}
-    required = {'CTRL_IPHONE_17','DYNAMIC_ISLAND','FRONT_SENSOR_PILL','FRONT_CAMERA_GLASS','APPLE_LOGO_DECAL','SCREEN_CONTENT','SCREEN_GLOW_ANCHOR'}
+    required = {'CTRL_IPHONE_17','FRONT_SENSOR_MASK','FRONT_CAMERA_MASK','FRONT_CAMERA_GLASS','APPLE_LOGO_DECAL','SCREEN_CONTENT','SCREEN_GLOW_ANCHOR'}
     missing = sorted(required - names)
     if missing:
         raise RuntimeError(f'GLB lost required nodes: {missing}')

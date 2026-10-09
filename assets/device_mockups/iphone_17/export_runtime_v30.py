@@ -1,6 +1,7 @@
 import json
 import os
 import bpy
+import bmesh
 from mathutils import Vector
 
 import sys
@@ -35,15 +36,31 @@ if logo_mat and logo_mat.use_nodes:
         if node.type == "TEX_IMAGE":
             node.image = bpy.data.images.load(runtime_logo, check_existing=True)
             break
+def material_uses_normal_map(material):
+    return bool(
+        material
+        and material.use_nodes
+        and any(node.type == "NORMAL_MAP" for node in material.node_tree.nodes)
+    )
+
 for obj in [root] + list(root.children_recursive):
     if obj.type == "MESH":
         obj.data.name = obj.name
+        if any(material_uses_normal_map(material) for material in obj.data.materials):
+            # Tangent-space normal maps need stable triangular faces in glTF.
+            # Triangulate only the runtime copy; authored source geometry is unchanged.
+            mesh = bmesh.new()
+            mesh.from_mesh(obj.data)
+            bmesh.ops.triangulate(mesh, faces=list(mesh.faces))
+            mesh.to_mesh(obj.data)
+            mesh.free()
+            obj.data.update()
 roles = {
     "BODY_ALUMINUM": "body",
     "SCREEN_CONTENT": "screen",
     "SCREEN_GLASS": "screen_glass",
-    "DYNAMIC_ISLAND": "front_sensor_cluster",
-    "FRONT_SENSOR_PILL": "front_sensor",
+    "FRONT_SENSOR_MASK": "front_sensor",
+    "FRONT_CAMERA_MASK": "front_camera_mask",
     "FRONT_CAMERA_GLASS": "front_camera_optic",
     "ACTION_BUTTON": "control",
     "VOL_UP": "control",
@@ -104,6 +121,7 @@ bpy.ops.export_scene.gltf(
     export_format="GLB",
     use_selection=True,
     export_extras=True,
+    export_tangents=True,
 )
 bpy.ops.file.pack_all()
 delivery = os.path.join(RUNTIME, "iphone_17_v30_delivery.blend")
@@ -141,6 +159,15 @@ manifest = {
         "screen_on": {"emission_strength": 0.85, "glow_intensity": 1.0},
     },
     "screen_glow": {"anchor": "SCREEN_GLOW_ANCHOR", "type": "rect_area", "width_mm": 66.57, "height_mm": 144.79, "source_energy_w": 8.0},
+    "default_colorway": "black",
+    "colorways": [
+        {"id": "black", "label": "Black"},
+        {"id": "white", "label": "White"},
+        {"id": "mist_blue", "label": "Mist Blue"},
+        {"id": "sage", "label": "Sage"},
+        {"id": "lavender", "label": "Lavender"},
+    ],
+    "colorway_reference": "Apple iPhone 17 official finishes; material RGB values are render-calibrated approximations from official product imagery",
     "lods": [{"name": "LOD0", "file": "iphone_17_v30_web.glb"}],
     "materials": materials,
     "exported_objects": exported,

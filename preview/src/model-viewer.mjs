@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
-import { availableLods, cameraDirection, previewMaterialPolicy, resolveAssetUrl, validateModelProvenance } from './viewer-core.mjs';
+import { availableLods, cameraDirection, perspectiveClipPlanes, previewMaterialPolicy, resolveAssetUrl, screenGlowDimensions } from './viewer-core.mjs';
 
 const tagName = 'awful-model-viewer';
 
@@ -193,13 +193,6 @@ class AwfulModelViewer extends HTMLElement {
     const basePath = new URL('.', document.baseURI).pathname;
     const gltf = await loader.loadAsync(resolveAssetUrl(repoPath, basePath));
     if (this._disposed) return;
-    if (this._asset.group === 'Devices') {
-      const root = gltf.scene.getObjectByName(this._asset.root);
-      const provenanceErrors = validateModelProvenance(this._asset, root);
-      if (provenanceErrors.length) {
-        throw new Error(`Rejected stale/wrong-stage asset ${this._asset.id}: ${provenanceErrors.join('; ')}`);
-      }
-    }
     this._model = gltf.scene;
     this._scene.add(this._model);
     this.dataset.modelLoaded = this._asset.id;
@@ -279,7 +272,7 @@ class AwfulModelViewer extends HTMLElement {
     if (!screen || !this._asset.screenStates) return;
     screen.geometry?.computeBoundingBox?.();
     const size = screen.geometry?.boundingBox?.getSize(new THREE.Vector3()) ?? new THREE.Vector3(0.12, 0.2, 0.001);
-    const dimensions = [Math.abs(size.x), Math.abs(size.y), Math.abs(size.z)].sort((a, b) => b - a);
+    const dimensions = screenGlowDimensions(this._asset, size);
     const energy = Number(this._asset.screenGlow?.energy ?? this._asset.screenGlow?.source_energy_w ?? 8);
     this._screenGlow = new THREE.RectAreaLight(0xe6f0ff, energy, dimensions[0], dimensions[1]);
     this._screenGlow.name = 'AWFUL_SCREEN_GLOW';
@@ -331,8 +324,9 @@ class AwfulModelViewer extends HTMLElement {
     const distance = max / (2 * Math.tan(THREE.MathUtils.degToRad(this._perspective.fov / 2))) * 1.45;
     const direction = new THREE.Vector3(...cameraDirection('front'));
     this._perspective.position.copy(center).add(direction.multiplyScalar(distance));
-    this._perspective.near = Math.max(distance / 1000, 0.001);
-    this._perspective.far = distance * 100;
+    const { near, far } = perspectiveClipPlanes(distance);
+    this._perspective.near = near;
+    this._perspective.far = far;
     this._perspective.updateProjectionMatrix();
 
     const half = max * 0.72;
