@@ -31,21 +31,21 @@
         "validator_version": "2.0.0-dev.3.10",
         "errors": 0,
         "warnings": 0,
-        "infos": 50,
+        "infos": 52,
         "hints": 0,
         "pass": true,
         "file": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_web.glb",
-        "sha256": "6dedbc72e92d3ea01abd7f2140c41bc8992f933c7312af0a447f0d9d9adb5043"
+        "sha256": "8770e82bd3a7c7ec19ec09d1c27964259389f87f580dd9e9518721c2d959476f"
       },
       "meshopt": {
         "validator_version": "2.0.0-dev.3.10",
         "errors": 0,
         "warnings": 0,
-        "infos": 51,
+        "infos": 53,
         "hints": 0,
         "pass": true,
         "file": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_web_meshopt.glb",
-        "sha256": "fbe515a75525d3293df75ae1cb7624ba805a886278ba20c87da93057e4a074bd"
+        "sha256": "d3bd6f91b9cd798df15febfaf6fe08aec787689785f5107cf90bb401c8352aa1"
       }
     },
     "ipad_pro_13_m5": {
@@ -53,21 +53,21 @@
         "validator_version": "2.0.0-dev.3.10",
         "errors": 0,
         "warnings": 0,
-        "infos": 50,
+        "infos": 52,
         "hints": 0,
         "pass": true,
         "file": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_web.glb",
-        "sha256": "493018d1c634d57a2ade0d1398fecf29eb2ed1e380e76601b40dd4795ec7e0a0"
+        "sha256": "ba80c77ea73a452c17ec3d2a17518aa245fd10c374cefdd7f700b30e5e025a9b"
       },
       "meshopt": {
         "validator_version": "2.0.0-dev.3.10",
         "errors": 0,
         "warnings": 0,
-        "infos": 51,
+        "infos": 53,
         "hints": 0,
         "pass": true,
         "file": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_web_meshopt.glb",
-        "sha256": "69c832370becaba4cab488f14fd1ccef341d7cf45621c6538937218841f9ed30"
+        "sha256": "838f0f5719308b09875808e7ac107495e2bf69e9e71ea98204f53fbe5e59e255"
       }
     },
     "macbook_pro_14_m5": {
