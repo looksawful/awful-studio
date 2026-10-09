@@ -75,6 +75,8 @@ async function checkStory(id, assetId, expectedClips = []) {
       await screen.selectOption('screen_off');
       await screen.selectOption('screen_on');
       if (assetId === 'iphone-17-v30') {
+        const backdrop = await viewer.evaluate((element) => `#${element._scene.background.getHexString()}`);
+        if (backdrop !== '#92969f') throw new Error(`iPhone rear defaults to unreadable dark stage: ${backdrop}`);
         await page.locator('awful-model-viewer button[data-camera="rear"]').click();
         const rearPolicy = await viewer.evaluate((element) => {
           const materials = {};

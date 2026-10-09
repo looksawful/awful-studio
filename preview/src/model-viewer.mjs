@@ -38,6 +38,7 @@ class AwfulModelViewer extends HTMLElement {
     this.#dispose();
     this._disposed = false;
     const asset = this._asset;
+    const background = asset.id === 'iphone-17-v30' ? '#92969f' : '#111111';
     this.shadowRoot.innerHTML = `
       <style>${styles}</style>
       <section class="shell">
@@ -54,7 +55,7 @@ class AwfulModelViewer extends HTMLElement {
           <label><input data-control="clip" type="checkbox"> section</label>
           <input data-control="clip-position" type="range" min="-1" max="1" step="0.01" value="0">
           <label><input data-control="axes" type="checkbox"> axes</label>
-          <input data-control="background" type="color" value="#111111" aria-label="background">
+          <input data-control="background" type="color" value="${background}" aria-label="background">
           <button data-action="fullscreen">fullscreen</button>
         </div>
         <div class="stage" data-stage></div>
@@ -71,7 +72,7 @@ class AwfulModelViewer extends HTMLElement {
     const height = Math.max(stage.clientHeight, 480);
 
     this._scene = new THREE.Scene();
-    this._scene.background = new THREE.Color('#111111');
+    this._scene.background = new THREE.Color(asset.id === 'iphone-17-v30' ? '#92969f' : '#111111');
     this._perspective = new THREE.PerspectiveCamera(35, width / height, 0.001, 1000);
     this._ortho = new THREE.OrthographicCamera(-2, 2, 2, -2, 0.001, 1000);
     this._camera = this._perspective;
