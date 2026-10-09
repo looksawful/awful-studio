@@ -45,7 +45,7 @@ class AwfulModelViewer extends HTMLElement {
           <label>LOD <select data-control="lod"></select></label>
           <label>mode <select data-control="mode"><option>texture</option><option>wireframe</option><option>clay</option><option>normals</option></select></label>
           <label>projection <select data-control="projection"><option value="perspective">perspective</option><option value="orthographic">orthographic</option></select></label>
-          <button data-camera="front">front</button><button data-camera="side">side</button><button data-camera="top">top</button>
+          <button data-camera="front">front</button><button data-camera="rear">rear</button><button data-camera="side">side</button><button data-camera="top">top</button>
           <button data-action="fit">fit</button>
           <label><input data-control="autorotate" type="checkbox"> rotate</label>
           <label>screen <select data-control="screen-state"></select></label>
@@ -212,6 +212,7 @@ class AwfulModelViewer extends HTMLElement {
         if (policy.transmission != null && 'transmission' in material) material.transmission = policy.transmission;
         if (policy.minRoughness != null && 'roughness' in material) material.roughness = Math.max(material.roughness, policy.minRoughness);
         if (policy.maxClearcoat != null && 'clearcoat' in material) material.clearcoat = Math.min(material.clearcoat, policy.maxClearcoat);
+        if (policy.specularIntensity != null && 'specularIntensity' in material) material.specularIntensity = policy.specularIntensity;
         material.needsUpdate = true;
         for (const texture of [material.map, material.emissiveMap, material.normalMap, material.roughnessMap, material.metalnessMap]) {
           if (!texture) continue;

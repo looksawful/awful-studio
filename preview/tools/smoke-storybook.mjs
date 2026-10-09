@@ -75,6 +75,24 @@ async function checkStory(id, assetId, expectedClips = []) {
       await screen.selectOption('screen_off');
       await screen.selectOption('screen_on');
       if (assetId === 'iphone-17-v30') {
+        await page.locator('awful-model-viewer button[data-camera="rear"]').click();
+        const rearPolicy = await viewer.evaluate((element) => {
+          const materials = {};
+          element._model.traverse((object) => {
+            if (!object.isMesh) return;
+            const entries = Array.isArray(object.material) ? object.material : [object.material];
+            for (const material of entries) {
+              if (['MAT_BACK_GLASS', 'MAT_APPLE_LOGO_DECAL'].includes(material.name)) {
+                materials[material.name] = material.specularIntensity;
+              }
+            }
+          });
+          return materials;
+        });
+        if (rearPolicy.MAT_BACK_GLASS !== 0 || rearPolicy.MAT_APPLE_LOGO_DECAL !== 0) {
+          throw new Error(`iPhone rear material hotspot suppression missing: ${JSON.stringify(rearPolicy)}`);
+        }
+        await page.locator('awful-model-viewer button[data-camera="front"]').click();
         const islandCenterRgb = await viewer.evaluate((element) => {
           let screenMaterial = null;
           element._model.traverse((object) => {

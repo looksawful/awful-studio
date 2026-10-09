@@ -34,6 +34,7 @@ export function screenGlowDimensions(asset, geometrySize = {}) {
 export function cameraDirection(preset) {
   const directions = {
     front: [0, 0, 1],
+    rear: [0, 0, -1],
     side: [1, 0, 0],
     top: [0, 1, 0],
   };
@@ -53,13 +54,13 @@ export function previewMaterialPolicy(name, { hasTexture = false } = {}) {
     MAT_IPAD_EDGE: { frontSide: true, envMapIntensity: 0.5, minRoughness: 0.28 },
     MAT_SPACE_BLACK_ALUMINUM: { frontSide: true, envMapIntensity: 0.5, minRoughness: 0.28 },
     MAT_EDGE_ALUMINUM: { frontSide: true, envMapIntensity: 0.5, minRoughness: 0.28 },
-    MAT_BACK_GLASS: { frontSide: true, envMapIntensity: 0.32, minRoughness: 0.38 },
+    MAT_BACK_GLASS: { frontSide: true, envMapIntensity: 0, minRoughness: 1, maxClearcoat: 0, specularIntensity: 0 },
     MAT_CAMERA_HOUSING: { frontSide: true, envMapIntensity: 0.45, minRoughness: 0.3 },
     MAT_TRACKPAD: { frontSide: true, envMapIntensity: 0.35, minRoughness: 0.3 },
   };
   if (surfacePolicies[name]) return surfacePolicies[name];
   if (name === 'MAT_APPLE_LOGO_DECAL') {
-    return { alphaTest: 0.5, transparent: false, depthWrite: true, frontSide: true };
+    return { alphaTest: 0.5, transparent: false, depthWrite: true, frontSide: true, envMapIntensity: 0, minRoughness: 1, maxClearcoat: 0, specularIntensity: 0 };
   }
   if (name === 'MAT_SCREEN_CONTENT') {
     return hasTexture
