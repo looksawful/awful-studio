@@ -1,0 +1,90 @@
+name: Device Khronos refresh
+on:
+  pull_request:
+    paths:
+      - 'assets/device_mockups/**'
+      - '.github/workflows/device-khronos-refresh.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install pinned Khronos validator
+        run: npm install --prefix /tmp/gltf-validator --no-package-lock --no-save gltf-validator@2.0.0-dev.3.10
+      - name: Validate canonical device GLBs
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const crypto = require('crypto');
+          const validator = require('/tmp/gltf-validator/node_modules/gltf-validator');
+
+          const plan = {
+            iphone_17: {
+              compat: 'assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb',
+              meshopt: 'assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web_meshopt.glb',
+            },
+            ipad_pro_11_m5: {
+              compat: 'assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_web.glb',
+              meshopt: 'assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_web_meshopt.glb',
+            },
+            ipad_pro_13_m5: {
+              compat: 'assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_web.glb',
+              meshopt: 'assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_web_meshopt.glb',
+            },
+            macbook_pro_14_m5: {
+              compat: 'assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web.glb',
+              meshopt: 'assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web_meshopt.glb',
+            },
+          };
+
+          const evidence = { schema_version: 1, validator_versions: [], assets: {}, pass: true };
+          const versions = new Set();
+
+          (async () => {
+            for (const [assetId, variants] of Object.entries(plan)) {
+              evidence.assets[assetId] = {};
+              for (const [variant, file] of Object.entries(variants)) {
+                const bytes = fs.readFileSync(file);
+                const report = await validator.validateBytes(new Uint8Array(bytes), { uri: file });
+                const issues = report.issues || {};
+                const summary = {
+                  validator_version: report.validatorVersion,
+                  errors: issues.numErrors || 0,
+                  warnings: issues.numWarnings || 0,
+                  infos: issues.numInfos || 0,
+                  hints: issues.numHints || 0,
+                  pass: (issues.numErrors || 0) === 0 && (issues.numWarnings || 0) === 0,
+                  file,
+                  sha256: crypto.createHash('sha256').update(bytes).digest('hex'),
+                };
+                versions.add(report.validatorVersion);
+                evidence.assets[assetId][variant] = summary;
+                evidence.pass = evidence.pass && summary.pass;
+              }
+            }
+            evidence.validator_versions = [...versions].sort();
+            fs.writeFileSync(
+              'assets/device_mockups/device_delivery_khronos_validation.json',
+              JSON.stringify(evidence, null, 2) + '\n',
+            );
+            if (!evidence.pass) process.exitCode = 1;
+          })().catch((error) => {
+            console.error(error);
+            process.exitCode = 1;
+          });
+          NODE
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: device-khronos-validation
+          path: assets/device_mockups/device_delivery_khronos_validation.json
+          if-no-files-found: error
