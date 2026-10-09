@@ -202,7 +202,7 @@ class AwfulModelViewer extends HTMLElement {
       if (!object.isMesh) return;
       const materials = Array.isArray(object.material) ? object.material : [object.material];
       for (const material of materials) {
-        const policy = previewMaterialPolicy(material.name, { hasTexture: Boolean(material.map || material.emissiveMap) });
+        const policy = previewMaterialPolicy(material.name, { hasTexture: Boolean(material.map || material.emissiveMap), assetId: this._asset?.id });
         if (policy.alphaTest != null) material.alphaTest = policy.alphaTest;
         if (policy.transparent != null) material.transparent = policy.transparent;
         if (policy.opacity != null) material.opacity = policy.opacity;

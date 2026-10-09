@@ -47,7 +47,14 @@ export function perspectiveClipPlanes(distance) {
   return { near: Math.max(distance / 100, 0.0001), far: Math.max(distance * 10, 0.1) };
 }
 
-export function previewMaterialPolicy(name, { hasTexture = false } = {}) {
+export function previewMaterialPolicy(name, { hasTexture = false, assetId = null } = {}) {
+  // Material names are shared across Apple devices; the matte override is iPhone-only.
+  if (assetId !== 'iphone-17-v30' && name === 'MAT_APPLE_LOGO_DECAL') {
+    return { alphaTest: 0.5, transparent: false, depthWrite: true, frontSide: true };
+  }
+  if (assetId !== 'iphone-17-v30' && name === 'MAT_BACK_GLASS') {
+    return { frontSide: true, envMapIntensity: 0.32, minRoughness: 0.38 };
+  }
   const surfacePolicies = {
     MAT_ANODIZED_ALUMINUM: { frontSide: true, envMapIntensity: 0.55, minRoughness: 0.28 },
     MAT_IPAD_ALUMINUM: { frontSide: true, envMapIntensity: 0.55, minRoughness: 0.3 },

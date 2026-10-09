@@ -74,6 +74,24 @@ async function checkStory(id, assetId, expectedClips = []) {
       }
       await screen.selectOption('screen_off');
       await screen.selectOption('screen_on');
+      if (assetId === 'ipad-pro-11-m5-v6' || assetId === 'ipad-pro-13-m5-v6') {
+        // Guard against iPhone lookdev leaking through a shared material name.
+        const logos = await viewer.evaluate((element) => {
+          const values = [];
+          element._model.traverse((object) => {
+            if (!object.isMesh) return;
+            for (const material of (Array.isArray(object.material) ? object.material : [object.material])) {
+              if (material.name === 'MAT_APPLE_LOGO_DECAL') {
+                values.push({ roughness: material.roughness, envMapIntensity: material.envMapIntensity });
+              }
+            }
+          });
+          return values;
+        });
+        if (!logos.length || logos.some((logo) => Math.abs(logo.roughness - 0.2) > 0.001 || Math.abs(logo.envMapIntensity - 1) > 0.001)) {
+          throw new Error(`Shared iPhone material policy regressed ${assetId} logo: ${JSON.stringify(logos)}`);
+        }
+      }
       if (assetId === 'iphone-17-v30') {
         const backdrop = await viewer.evaluate((element) => `#${element._scene.background.getHexString()}`);
         if (backdrop !== '#92969f') throw new Error(`iPhone rear defaults to unreadable dark stage: ${backdrop}`);
