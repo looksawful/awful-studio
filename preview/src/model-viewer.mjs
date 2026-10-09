@@ -218,6 +218,31 @@ class AwfulModelViewer extends HTMLElement {
           texture.anisotropy = maxAnisotropy;
           texture.needsUpdate = true;
         }
+        if (asset.id === 'iphone-17-v30' && material.name === 'MAT_SCREEN_CONTENT') {
+          // System-owned Dynamic Island, composited over replaceable screen artwork.
+          // Pixel datum: original Apple iOS 26 screenshot, 1206x2622 (not hardware geometry).
+          const source = material.emissiveMap ?? material.map;
+          if (source?.image) {
+            const canvas = document.createElement('canvas');
+            canvas.width = source.image.width;
+            canvas.height = source.image.height;
+            const context = canvas.getContext('2d');
+            if (!context) throw new Error('Canvas 2D unavailable for screen compositor');
+            context.drawImage(source.image, 0, 0);
+            const x = canvas.width / 1206;
+            const y = canvas.height / 2622;
+            context.fillStyle = '#000000';
+            context.beginPath();
+            context.roundRect(405 * x, 9 * y, 398 * x, 121 * y, 60 * y);
+            context.fill();
+            const composed = source.clone();
+            composed.image = canvas;
+            composed.needsUpdate = true;
+            if (material.map) material.map = composed;
+            if (material.emissiveMap) material.emissiveMap = composed;
+            material.needsUpdate = true;
+          }
+        }
         if (material.name === 'MAT_SCREEN_CONTENT' && !material.userData.previewScreenOn) {
           material.userData.previewScreenOn = {
             map: material.map,
