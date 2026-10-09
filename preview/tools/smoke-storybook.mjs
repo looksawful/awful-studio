@@ -74,6 +74,30 @@ async function checkStory(id, assetId, expectedClips = []) {
       }
       await screen.selectOption('screen_off');
       await screen.selectOption('screen_on');
+      if (assetId === 'iphone-17-v30') {
+        const islandCenterRgb = await viewer.evaluate((element) => {
+          let screenMaterial = null;
+          element._model.traverse((object) => {
+            if (!object.isMesh) return;
+            const materials = Array.isArray(object.material) ? object.material : [object.material];
+            for (const material of materials) {
+              if (material.name === 'MAT_SCREEN_CONTENT') screenMaterial = material;
+            }
+          });
+          const image = (screenMaterial?.emissiveMap ?? screenMaterial?.map)?.image;
+          if (!image) return null;
+          const canvas = document.createElement('canvas');
+          canvas.width = image.width;
+          canvas.height = image.height;
+          const context = canvas.getContext('2d');
+          context.drawImage(image, 0, 0);
+          const rgba = context.getImageData(Math.floor(image.width / 2), Math.floor(image.height * 70 / 2622), 1, 1).data;
+          return Array.from(rgba).slice(0, 3);
+        });
+        if (!islandCenterRgb || Math.max(...islandCenterRgb) > 5) {
+          throw new Error(`iPhone system-owned Dynamic Island missing from screen_on compositor: ${JSON.stringify(islandCenterRgb)}`);
+        }
+      }
       const glow = await viewer.evaluate((element) => ({
         actual: [element._screenGlow?.width, element._screenGlow?.height],
         expected: [element.asset?.screenGlow?.width_mm / 1000, element.asset?.screenGlow?.height_mm / 1000],
