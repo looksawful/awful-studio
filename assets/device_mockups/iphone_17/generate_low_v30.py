@@ -252,6 +252,7 @@ def rounded_rect_cdt_prism_y(
     *,
     target_step=6.0 * MM,
     corner_segments=16,
+    corner_guard=False,
 ):
     """Build a rounded-rectangle prism with local constrained-Delaunay cap triangles."""
     half_w, half_h = width * 0.5, height * 0.5
@@ -308,6 +309,14 @@ def rounded_rect_cdt_prism_y(
             x = -half_w + (x_index + 0.5) * width / x_cells
             if inside_cap(x, z):
                 coords.append(Vector((x, z)))
+
+    if corner_guard:
+        # Protect densely sampled corner arcs from skinny long-distance cap spans.
+        inner_radius = radius - 2.0 * MM
+        for x_center, z_center, start_deg in ((cx, cz, 0), (-cx, cz, 90), (-cx, -cz, 180), (cx, -cz, 270)):
+            for k in range(corner_segments // 2 + 1):
+                angle = math.radians(start_deg + 180.0 * k / corner_segments)
+                coords.append(Vector((x_center + inner_radius * math.cos(angle), z_center + inner_radius * math.sin(angle))))
 
     boundary_edges = [
         (index, (index + 1) % boundary_count)
@@ -452,13 +461,13 @@ ctrl_c = fc.make_collection("IPHONE_17_CONTROLLERS")
 metal = fc.make_material("MAT_ANODIZED_ALUMINUM", (0.006, 0.007, 0.010), 1.0, 0.31)
 metal_dark = fc.make_material("MAT_ALUMINUM_EDGE", (0.012, 0.014, 0.020), 1.0, 0.24)
 camera_housing_mat = fc.make_material("MAT_CAMERA_HOUSING", (0.010, 0.013, 0.020), 1.0, 0.27)
-back_mat = fc.make_material("MAT_BACK_GLASS", (0.00008, 0.00010, 0.00014), 0.0, 0.38)
-camera_seat_mat = fc.make_material("MAT_CAMERA_HOUSING_SEAT", (0.00008, 0.00010, 0.00014), 0.0, 0.38)
+back_mat = fc.make_material("MAT_BACK_GLASS", (0.012, 0.013, 0.017), 0.0, 0.70)
+camera_seat_mat = fc.make_material("MAT_CAMERA_HOUSING_SEAT", (0.004, 0.005, 0.007), 0.0, 0.50)
 back_bsdf = back_mat.node_tree.nodes.get("Principled BSDF")
-back_bsdf.inputs["Coat Weight"].default_value = 0.22
+back_bsdf.inputs["Coat Weight"].default_value = 0.0
 back_bsdf.inputs["Coat Roughness"].default_value = 0.09
 if back_bsdf.inputs.get("Specular IOR Level"):
-    back_bsdf.inputs["Specular IOR Level"].default_value = 0.18
+    back_bsdf.inputs["Specular IOR Level"].default_value = 0.0
 black = fc.make_material("MAT_OPTICS_BLACK", (0.0008, 0.0010, 0.0014), 0.0, 0.07)
 grille_mat = fc.make_material("MAT_APERTURE_GRILLE", (0.0010, 0.0012, 0.0016), 0.0, 0.82)
 # A fine woven grille is surface detail; the surrounding recess remains geometry.
@@ -693,7 +702,7 @@ back_glass = rounded_rect_cdt_prism_y(
     corner_segments=16,
 )
 
-front_seat = display_frame_prism_y(
+front_seat = rounded_rect_cdt_prism_y(
     "DISPLAY_GLASS_SEAT",
     COVER_W + 0.10*MM,
     COVER_H + 0.10*MM,
@@ -702,8 +711,11 @@ front_seat = display_frame_prism_y(
     gap_mat,
     screen_c,
     location=(0, -METAL_D*0.5 - 0.010*MM, 0),
+    target_step=16*MM,
+    corner_segments=20,
+    corner_guard=True,
 )
-bezel = display_frame_prism_y(
+bezel = rounded_rect_cdt_prism_y(
     "DISPLAY_BEZEL",
     SCREEN_W + 0.68*MM,
     SCREEN_H + 0.68*MM,
@@ -712,6 +724,9 @@ bezel = display_frame_prism_y(
     bezel_mat,
     screen_c,
     location=(0, front_y + 0.08*MM, 0),
+    target_step=16*MM,
+    corner_segments=20,
+    corner_guard=True,
 )
 
 screen_glass = screen_glass_ring_y(
@@ -1029,11 +1044,12 @@ out = nodes.new("ShaderNodeOutputMaterial")
 bsdf = nodes.new("ShaderNodeBsdfPrincipled")
 tex = nodes.new("ShaderNodeTexImage")
 tex.image = bpy.data.images.load(logo_img_path, check_existing=True)
-bsdf.inputs["Base Color"].default_value = (0.14, 0.15, 0.17, 1.0)
-bsdf.inputs["Roughness"].default_value = 0.16
-bsdf.inputs["Coat Weight"].default_value = 0.12
+bsdf.inputs["Base Color"].default_value = (0.09, 0.10, 0.12, 1.0)
+bsdf.inputs["Roughness"].default_value = 1.0
+bsdf.inputs["Coat Weight"].default_value = 0.0
 bsdf.inputs["Coat Roughness"].default_value = 0.045
-bsdf.inputs["Metallic"].default_value = 0.86
+bsdf.inputs["Metallic"].default_value = 0.0
+bsdf.inputs["Specular IOR Level"].default_value = 0.0
 logo_mat.use_backface_culling = True
 links.new(tex.outputs["Alpha"], bsdf.inputs["Alpha"])
 links.new(bsdf.outputs["BSDF"], out.inputs["Surface"])
