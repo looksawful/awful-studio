@@ -16,10 +16,10 @@
         }
       ],
       "collision": null,
-      "sourceRevision": "1a2da674579d14eb853dc211126f0494958122930cebb38ffde1afa9f1f31930",
-      "sourceCommit": "adab006c0d2200bf4321c4655195518cb9dbeb6a",
-      "triangleCount": 32412,
-      "materialCount": 15,
+      "sourceRevision": "00ea0cb1bdd5834eeb59a1e7087d6aa9c75f0cdc7c8ddb5d4043388492b472bb",
+      "sourceCommit": "870bc6670a2e8c48f7df601b1c1a16561219873c",
+      "triangleCount": 13878,
+      "materialCount": 24,
       "animations": [],
       "screenStates": {
         "screen_off": {
@@ -53,9 +53,9 @@
         }
       ],
       "collision": null,
-      "sourceRevision": "13b3796b0c2307acd337d7fd9bffc4392f52d54628252b0ba9fa14db6e8fea4f",
-      "sourceCommit": "dda41decc027d2a83e327a36e737de46bcce56aa",
-      "triangleCount": 21056,
+      "sourceRevision": "8c21f5ac67bd4f37c130b9129132d3f21e55ab019dcb5d53a6a50ffddc8aea55",
+      "sourceCommit": "1a4bd053561a9373358fcd5f2a180d0d9e92a797",
+      "triangleCount": 32184,
       "materialCount": 10,
       "animations": [],
       "screenStates": {
@@ -90,9 +90,9 @@
         }
       ],
       "collision": null,
-      "sourceRevision": "9d2cc936eceaf8172d926ade0474329eac499fca09697bedd1740006d1488b08",
-      "sourceCommit": "dda41decc027d2a83e327a36e737de46bcce56aa",
-      "triangleCount": 21064,
+      "sourceRevision": "3efe7acbfe55c3e92d5a17d7c74c5a0fededd56f2ce6f610d4c0afce379544ff",
+      "sourceCommit": "1a4bd053561a9373358fcd5f2a180d0d9e92a797",
+      "triangleCount": 34744,
       "materialCount": 10,
       "animations": [],
       "screenStates": {

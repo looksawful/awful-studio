@@ -161,9 +161,9 @@
     }
   },
   "camera_fit": "runtime_bounds",
-  "source_revision": "13b3796b0c2307acd337d7fd9bffc4392f52d54628252b0ba9fa14db6e8fea4f",
-  "source_commit": "dda41decc027d2a83e327a36e737de46bcce56aa",
-  "plugin_source_revision": "13b3796b0c2307acd337d7fd9bffc4392f52d54628252b0ba9fa14db6e8fea4f",
+  "source_revision": "8c21f5ac67bd4f37c130b9129132d3f21e55ab019dcb5d53a6a50ffddc8aea55",
+  "source_commit": "1a4bd053561a9373358fcd5f2a180d0d9e92a797",
+  "plugin_source_revision": "8c21f5ac67bd4f37c130b9129132d3f21e55ab019dcb5d53a6a50ffddc8aea55",
   "generator_version": "ipad_v6_packaged_blend_web_delivery",
   "delivery_profile": {
     "simplification": "none",
@@ -180,14 +180,15 @@
   "source_files": {
     "assets/device_mockups/common/foundation_common.py": "1d68c3fff908b7ae149f74c31a19064eb6d2384234d33bd71071fea70d651d12",
     "assets/device_mockups/ipad_pro/export_runtime_v6.py": "a3ad601ffb9cee2803487c66ee565ed848d88a4a2a6988ae5db2595e3cf7d7d9",
-    "assets/device_mockups/ipad_pro/generate_low_v6.py": "82bad4395d1d4af21070f5d221285769b366057170e31f0b73e25043a2629262",
+    "assets/device_mockups/ipad_pro/generate_low_v6.py": "289cb167b1c45138cd8710ae14a39a9c3ba983e0d7acce643e7ec36f6c7709eb",
     "assets/device_mockups/ipad_pro/optimize_runtime_v6.py": "e9eb6ac3ab33af97ab4ad008264c9c997c02715ce87be2fedff4ef2cb77c8c0a",
+    "assets/device_mockups/ipad_pro/planar_topology_v6.py": "220e6b94a98f5aff6593d71c96cb0795f3bc5526f2579149e220e425e6b106f7",
     "assets/device_mockups/ipad_pro/reference/apple_logo_alpha.png": "50209309a1cf3bcb874118b27fe9c9779aaafabaf79bb304cf0aa3a2898c9833",
     "assets/device_mockups/ipad_pro/reference/ipados26_lock_screen_11.png": "f3d7ac3d796ac9421981443521fd783076232a535e1707695add4a10e1e16de6",
     "assets/device_mockups/ipad_pro/reference/ipados26_official_screen_11.png": "7bd9230afaa84e2838c6c4be2e3a46170d4044de8af54f6c8dd4d6c85b490571"
   },
   "glb_qa": {
-    "triangle_count": 21056,
+    "triangle_count": 32184,
     "required_nodes": [
       "ANCHOR_BOTTOM_CENTER",
       "ANCHOR_CENTER",
@@ -213,15 +214,15 @@
   "artifacts": {
     "delivery_blend": {
       "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_delivery.blend",
-      "sha256": "5254156913f69928eea370f546697c6ac45be806fd5ab0d62017ea93560baa0d"
+      "sha256": "a7aeab4b197639df88c14e4362a1ebad1e5073f42678ff7e64daa73f24ee8cb5"
     },
     "compat_glb": {
       "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_web.glb",
-      "sha256": "104e297fc298a2c73cb986fba2cae4c180921ef112f9b9e9784d2ec7eb349200"
+      "sha256": "8770e82bd3a7c7ec19ec09d1c27964259389f87f580dd9e9518721c2d959476f"
     },
     "meshopt_glb": {
       "path": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_web_meshopt.glb",
-      "sha256": "acbb7ad7281f5fb6ebd20e6584f934be4d0c096215013af517f9f096699795ef"
+      "sha256": "d3bd6f91b9cd798df15febfaf6fe08aec787689785f5107cf90bb401c8352aa1"
     }
   }
 }
