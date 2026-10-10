@@ -62,7 +62,7 @@ def _matched_annulus_loops(xa, xb, ya, yb, hole, base_segments=16):
     return outer, inner
 
 
-def _uniform_annulus_loops(xa, xb, ya, yb, hole, segments=44):
+def _uniform_annulus_loops(xa, xb, ya, yb, hole, segments=44, *, pin_corners=False):
     """Sample a convex hole and rectangular cell on the same uniform rays.
 
     Unlike _matched_annulus_loops, this deliberately avoids injecting every
@@ -71,9 +71,28 @@ def _uniform_annulus_loops(xa, xb, ya, yb, hole, segments=44):
     """
     cx = sum(x for x, _ in hole) / len(hole)
     cy = sum(y for _, y in hole) / len(hole)
+    angles = [2.0 * math.pi * index / segments for index in range(segments)]
+    if pin_corners:
+        # Consecutive bottom cells must meet at exact rectangle corners.
+        # Redistribute the SAME number of rays between those four anchors;
+        # snapping a nearby uniform ray produced 3-degree needle triangles.
+        circle = 2.0 * math.pi
+        anchors = sorted(math.atan2(y - cy, x - cx) % circle
+                         for x, y in ((xa, ya), (xb, ya), (xb, yb), (xa, yb)))
+        spans = [
+            (anchors[(i + 1) % 4] + (circle if i == 3 else 0.0)) - anchors[i]
+            for i in range(4)
+        ]
+        counts = [1, 1, 1, 1]
+        for _ in range(segments - 4):
+            widest = max(range(4), key=lambda i: spans[i] / counts[i])
+            counts[widest] += 1
+        angles = sorted(
+            (anchors[i] + spans[i] * j / counts[i]) % circle
+            for i in range(4) for j in range(counts[i])
+        )
     outer, inner = [], []
-    for index in range(segments):
-        angle = 2.0 * math.pi * index / segments
+    for angle in angles:
         dx, dy = math.cos(angle), math.sin(angle)
         tx = ((xb - cx) if dx > 0 else (xa - cx)) / dx if abs(dx) > 1e-12 else 1e30
         ty = ((yb - cy) if dy > 0 else (ya - cy)) / dy if abs(dy) > 1e-12 else 1e30
@@ -422,7 +441,7 @@ def build_body_mesh(
     bottom_z = -height * 0.5
 
     def flat_bottom_cell(xa, xb, hole, thickness=0.01 * mm):
-        outer_loop, hole_loop = _uniform_annulus_loops(xa, xb, y0, y1, hole, segments=12)
+        outer_loop, hole_loop = _uniform_annulus_loops(xa, xb, y0, y1, hole, segments=8, pin_corners=True)
         verts = []
         for z in (bottom_z, bottom_z + thickness):
             verts.extend((x, y, z) for x, y in outer_loop)
@@ -431,7 +450,7 @@ def build_body_mesh(
         _append_component(master_vertices, master_faces, master_materials, verts, fs, mats)
 
     def curved_bottom_cell(xa, xb, hole, thickness=0.01 * mm):
-        outer_loop, hole_loop = _uniform_annulus_loops(xa, xb, y0, y1, hole, segments=12)
+        outer_loop, hole_loop = _uniform_annulus_loops(xa, xb, y0, y1, hole, segments=8, pin_corners=True)
 
         def surface(point, back=False):
             x, y = point
