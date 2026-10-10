@@ -74,6 +74,110 @@ async function checkStory(id, assetId, expectedClips = []) {
       }
       await screen.selectOption('screen_off');
       await screen.selectOption('screen_on');
+      if (assetId === 'ipad-pro-11-m5-v6' || assetId === 'ipad-pro-13-m5-v6') {
+        // Guard against iPhone lookdev leaking through a shared material name.
+        const logos = await viewer.evaluate((element) => {
+          const values = [];
+          element._model.traverse((object) => {
+            if (!object.isMesh) return;
+            for (const material of (Array.isArray(object.material) ? object.material : [object.material])) {
+              if (material.name === 'MAT_APPLE_LOGO_DECAL') {
+                values.push({ roughness: material.roughness, envMapIntensity: material.envMapIntensity });
+              }
+            }
+          });
+          return values;
+        });
+        if (!logos.length || logos.some((logo) => Math.abs(logo.roughness - 0.2) > 0.001 || Math.abs(logo.envMapIntensity - 1) > 0.001)) {
+          throw new Error(`Shared iPhone material policy regressed ${assetId} logo: ${JSON.stringify(logos)}`);
+        }
+      }
+      if (assetId === 'iphone-17-v30') {
+        const backdrop = await viewer.evaluate((element) => `#${element._scene.background.getHexString()}`);
+        if (backdrop !== '#92969f') throw new Error(`iPhone rear defaults to unreadable dark stage: ${backdrop}`);
+        await page.locator('awful-model-viewer button[data-camera="rear"]').click();
+        const rearPolicy = await viewer.evaluate((element) => {
+          const materials = {};
+          element._model.traverse((object) => {
+            if (!object.isMesh) return;
+            const entries = Array.isArray(object.material) ? object.material : [object.material];
+            for (const material of entries) {
+              if (['MAT_BACK_GLASS', 'MAT_APPLE_LOGO_DECAL'].includes(material.name)) {
+                materials[material.name] = material.specularIntensity;
+              }
+            }
+          });
+          return materials;
+        });
+        if (rearPolicy.MAT_BACK_GLASS !== 0 || rearPolicy.MAT_APPLE_LOGO_DECAL !== 0) {
+          throw new Error(`iPhone rear material hotspot suppression missing: ${JSON.stringify(rearPolicy)}`);
+        }
+        await page.locator('awful-model-viewer button[data-camera="front"]').click();
+        const islandCenterRgb = await viewer.evaluate((element) => {
+          let screenMaterial = null;
+          element._model.traverse((object) => {
+            if (!object.isMesh) return;
+            const materials = Array.isArray(object.material) ? object.material : [object.material];
+            for (const material of materials) {
+              if (material.name === 'MAT_SCREEN_CONTENT') screenMaterial = material;
+            }
+          });
+          const image = (screenMaterial?.emissiveMap ?? screenMaterial?.map)?.image;
+          if (!image) return null;
+          const canvas = document.createElement('canvas');
+          canvas.width = image.width;
+          canvas.height = image.height;
+          const context = canvas.getContext('2d');
+          context.drawImage(image, 0, 0);
+          const rgba = context.getImageData(Math.floor(image.width / 2), Math.floor(image.height * 70 / 2622), 1, 1).data;
+          return Array.from(rgba).slice(0, 3);
+        });
+        if (!islandCenterRgb || Math.max(...islandCenterRgb) > 5) {
+          throw new Error(`iPhone system-owned Dynamic Island missing from screen_on compositor: ${JSON.stringify(islandCenterRgb)}`);
+        }
+        // The raster pill alone is insufficient: actual GLB polygons must
+        // expose both physical sensor and camera without an opaque screen cap.
+        const opticVisibility = await viewer.evaluate((element) => {
+          const meshes = [];
+          element._model.updateMatrixWorld(true);
+          element._model.traverse((node) => { if (node.isMesh) meshes.push(node); });
+          const V = element._model.position.constructor;
+          const a = new V(), b = new V(), c = new V();
+          const covers = (mesh, x, y) => {
+            const pos = mesh.geometry.attributes.position;
+            const index = mesh.geometry.index;
+            const count = index ? index.count : pos.count;
+            for (let i = 0; i < count; i += 3) {
+              a.fromBufferAttribute(pos, index ? index.getX(i) : i).applyMatrix4(mesh.matrixWorld);
+              b.fromBufferAttribute(pos, index ? index.getX(i + 1) : i + 1).applyMatrix4(mesh.matrixWorld);
+              c.fromBufferAttribute(pos, index ? index.getX(i + 2) : i + 2).applyMatrix4(mesh.matrixWorld);
+              const d = (b.y - c.y) * (a.x - c.x) + (c.x - b.x) * (a.y - c.y);
+              if (Math.abs(d) < 1e-12) continue;
+              const u = ((b.y - c.y) * (x - c.x) + (c.x - b.x) * (y - c.y)) / d;
+              const v = ((c.y - a.y) * (x - c.x) + (a.x - c.x) * (y - c.y)) / d;
+              if (u >= -1e-7 && v >= -1e-7 && u + v <= 1 + 1e-7) return true;
+            }
+            return false;
+          };
+          const opaqueScreen = meshes.filter((m) => m.name.startsWith('SCREEN_CONTENT_'));
+          const anyScreen = (x, y) => opaqueScreen.some((m) => covers(m, x, y));
+          const targets = [
+            { x: -0.00415, y: 0.067015, optic: 'FRONT_SENSOR_MASK' },
+            { x: 0.00672, y: 0.067015, optic: 'FRONT_CAMERA_GLASS' },
+          ];
+          return {
+            ordinaryScreenCovered: anyScreen(0, 0),
+            clearOptics: targets.map(({ x, y, optic }) => ({
+              optic, covered: anyScreen(x, y),
+              opticPresent: meshes.some((m) => m.name === optic && covers(m, x, y)),
+            })),
+          };
+        });
+        if (!opticVisibility.ordinaryScreenCovered ||
+            opticVisibility.clearOptics.some(({ covered, opticPresent }) => covered || !opticPresent)) {
+          throw new Error(`iPhone front optic is hidden behind opaque GLB screen: ${JSON.stringify(opticVisibility)}`);
+        }
+      }
       const glow = await viewer.evaluate((element) => ({
         actual: [element._screenGlow?.width, element._screenGlow?.height],
         expected: [element.asset?.screenGlow?.width_mm / 1000, element.asset?.screenGlow?.height_mm / 1000],

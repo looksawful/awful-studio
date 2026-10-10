@@ -38,6 +38,7 @@ class AwfulModelViewer extends HTMLElement {
     this.#dispose();
     this._disposed = false;
     const asset = this._asset;
+    const background = asset.id === 'iphone-17-v30' ? '#92969f' : '#111111';
     this.shadowRoot.innerHTML = `
       <style>${styles}</style>
       <section class="shell">
@@ -45,7 +46,7 @@ class AwfulModelViewer extends HTMLElement {
           <label>LOD <select data-control="lod"></select></label>
           <label>mode <select data-control="mode"><option>texture</option><option>wireframe</option><option>clay</option><option>normals</option></select></label>
           <label>projection <select data-control="projection"><option value="perspective">perspective</option><option value="orthographic">orthographic</option></select></label>
-          <button data-camera="front">front</button><button data-camera="side">side</button><button data-camera="top">top</button>
+          <button data-camera="front">front</button><button data-camera="rear">rear</button><button data-camera="side">side</button><button data-camera="top">top</button>
           <button data-action="fit">fit</button>
           <label><input data-control="autorotate" type="checkbox"> rotate</label>
           <label>screen <select data-control="screen-state"></select></label>
@@ -54,7 +55,7 @@ class AwfulModelViewer extends HTMLElement {
           <label><input data-control="clip" type="checkbox"> section</label>
           <input data-control="clip-position" type="range" min="-1" max="1" step="0.01" value="0">
           <label><input data-control="axes" type="checkbox"> axes</label>
-          <input data-control="background" type="color" value="#111111" aria-label="background">
+          <input data-control="background" type="color" value="${background}" aria-label="background">
           <button data-action="fullscreen">fullscreen</button>
         </div>
         <div class="stage" data-stage></div>
@@ -71,7 +72,7 @@ class AwfulModelViewer extends HTMLElement {
     const height = Math.max(stage.clientHeight, 480);
 
     this._scene = new THREE.Scene();
-    this._scene.background = new THREE.Color('#111111');
+    this._scene.background = new THREE.Color(asset.id === 'iphone-17-v30' ? '#92969f' : '#111111');
     this._perspective = new THREE.PerspectiveCamera(35, width / height, 0.001, 1000);
     this._ortho = new THREE.OrthographicCamera(-2, 2, 2, -2, 0.001, 1000);
     this._camera = this._perspective;
@@ -201,7 +202,7 @@ class AwfulModelViewer extends HTMLElement {
       if (!object.isMesh) return;
       const materials = Array.isArray(object.material) ? object.material : [object.material];
       for (const material of materials) {
-        const policy = previewMaterialPolicy(material.name, { hasTexture: Boolean(material.map || material.emissiveMap) });
+        const policy = previewMaterialPolicy(material.name, { hasTexture: Boolean(material.map || material.emissiveMap), assetId: this._asset?.id });
         if (policy.alphaTest != null) material.alphaTest = policy.alphaTest;
         if (policy.transparent != null) material.transparent = policy.transparent;
         if (policy.opacity != null) material.opacity = policy.opacity;
@@ -212,11 +213,37 @@ class AwfulModelViewer extends HTMLElement {
         if (policy.transmission != null && 'transmission' in material) material.transmission = policy.transmission;
         if (policy.minRoughness != null && 'roughness' in material) material.roughness = Math.max(material.roughness, policy.minRoughness);
         if (policy.maxClearcoat != null && 'clearcoat' in material) material.clearcoat = Math.min(material.clearcoat, policy.maxClearcoat);
+        if (policy.specularIntensity != null && 'specularIntensity' in material) material.specularIntensity = policy.specularIntensity;
         material.needsUpdate = true;
         for (const texture of [material.map, material.emissiveMap, material.normalMap, material.roughnessMap, material.metalnessMap]) {
           if (!texture) continue;
           texture.anisotropy = maxAnisotropy;
           texture.needsUpdate = true;
+        }
+        if (this._asset?.id === 'iphone-17-v30' && material.name === 'MAT_SCREEN_CONTENT') {
+          // System-owned Dynamic Island, composited over replaceable screen artwork.
+          // Pixel datum: original Apple iOS 26 screenshot, 1206x2622 (not hardware geometry).
+          const source = material.emissiveMap ?? material.map;
+          if (source?.image) {
+            const canvas = document.createElement('canvas');
+            canvas.width = source.image.width;
+            canvas.height = source.image.height;
+            const context = canvas.getContext('2d');
+            if (!context) throw new Error('Canvas 2D unavailable for screen compositor');
+            context.drawImage(source.image, 0, 0);
+            const x = canvas.width / 1206;
+            const y = canvas.height / 2622;
+            context.fillStyle = '#000000';
+            context.beginPath();
+            context.roundRect(405 * x, 9 * y, 398 * x, 121 * y, 60 * y);
+            context.fill();
+            const composed = source.clone();
+            composed.image = canvas;
+            composed.needsUpdate = true;
+            if (material.map) material.map = composed;
+            if (material.emissiveMap) material.emissiveMap = composed;
+            material.needsUpdate = true;
+          }
         }
         if (material.name === 'MAT_SCREEN_CONTENT' && !material.userData.previewScreenOn) {
           material.userData.previewScreenOn = {

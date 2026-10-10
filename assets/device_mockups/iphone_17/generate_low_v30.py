@@ -252,6 +252,8 @@ def rounded_rect_cdt_prism_y(
     *,
     target_step=6.0 * MM,
     corner_segments=16,
+    corner_guard=False,
+    cutouts=(),
 ):
     """Build a rounded-rectangle prism with local constrained-Delaunay cap triangles."""
     half_w, half_h = width * 0.5, height * 0.5
@@ -259,7 +261,7 @@ def rounded_rect_cdt_prism_y(
     if cx <= 0.0 or cz <= 0.0:
         raise ValueError("rounded rectangle radius must fit inside width/height")
 
-    top_segments = max(1, math.ceil((width - 2.0 * radius) / target_step))
+    top_segments = max(1, math.ceil((width - 2.0 * radius) / (min(target_step, 6.0*MM) if cutouts else target_step)))
     side_segments = max(1, math.ceil((height - 2.0 * radius) / target_step))
     boundary = []
 
@@ -309,10 +311,61 @@ def rounded_rect_cdt_prism_y(
             if inside_cap(x, z):
                 coords.append(Vector((x, z)))
 
+    if corner_guard:
+        # Protect densely sampled corner arcs from skinny long-distance cap spans.
+        inner_radius = radius - 2.0 * MM
+        for x_center, z_center, start_deg in ((cx, cz, 0), (-cx, cz, 90), (-cx, -cz, 180), (cx, -cz, 270)):
+            for k in range(corner_segments // 2 + 1):
+                angle = math.radians(start_deg + 180.0 * k / corner_segments)
+                coords.append(Vector((x_center + inner_radius * math.cos(angle), z_center + inner_radius * math.sin(angle))))
+
+    def in_ring(point, ring):
+        inside = False
+        x, z = point
+        for i, (a, b) in enumerate(ring):
+            c, d = ring[(i + 1) % len(ring)]
+            if ((b > z) != (d > z)) and (x < a + (c - a) * (z - b) / (d - b)):
+                inside = not inside
+        return inside
+
+    hole_loops = []
+    if cutouts:
+        coords = coords[:boundary_count] + [
+            point for point in coords[boundary_count:]
+            if not any(in_ring((point.x, point.y), ring) for ring in cutouts)
+        ]
+        # Steiner support close to the small optic apertures prevents long
+        # needle triangles from connecting millimetre-scale edges to the grid.
+        for ring in cutouts:
+            cx = sum(point[0] for point in ring) / len(ring)
+            cz = sum(point[1] for point in ring) / len(ring)
+            for x, z in ring:
+                dx, dz = x - cx, z - cz
+                d = math.hypot(dx, dz)
+                coords.append(Vector((x + dx / d * 2.0 * MM,
+                                      z + dz / d * 2.0 * MM)))
+        optic_z = sum(z for ring in cutouts for _, z in ring) / sum(len(ring) for ring in cutouts)
+        # Local support only. Other devices and the remaining display keep their
+        # original sparse quality-bounded triangulation.
+        for row in range(-4, 3):
+            for col in range(-7, 8):
+                x, z = col * 2.0 * MM, optic_z + row * 2.0 * MM
+                if not inside_cap(x, z) or any(in_ring((x, z), ring) for ring in cutouts):
+                    continue
+                if any((point.x - x)**2 + (point.y - z)**2 < (0.7*MM)**2 for point in coords):
+                    continue
+                coords.append(Vector((x, z)))
+        for ring in cutouts:
+            start = len(coords)
+            coords.extend(Vector(point) for point in ring)
+            hole_loops.append(list(range(start, len(coords))))
+
     boundary_edges = [
         (index, (index + 1) % boundary_count)
         for index in range(boundary_count)
     ]
+    for loop in hole_loops:
+        boundary_edges.extend((loop[i], loop[(i + 1) % len(loop)]) for i in range(len(loop)))
     result = delaunay_2d_cdt(
         coords,
         boundary_edges,
@@ -322,7 +375,13 @@ def rounded_rect_cdt_prism_y(
         True,
     )
     cap_coords, _, cap_faces, source_vertices, _, _ = result
-    cap_faces = [tuple(face) for face in cap_faces if len(face) == 3]
+    cap_faces = [
+        tuple(face) for face in cap_faces if len(face) == 3
+        and not any(in_ring(
+            (sum(cap_coords[i].x for i in face) / 3,
+             sum(cap_coords[i].y for i in face) / 3), ring
+        ) for ring in cutouts)
+    ]
     if not cap_faces:
         raise RuntimeError(f"{name}: constrained Delaunay cap produced no triangles")
 
@@ -345,6 +404,11 @@ def rounded_rect_cdt_prism_y(
     for index, a in enumerate(boundary_output):
         b = boundary_output[(index + 1) % boundary_count]
         faces.append((a, b, b + count, a + count))
+    for loop in hole_loops:
+        out = [output_for_source[index] for index in loop]
+        for i, a in enumerate(out):
+            b = out[(i + 1) % len(out)]
+            faces.append((b, a, a + count, b + count))
 
     mesh = bpy.data.meshes.new(f"{name}_MESH")
     mesh.from_pydata(verts, [], faces)
@@ -452,13 +516,13 @@ ctrl_c = fc.make_collection("IPHONE_17_CONTROLLERS")
 metal = fc.make_material("MAT_ANODIZED_ALUMINUM", (0.006, 0.007, 0.010), 1.0, 0.31)
 metal_dark = fc.make_material("MAT_ALUMINUM_EDGE", (0.012, 0.014, 0.020), 1.0, 0.24)
 camera_housing_mat = fc.make_material("MAT_CAMERA_HOUSING", (0.010, 0.013, 0.020), 1.0, 0.27)
-back_mat = fc.make_material("MAT_BACK_GLASS", (0.00008, 0.00010, 0.00014), 0.0, 0.38)
-camera_seat_mat = fc.make_material("MAT_CAMERA_HOUSING_SEAT", (0.00008, 0.00010, 0.00014), 0.0, 0.38)
+back_mat = fc.make_material("MAT_BACK_GLASS", (0.012, 0.013, 0.017), 0.0, 0.70)
+camera_seat_mat = fc.make_material("MAT_CAMERA_HOUSING_SEAT", (0.004, 0.005, 0.007), 0.0, 0.50)
 back_bsdf = back_mat.node_tree.nodes.get("Principled BSDF")
-back_bsdf.inputs["Coat Weight"].default_value = 0.22
+back_bsdf.inputs["Coat Weight"].default_value = 0.0
 back_bsdf.inputs["Coat Roughness"].default_value = 0.09
 if back_bsdf.inputs.get("Specular IOR Level"):
-    back_bsdf.inputs["Specular IOR Level"].default_value = 0.18
+    back_bsdf.inputs["Specular IOR Level"].default_value = 0.0
 black = fc.make_material("MAT_OPTICS_BLACK", (0.0008, 0.0010, 0.0014), 0.0, 0.07)
 grille_mat = fc.make_material("MAT_APERTURE_GRILLE", (0.0010, 0.0012, 0.0016), 0.0, 0.82)
 # A fine woven grille is surface detail; the surrounding recess remains geometry.
@@ -693,7 +757,7 @@ back_glass = rounded_rect_cdt_prism_y(
     corner_segments=16,
 )
 
-front_seat = display_frame_prism_y(
+front_seat = rounded_rect_cdt_prism_y(
     "DISPLAY_GLASS_SEAT",
     COVER_W + 0.10*MM,
     COVER_H + 0.10*MM,
@@ -702,8 +766,11 @@ front_seat = display_frame_prism_y(
     gap_mat,
     screen_c,
     location=(0, -METAL_D*0.5 - 0.010*MM, 0),
+    target_step=16*MM,
+    corner_segments=20,
+    corner_guard=True,
 )
-bezel = display_frame_prism_y(
+bezel = rounded_rect_cdt_prism_y(
     "DISPLAY_BEZEL",
     SCREEN_W + 0.68*MM,
     SCREEN_H + 0.68*MM,
@@ -712,6 +779,9 @@ bezel = display_frame_prism_y(
     bezel_mat,
     screen_c,
     location=(0, front_y + 0.08*MM, 0),
+    target_step=16*MM,
+    corner_segments=20,
+    corner_guard=True,
 )
 
 screen_glass = screen_glass_ring_y(
@@ -733,7 +803,37 @@ apply_runtime_bevel(screen_glass, 0.00006)
 front_hardware_z = H*0.5 - 7.79*MM
 cam_x = 6.72*MM
 
-screen_content = display_frame_prism_y(
+def rounded_optic_aperture(x, z, width, height, radius, arc_steps=4):
+    half_x = width * 0.5 - radius
+    half_z = height * 0.5 - radius
+    points = []
+    for cx, cz, first_angle in (
+        (half_x, half_z, 0),
+        (-half_x, half_z, 90),
+        (-half_x, -half_z, 180),
+        (half_x, -half_z, 270),
+    ):
+        for step in range(arc_steps):
+            angle = math.radians(first_angle + step * 90 / arc_steps)
+            points.append((x + cx + radius * math.cos(angle),
+                           z + cz + radius * math.sin(angle)))
+    return points
+
+# Two genuine display openings expose authored TrueDepth optics. The software
+# Dynamic Island stays in replaceable screen artwork, not duplicate geometry.
+aperture_margin = 0.04 * MM
+front_optic_apertures = (
+    rounded_optic_aperture(-4.15*MM, front_hardware_z,
+                          7.10*MM + 2*aperture_margin,
+                          2.30*MM + 2*aperture_margin,
+                          1.15*MM + aperture_margin),
+    rounded_optic_aperture(cam_x, front_hardware_z,
+                          2.30*MM + 2*aperture_margin,
+                          2.30*MM + 2*aperture_margin,
+                          1.15*MM + aperture_margin),
+)
+
+screen_content = rounded_rect_cdt_prism_y(
     "SCREEN_CONTENT",
     SCREEN_W,
     SCREEN_H,
@@ -742,8 +842,10 @@ screen_content = display_frame_prism_y(
     screen_mat,
     screen_c,
     location=(0, front_y + 0.010*MM, 0),
-    outer_segments=16,
-    inner_segments=4,
+    target_step=12*MM,
+    corner_segments=20,
+    corner_guard=True,
+    cutouts=front_optic_apertures,
 )
 
 # SCREEN_CONTENT stays clean replaceable artwork. Physical front hardware is
@@ -1029,11 +1131,12 @@ out = nodes.new("ShaderNodeOutputMaterial")
 bsdf = nodes.new("ShaderNodeBsdfPrincipled")
 tex = nodes.new("ShaderNodeTexImage")
 tex.image = bpy.data.images.load(logo_img_path, check_existing=True)
-bsdf.inputs["Base Color"].default_value = (0.14, 0.15, 0.17, 1.0)
-bsdf.inputs["Roughness"].default_value = 0.16
-bsdf.inputs["Coat Weight"].default_value = 0.12
+bsdf.inputs["Base Color"].default_value = (0.09, 0.10, 0.12, 1.0)
+bsdf.inputs["Roughness"].default_value = 1.0
+bsdf.inputs["Coat Weight"].default_value = 0.0
 bsdf.inputs["Coat Roughness"].default_value = 0.045
-bsdf.inputs["Metallic"].default_value = 0.86
+bsdf.inputs["Metallic"].default_value = 0.0
+bsdf.inputs["Specular IOR Level"].default_value = 0.0
 logo_mat.use_backface_culling = True
 links.new(tex.outputs["Alpha"], bsdf.inputs["Alpha"])
 links.new(bsdf.outputs["BSDF"], out.inputs["Surface"])

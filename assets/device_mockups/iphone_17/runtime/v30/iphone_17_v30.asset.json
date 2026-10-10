@@ -203,8 +203,8 @@
   },
   "camera_fit": "runtime_bounds",
   "source_reference": "Apple iPhone 17 Dimensional Drawings 2025-09-09",
-  "source_revision": "00ea0cb1bdd5834eeb59a1e7087d6aa9c75f0cdc7c8ddb5d4043388492b472bb",
-  "source_commit": "870bc6670a2e8c48f7df601b1c1a16561219873c",
+  "source_revision": "da923312435d3a819c480af120d3c882eec39e6ee61705a397d66a3fedecbb44",
+  "source_commit": "f0a523ca51a20615a372236ee069752986a06b21",
   "generator_version": "web_delivery_camera_logo_normals_v30",
   "delivery_profile": {
     "simplification": "none",
@@ -220,11 +220,11 @@
   },
   "source_files": {
     "assets/device_mockups/common/foundation_common.py": "1d68c3fff908b7ae149f74c31a19064eb6d2384234d33bd71071fea70d651d12",
-    "assets/device_mockups/iphone_17/body_topology_v30.py": "4077030946aa22dfef3676a6c8a56e4a4d639a02e7aa4ff28d7f9b9bd701caf6",
+    "assets/device_mockups/iphone_17/body_topology_v30.py": "5f9739ada4b6ccafc4760eef108928e178dc9b3bbc17adc9d2ed8688e21fd5b5",
     "assets/device_mockups/iphone_17/camera_topology_v30.py": "ecd3e27ce17e40d13a7a748d0dca728433738d9cd59c3e93aa49a46227ece950",
     "assets/device_mockups/iphone_17/display_topology_v30.py": "083483043c7dcbcd3372598988e8415e2aa07dbb072d903079c5ef4f540463e2",
     "assets/device_mockups/iphone_17/export_runtime_v30.py": "f8f5d3a8f037c37045c6f51edb2dfbc124274ae84baa4d4d5d76056898fd6a48",
-    "assets/device_mockups/iphone_17/generate_low_v30.py": "56a820dd9daaae3546ff2174277e65160606966c3e61391175464e97ebeb08ae",
+    "assets/device_mockups/iphone_17/generate_low_v30.py": "4174f5b40b89b632ca6fcf6d0b9589f40ac25fed5ff2d352d9c612a84f4170a7",
     "assets/device_mockups/iphone_17/optimize_runtime_v30.py": "494c5d9086e51bdb0f427073ac21ccf4cb0df5a2b3dfe3c416821d338ed1f1ce",
     "assets/device_mockups/iphone_17/reference/apple_logo_glb_mask.png": "8359212a9b1663f4449675604ae1b9aa14e325a99306e77175d938dfae04a9da",
     "assets/device_mockups/iphone_17/reference/camera_bake_v30/bevel_40_normal.png": "a54b123c5906cdd052f4522c2796a07f7b875cd022295bb9cd697507a2074f48",
@@ -248,7 +248,7 @@
     "tools/package_device_asset.py": "d89c4b7fe2ad682db684d82785d2a5f9e274e3088936d7a69a04cb623883a360"
   },
   "glb_qa": {
-    "triangle_count": 13878,
+    "triangle_count": 14750,
     "required_nodes": [
       "APPLE_LOGO_DECAL",
       "CTRL_IPHONE_17",
@@ -270,27 +270,27 @@
   "artifacts": {
     "generated_blend": {
       "path": "assets/device_mockups/iphone_17/generated/iphone_17_low_v30.blend",
-      "sha256": "e8e71f9ef4fde0dab28bf45886c3bb399903cf89b531ff3999dff53f1b7df149"
+      "sha256": "1a289d37e1a5b73d0180066ace7ab369a047feffc697485d237da961dd45e7b5"
     },
     "validation": {
       "path": "assets/device_mockups/iphone_17/evidence/low_v30_validation.json",
-      "sha256": "a26e7a8c1ac5bc1ba6f776371c3a60f784afb040bb40937722e0d83aec1b039a"
+      "sha256": "d69e3877358b7ae6acbf5d794ece79ed0a7aff7887357ab49e57bcaa1947062d"
     },
     "delivery_blend": {
       "path": "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_delivery.blend",
-      "sha256": "4fa73f0db6a33edbc17080a62f46cceefaf6c7e585513b1177c3fc3c5ff18d8a"
+      "sha256": "78c9fc1dd02486136d851cfeae9375a177d4b33339f0cef53c0469917282f100"
     },
     "compat_glb": {
       "path": "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb",
-      "sha256": "7a57e99284f0055830382049a7d9eb6a98a5467b023f0a9f2ec2ef8a423cdf53"
+      "sha256": "1b2a30624c117f6b320ec87604948418f0854e3d8d018a3b0ab39961f6ffcbd5"
     },
     "meshopt_glb": {
       "path": "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web_meshopt.glb",
-      "sha256": "cb0f0bc7ec386aef73407ea244b2ffbdc351561bbd0beef9d0eab4862913ec2a"
+      "sha256": "26c670d1acc08802853028b69cb8a66b11fce5867145e2a97164b792b9bfcf8e"
     },
     "plugin_bundle": {
       "path": "extension/awful_studio/assets/devices/iphone_17_low_v30.blend",
-      "sha256": "2cf28c7a018f7f2af9c2e2b32b66a28dc928de39eab805473fcb361c67bc7864"
+      "sha256": "3a818384562e649bcfb0f96240eb27023a384dda9e65d736b86c8fc803d05a51"
     }
   }
 }

@@ -26,6 +26,14 @@ EXPECTED = {
         "location_m": (0.0, -0.00372, 0.0),
         "radius_m": 0.01087,
     },
+    "SCREEN_CONTENT": {
+        "materials": ["MAT_SCREEN_CONTENT", "MAT_SCREEN_EDGE"],
+        "dimensions_m": (0.06657, 0.000325, 0.14479),
+        "location_m": (0.0, -0.00379, 0.0),
+        "radius_m": 0.01055,
+        "max_vertices": 800,  # two real optic cutouts plus localized Steiner support
+        "max_cap_edge_m": 0.020,
+    },
 }
 
 REJECTED_BASELINE_VERTS = 392
@@ -132,6 +140,7 @@ for name, expected in EXPECTED.items():
         if len(face.verts) == 3 and abs(face.normal.y) > 0.99
     ]
     triangle_metrics = [triangle_quality(face) for face in cap_triangles]
+    max_cap_edge = max((edge.verts[0].co - edge.verts[1].co).length for face in cap_triangles for edge in face.edges)
     min_angle = min(metric[0] for metric in triangle_metrics)
     max_aspect = max(metric[1] for metric in triangle_metrics)
     quality.free()
@@ -146,6 +155,7 @@ for name, expected in EXPECTED.items():
         "cap_triangles": len(cap_triangles),
         "min_triangle_angle_deg": min_angle,
         "max_triangle_aspect": max_aspect,
+        "max_cap_edge_m": max_cap_edge,
         "materials": [material.name for material in obj.data.materials],
         "dimensions_m": tuple(obj.dimensions),
         "location_m": tuple(obj.location),
@@ -154,12 +164,14 @@ for name, expected in EXPECTED.items():
 
     assert report[name]["ngons"] == 0, report
     assert report[name]["nonmanifold"] == 0, report
-    assert report[name]["verts"] < REJECTED_BASELINE_VERTS, report
+    assert report[name]["verts"] < expected.get("max_vertices", REJECTED_BASELINE_VERTS), report
     assert report[name]["outline_points"] < REJECTED_BASELINE_OUTLINE_POINTS, report
     assert report[name]["contour_error_m"] <= MAX_CONTOUR_ERROR_M, report
     assert report[name]["min_triangle_angle_deg"] >= MIN_TRIANGLE_ANGLE_DEG, report
     assert report[name]["max_triangle_aspect"] <= MAX_TRIANGLE_ASPECT, report
-    assert report[name]["materials"] == [expected["material"]], report
+    assert report[name]["materials"] == expected.get("materials", [expected.get("material")]), report
+    if "max_cap_edge_m" in expected:
+        assert report[name]["max_cap_edge_m"] <= expected["max_cap_edge_m"], report
     assert all(
         math.isclose(actual, target, abs_tol=1e-7)
         for actual, target in zip(report[name]["dimensions_m"], expected["dimensions_m"])

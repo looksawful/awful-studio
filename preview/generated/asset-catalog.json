@@ -7,6 +7,8 @@
       "label": "iPhone 17",
       "group": "Devices",
       "version": "v30",
+      "stage": "LOW_DRAFT",
+      "root": "CTRL_IPHONE_17",
       "sourceBlend": "assets/device_mockups/iphone_17/generated/iphone_17_low_v30.blend",
       "previewGlb": "assets/device_mockups/iphone_17/runtime/v30/iphone_17_v30_web.glb",
       "lods": [
@@ -16,9 +18,9 @@
         }
       ],
       "collision": null,
-      "sourceRevision": "00ea0cb1bdd5834eeb59a1e7087d6aa9c75f0cdc7c8ddb5d4043388492b472bb",
-      "sourceCommit": "870bc6670a2e8c48f7df601b1c1a16561219873c",
-      "triangleCount": 13878,
+      "sourceRevision": "da923312435d3a819c480af120d3c882eec39e6ee61705a397d66a3fedecbb44",
+      "sourceCommit": "f0a523ca51a20615a372236ee069752986a06b21",
+      "triangleCount": 14750,
       "materialCount": 24,
       "animations": [],
       "screenStates": {
@@ -44,6 +46,8 @@
       "label": "iPad Pro 11 M5",
       "group": "Devices",
       "version": "v6",
+      "stage": "LOW_DRAFT",
+      "root": "CTRL_IPAD_PRO_11",
       "sourceBlend": "generated/ipad_pro_11_m5_low_v6.blend",
       "previewGlb": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_11_m5_v6_web.glb",
       "lods": [
@@ -81,6 +85,8 @@
       "label": "iPad Pro 13 M5",
       "group": "Devices",
       "version": "v6",
+      "stage": "LOW_DRAFT",
+      "root": "CTRL_IPAD_PRO_13",
       "sourceBlend": "generated/ipad_pro_13_m5_low_v6.blend",
       "previewGlb": "assets/device_mockups/ipad_pro/runtime/v6/ipad_pro_13_m5_v6_web.glb",
       "lods": [
@@ -118,6 +124,8 @@
       "label": "MacBook Pro 14 M5",
       "group": "Devices",
       "version": "v1",
+      "stage": "RELEASE_CANDIDATE",
+      "root": "CTRL_MACBOOK_PRO_14",
       "sourceBlend": "extension/awful_studio/assets/devices/macbook_pro_14_m5_low_v1_release.blend",
       "previewGlb": "assets/device_mockups/macbook_pro_14/runtime/v1/macbook_pro_14_m5_v1_web.glb",
       "lods": [
