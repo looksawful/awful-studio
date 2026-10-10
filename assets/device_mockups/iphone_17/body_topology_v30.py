@@ -515,6 +515,16 @@ def build_body_mesh(
     bm.from_mesh(mesh)
     bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
     _refine_main_rail_edges(bm, 12.0 * mm)
+    # Only the hidden lower inner-wall segment over USB needs rear clearance.
+    # Adjust subdivided inner-contour stations, not the exposed Apple outline,
+    # outer bottom cells or the unrelated mic/speaker aperture geometry.
+    inner_bottom_z = -inner_height * 0.5
+    for vertex in bm.verts:
+        x, y, z = vertex.co
+        if abs(z - inner_bottom_z) <= 1e-7 and abs(x) < 16.0 * mm:
+            u = abs(x) / (16.0 * mm)
+            vertex.co.z += 0.90 * mm * (1.0 - u * u) ** 2
+    bm.normal_update()
     bm.to_mesh(mesh)
     bm.free()
     mesh.update()

@@ -18,8 +18,8 @@
         }
       ],
       "collision": null,
-      "sourceRevision": "dcdcde94d95635529c9ab3755ad2aab52bb3509049c6bf3d0bd3e7b1e50f20d7",
-      "sourceCommit": "f5cccfc2fc383048815b94db23afa014a83e4517",
+      "sourceRevision": "2adaa0790997be34d1ccf0e18091ee3c87315ae29f876d94e3c8639aa44f5731",
+      "sourceCommit": "f0a523ca51a20615a372236ee069752986a06b21",
       "triangleCount": 15102,
       "materialCount": 24,
       "animations": [],
