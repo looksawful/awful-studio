@@ -18,9 +18,9 @@
         }
       ],
       "collision": null,
-      "sourceRevision": "da923312435d3a819c480af120d3c882eec39e6ee61705a397d66a3fedecbb44",
+      "sourceRevision": "19add83ba64972baa5d4bc23538a509d476e1a4f9d676745d288113a7d7e649b",
       "sourceCommit": "f0a523ca51a20615a372236ee069752986a06b21",
-      "triangleCount": 14750,
+      "triangleCount": 18630,
       "materialCount": 24,
       "animations": [],
       "screenStates": {

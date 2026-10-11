@@ -1311,7 +1311,24 @@ usb_cutter = fc.rounded_cube("USB_C_CUTTER", (8.99*MM, 3.00*MM, 1.82*MM), 0.91*M
 place_on_apple_bottom(usb_cutter, 0.0, outward=-0.70*MM, preserve_depth_axis=True)
 fc.boolean_difference(body, usb_cutter, name="CUT_USB_C")
 boolean_cuts.append("USB_C")
-usb_cavity = fc.rounded_cube("USB_C_CAVITY", (8.45*MM, 2.38*MM, 0.12*MM), 0.04*MM, grille_mat, detail_c)
+# Build a true rounded USB-C recess rather than a cube with a nominal
+# 0.04 mm bevel: the latter had a visibly rectangular front silhouette.
+# Construct the cap in local X/Z and rotate the source mesh to local X/Y;
+# place_on_apple_bottom then maps local +Z onto the physical underside.
+usb_cavity = rounded_rect_cdt_prism_y(
+    "USB_C_CAVITY", 8.45*MM, 2.38*MM, 0.12*MM,
+    .74*MM, grille_mat, detail_c,
+    target_step=.65*MM, corner_segments=8,
+)
+for vertex in usb_cavity.data.vertices:
+    x, y, z = vertex.co
+    vertex.co = (x, z, -y)
+usb_uv = usb_cavity.data.uv_layers.new(name="UVMap")
+for face in usb_cavity.data.polygons:
+    for index in face.loop_indices:
+        point = usb_cavity.data.vertices[usb_cavity.data.loops[index].vertex_index].co
+        usb_uv.data[index].uv = (point.x / (8.45*MM) + .5, point.y / (2.38*MM) + .5)
+usb_cavity.data.update()
 place_on_apple_bottom(usb_cavity, 0.0, outward=-1.40*MM, preserve_depth_axis=True)
 usb_tongue = fc.rounded_cube("USB_C_TONGUE", (5.25*MM, 0.48*MM, 0.18*MM), 0.08*MM, metal_dark, detail_c)
 place_on_apple_bottom(usb_tongue, 0.0, outward=-0.80*MM, preserve_depth_axis=True)
@@ -1319,7 +1336,7 @@ place_on_apple_bottom(usb_tongue, 0.0, outward=-0.80*MM, preserve_depth_axis=Tru
 # Materialize the physical USB bevel. Preserve quads where possible: forcing
 # every face to triangles created needle diagonals across the broad visible
 # cavity/tongue surfaces. Only residual n-gons need an authored BEAUTY split.
-for usb_part, bevel_segments in ((usb_cavity, 2), (usb_tongue, 3)):
+for usb_part, bevel_segments in ((usb_tongue, 3),):
     usb_part.modifiers["EDGE_BEVEL"].segments = bevel_segments
     bpy.context.view_layer.objects.active = usb_part
     bpy.ops.object.modifier_apply(modifier="EDGE_BEVEL")
@@ -1398,13 +1415,93 @@ for idx, from_left_mm in enumerate((19.71, 21.965, 24.22), 1):
 for idx, from_left_mm in enumerate((47.23, 49.485, 51.74, 53.995, 56.25), 1):
     bottom_aperture(f"BOTTOM_SPEAKER_APERTURE_{idx:02d}", from_left_mm - 71.45*0.5)
 
+def pentalobe_screw_head(name, material, recess_material, collection):
+    """Model a closed recessed Pentalobe head with controlled cap triangles.
+
+    Author the concentric five-lobe cavity directly. Cutting an already
+    triangulated radial head via Boolean creates sliver/coplanar triangles.
+    The outer radius and head depth remain the original 0.75/0.24 mm.
+    """
+    outer_radius = 0.75 * MM
+    top_z, bottom_z = 0.12 * MM, -0.12 * MM
+    floor_z = top_z - 0.08 * MM
+    count = 20
+    points, boundary, floor_faces = circular_cap_topology(
+        0.33 * MM, count, inner_ratio=0.50
+    )
+    # Only the inner screw-slot boundary is five-lobed; its floor retains
+    # a small low-valence ring and centre to avoid a 30-triangle centre fan.
+    pentalobe = []
+    for i, (x, y) in enumerate(points[:count]):
+        factor = 1.0 + 0.22 * math.cos(5.0 * math.atan2(y, x))
+        pentalobe.append((x * factor, y * factor))
+
+    vertices = []
+    for step in range(2):
+        t = float(step)
+        for i, (x, y) in enumerate(pentalobe):
+            angle = 2.0 * math.pi * i / count
+            radius = (1.0 - t) * outer_radius + t * math.hypot(x, y)
+            vertices.append((radius * math.cos(angle),
+                             radius * math.sin(angle), top_z))
+    floor_offset = len(vertices)
+    vertices.extend((x, y, floor_z) for x, y in pentalobe)
+    vertices.extend((x, y, floor_z) for x, y in points[count:])
+    bottom_offset = len(vertices)
+    bottom_points, _, bottom_faces = circular_cap_topology(outer_radius, count)
+    vertices.extend((x, y, bottom_z) for x, y in bottom_points)
+
+    faces = []
+    for band in range(1):
+        for i in range(count):
+            j = (i + 1) % count
+            a = band * count + i
+            b = band * count + j
+            c = (band + 1) * count + i
+            d = (band + 1) * count + j
+            faces.extend(((a, b, d), (a, d, c)))
+    inner_top = count
+    slot_faces_start = len(faces)
+    for i in range(count):
+        j = (i + 1) % count
+        faces.extend(((inner_top + i, inner_top + j, floor_offset + j),
+                      (inner_top + i, floor_offset + j, floor_offset + i)))
+    faces.extend(tuple(floor_offset + i for i in face) for face in floor_faces)
+    slot_faces_end = len(faces)
+    for i in range(count):
+        j = (i + 1) % count
+        faces.extend(((i, bottom_offset + i, bottom_offset + j),
+                      (i, bottom_offset + j, j)))
+    faces.extend(tuple(bottom_offset + i for i in reversed(face))
+                 for face in bottom_faces)
+
+    mesh = bpy.data.meshes.new(name + "_MESH")
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update()
+    bm = bmesh.new()
+    bm.from_mesh(mesh)
+    bmesh.ops.recalc_face_normals(bm, faces=list(bm.faces))
+    bm.to_mesh(mesh)
+    bm.free()
+    mesh.update()
+    for poly in mesh.polygons:
+        poly.use_smooth = abs(poly.normal.z) < 0.72
+    obj = bpy.data.objects.new(name, mesh)
+    collection.objects.link(obj)
+    mesh.materials.append(material)
+    mesh.materials.append(recess_material)
+    for face in mesh.polygons[slot_faces_start:slot_faces_end]:
+        face.material_index = 1
+    return obj
+
 for side, from_left_mm in (("L", 28.80), ("R", 42.65)):
     x_mm = from_left_mm - 71.45*0.5
     recess = fc.cylinder(f"BOTTOM_SCREW_{side}_RECESS", 0.78*MM, 0.90*MM, None, detail_c, vertices=48)
     place_on_apple_bottom(recess, x_mm*MM, outward=-0.38*MM)
     fc.boolean_difference(body, recess, name=f"CUT_SCREW_{side}")
     boolean_cuts.append(f"SCREW_{side}")
-    screw = radial_prism_z(f"BOTTOM_SCREW_{side}", 0.75*MM, 0.24*MM, screw_mat, detail_c, segments=20)
+    screw = pentalobe_screw_head(f"BOTTOM_SCREW_{side}", screw_mat, grille_mat, detail_c)
+    ensure_box_uv(screw, tile_mm=1.50, replace=True)
     place_on_apple_bottom(screw, x_mm*MM, outward=-0.15*MM)
 
 # Keep the detailed boolean body as hidden dimensional/reference evidence.

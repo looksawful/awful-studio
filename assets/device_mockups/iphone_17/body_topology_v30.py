@@ -170,6 +170,54 @@ def _quality_shell_faces(outer_loop, hole_loop):
     return faces, materials
 
 
+def _supported_annulus_shell(outer, inner, surface, *, slices=3):
+    """Rounded vent rim with matched, quality-bounded intermediate rings.
+
+    Avoid needle triangles when a 24-point circular hole meets a large,
+    four-corner rectangular cell. The same rings close both sides and walls.
+    """
+    count = len(outer)
+    rings = [
+        [(a[0] * (1.0 - k / slices) + b[0] * k / slices,
+          a[1] * (1.0 - k / slices) + b[1] * k / slices)
+         for a, b in zip(outer, inner)]
+        for k in range(slices + 1)
+    ]
+    verts = [surface(point, False) for ring in rings for point in ring]
+    verts += [surface(point, True) for ring in rings for point in ring]
+    back = len(rings) * count
+    faces, materials = [], []
+    for ring_index in range(slices):
+        first = ring_index * count
+        second = (ring_index + 1) * count
+        for i in range(count):
+            j = (i + 1) % count
+            a, b = rings[ring_index][i], rings[ring_index][j]
+            c, d = rings[ring_index + 1][i], rings[ring_index + 1][j]
+            diag_a = min(_triangle_quality_2d(a, b, d)[0],
+                         _triangle_quality_2d(a, d, c)[0])
+            diag_b = min(_triangle_quality_2d(a, b, c)[0],
+                         _triangle_quality_2d(b, d, c)[0])
+            if diag_a >= diag_b:
+                caps = ((first + i, first + j, second + j),
+                        (first + i, second + j, second + i))
+            else:
+                caps = ((first + i, first + j, second + i),
+                        (first + j, second + j, second + i))
+            for tri in caps:
+                faces.append(tri)
+                materials.append(0)
+                faces.append(tuple(back + index for index in reversed(tri)))
+                materials.append(1)
+    hole = slices * count
+    for i in range(count):
+        j = (i + 1) % count
+        faces.extend(((j, i, back + i, back + j),
+                      (hole + i, hole + j, back + hole + j, back + hole + i)))
+        materials.extend((1, 1))
+    return verts, faces, materials
+
+
 def _circle(cx, radius, segments=16):
     return [
         (
@@ -441,16 +489,30 @@ def build_body_mesh(
     bottom_z = -height * 0.5
 
     def flat_bottom_cell(xa, xb, hole, thickness=0.01 * mm):
-        outer_loop, hole_loop = _uniform_annulus_loops(xa, xb, y0, y1, hole, segments=8, pin_corners=True)
-        verts = []
-        for z in (bottom_z, bottom_z + thickness):
-            verts.extend((x, y, z) for x, y in outer_loop)
-            verts.extend((x, y, z) for x, y in hole_loop)
-        fs, mats = _quality_shell_faces(outer_loop, hole_loop)
+        is_usb = xa < 0 < xb
+        segments = 40 if is_usb else 24
+        outer_loop, hole_loop = _uniform_annulus_loops(
+            xa, xb, y0, y1, hole, segments=segments, pin_corners=True
+        )
+        if is_usb:
+            verts = []
+            for z in (bottom_z, bottom_z + thickness):
+                verts.extend((x, y, z) for x, y in outer_loop)
+                verts.extend((x, y, z) for x, y in hole_loop)
+            fs, mats = _quality_shell_faces(outer_loop, hole_loop)
+        else:
+            verts, fs, mats = _supported_annulus_shell(
+                outer_loop, hole_loop,
+                lambda point, back: (point[0], point[1],
+                                     bottom_z + (thickness if back else 0.0)),
+                slices=3,
+            )
         _append_component(master_vertices, master_faces, master_materials, verts, fs, mats)
 
     def curved_bottom_cell(xa, xb, hole, thickness=0.01 * mm):
-        outer_loop, hole_loop = _uniform_annulus_loops(xa, xb, y0, y1, hole, segments=8, pin_corners=True)
+        outer_loop, hole_loop = _uniform_annulus_loops(
+            xa, xb, y0, y1, hole, segments=24, pin_corners=True
+        )
 
         def surface(point, back=False):
             x, y = point
@@ -460,13 +522,9 @@ def build_body_mesh(
                 coord -= normal * thickness
             return tuple(coord)
 
-        verts = (
-            [surface(point, False) for point in outer_loop]
-            + [surface(point, False) for point in hole_loop]
-            + [surface(point, True) for point in outer_loop]
-            + [surface(point, True) for point in hole_loop]
+        verts, fs, mats = _supported_annulus_shell(
+            outer_loop, hole_loop, surface, slices=3
         )
-        fs, mats = _quality_shell_faces(outer_loop, hole_loop)
         _append_component(master_vertices, master_faces, master_materials, verts, fs, mats)
 
     def side_cell(side, zlo, zhi, hole, thickness=0.01 * mm):
