@@ -52,6 +52,7 @@ test('LOD options preserve manifest order and fall back to preview model', () =>
 });
 test('camera presets are explicit and normalized', () => {
   assert.deepEqual(cameraDirection('front'), [0, 0, 1]);
+  assert.deepEqual(cameraDirection('rear'), [0, 0, -1]);
   assert.deepEqual(cameraDirection('side'), [1, 0, 0]);
   assert.deepEqual(cameraDirection('top'), [0, 1, 0]);
   assert.throws(() => cameraDirection('diagonal'), /Unknown camera preset/);
@@ -62,9 +63,17 @@ test('screen glow preserves manifest width and height orientation', () => {
   assert.deepEqual(screenGlowDimensions({}, { x: 0.16, y: 0.23, z: 0.001 }), [0.16, 0.23]);
 });
 
+test('iPad Apple decal preserves original finish independent of iPhone tuning', () => {
+  for (const assetId of ['ipad-pro-11-m5-v6', 'ipad-pro-13-m5-v6']) {
+    assert.deepEqual(previewMaterialPolicy('MAT_APPLE_LOGO_DECAL', { assetId }), {
+      alphaTest: 0.5, transparent: false, depthWrite: true, frontSide: true,
+    });
+  }
+});
+
 test('binary Apple decal uses crisp preview alpha policy', () => {
-  assert.deepEqual(previewMaterialPolicy('MAT_APPLE_LOGO_DECAL'), {
-    alphaTest: 0.5, transparent: false, depthWrite: true, frontSide: true,
+  assert.deepEqual(previewMaterialPolicy('MAT_APPLE_LOGO_DECAL', { assetId: 'iphone-17-v30' }), {
+    alphaTest: 0.5, transparent: false, depthWrite: true, frontSide: true, envMapIntensity: 0, minRoughness: 1, maxClearcoat: 0, specularIntensity: 0,
   });
   assert.deepEqual(previewMaterialPolicy('MAT_SCREEN_CONTENT', { hasTexture: true }), { emissiveIntensity: 2, envMapIntensity: 0, minRoughness: 0.12, maxClearcoat: 0 });
   assert.deepEqual(previewMaterialPolicy('MAT_SCREEN_CONTENT'), { emissiveIntensity: 0, envMapIntensity: 0, minRoughness: 0.45, maxClearcoat: 0 });
@@ -72,6 +81,6 @@ test('binary Apple decal uses crisp preview alpha policy', () => {
   assert.deepEqual(previewMaterialPolicy('MAT_ANODIZED_ALUMINUM'), { frontSide: true, envMapIntensity: 0.55, minRoughness: 0.28 });
   assert.deepEqual(previewMaterialPolicy('MAT_IPAD_ALUMINUM'), { frontSide: true, envMapIntensity: 0.55, minRoughness: 0.3 });
   assert.deepEqual(previewMaterialPolicy('MAT_SPACE_BLACK_ALUMINUM'), { frontSide: true, envMapIntensity: 0.5, minRoughness: 0.28 });
-  assert.deepEqual(previewMaterialPolicy('MAT_BACK_GLASS'), { frontSide: true, envMapIntensity: 0.32, minRoughness: 0.38 });
+  assert.deepEqual(previewMaterialPolicy('MAT_BACK_GLASS', { assetId: 'iphone-17-v30' }), { frontSide: true, envMapIntensity: 0, minRoughness: 1, maxClearcoat: 0, specularIntensity: 0 });
   assert.deepEqual(previewMaterialPolicy('MAT_OPTICS_BLACK'), { frontSide: true });
 });

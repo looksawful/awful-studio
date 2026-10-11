@@ -18,7 +18,13 @@ for name in apertures+screws:
     bm.free()
     assert report[name]["ngons"]==0,report
     assert report[name]["nonmanifold"]==0,report
-    # One inner support ring replaces the rejected full-cap center fan.
-    limit=50 if name in apertures else 58
-    assert report[name]["verts"]<=limit,report
+    if name in apertures:
+        # Existing 50-vertex production acoustic caps are unchanged.
+        assert report[name]["verts"] <= 50, report
+    else:
+        # The owner's required real five-lobed Pentalobe recess needs more
+        # geometry than the rejected 58-vertex flat screw. This budget is
+        # narrow (98 vertices) and still requires manifold, no n-gons, and
+        # independent visible-triangle and physical-recess contracts.
+        assert 80 <= report[name]["verts"] <= 100, report
 print("IPHONE_BOTTOM_TOPOLOGY_GREEN",json.dumps(report,sort_keys=True))
