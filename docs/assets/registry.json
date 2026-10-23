@@ -55,7 +55,7 @@
       "source_refs": [
         "iphone17_current"
       ],
-      "stage": "LOW_V15",
+      "stage": "LOW_DRAFT",
       "tier": "HERO",
       "variants": [
         "Space Black",
@@ -124,7 +124,7 @@
       "source_refs": [
         "ipad_current"
       ],
-      "stage": "RELEASE_CANDIDATE",
+      "stage": "LOW_DRAFT",
       "tier": "HERO",
       "variants": [
         "Space Black",
@@ -193,7 +193,7 @@
       "source_refs": [
         "ipad_current"
       ],
-      "stage": "RELEASE_CANDIDATE",
+      "stage": "LOW_DRAFT",
       "tier": "HERO",
       "variants": [
         "Space Black",

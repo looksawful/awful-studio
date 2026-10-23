@@ -60,15 +60,15 @@ def add(asset_id, name, category, identity, tier, stage, dimensions, sources, co
         "notes": notes or [], "runtime": runtime or {"lod": ["LOD0", "LOD1", "LOD2"], "collision": "simple_proxy", "shipping": "GLB"},
         "production_ready": True,
     })# Devices
-add("iphone_17", "iPhone 17", "DEVICE_MOCKUP", "PROJECT_VERIFIED", "HERO", "LOW_V15",
+add("iphone_17", "iPhone 17", "DEVICE_MOCKUP", "PROJECT_VERIFIED", "HERO", "LOW_DRAFT",
     {"body_mm": d([71.5,149.6,7.95],"VERIFIED")}, ["iphone17_current"],
     ["unibody","display_stack","dynamic_island","front_camera","rear_camera_system","buttons","ports","logo"],
     ["anodized_aluminum","display_glass","optical_glass","matte_black","decal"], ["Space Black","Silver"], mounts=["SCREEN_PLANE","FLOOR_CONTACT"])
-add("ipad_pro_11_m5", "iPad Pro 11 M5", "DEVICE_MOCKUP", "PROJECT_VERIFIED", "HERO", "RELEASE_CANDIDATE",
+add("ipad_pro_11_m5", "iPad Pro 11 M5", "DEVICE_MOCKUP", "PROJECT_VERIFIED", "HERO", "LOW_DRAFT",
     {"body_mm": d([177.5,249.7,5.3],"VERIFIED"),"screen_mm": d([160.13,232.32],"PROJECT_VERIFIED")}, ["ipad_current"],
     ["unibody","display_stack","camera_housing","rear_camera","flash","lidar","front_camera","side_controls","smart_connector"],
     ["anodized_aluminum","display_glass","optical_glass","matte_black","decal"], ["Space Black","Silver"], mounts=["SCREEN_PLANE","FLOOR_CONTACT"])
-add("ipad_pro_13_m5", "iPad Pro 13 M5", "DEVICE_MOCKUP", "PROJECT_VERIFIED", "HERO", "RELEASE_CANDIDATE",
+add("ipad_pro_13_m5", "iPad Pro 13 M5", "DEVICE_MOCKUP", "PROJECT_VERIFIED", "HERO", "LOW_DRAFT",
     {"body_mm": d([215.5,281.6,5.1],"VERIFIED"),"screen_mm": d([199.14,265.19],"PROJECT_VERIFIED")}, ["ipad_current"],
     ["unibody","display_stack","camera_housing","rear_camera","flash","lidar","front_camera","side_controls","smart_connector"],
     ["anodized_aluminum","display_glass","optical_glass","matte_black","decal"], ["Space Black","Silver"], mounts=["SCREEN_PLANE","FLOOR_CONTACT"])

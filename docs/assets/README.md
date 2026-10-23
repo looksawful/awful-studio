@@ -16,9 +16,9 @@ Canonical preparation package for all currently approved device, studio-equipmen
 | Asset | Category | Identity | Stage | Tier |
 | --- | --- | --- | --- | --- |
 | [Canon EOS 5D Mark IV](dossiers/canon_eos_5d_mark_iv.md) | `CAMERA` | `REFERENCE_STANDARD` | `SPEC_READY` | `HERO` |
-| [iPad Pro 11 M5](dossiers/ipad_pro_11_m5.md) | `DEVICE_MOCKUP` | `PROJECT_VERIFIED` | `RELEASE_CANDIDATE` | `HERO` |
-| [iPad Pro 13 M5](dossiers/ipad_pro_13_m5.md) | `DEVICE_MOCKUP` | `PROJECT_VERIFIED` | `RELEASE_CANDIDATE` | `HERO` |
-| [iPhone 17](dossiers/iphone_17.md) | `DEVICE_MOCKUP` | `PROJECT_VERIFIED` | `LOW_V15` | `HERO` |
+| [iPad Pro 11 M5](dossiers/ipad_pro_11_m5.md) | `DEVICE_MOCKUP` | `PROJECT_VERIFIED` | `LOW_DRAFT` | `HERO` |
+| [iPad Pro 13 M5](dossiers/ipad_pro_13_m5.md) | `DEVICE_MOCKUP` | `PROJECT_VERIFIED` | `LOW_DRAFT` | `HERO` |
+| [iPhone 17](dossiers/iphone_17.md) | `DEVICE_MOCKUP` | `PROJECT_VERIFIED` | `LOW_DRAFT` | `HERO` |
 | [MacBook Pro 14 M5](dossiers/macbook_pro_14_m5.md) | `DEVICE_MOCKUP` | `PROJECT_VERIFIED` | `RELEASE_CANDIDATE` | `HERO` |
 | [Bar Stool, High](dossiers/bar_stool_high.md) | `FURNITURE` | `DESIGN_STANDARD` | `SPEC_READY` | `STANDARD` |
 | [Bar Stool, Low](dossiers/bar_stool_low.md) | `FURNITURE` | `DESIGN_STANDARD` | `SPEC_READY` | `STANDARD` |

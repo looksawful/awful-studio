@@ -5,7 +5,7 @@
     - Asset ID: `ipad_pro_13_m5`
     - Category: `DEVICE_MOCKUP`
     - Identity class: `PROJECT_VERIFIED`
-    - Current stage: `RELEASE_CANDIDATE`
+    - Current stage: `LOW_DRAFT`
     - Quality tier: `HERO`
     - Variants: `Space Black`, `Silver`
     - `production_ready=true` means this dossier is complete enough to enter the next modeling gate; it does not mean the 3D asset is released.
@@ -78,7 +78,7 @@
 - Blender 5.2.1 save/reopen, spawn/delete/respawn, LOD export and GLB validation pass before release approval.
 
 ## Production handoff
-- Next gate: `RELEASE_CANDIDATE` → blockout/review unless the current stage is already further advanced.
+- Next gate: `LOW_DRAFT` → blockout/review unless the current stage is already further advanced.
 - Modeling starts from this dossier and the shared contracts; new facts update `registry.json` and regenerate this file.
 - Evidence class remains `PROJECT_VERIFIED` until a stronger source explicitly justifies an upgrade.
 **Asset-specific constraints**
