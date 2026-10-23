@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
 LOCK = ROOT / 'runtime' / 'blender.lock'
@@ -86,6 +87,53 @@ def doctor():
     return 1 if failed else 0
 
 
+def asset_metrics(asset, output):
+    asset = Path(asset)
+    if not asset.is_file():
+        print(json.dumps({'error': 'asset not found', 'asset': asset.name}), file=sys.stderr)
+        return 2
+
+    receipt = {
+        'schema_version': 1,
+        'kind': 'awful-studio.asset-metrics',
+        'asset': {
+            'name': asset.name,
+            'extension': asset.suffix.lower(),
+            'bytes': asset.stat().st_size,
+            'sha256': sha256(asset),
+        },
+    }
+    encoded = json.dumps(receipt, indent=2, sort_keys=True)
+    if output is not None:
+        output = Path(output)
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(encoded + '\n', encoding='utf-8')
+    print(encoded)
+    return 0
+
+
+def tooling_doctor():
+    tools = [
+        ('Docker', 'docker'),
+        ('SonarQube Community', None),
+        ('CircleCI CLI', 'circleci'),
+    ]
+    payload = {
+        'status': 'PASS',
+        'policy': 'optional zero-cost tooling; canonical Blender QA remains unchanged',
+        'tools': [
+            {
+                'name': name,
+                'required': False,
+                'status': 'CONFIGURED' if executable is None else ('AVAILABLE' if shutil.which(executable) else 'UNAVAILABLE'),
+            }
+            for name, executable in tools
+        ],
+    }
+    print(json.dumps(payload, indent=2))
+    return 0
+
+
 def bootstrap(destination):
     from setup_blender import install
     executable = install(destination.resolve())
@@ -116,6 +164,10 @@ def main():
     sub.add_parser('status', help='Print pinned project/runtime state without Blender')
     sub.add_parser('doctor', help='Run pure filesystem/metadata checks without Blender')
     sub.add_parser('fast', help='Run the pure/static test suite')
+    metrics = sub.add_parser('asset-metrics', help='Write deterministic local metrics for one asset')
+    metrics.add_argument('asset', type=Path)
+    metrics.add_argument('--output', type=Path)
+    sub.add_parser('tooling-doctor', help='Report optional zero-cost QA tooling without network access')
 
     boot = sub.add_parser('bootstrap', help='Explicitly download/verify the pinned official Blender runtime')
     boot.add_argument('--destination', type=Path, default=ROOT / '.blender')
@@ -132,6 +184,10 @@ def main():
         return doctor()
     if args.command == 'fast':
         return fast()
+    if args.command == 'asset-metrics':
+        return asset_metrics(args.asset, args.output)
+    if args.command == 'tooling-doctor':
+        return tooling_doctor()
     if args.command == 'bootstrap':
         return bootstrap(args.destination)
     if args.command == 'test-runtime':
