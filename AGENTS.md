@@ -109,3 +109,17 @@ Before stopping a substantial task:
 - leave exact next steps, not vague prose.
 
 Evidence before claims. If the relevant test was not run in the current work session, do not state that it passes.
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues are used for this repository. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Triage vocabulary is configured in `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context layout. See `docs/agents/domain.md`.
