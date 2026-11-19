@@ -458,18 +458,23 @@ class AwfulModelViewer extends HTMLElement {
 }
 
 const styles = `
-  :host { display:block; min-height:720px; color:#ececec; font:12px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace; }
-  .shell { display:grid; grid-template-rows:auto minmax(560px,1fr) auto; min-height:720px; background:#0b0b0c; border:1px solid #252527; }
-  .toolbar { display:flex; flex-wrap:wrap; gap:6px; align-items:center; padding:8px; border-bottom:1px solid #252527; background:#111113; }
+  :host { display:block; min-width:0; min-height:720px; color:#ececec; font:12px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace; }
+  .shell { display:grid; min-width:0; grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(560px,1fr) auto; min-height:720px; background:#0b0b0c; border:1px solid #252527; }
+  .toolbar { display:flex; min-width:0; flex-wrap:wrap; gap:6px; align-items:center; padding:8px; border-bottom:1px solid #252527; background:#111113; }
   label { display:inline-flex; gap:5px; align-items:center; }
   button, select, input { font:inherit; color:#ececec; background:#19191c; border:1px solid #343438; border-radius:4px; }
   button, select { min-height:28px; padding:3px 7px; }
   input[type='range'] { width:92px; }
   input[type='color'] { width:32px; height:28px; padding:2px; }
   button:hover { background:#232328; }
-  .stage { position:relative; min-height:560px; overflow:hidden; background:#111; }
+  .stage { position:relative; min-width:0; min-height:560px; overflow:hidden; background:#111; }
   .stage canvas { display:block; width:100%; height:100%; min-height:560px; }
-  .meta { margin:0; padding:10px; border-top:1px solid #252527; white-space:pre-wrap; color:#a9a9ad; background:#0e0e10; }
+  .meta { min-width:0; margin:0; padding:10px; border-top:1px solid #252527; white-space:pre-wrap; overflow-wrap:anywhere; color:#a9a9ad; background:#0e0e10; }
+  @media (max-width:600px) {
+    :host { min-height:0; }
+    .shell { grid-template-rows:auto minmax(320px,50svh) auto; min-height:0; }
+    .stage, .stage canvas { min-height:320px; }
+  }
 `;
 
 if (!customElements.get(tagName)) customElements.define(tagName, AwfulModelViewer);
