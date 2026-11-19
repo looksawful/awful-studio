@@ -98,6 +98,34 @@ async function checkStory(id, assetId, expectedClips = []) {
   await page.close();
 }
 
+async function checkResponsiveViewer(id, assetId) {
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  try {
+    await page.goto(`http://127.0.0.1:${port}/iframe.html?id=${id}&viewMode=story`, { waitUntil: 'networkidle' });
+    const viewer = page.locator(`awful-model-viewer[data-model-loaded="${assetId}"]`);
+    await viewer.waitFor({ state: 'attached', timeout: 20000 });
+    for (const width of [320, 390, 768]) {
+      await page.setViewportSize({ width, height: 844 });
+      const sizes = await viewer.evaluate((element) => {
+        const shadow = element.shadowRoot;
+        return {
+          viewport: document.documentElement.clientWidth,
+          content: document.documentElement.scrollWidth,
+          toolbarRight: shadow.querySelector('.toolbar').getBoundingClientRect().right,
+          stageRight: shadow.querySelector('.stage').getBoundingClientRect().right,
+        };
+      });
+      if (sizes.content > sizes.viewport + 1 ||
+          sizes.toolbarRight > sizes.viewport + 1 ||
+          sizes.stageRight > sizes.viewport + 1) {
+        throw new Error(`${assetId}: horizontal overflow at ${width}px: ${JSON.stringify(sizes)}`);
+      }
+    }
+  } finally {
+    await page.close();
+  }
+}
+
 try {
   await checkStory('models-devices--i-phone-17', 'iphone-17-v30');
   await checkStory('models-devices--i-pad-pro-11', 'ipad-pro-11-m5-v6');
@@ -110,6 +138,7 @@ try {
   await checkStory('models-scenes--white-studio', 'white-studio-v2');
   await checkStory('models-scenes--dark-neon', 'dark-neon-v2');
   await checkStory('models-scenes--loft-daylight', 'loft-daylight-v2');
+  await checkResponsiveViewer('models-devices--i-phone-17', 'iphone-17-v30');
   console.log('Storybook model smoke passed: all 11 canonical assets');
 } finally {
   await browser.close();
